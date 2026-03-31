@@ -134,8 +134,13 @@ def monitor_and_log(llm_threshold=1, delta_threshold=1,
     # 2. Take the Original Screenshot (UPDATED WITH STEALTH)
     try:
         with sync_playwright() as p:
-            # Added slow_mo to act more human
-            browser = p.chromium.launch(headless=False, slow_mo=50)
+            # headless=False + stealth bypasses Cloudflare fingerprinting.
+            # RESIDENTIAL_PROXY routes browser traffic through a residential IP
+            # so datacenter runners (GitHub Actions) aren't blocked by Cloudflare.
+            _proxy_url = os.getenv("RESIDENTIAL_PROXY", "").strip()
+            _proxy_cfg = {"server": _proxy_url} if _proxy_url else None
+            browser = p.chromium.launch(headless=False, slow_mo=50,
+                                        proxy=_proxy_cfg)
 
             # Added realistic browser context/headers
             context = browser.new_context(

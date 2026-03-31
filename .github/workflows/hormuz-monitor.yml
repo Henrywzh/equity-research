@@ -1,0 +1,103 @@
+name: Hormuz Maritime Monitor
+
+on:
+  schedule:
+    - cron: '*/15 * * * *'   # every 15 minutes
+  workflow_dispatch:           # manual "Run workflow" button in GitHub UI
+
+jobs:
+  monitor:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write          # needed to push data commits back to repo
+
+    steps:
+      # ── 1. Checkout ────────────────────────────────────────────────────────
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      # ── 2. Python ──────────────────────────────────────────────────────────
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: 'pip'          # cache pip downloads — cuts install time ~60s → ~10s
+
+      # ── 3. System deps ─────────────────────────────────────────────────────
+      - name: Install system dependencies (Xvfb)
+        run: |
+          sudo apt-get update -q
+          sudo apt-get install -y xvfb
+
+      # ── 4. Python deps ─────────────────────────────────────────────────────
+      - name: Install Python dependencies
+        run: |
+          pip install \
+            playwright \
+            opencv-python-headless \
+            groq \
+            openai \
+            anthropic \
+            feedparser \
+            python-dotenv \
+            requests \
+            websockets \
+            playwright-stealth
+          playwright install chromium
+          playwright install-deps chromium
+
+      # ── 5. Write .config from GitHub Secrets ──────────────────────────────
+      # The .config file is gitignored — recreated fresh on every run from secrets.
+      - name: Write .config
+        run: |
+          cat > .config << EOF
+          GROK_API_KEY=${{ secrets.GROK_API_KEY }}
+          OPENROUTER_API_KEY=${{ secrets.OPENROUTER_API_KEY }}
+          ANTHROPIC_API_KEY=${{ secrets.ANTHROPIC_API_KEY }}
+          GMAIL_SENDER=${{ secrets.GMAIL_SENDER }}
+          GMAIL_APP_PASSWORD=${{ secrets.GMAIL_APP_PASSWORD }}
+          GMAIL_RECIPIENT=${{ secrets.GMAIL_RECIPIENT }}
+          RESIDENTIAL_PROXY=${{ secrets.RESIDENTIAL_PROXY }}
+          EOF
+
+      # ── 6. Virtual display ─────────────────────────────────────────────────
+      # headless=False requires a display. Xvfb creates a virtual one so
+      # Cloudflare sees a "real" browser launch, not a headless fingerprint.
+      - name: Start Xvfb virtual display
+        run: |
+          Xvfb :99 -screen 0 1920x1080x24 &
+          sleep 2
+
+      # ── 7. Run one monitoring cycle ────────────────────────────────────────
+      # RESIDENTIAL_PROXY routes browser traffic through a residential IP so
+      # Cloudflare doesn't block the Azure datacenter runner IP.
+      - name: Run one monitoring cycle
+        env:
+          DISPLAY: ":99"
+        run: |
+          cd marine-traffic-monitor
+          python run.py \
+            --iterations 1 \
+            --llm-threshold 1 \
+            --delta-threshold 1 \
+            --alert-cooldown 5
+
+      # ── 8. Persist data back to repo ──────────────────────────────────────
+      # Runners are stateless — commit updated CSV/state/audit files so the
+      # next run starts with the correct history and state.
+      # [skip ci] prevents this commit from triggering another workflow run.
+      - name: Commit updated data files
+        run: |
+          git config user.name  "hormuz-monitor[bot]"
+          git config user.email "hormuz-monitor[bot]@users.noreply.github.com"
+          git add \
+            marine-traffic-monitor/data/hormuz_traffic_log.csv \
+            marine-traffic-monitor/state/current_state.json \
+            marine-traffic-monitor/state/last_alert.json \
+            marine-traffic-monitor/state/rate_counters.json \
+            marine-traffic-monitor/logs/analyst_audit.jsonl
+          git diff --staged --quiet || \
+            git commit -m "data: monitor cycle $(date -u +%Y-%m-%dT%H:%M:%SZ) [skip ci]"
+          git push

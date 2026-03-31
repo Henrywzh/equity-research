@@ -43,6 +43,10 @@ parser.add_argument(
     dest="digest_hour",
     help="UTC hour to send daily digest email (default: 10 = 10:00 UTC)"
 )
+parser.add_argument(
+    "--iterations", type=int, default=None,
+    help="Number of cycles to run then exit (default: run continuously until Ctrl-C)"
+)
 args = parser.parse_args()
 
 # ── Tee stdout/stderr to a log file ──────────────────────────────────────────
@@ -98,7 +102,7 @@ print(f"[run.py]    Press Ctrl-C to stop\n")
 try:
     run_monitor(
         check_interval=args.interval,
-        iteration=5,
+        iteration=args.iterations,   # None = continuous, N = exit after N cycles
         llm_threshold=args.llm_threshold,
         delta_threshold=args.delta_threshold,
         alert_cooldown=args.alert_cooldown,
