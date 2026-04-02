@@ -3,6 +3,60 @@
 
 ---
 
+## Quickstart
+
+### 1. Set up the environment
+
+From the repository root:
+
+```bash
+python -m venv venv
+source venv/bin/activate
+pip install playwright opencv-python groq anthropic openai feedparser python-dotenv requests
+playwright install chromium
+```
+
+### 2. Configure API keys
+
+Create a `.config` file in the repository root:
+
+```bash
+GROQ_API_KEY=your_groq_api_key
+ANTHROPIC_API_KEY=your_anthropic_api_key
+OPENROUTER_API_KEY=your_openrouter_api_key
+
+GMAIL_SENDER=yourname@gmail.com
+GMAIL_APP_PASSWORD=your_gmail_app_password
+GMAIL_RECIPIENT=yourname@gmail.com
+```
+
+### 3. Run the monitor
+
+```bash
+cd marine-traffic-monitor
+python run.py
+```
+
+Common examples:
+
+```bash
+python run.py --interval 300 --llm-threshold 0 --delta-threshold 0 --alert-cooldown 0
+python run.py --interval 1800 --alert-cooldown 30
+```
+
+### 4. Test individual components
+
+Run these from inside `marine-traffic-monitor/`:
+
+```bash
+python policy_engine.py
+python news_fetcher.py
+python notifier.py --level ESCALATED
+python analyst.py --model consensus --count 4
+```
+
+---
+
 ## 1. Project Overview
 
 This system continuously monitors the **Strait of Hormuz** — one of the world's most geopolitically sensitive maritime chokepoints — for anomalous vessel activity. Every few minutes it:
