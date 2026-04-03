@@ -82,6 +82,7 @@ class TranscriptPayload:
     language: str | None
     text: str | None
     source: str | None
+    segments: list["TranscriptSegment"] = field(default_factory=list)
     error: str | None = None
 
 
@@ -112,4 +113,18 @@ class ArchivedItemSummary:
             "source_kind": self.source_kind,
             "transcript_status": self.transcript_status,
             "description_excerpt": self.description_excerpt,
+        }
+
+
+@dataclass(slots=True)
+class TranscriptSegment:
+    start_seconds: float
+    duration_seconds: float | None
+    text: str
+
+    def to_mapping(self) -> dict[str, Any]:
+        return {
+            "start_seconds": round(self.start_seconds, 3),
+            "duration_seconds": round(self.duration_seconds, 3) if self.duration_seconds is not None else None,
+            "text": self.text,
         }

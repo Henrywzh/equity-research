@@ -2,11 +2,14 @@ from __future__ import annotations
 
 from datetime import datetime, timezone
 from pathlib import Path
+from typing import TYPE_CHECKING
 
 from .config import get_config_path, get_data_dir, get_state_path
 from .models import ArchivedItemSummary, ChannelState, TranscriptPayload, VideoMetadata
 from .storage import load_channel_targets, load_state, save_state, write_archive
-from .youtube_client import YoutubeClient
+
+if TYPE_CHECKING:
+    from .youtube_client import YoutubeClient
 
 
 def run_sync(
@@ -16,6 +19,9 @@ def run_sync(
     data_dir: str | Path | None = None,
     client: YoutubeClient | None = None,
 ) -> dict[str, object]:
+    if client is None:
+        from .youtube_client import YoutubeClient
+
     resolved_config_path = get_config_path(config_path)
     resolved_state_path = get_state_path(state_path)
     resolved_data_dir = get_data_dir(data_dir)
@@ -34,6 +40,8 @@ def run_sync(
         "archived_count": 0,
         "bootstrap_count": 0,
         "transcript_unavailable_count": 0,
+        "analysis_result_path": None,
+        "analysis_artifact_dir": None,
         "channels": {},
         "errors": [],
         "new_items": [],
@@ -120,6 +128,9 @@ def run_smoke(
     config_path: str | Path | None = None,
     client: YoutubeClient | None = None,
 ) -> dict[str, object]:
+    if client is None:
+        from .youtube_client import YoutubeClient
+
     resolved_config_path = get_config_path(config_path)
     channels = [channel for channel in load_channel_targets(resolved_config_path) if channel.enabled]
     if not channels:

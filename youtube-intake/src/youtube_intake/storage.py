@@ -63,6 +63,7 @@ def write_archive(
     payload = {
         "archived_at": archived_at,
         "source_kind": video.source_kind,
+        "analysis_input_basis": "transcript" if transcript.segments or transcript.text else "metadata_only",
         "channel": {
             "slug": channel.slug,
             "handle": channel.handle,
@@ -87,8 +88,21 @@ def write_archive(
         "transcript_status": transcript.status,
         "transcript_language": transcript.language,
         "transcript_text": transcript.text,
+        "transcript_segments": [segment.to_mapping() for segment in transcript.segments],
         "transcript_source": transcript.source,
         "error": transcript.error,
     }
-    archive_path.write_text(json.dumps(payload, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+    write_json_document(archive_path, payload)
     return archive_path
+
+
+def load_json_document(path: str | Path) -> dict:
+    resolved = Path(path).expanduser().resolve()
+    return json.loads(resolved.read_text(encoding="utf-8"))
+
+
+def write_json_document(path: str | Path, payload: dict) -> Path:
+    resolved = Path(path).expanduser().resolve()
+    resolved.parent.mkdir(parents=True, exist_ok=True)
+    resolved.write_text(json.dumps(payload, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+    return resolved

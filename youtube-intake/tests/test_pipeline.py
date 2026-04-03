@@ -5,7 +5,7 @@ import tempfile
 import unittest
 from pathlib import Path
 
-from youtube_intake.models import ChannelState, FlatPlaylistEntry, TranscriptPayload, VideoMetadata
+from youtube_intake.models import ChannelState, FlatPlaylistEntry, TranscriptPayload, TranscriptSegment, VideoMetadata
 from youtube_intake.pipeline import run_sync
 from youtube_intake.storage import save_state
 
@@ -45,7 +45,13 @@ class FakeYoutubeClient:
         self.transcript_calls.append(video.video_id)
         return self.transcript_by_id.get(
             video.video_id,
-            TranscriptPayload(status="fetched", language="en", text=f"Transcript for {video.video_id}", source="fake"),
+            TranscriptPayload(
+                status="fetched",
+                language="en",
+                text=f"Transcript for {video.video_id}",
+                source="fake",
+                segments=[TranscriptSegment(start_seconds=0.0, duration_seconds=5.0, text=f"Transcript for {video.video_id}")],
+            ),
         )
 
 
@@ -113,6 +119,11 @@ class PipelineTests(unittest.TestCase):
         self.assertTrue((self.data_dir / "youtube" / "top3pct" / "videos" / "new-video.json").exists())
         self.assertFalse((self.data_dir / "youtube" / "top3pct" / "videos" / "old-video.json").exists())
         self.assertTrue((self.data_dir / "youtube" / "meitou-news" / "videos" / "news-new.json").exists())
+        archived_payload = json.loads(
+            (self.data_dir / "youtube" / "top3pct" / "videos" / "new-video.json").read_text(encoding="utf-8")
+        )
+        self.assertEqual(archived_payload["analysis_input_basis"], "transcript")
+        self.assertEqual(archived_payload["transcript_segments"][0]["start_seconds"], 0.0)
 
         state_payload = json.loads(self.state_path.read_text(encoding="utf-8"))
         self.assertEqual(state_payload["top3pct"]["last_processed_video_id"], "new-video")
@@ -148,6 +159,7 @@ class PipelineTests(unittest.TestCase):
                     language=None,
                     text=None,
                     source=None,
+                    segments=[],
                     error="no captions",
                 )
             },

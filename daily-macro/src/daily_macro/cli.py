@@ -4,6 +4,7 @@ import argparse
 import json
 import logging
 
+from .analysis import run_analysis
 from .config import DEFAULT_RETENTION_DAYS, get_db_path
 from .pipeline import cleanup_old_snapshots, run_scrape, run_smoke
 from .storage import Storage
@@ -17,15 +18,24 @@ def build_parser() -> argparse.ArgumentParser:
     scrape_parser.add_argument("--data-dir", default=None, help="Override the data directory.")
     scrape_parser.add_argument("--db-path", default=None, help="Override the SQLite database path.")
 
-    cleanup_parser = subparsers.add_parser("cleanup", help="Remove old raw HTML snapshots.")
+    cleanup_parser = subparsers.add_parser("cleanup", help="Remove old parsed JSON backups.")
     cleanup_parser.add_argument("--data-dir", default=None, help="Override the data directory.")
     cleanup_parser.add_argument("--db-path", default=None, help="Override the SQLite database path.")
     cleanup_parser.add_argument(
         "--retention-days",
         type=int,
         default=DEFAULT_RETENTION_DAYS,
-        help="Number of days of raw HTML snapshots to retain.",
+        help="Number of days of parsed JSON backups to retain.",
     )
+
+    analyze_parser = subparsers.add_parser("analyze", help="Analyze stored daily articles with Groq.")
+    analyze_parser.add_argument("target", choices=["today"], help="Analyze the requested daily article set.")
+    analyze_parser.add_argument("--date", default=None, help="Override the target date in YYYY-MM-DD format.")
+    analyze_parser.add_argument("--json", action="store_true", help="Print the generated report as JSON.")
+    analyze_parser.add_argument("--force", action="store_true", help="Regenerate the report even if it already exists.")
+    analyze_parser.add_argument("--verbose", action="store_true", help="Enable detailed analysis diagnostics logging.")
+    analyze_parser.add_argument("--data-dir", default=None, help="Override the data directory.")
+    analyze_parser.add_argument("--db-path", default=None, help="Override the SQLite database path.")
 
     smoke_parser = subparsers.add_parser("smoke", help="Validate homepage parsing without writing data.")
     smoke_parser.add_argument("--json", action="store_true", help="Print the result as JSON.")
@@ -67,6 +77,9 @@ def main(argv: list[str] | None = None) -> int:
     parser = build_parser()
     args = parser.parse_args(argv)
 
+    if args.command == "analyze" and args.verbose:
+        logging.getLogger("daily_macro.analysis").setLevel(logging.DEBUG)
+
     if args.command == "scrape":
         result = run_scrape(data_dir=args.data_dir, db_path=args.db_path)
         print(json.dumps(result, ensure_ascii=False, indent=2))
@@ -91,6 +104,19 @@ def main(argv: list[str] | None = None) -> int:
             print(f"Top hero: {result['head_titles'][0]}")
             print(f"Latest first: {result['latest_first_title']}")
         return 0
+
+    if args.command == "analyze":
+        result = run_analysis(
+            date_string=args.date,
+            data_dir=args.data_dir,
+            db_path=args.db_path,
+            force=args.force,
+        )
+        if args.json:
+            print(json.dumps(result, ensure_ascii=False, indent=2))
+        else:
+            _print_analysis_result(result)
+        return 0 if result["status"] != "failed" else 1
 
     if args.command == "inspect":
         result = inspect_latest_run(
@@ -234,3 +260,29 @@ def _print_query_article_result(result: dict[str, object]) -> None:
     latest_backup = item.get("latest_backup")
     if latest_backup:
         print(f"Latest backup: {latest_backup['relative_path']}")
+
+
+def _print_analysis_result(result: dict[str, object]) -> None:
+    print(f"Report date: {result['report_date']}")
+    print(f"Status: {result['status']}")
+    print(f"Primary model: {result['model']['provider']}/{result['model']['primary_model']}")
+    print(f"Fallback model: {result['model']['provider']}/{result['model']['fallback_model']}")
+    print(f"Articles analyzed: {result['totals']['article_count']}")
+    print(f"Categories: {result['input']['category_count']}")
+    print(f"Full-text articles: {result['totals']['full_text_article_count']}")
+    print(f"Truncated articles: {result['totals']['truncated_article_count']}")
+    print(f"Model switches: {len(result.get('model_switches', []))}")
+    diagnostics = result.get("diagnostics") or {}
+    if diagnostics:
+        print(
+            f"Rate-limit waits: {diagnostics.get('rate_limit_wait_count', 0)} "
+            f"({diagnostics.get('rate_limit_wait_seconds_total', 0)}s)"
+        )
+        print(
+            "Batch splits: "
+            f"pre-send={diagnostics.get('pre_send_split_count', 0)}, "
+            f"after-413={diagnostics.get('response_413_split_count', 0)}"
+        )
+    if result.get("cached"):
+        print("Used cached report: yes")
+    print(f"Output: {result['output_path']}")

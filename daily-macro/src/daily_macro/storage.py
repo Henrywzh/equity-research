@@ -271,6 +271,25 @@ class Storage:
     def fetch_articles_by_date(self, date_string: str) -> list[dict[str, Any]]:
         return self.fetch_articles_by_date_with_limit(date_string)
 
+    def fetch_published_articles_for_date(
+        self,
+        date_string: str,
+        *,
+        source_site: str | None = None,
+    ) -> list[dict[str, Any]]:
+        sql = """
+            SELECT *
+            FROM articles
+            WHERE substr(published_at, 1, 10) = ?
+        """
+        params: list[Any] = [date_string]
+        if source_site is not None:
+            sql += " AND source_site = ?"
+            params.append(source_site)
+        sql += " ORDER BY published_at DESC, id DESC"
+        rows = self.connection.execute(sql, params).fetchall()
+        return [dict(row) for row in rows]
+
     def fetch_articles_by_date_with_limit(self, date_string: str, limit: int | None = None) -> list[dict[str, Any]]:
         sql = """
             SELECT *

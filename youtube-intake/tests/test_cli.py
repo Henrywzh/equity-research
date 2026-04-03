@@ -37,6 +37,28 @@ class CliTests(unittest.TestCase):
             data_dir=None,
         )
 
+    def test_analyze_passes_expected_paths(self) -> None:
+        with patch(
+            "youtube_intake.cli.analyze_run",
+            return_value={"status": "success", "videos": [], "run_summary": {}, "errors": []},
+        ) as mock_analyze_run:
+            exit_code = main(
+                [
+                    "analyze",
+                    "--result-path",
+                    "/tmp/run-result.json",
+                    "--analysis-result-path",
+                    "/tmp/analysis-result.json",
+                ]
+            )
+
+        self.assertEqual(exit_code, 0)
+        mock_analyze_run.assert_called_once_with(
+            result_path="/tmp/run-result.json",
+            analysis_result_path="/tmp/analysis-result.json",
+            data_dir=None,
+        )
+
 
 if __name__ == "__main__":
     unittest.main()

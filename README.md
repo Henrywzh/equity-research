@@ -30,7 +30,7 @@ See [marine-traffic-monitor/PROJECT_README.md](/Users/henrywzh/Desktop/Quant/equ
 
 ### `youtube-intake/`
 
-A scheduled YouTube intake and Gmail delivery project for finance and market research workflows. It monitors configured channels, archives new videos and livestream replays into repo-backed JSON artifacts, and can send one compact Gmail summary per run when new content appears.
+A scheduled YouTube intake, transcript archiving, Groq-based video analysis, and Gmail delivery project for finance and market research workflows. It monitors configured channels, archives new videos and livestream replays into repo-backed JSON artifacts, produces per-video and run-level analyst summaries, and can send one compact Gmail digest when new content appears.
 
 See [youtube-intake/README.md](/Users/henrywzh/Desktop/Quant/equity-research/youtube-intake/README.md) for commands, local config setup, and GitHub Actions email delivery details.
 
@@ -58,5 +58,6 @@ Start from the subproject you want to work on:
 - For daily news scraping and structured storage, go to [daily-macro/README.md](/Users/henrywzh/Desktop/Quant/equity-research/daily-macro/README.md)
 - For the maritime monitor, go to [marine-traffic-monitor/PROJECT_README.md](/Users/henrywzh/Desktop/Quant/equity-research/marine-traffic-monitor/PROJECT_README.md)
 - For scheduled YouTube channel intake and Gmail summaries, go to [youtube-intake/README.md](/Users/henrywzh/Desktop/Quant/equity-research/youtube-intake/README.md)
+- For scheduled YouTube channel intake, Groq analysis, and Gmail delivery, go to [youtube-intake/README.md](/Users/henrywzh/Desktop/Quant/equity-research/youtube-intake/README.md)
 
 This root README is intentionally broad. Project-specific setup, commands, and operational details live inside each subfolder’s own documentation.

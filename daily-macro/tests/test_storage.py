@@ -288,6 +288,28 @@ class StorageTests(unittest.TestCase):
         self.assertEqual(fetched["title"], "Iran market update")
         self.assertIsNotNone(fetched["latest_backup"])
 
+    def test_fetch_published_articles_for_date_uses_published_at_and_source_filter(self) -> None:
+        seen_at = "2026-04-03T00:00:00+00:00"
+        article = self._build_article("https://www.hkej.com/instantnews/current/article/1234/story")
+        other_source_article = self._build_article("https://example.com/other")
+        other_source_article.source_site = "other-source"
+        other_source_article.source_article_id = "5678"
+        other_source_article.title = "Other Source"
+        unpublished_article = self._build_article("https://www.hkej.com/instantnews/current/article/9999/story")
+        unpublished_article.source_article_id = "9999"
+        unpublished_article.title = "No Published Date"
+        unpublished_article.published_at = None
+
+        self.storage.upsert_article(article, seen_at)
+        self.storage.upsert_article(other_source_article, seen_at)
+        self.storage.upsert_article(unpublished_article, seen_at)
+
+        published = self.storage.fetch_published_articles_for_date("2026-04-03", source_site="hkej")
+
+        self.assertEqual(len(published), 1)
+        self.assertEqual(published[0]["source_site"], "hkej")
+        self.assertEqual(published[0]["title"], "Example Article")
+
 
 if __name__ == "__main__":
     unittest.main()

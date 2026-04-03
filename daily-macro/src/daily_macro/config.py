@@ -50,3 +50,7 @@ def get_raw_html_dir(custom_data_dir: str | Path | None = None) -> Path:
 
 def get_article_backup_dir(custom_data_dir: str | Path | None = None) -> Path:
     return get_data_dir(custom_data_dir) / "article_backups"
+
+
+def get_analysis_dir(custom_data_dir: str | Path | None = None) -> Path:
+    return get_data_dir(custom_data_dir) / "analyses"

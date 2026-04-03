@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import io
 import json
+import logging
 import tempfile
 import unittest
 from contextlib import redirect_stdout
@@ -64,6 +65,109 @@ class CliTests(unittest.TestCase):
         payload = json.loads(buffer.getvalue())
         self.assertEqual(payload["latest_run"]["id"], 3)
         self.assertEqual(payload["recent_items"][0]["title"], "Top story")
+
+    def test_analyze_json_output(self) -> None:
+        with patch(
+            "daily_macro.cli.run_analysis",
+            return_value={
+                "report_date": "2026-04-03",
+                "status": "success",
+                "model": {
+                    "provider": "groq",
+                    "primary_model": "qwen/qwen3-32b",
+                    "fallback_model": "llama-3.1-8b-instant",
+                },
+                "model_switches": [],
+                "input": {"article_count": 2, "category_count": 1},
+                "totals": {
+                    "article_count": 2,
+                    "full_text_article_count": 2,
+                    "truncated_article_count": 0,
+                },
+                "output_path": "/tmp/report.json",
+            },
+        ):
+            buffer = io.StringIO()
+            with redirect_stdout(buffer):
+                exit_code = main(["analyze", "today", "--json"])
+
+        self.assertEqual(exit_code, 0)
+        payload = json.loads(buffer.getvalue())
+        self.assertEqual(payload["report_date"], "2026-04-03")
+        self.assertEqual(payload["model"]["primary_model"], "qwen/qwen3-32b")
+
+    def test_analyze_default_output(self) -> None:
+        with patch(
+            "daily_macro.cli.run_analysis",
+            return_value={
+                "report_date": "2026-04-03",
+                "status": "partial",
+                "model": {
+                    "provider": "groq",
+                    "primary_model": "qwen/qwen3-32b",
+                    "fallback_model": "llama-3.1-8b-instant",
+                },
+                "model_switches": [{"from_model": "qwen/qwen3-32b", "to_model": "llama-3.1-8b-instant"}],
+                "input": {"article_count": 3, "category_count": 2},
+                "diagnostics": {
+                    "rate_limit_wait_count": 1,
+                    "rate_limit_wait_seconds_total": 12.5,
+                    "pre_send_split_count": 2,
+                    "response_413_split_count": 1,
+                },
+                "totals": {
+                    "article_count": 3,
+                    "full_text_article_count": 2,
+                    "truncated_article_count": 1,
+                },
+                "output_path": "/tmp/report.json",
+                "cached": False,
+            },
+        ):
+            buffer = io.StringIO()
+            with redirect_stdout(buffer):
+                exit_code = main(["analyze", "today"])
+
+        self.assertEqual(exit_code, 0)
+        output = buffer.getvalue()
+        self.assertIn("Report date: 2026-04-03", output)
+        self.assertIn("Truncated articles: 1", output)
+        self.assertIn("Model switches: 1", output)
+        self.assertIn("Rate-limit waits: 1 (12.5s)", output)
+        self.assertIn("Batch splits: pre-send=2, after-413=1", output)
+
+    def test_analyze_verbose_sets_analysis_logger_to_debug(self) -> None:
+        logger = logging.getLogger("daily_macro.analysis")
+        previous_level = logger.level
+        try:
+            logger.setLevel(logging.NOTSET)
+            with patch(
+                "daily_macro.cli.run_analysis",
+                return_value={
+                    "report_date": "2026-04-03",
+                    "status": "success",
+                    "model": {
+                        "provider": "groq",
+                        "primary_model": "qwen/qwen3-32b",
+                        "fallback_model": "llama-3.1-8b-instant",
+                    },
+                    "model_switches": [],
+                    "input": {"article_count": 1, "category_count": 1},
+                    "diagnostics": {},
+                    "totals": {
+                        "article_count": 1,
+                        "full_text_article_count": 1,
+                        "truncated_article_count": 0,
+                    },
+                    "output_path": "/tmp/report.json",
+                },
+            ):
+                exit_code = main(["analyze", "today", "--verbose"])
+
+            self.assertEqual(exit_code, 0)
+            self.assertEqual(logger.level, logging.DEBUG)
+        finally:
+            logger.setLevel(previous_level)
 
     def test_inspect_default_returns_zero_with_empty_db(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
