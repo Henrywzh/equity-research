@@ -25,12 +25,14 @@ From inside `daily-macro/`:
 PYTHONPATH=src python -m daily_macro smoke --json
 PYTHONPATH=src python -m daily_macro scrape
 PYTHONPATH=src python -m daily_macro cleanup --retention-days 30
+PYTHONPATH=src python -m daily_macro inspect
 ```
 
 What they do:
 - `smoke`: validate that the homepage structure can still be parsed
 - `scrape`: fetch the homepage and article pages, then persist normalized data
 - `cleanup`: remove old parsed JSON backups based on retention
+- `inspect`: show a quick overview of the latest scrape run and a short list of recent items
 
 ## Data Layout
 

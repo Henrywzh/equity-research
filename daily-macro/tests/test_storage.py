@@ -191,6 +191,67 @@ class StorageTests(unittest.TestCase):
         self.assertEqual(len(payload["placements"]), 2)
         self.assertEqual(payload["placements"][0]["collection"], "head_news")
 
+    def test_latest_run_inspect_helpers(self) -> None:
+        run_id = self.storage.start_run("2026-04-03T00:00:00+00:00")
+        article_id = self.storage.upsert_article(
+            self._build_article("https://www.hkej.com/instantnews/current/article/1234/story"),
+            "2026-04-03T00:00:00+00:00",
+        )
+        self.storage.record_placement(
+            article_id,
+            run_id,
+            PlacementCandidate(
+                collection="head_news",
+                rank=1,
+                title="Hero",
+                url="https://www.hkej.com/instantnews/current/article/1234/story",
+                homepage_section="時事脈搏",
+            ),
+            "2026-04-03T00:00:00+00:00",
+        )
+        self.storage.record_placement(
+            article_id,
+            run_id,
+            PlacementCandidate(
+                collection="latest",
+                rank=1,
+                title="Latest",
+                url="https://www.hkej.com/instantnews/current/article/1234/story",
+                homepage_section="時事脈搏",
+            ),
+            "2026-04-03T00:00:00+00:00",
+        )
+        self.storage.record_backup(
+            run_id,
+            "parsed_article_json",
+            "2026/04/03/run_1/article-1234.json",
+            "hash",
+            "2026-04-03T00:00:00+00:00",
+            article_id=article_id,
+        )
+        self.storage.finish_run(
+            run_id,
+            finished_at="2026-04-03T00:10:00+00:00",
+            status="success",
+            article_count=1,
+            placement_count=2,
+        )
+
+        latest_run = self.storage.fetch_latest_run()
+        totals = self.storage.fetch_total_counts()
+        run_backup_count = self.storage.fetch_latest_run_backup_count(run_id)
+        recent_items = self.storage.fetch_latest_run_items(run_id, limit=5)
+
+        self.assertIsNotNone(latest_run)
+        self.assertEqual(latest_run["id"], run_id)
+        self.assertEqual(totals["article_count"], 1)
+        self.assertEqual(totals["backup_count"], 1)
+        self.assertEqual(run_backup_count, 1)
+        self.assertEqual(len(recent_items), 2)
+        self.assertEqual(recent_items[0]["collection"], "head_news")
+        self.assertEqual(recent_items[0]["rank"], 1)
+        self.assertEqual(recent_items[1]["collection"], "latest")
+
 
 if __name__ == "__main__":
     unittest.main()

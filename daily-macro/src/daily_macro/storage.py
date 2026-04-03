@@ -331,3 +331,46 @@ class Storage:
                 (source_article_id,),
             ).fetchone()
         return dict(row) if row is not None else None
+
+    def fetch_total_counts(self) -> dict[str, int]:
+        article_count = self.connection.execute("SELECT COUNT(*) FROM articles").fetchone()[0]
+        backup_count = self.connection.execute("SELECT COUNT(*) FROM article_backups").fetchone()[0]
+        return {
+            "article_count": int(article_count),
+            "backup_count": int(backup_count),
+        }
+
+    def fetch_latest_run_backup_count(self, run_id: int) -> int:
+        count = self.connection.execute(
+            "SELECT COUNT(*) FROM article_backups WHERE run_id = ?",
+            (run_id,),
+        ).fetchone()[0]
+        return int(count)
+
+    def fetch_latest_run_items(self, run_id: int, limit: int = 5) -> list[dict[str, Any]]:
+        rows = self.connection.execute(
+            """
+            SELECT
+                article_placements.collection,
+                article_placements.rank,
+                article_placements.collected_at,
+                articles.title,
+                articles.canonical_url,
+                articles.article_section,
+                articles.published_at
+            FROM article_placements
+            JOIN articles ON articles.id = article_placements.article_id
+            WHERE article_placements.run_id = ?
+            ORDER BY
+                CASE article_placements.collection
+                    WHEN 'head_news' THEN 0
+                    WHEN 'latest' THEN 1
+                    ELSE 2
+                END,
+                article_placements.rank ASC,
+                article_placements.id ASC
+            LIMIT ?
+            """,
+            (run_id, limit),
+        ).fetchall()
+        return [dict(row) for row in rows]

@@ -2,11 +2,13 @@ from __future__ import annotations
 
 import io
 import json
+import tempfile
 import unittest
 from contextlib import redirect_stdout
 from unittest.mock import patch
 
 from daily_macro.cli import main
+from daily_macro.storage import Storage
 
 
 class CliTests(unittest.TestCase):
@@ -44,6 +46,37 @@ class CliTests(unittest.TestCase):
 
         self.assertEqual(exit_code, 0)
         mock_run_scrape.assert_called_once_with(data_dir="/tmp/data", db_path="/tmp/data/news.sqlite")
+
+    def test_inspect_json_output(self) -> None:
+        with patch(
+            "daily_macro.cli.inspect_latest_run",
+            return_value={
+                "latest_run": {"id": 3, "status": "success", "article_count": 10, "placement_count": 10, "backup_count": 10},
+                "totals": {"article_count": 15, "backup_count": 15},
+                "recent_items": [{"collection": "head_news", "rank": 1, "title": "Top story", "canonical_url": "https://example.com"}],
+            },
+        ):
+            buffer = io.StringIO()
+            with redirect_stdout(buffer):
+                exit_code = main(["inspect", "--json"])
+
+        self.assertEqual(exit_code, 0)
+        payload = json.loads(buffer.getvalue())
+        self.assertEqual(payload["latest_run"]["id"], 3)
+        self.assertEqual(payload["recent_items"][0]["title"], "Top story")
+
+    def test_inspect_default_returns_zero_with_empty_db(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            db_path = f"{tmp}/news.sqlite"
+            storage = Storage(db_path)
+            storage.close()
+
+            buffer = io.StringIO()
+            with redirect_stdout(buffer):
+                exit_code = main(["inspect", "--db-path", db_path])
+
+        self.assertEqual(exit_code, 0)
+        self.assertIn("No scrape runs found.", buffer.getvalue())
 
 
 if __name__ == "__main__":
