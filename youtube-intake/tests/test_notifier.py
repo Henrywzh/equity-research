@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+import os
 import tempfile
 import unittest
 from email import message_from_string
@@ -11,6 +12,10 @@ from youtube_intake.notifier import (
     GMAIL_APP_PASSWORD_ENV,
     GMAIL_RECIPIENT_ENV,
     GMAIL_SENDER_ENV,
+    LEGACY_GMAIL_APP_PASSWORD_ENV,
+    LEGACY_GMAIL_RECIPIENT_ENV,
+    LEGACY_GMAIL_SENDER_ENV,
+    _merge_config_file,
     load_run_result,
     send_run_summary_email,
     send_test_email,
@@ -98,8 +103,28 @@ class NotifierTests(unittest.TestCase):
 
     def test_missing_credentials_raises_when_send_needed(self) -> None:
         with patch.dict("os.environ", {}, clear=True):
-            with self.assertRaises(RuntimeError):
-                send_run_summary_email(self.summary)
+            with patch("youtube_intake.notifier._load_local_config", return_value=None):
+                with self.assertRaises(RuntimeError):
+                    send_run_summary_email(self.summary)
+
+    def test_local_config_file_can_supply_legacy_names(self) -> None:
+        with tempfile.TemporaryDirectory() as temp_dir:
+            config_path = Path(temp_dir) / ".config"
+            config_path.write_text(
+                "\n".join(
+                    [
+                        f"{LEGACY_GMAIL_SENDER_ENV}=sender@example.com",
+                        f"{LEGACY_GMAIL_APP_PASSWORD_ENV}=app-password",
+                        f"{LEGACY_GMAIL_RECIPIENT_ENV}=recipient@example.com",
+                    ]
+                ),
+                encoding="utf-8",
+            )
+            with patch.dict("os.environ", {}, clear=True):
+                _merge_config_file(config_path)
+                self.assertEqual(os.getenv(LEGACY_GMAIL_SENDER_ENV), "sender@example.com")
+                self.assertEqual(os.getenv(LEGACY_GMAIL_APP_PASSWORD_ENV), "app-password")
+                self.assertEqual(os.getenv(LEGACY_GMAIL_RECIPIENT_ENV), "recipient@example.com")
 
     def test_load_run_result_reads_json(self) -> None:
         with tempfile.TemporaryDirectory() as temp_dir:

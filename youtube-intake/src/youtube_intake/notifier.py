@@ -12,6 +12,12 @@ from typing import Any
 GMAIL_SENDER_ENV = "YOUTUBE_INTAKE_GMAIL_SENDER"
 GMAIL_APP_PASSWORD_ENV = "YOUTUBE_INTAKE_GMAIL_APP_PASSWORD"
 GMAIL_RECIPIENT_ENV = "YOUTUBE_INTAKE_GMAIL_RECIPIENT"
+LEGACY_GMAIL_SENDER_ENV = "GMAIL_SENDER"
+LEGACY_GMAIL_APP_PASSWORD_ENV = "GMAIL_APP_PASSWORD"
+LEGACY_GMAIL_RECIPIENT_ENV = "GMAIL_RECIPIENT"
+
+_REPO_ROOT = Path(__file__).resolve().parents[3]
+_PROJECT_ROOT = Path(__file__).resolve().parents[2]
 
 
 def load_run_result(result_path: str | Path) -> dict[str, Any]:
@@ -24,13 +30,12 @@ def send_run_summary_email(summary: dict[str, Any]) -> tuple[bool, str]:
     if not new_items:
         return False, "No new items to email."
 
-    sender = os.getenv(GMAIL_SENDER_ENV, "").strip()
-    app_password = os.getenv(GMAIL_APP_PASSWORD_ENV, "").strip()
-    recipient = os.getenv(GMAIL_RECIPIENT_ENV, "").strip()
+    sender, app_password, recipient = _get_gmail_credentials()
     if not sender or not app_password or not recipient:
         raise RuntimeError(
-            "Gmail credentials not set. Expected "
-            f"{GMAIL_SENDER_ENV}, {GMAIL_APP_PASSWORD_ENV}, and {GMAIL_RECIPIENT_ENV}."
+            "Gmail credentials not set. Expected either "
+            f"{GMAIL_SENDER_ENV}, {GMAIL_APP_PASSWORD_ENV}, and {GMAIL_RECIPIENT_ENV} "
+            "or local .config equivalents."
         )
 
     msg = MIMEMultipart("alternative")
@@ -170,3 +175,37 @@ def _escape_html(value: str) -> str:
         .replace(">", "&gt;")
         .replace('"', "&quot;")
     )
+
+
+def _get_gmail_credentials() -> tuple[str, str, str]:
+    _load_local_config()
+
+    sender = _read_env(GMAIL_SENDER_ENV, LEGACY_GMAIL_SENDER_ENV)
+    app_password = _read_env(GMAIL_APP_PASSWORD_ENV, LEGACY_GMAIL_APP_PASSWORD_ENV)
+    recipient = _read_env(GMAIL_RECIPIENT_ENV, LEGACY_GMAIL_RECIPIENT_ENV)
+    return sender, app_password, recipient
+
+
+def _read_env(primary: str, legacy: str) -> str:
+    return os.getenv(primary, "").strip() or os.getenv(legacy, "").strip()
+
+
+def _load_local_config() -> None:
+    for path in (_REPO_ROOT / ".config", _PROJECT_ROOT / ".config"):
+        _merge_config_file(path)
+
+
+def _merge_config_file(path: Path) -> None:
+    if not path.exists():
+        return
+
+    for raw_line in path.read_text(encoding="utf-8").splitlines():
+        line = raw_line.strip()
+        if not line or line.startswith("#") or "=" not in line:
+            continue
+        key, value = line.split("=", 1)
+        key = key.strip()
+        value = value.strip().strip("'").strip('"')
+        if not key:
+            continue
+        os.environ.setdefault(key, value)

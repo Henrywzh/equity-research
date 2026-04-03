@@ -36,3 +36,24 @@ Use a Gmail App Password, not your normal password:
 4. Store the 16-character password in `YOUTUBE_INTAKE_GMAIL_APP_PASSWORD`.
 
 The workflow sends one compact Gmail summary per run only when new videos were archived.
+
+For local runs, you can also use an untracked `.config` file at either:
+
+- repo root: `/Users/henrywzh/Desktop/Quant/equity-research/.config`
+- project root: `/Users/henrywzh/Desktop/Quant/equity-research/youtube-intake/.config`
+
+Supported local keys:
+
+```bash
+YOUTUBE_INTAKE_GMAIL_SENDER=yourname@gmail.com
+YOUTUBE_INTAKE_GMAIL_APP_PASSWORD=your_app_password
+YOUTUBE_INTAKE_GMAIL_RECIPIENT=yourname@gmail.com
+```
+
+For convenience, local `.config` loading also accepts the legacy generic names:
+
+```bash
+GMAIL_SENDER=yourname@gmail.com
+GMAIL_APP_PASSWORD=your_app_password
+GMAIL_RECIPIENT=yourname@gmail.com
+```

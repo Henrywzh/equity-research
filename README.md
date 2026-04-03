@@ -28,6 +28,12 @@ A project-specific maritime OSINT monitor for the Strait of Hormuz. It combines 
 
 See [marine-traffic-monitor/PROJECT_README.md](/Users/henrywzh/Desktop/Quant/equity-research/marine-traffic-monitor/PROJECT_README.md) for the full project guide.
 
+### `youtube-intake/`
+
+A scheduled YouTube intake and Gmail delivery project for finance and market research workflows. It monitors configured channels, archives new videos and livestream replays into repo-backed JSON artifacts, and can send one compact Gmail summary per run when new content appears.
+
+See [youtube-intake/README.md](/Users/henrywzh/Desktop/Quant/equity-research/youtube-intake/README.md) for commands, local config setup, and GitHub Actions email delivery details.
+
 ### Shared or supporting files
 
 - `models.py`: model registry / shared model-selection utilities used by some experiments
@@ -39,6 +45,7 @@ See [marine-traffic-monitor/PROJECT_README.md](/Users/henrywzh/Desktop/Quant/equ
 equity-research/
 ├── daily-macro/              # Daily news scraping and structured storage
 ├── marine-traffic-monitor/   # Maritime monitoring and alerting workflow
+├── youtube-intake/           # YouTube channel intake and Gmail delivery
 ├── not_in_use/               # Archived or inactive experiments
 ├── models.py                 # Shared model-selection utilities
 └── README.md                 # Repo-level overview
@@ -50,5 +57,6 @@ Start from the subproject you want to work on:
 
 - For daily news scraping and structured storage, go to [daily-macro/README.md](/Users/henrywzh/Desktop/Quant/equity-research/daily-macro/README.md)
 - For the maritime monitor, go to [marine-traffic-monitor/PROJECT_README.md](/Users/henrywzh/Desktop/Quant/equity-research/marine-traffic-monitor/PROJECT_README.md)
+- For scheduled YouTube channel intake and Gmail summaries, go to [youtube-intake/README.md](/Users/henrywzh/Desktop/Quant/equity-research/youtube-intake/README.md)
 
 This root README is intentionally broad. Project-specific setup, commands, and operational details live inside each subfolder’s own documentation.
