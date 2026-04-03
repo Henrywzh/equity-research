@@ -41,6 +41,18 @@ def run_scrape(
     try:
         homepage_html = fetch_text(session, adapter.homepage_url)
         placements = adapter.parse_homepage(homepage_html)
+        latest_rank = sum(1 for item in placements if item.collection == "latest") + 1
+        page_number = 2
+        while True:
+            latest_page_url = f"https://www.hkej.com/instantnews/index?page={page_number}"
+            latest_page_html = fetch_text(session, latest_page_url)
+            latest_snapshot = adapter.parse_latest_page(latest_page_html, start_rank=latest_rank)
+            if latest_snapshot.active_title != "最新":
+                break
+            placements.extend(latest_snapshot.items)
+            latest_rank += len(latest_snapshot.items)
+            page_number += 1
+
         grouped = _group_placements_by_url(placements)
 
         for url, related_placements in grouped.items():

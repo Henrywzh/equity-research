@@ -11,7 +11,7 @@ The current source integration is:
 
 The project currently:
 - scrapes the featured stories shown before `最新`
-- scrapes all articles currently listed under `最新`
+- scrapes all articles listed under paginated `最新` pages until the active listing title changes from `最新`
 - normalizes article metadata and body text
 - stores normalized articles in SQLite
 - writes compact parsed JSON article backups
@@ -26,6 +26,9 @@ PYTHONPATH=src python -m daily_macro smoke --json
 PYTHONPATH=src python -m daily_macro scrape
 PYTHONPATH=src python -m daily_macro cleanup --retention-days 30
 PYTHONPATH=src python -m daily_macro inspect
+PYTHONPATH=src python -m daily_macro query date 2026-04-03
+PYTHONPATH=src python -m daily_macro query search "伊朗"
+PYTHONPATH=src python -m daily_macro query article --id 4364598
 ```
 
 What they do:
@@ -33,6 +36,9 @@ What they do:
 - `scrape`: fetch the homepage and article pages, then persist normalized data
 - `cleanup`: remove old parsed JSON backups based on retention
 - `inspect`: show a quick overview of the latest scrape run and a short list of recent items
+- `query date`: list stored articles for a date
+- `query search`: search stored articles by keyword
+- `query article`: inspect one stored article by URL or source article id
 
 ## Data Layout
 

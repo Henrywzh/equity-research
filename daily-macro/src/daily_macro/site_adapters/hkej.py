@@ -9,7 +9,7 @@ from urllib.parse import urljoin, urlparse
 from bs4 import BeautifulSoup, Tag
 
 from ..config import DEFAULT_HOMEPAGE_URL, DEFAULT_SOURCE_SITE
-from ..models import ArticleDetails, PlacementCandidate
+from ..models import ArticleDetails, LatestPageSnapshot, PlacementCandidate
 from .base import SiteAdapter
 
 BOILERPLATE_SNIPPETS = (
@@ -53,28 +53,33 @@ class HkejAdapter(SiteAdapter):
             if featured_rank > 5:
                 break
 
-        current_rank = 1
-        latest_start = soup.find("span", class_="listing_new_title", string=lambda text: text and "最新" in text)
-        if latest_start is not None and latest_start.find_parent("ul") is not None:
-            latest_root = latest_start.find_parent("ul")
-            latest_items = latest_root.find_all_next("div", class_="hkej_toc_listingAll_news2_2014")
-        else:
-            latest_items = soup.select("div.hkej_toc_listingAll_news2_2014")
-            if not latest_items:
-                raise ValueError("Could not locate latest news cards on the homepage.")
-
-        for item in latest_items:
-            candidate = self._build_latest_candidate(item, current_rank)
-            if candidate is None:
-                continue
+        latest_snapshot = self.parse_latest_page(html, start_rank=1)
+        for candidate in latest_snapshot.items:
             pair = (candidate.collection, candidate.url)
             if pair in seen_pairs:
                 continue
             placements.append(candidate)
             seen_pairs.add(pair)
-            current_rank += 1
 
         return placements
+
+    def parse_latest_page(self, html: str, start_rank: int = 1) -> LatestPageSnapshot:
+        soup = BeautifulSoup(html, "html.parser")
+        active_title = self._extract_active_listing_title(soup)
+        latest_items = soup.select("div.hkej_toc_listingAll_news2_2014")
+        if not latest_items:
+            raise ValueError("Could not locate latest news cards on the page.")
+
+        candidates: list[PlacementCandidate] = []
+        current_rank = start_rank
+        for item in latest_items:
+            candidate = self._build_latest_candidate(item, current_rank)
+            if candidate is None:
+                continue
+            candidates.append(candidate)
+            current_rank += 1
+
+        return LatestPageSnapshot(active_title=active_title, items=candidates)
 
     def parse_article(self, html: str, url: str) -> ArticleDetails:
         soup = BeautifulSoup(html, "html.parser")
@@ -173,6 +178,12 @@ class HkejAdapter(SiteAdapter):
             homepage_section=section,
             summary_snippet=snippet,
         )
+
+    def _extract_active_listing_title(self, soup: BeautifulSoup) -> str | None:
+        node = soup.select_one(
+            "ul.hkej_online-news-menu_2014 li.hkej_onewsCat_2014_on span.listing_new_title"
+        )
+        return self._safe_text(node)
 
     def _extract_news_article_jsonld(self, soup: BeautifulSoup) -> tuple[dict | None, bool]:
         for script in soup.find_all("script", attrs={"type": "application/ld+json"}):

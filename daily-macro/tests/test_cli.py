@@ -78,6 +78,45 @@ class CliTests(unittest.TestCase):
         self.assertEqual(exit_code, 0)
         self.assertIn("No scrape runs found.", buffer.getvalue())
 
+    def test_query_date_json_output(self) -> None:
+        with patch(
+            "daily_macro.cli.run_query_command",
+            return_value={"mode": "date", "query": "2026-04-03", "items": [{"title": "A"}]},
+        ):
+            buffer = io.StringIO()
+            with redirect_stdout(buffer):
+                exit_code = main(["query", "date", "2026-04-03", "--json"])
+
+        self.assertEqual(exit_code, 0)
+        payload = json.loads(buffer.getvalue())
+        self.assertEqual(payload["mode"], "date")
+        self.assertEqual(payload["items"][0]["title"], "A")
+
+    def test_query_article_default_output(self) -> None:
+        with patch(
+            "daily_macro.cli.run_query_command",
+            return_value={
+                "mode": "article",
+                "item": {
+                    "title": "Article title",
+                    "article_section": "時事脈搏",
+                    "published_at": "2026-04-03T08:00:00+08:00",
+                    "canonical_url": "https://example.com/article",
+                    "source_article_id": "1234",
+                    "summary_snippet": "Summary",
+                    "content_text": "Body text",
+                    "latest_backup": {"relative_path": "2026/04/03/run_1/article-1234.json"},
+                },
+            },
+        ):
+            buffer = io.StringIO()
+            with redirect_stdout(buffer):
+                exit_code = main(["query", "article", "--id", "1234"])
+
+        self.assertEqual(exit_code, 0)
+        self.assertIn("Article title", buffer.getvalue())
+        self.assertIn("Latest backup:", buffer.getvalue())
+
 
 if __name__ == "__main__":
     unittest.main()

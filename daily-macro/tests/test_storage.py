@@ -156,6 +156,13 @@ class StorageTests(unittest.TestCase):
                     ),
                 ]
 
+            def parse_latest_page(self, html: str, start_rank: int = 1):
+                class Snapshot:
+                    active_title = "昨日"
+                    items = []
+
+                return Snapshot()
+
             def parse_article(self, html: str, url: str) -> ArticleDetails:
                 return ArticleDetails(
                     canonical_url=url,
@@ -178,7 +185,10 @@ class StorageTests(unittest.TestCase):
 
         from unittest.mock import patch
 
-        with patch("daily_macro.pipeline.fetch_text", side_effect=lambda session, url: responses[url]):
+        with patch(
+            "daily_macro.pipeline.fetch_text",
+            side_effect=lambda session, url: responses.get(url, "<html>stop</html>"),
+        ):
             result = run_scrape(data_dir=self.data_dir, db_path=self.db_path, adapter=FakeAdapter())
 
         self.assertEqual(result["status"], "success")
@@ -251,6 +261,32 @@ class StorageTests(unittest.TestCase):
         self.assertEqual(recent_items[0]["collection"], "head_news")
         self.assertEqual(recent_items[0]["rank"], 1)
         self.assertEqual(recent_items[1]["collection"], "latest")
+
+    def test_query_helpers_support_date_search_and_article_lookup(self) -> None:
+        seen_at = "2026-04-03T00:00:00+00:00"
+        run_id = self.storage.start_run(seen_at)
+        article = self._build_article("https://www.hkej.com/instantnews/current/article/1234/story", summary="macro theme")
+        article.title = "Iran market update"
+        article.content_text = "This article discusses macro risk and Iran."
+        article_id = self.storage.upsert_article(article, seen_at)
+        self.storage.record_backup(
+            run_id,
+            "parsed_article_json",
+            "2026/04/03/run_1/article-1234.json",
+            "hash",
+            seen_at,
+            article_id=article_id,
+        )
+
+        by_date = self.storage.fetch_articles_by_date_with_limit("2026-04-03", limit=5)
+        matches = self.storage.search_articles("Iran", limit=5)
+        fetched = self.storage.fetch_article_with_latest_backup(source_article_id="1234")
+
+        self.assertEqual(len(by_date), 1)
+        self.assertEqual(len(matches), 1)
+        self.assertIsNotNone(fetched)
+        self.assertEqual(fetched["title"], "Iran market update")
+        self.assertIsNotNone(fetched["latest_backup"])
 
 
 if __name__ == "__main__":

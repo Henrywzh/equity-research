@@ -47,6 +47,25 @@ class HkejAdapterTests(unittest.TestCase):
         self.assertEqual(article.extraction_method, "jsonld")
         self.assertFalse(article.malformed_jsonld_recovered)
 
+    def test_parse_latest_page_extracts_page_2_items(self) -> None:
+        html = (FIXTURES / "latest_page_2.html").read_text(encoding="utf-8")
+
+        snapshot = self.adapter.parse_latest_page(html, start_rank=4)
+
+        self.assertEqual(snapshot.active_title, "最新")
+        self.assertEqual(len(snapshot.items), 2)
+        self.assertEqual(snapshot.items[0].rank, 4)
+        self.assertEqual(snapshot.items[0].title, "第二頁最新一")
+        self.assertEqual(snapshot.items[1].rank, 5)
+
+    def test_parse_latest_page_detects_yesterday_boundary(self) -> None:
+        html = (FIXTURES / "latest_page_yesterday.html").read_text(encoding="utf-8")
+
+        snapshot = self.adapter.parse_latest_page(html, start_rank=10)
+
+        self.assertEqual(snapshot.active_title, "昨日")
+        self.assertEqual(snapshot.items[0].rank, 10)
+
     def test_parse_article_uses_html_fallback(self) -> None:
         html = (FIXTURES / "article_fallback.html").read_text(encoding="utf-8")
 

@@ -269,14 +269,22 @@ class Storage:
         self.connection.commit()
 
     def fetch_articles_by_date(self, date_string: str) -> list[dict[str, Any]]:
-        rows = self.connection.execute(
-            """
+        return self.fetch_articles_by_date_with_limit(date_string)
+
+    def fetch_articles_by_date_with_limit(self, date_string: str, limit: int | None = None) -> list[dict[str, Any]]:
+        sql = """
             SELECT *
             FROM articles
             WHERE substr(COALESCE(published_at, first_seen_at), 1, 10) = ?
             ORDER BY published_at DESC, id DESC
-            """,
-            (date_string,),
+        """
+        params: list[Any] = [date_string]
+        if limit is not None:
+            sql += " LIMIT ?"
+            params.append(limit)
+        rows = self.connection.execute(
+            sql,
+            params,
         ).fetchall()
         return [dict(row) for row in rows]
 
@@ -331,6 +339,51 @@ class Storage:
                 (source_article_id,),
             ).fetchone()
         return dict(row) if row is not None else None
+
+    def search_articles(self, keyword: str, limit: int = 10) -> list[dict[str, Any]]:
+        pattern = f"%{keyword}%"
+        rows = self.connection.execute(
+            """
+            SELECT *
+            FROM articles
+            WHERE
+                title LIKE ?
+                OR COALESCE(summary_snippet, '') LIKE ?
+                OR content_text LIKE ?
+            ORDER BY COALESCE(published_at, last_seen_at) DESC, id DESC
+            LIMIT ?
+            """,
+            (pattern, pattern, pattern, limit),
+        ).fetchall()
+        return [dict(row) for row in rows]
+
+    def fetch_article_with_latest_backup(
+        self,
+        *,
+        url: str | None = None,
+        source_article_id: str | None = None,
+    ) -> dict[str, Any] | None:
+        article = self.fetch_article_content(url=url, source_article_id=source_article_id)
+        if article is None:
+            return None
+
+        backup = self.connection.execute(
+            """
+            SELECT
+                article_backups.relative_path,
+                article_backups.scraped_at,
+                article_backups.content_hash
+            FROM article_backups
+            JOIN articles ON articles.id = article_backups.article_id
+            WHERE articles.id = ?
+            ORDER BY article_backups.scraped_at DESC, article_backups.id DESC
+            LIMIT 1
+            """,
+            (article["id"],),
+        ).fetchone()
+
+        article["latest_backup"] = dict(backup) if backup is not None else None
+        return article
 
     def fetch_total_counts(self) -> dict[str, int]:
         article_count = self.connection.execute("SELECT COUNT(*) FROM articles").fetchone()[0]

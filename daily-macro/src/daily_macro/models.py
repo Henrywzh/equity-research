@@ -14,6 +14,12 @@ class PlacementCandidate:
 
 
 @dataclass(slots=True)
+class LatestPageSnapshot:
+    active_title: str | None
+    items: list[PlacementCandidate]
+
+
+@dataclass(slots=True)
 class ArticleDetails:
     canonical_url: str
     title: str

@@ -35,6 +35,30 @@ def build_parser() -> argparse.ArgumentParser:
     inspect_parser.add_argument("--limit", type=int, default=5, help="Number of recent items to show.")
     inspect_parser.add_argument("--data-dir", default=None, help="Override the data directory.")
     inspect_parser.add_argument("--db-path", default=None, help="Override the SQLite database path.")
+
+    query_parser = subparsers.add_parser("query", help="Query stored article data.")
+    query_subparsers = query_parser.add_subparsers(dest="query_command", required=True)
+
+    query_date_parser = query_subparsers.add_parser("date", help="List articles for a date.")
+    query_date_parser.add_argument("date", help="Date in YYYY-MM-DD format.")
+    query_date_parser.add_argument("--json", action="store_true", help="Print results as JSON.")
+    query_date_parser.add_argument("--limit", type=int, default=10, help="Number of items to show.")
+    query_date_parser.add_argument("--data-dir", default=None, help="Override the data directory.")
+    query_date_parser.add_argument("--db-path", default=None, help="Override the SQLite database path.")
+
+    query_search_parser = query_subparsers.add_parser("search", help="Search articles by keyword.")
+    query_search_parser.add_argument("keyword", help="Keyword to search for.")
+    query_search_parser.add_argument("--json", action="store_true", help="Print results as JSON.")
+    query_search_parser.add_argument("--limit", type=int, default=10, help="Number of items to show.")
+    query_search_parser.add_argument("--data-dir", default=None, help="Override the data directory.")
+    query_search_parser.add_argument("--db-path", default=None, help="Override the SQLite database path.")
+
+    query_article_parser = query_subparsers.add_parser("article", help="Show one article by URL or source id.")
+    query_article_parser.add_argument("--url", default=None, help="Canonical article URL.")
+    query_article_parser.add_argument("--id", dest="source_article_id", default=None, help="Source article id.")
+    query_article_parser.add_argument("--json", action="store_true", help="Print results as JSON.")
+    query_article_parser.add_argument("--data-dir", default=None, help="Override the data directory.")
+    query_article_parser.add_argument("--db-path", default=None, help="Override the SQLite database path.")
     return parser
 
 
@@ -80,6 +104,17 @@ def main(argv: list[str] | None = None) -> int:
             _print_inspect_result(result)
         return 0
 
+    if args.command == "query":
+        result = run_query_command(args)
+        if args.json:
+            print(json.dumps(result, ensure_ascii=False, indent=2))
+        else:
+            if args.query_command == "article":
+                _print_query_article_result(result)
+            else:
+                _print_query_list_result(result)
+        return 0
+
     parser.error(f"Unknown command: {args.command}")
     return 2
 
@@ -113,6 +148,32 @@ def inspect_latest_run(
         storage.close()
 
 
+def run_query_command(args: argparse.Namespace) -> dict[str, object]:
+    resolved_db_path = get_db_path(args.db_path, args.data_dir)
+    storage = Storage(resolved_db_path)
+    try:
+        if args.query_command == "date":
+            items = storage.fetch_articles_by_date_with_limit(args.date, limit=args.limit)
+            return {"mode": "date", "query": args.date, "items": items}
+
+        if args.query_command == "search":
+            items = storage.search_articles(args.keyword, limit=args.limit)
+            return {"mode": "search", "query": args.keyword, "items": items}
+
+        if args.query_command == "article":
+            if bool(args.url) == bool(args.source_article_id):
+                raise SystemExit("Provide exactly one of --url or --id.")
+            article = storage.fetch_article_with_latest_backup(
+                url=args.url,
+                source_article_id=args.source_article_id,
+            )
+            return {"mode": "article", "item": article}
+
+        raise SystemExit(f"Unknown query command: {args.query_command}")
+    finally:
+        storage.close()
+
+
 def _print_inspect_result(result: dict[str, object]) -> None:
     latest_run = result["latest_run"]
     totals = result["totals"]
@@ -136,3 +197,40 @@ def _print_inspect_result(result: dict[str, object]) -> None:
     print("Recent items:")
     for item in recent_items:
         print(f"[{item['collection']} #{item['rank']}] {item['title']}")
+
+
+def _print_query_list_result(result: dict[str, object]) -> None:
+    items = result["items"]
+    if not items:
+        print("No matching articles found.")
+        return
+
+    for item in items:
+        published = item.get("published_at") or item.get("first_seen_at") or "N/A"
+        section = item.get("article_section") or "N/A"
+        print(f"[{published}] [{section}] {item['title']}")
+
+
+def _print_query_article_result(result: dict[str, object]) -> None:
+    item = result["item"]
+    if item is None:
+        print("Article not found.")
+        return
+
+    print(item["title"])
+    print(f"Section: {item.get('article_section') or 'N/A'}")
+    print(f"Published: {item.get('published_at') or 'N/A'}")
+    print(f"URL: {item['canonical_url']}")
+    print(f"Source article id: {item.get('source_article_id') or 'N/A'}")
+    if item.get("summary_snippet"):
+        print(f"Summary: {item['summary_snippet']}")
+
+    body = item.get("content_text") or ""
+    preview = body[:500]
+    if len(body) > 500:
+        preview += "..."
+    print("Body preview:")
+    print(preview)
+    latest_backup = item.get("latest_backup")
+    if latest_backup:
+        print(f"Latest backup: {latest_backup['relative_path']}")
