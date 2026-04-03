@@ -38,7 +38,14 @@ jobs:
           python -m pip install .
 
       - name: Run intake pipeline
-        run: python -m youtube_intake run
+        run: python -m youtube_intake run --result-path run-result.json
+
+      - name: Send Gmail summary
+        env:
+          YOUTUBE_INTAKE_GMAIL_SENDER: ${{ secrets.YOUTUBE_INTAKE_GMAIL_SENDER }}
+          YOUTUBE_INTAKE_GMAIL_APP_PASSWORD: ${{ secrets.YOUTUBE_INTAKE_GMAIL_APP_PASSWORD }}
+          YOUTUBE_INTAKE_GMAIL_RECIPIENT: ${{ secrets.YOUTUBE_INTAKE_GMAIL_RECIPIENT }}
+        run: python -m youtube_intake notify --result-path run-result.json
 
       - name: Commit updated state and archives
         working-directory: .

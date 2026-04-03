@@ -109,6 +109,7 @@ class PipelineTests(unittest.TestCase):
         self.assertEqual(result["status"], "success")
         self.assertEqual(result["archived_count"], 2)
         self.assertEqual(result["bootstrap_count"], 2)
+        self.assertEqual(len(result["new_items"]), 2)
         self.assertTrue((self.data_dir / "youtube" / "top3pct" / "videos" / "new-video.json").exists())
         self.assertFalse((self.data_dir / "youtube" / "top3pct" / "videos" / "old-video.json").exists())
         self.assertTrue((self.data_dir / "youtube" / "meitou-news" / "videos" / "news-new.json").exists())
@@ -161,6 +162,7 @@ class PipelineTests(unittest.TestCase):
 
         self.assertEqual(result["channels"]["top3pct"]["archived_count"], 2)
         self.assertEqual(result["channels"]["top3pct"]["transcript_unavailable_count"], 1)
+        self.assertEqual(len(result["new_items"]), 2)
         self.assertEqual(client.transcript_calls, ["older-video", "newest-video"])
 
         state_payload = json.loads(self.state_path.read_text(encoding="utf-8"))
@@ -188,7 +190,27 @@ class PipelineTests(unittest.TestCase):
         self.assertEqual(result["status"], "partial_success")
         self.assertEqual(result["channels"]["top3pct"]["archived_count"], 1)
         self.assertEqual(len(result["channels"]["meitou-news"]["errors"]), 1)
+        self.assertEqual(len(result["new_items"]), 1)
         self.assertTrue((self.data_dir / "youtube" / "top3pct" / "videos" / "top3pct-video.json").exists())
+
+    def test_noop_run_returns_no_new_items(self) -> None:
+        client = FakeYoutubeClient(
+            candidates_by_slug={
+                "top3pct": [],
+                "meitou-news": [],
+            },
+            metadata_by_id={},
+        )
+
+        result = run_sync(
+            config_path=self.config_path,
+            state_path=self.state_path,
+            data_dir=self.data_dir,
+            client=client,
+        )
+
+        self.assertEqual(result["archived_count"], 0)
+        self.assertEqual(result["new_items"], [])
 
 
 def _candidate(video_id: str, *, source_tab: str = "videos") -> FlatPlaylistEntry:

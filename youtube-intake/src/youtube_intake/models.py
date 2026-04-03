@@ -83,3 +83,33 @@ class TranscriptPayload:
     text: str | None
     source: str | None
     error: str | None = None
+
+
+@dataclass(slots=True)
+class ArchivedItemSummary:
+    archive_path: str
+    channel_slug: str
+    channel_handle: str
+    channel_name: str | None
+    video_id: str
+    title: str
+    webpage_url: str
+    published_at: str | None
+    source_kind: str
+    transcript_status: str
+    description_excerpt: str
+
+    def to_mapping(self) -> dict[str, Any]:
+        return {
+            "archive_path": self.archive_path,
+            "channel_slug": self.channel_slug,
+            "channel_handle": self.channel_handle,
+            "channel_name": self.channel_name,
+            "video_id": self.video_id,
+            "title": self.title,
+            "webpage_url": self.webpage_url,
+            "published_at": self.published_at,
+            "source_kind": self.source_kind,
+            "transcript_status": self.transcript_status,
+            "description_excerpt": self.description_excerpt,
+        }

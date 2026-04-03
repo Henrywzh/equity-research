@@ -4,7 +4,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 
 from .config import get_config_path, get_data_dir, get_state_path
-from .models import ChannelState, ChannelTarget, TranscriptPayload, VideoMetadata
+from .models import ArchivedItemSummary, ChannelState, TranscriptPayload, VideoMetadata
 from .storage import load_channel_targets, load_state, save_state, write_archive
 from .youtube_client import YoutubeClient
 
@@ -30,11 +30,13 @@ def run_sync(
 
     summary: dict[str, object] = {
         "status": "success",
+        "run_started_at": run_started_at,
         "archived_count": 0,
         "bootstrap_count": 0,
         "transcript_unavailable_count": 0,
         "channels": {},
         "errors": [],
+        "new_items": [],
     }
 
     for channel in channels:
@@ -68,7 +70,7 @@ def run_sync(
             for video in selected:
                 transcript = client.fetch_transcript(video)
                 archived_at = utc_now()
-                write_archive(
+                archive_path = write_archive(
                     data_dir=resolved_data_dir,
                     channel=channel,
                     video=video,
@@ -89,6 +91,14 @@ def run_sync(
                     result["transcript_unavailable_count"] += 1
                 if bootstrap_mode:
                     result["bootstrap_count"] = 1
+                summary["new_items"].append(
+                    _build_new_item_summary(
+                        archive_path=archive_path,
+                        channel=channel,
+                        video=video,
+                        transcript=transcript,
+                    ).to_mapping()
+                )
 
             summary["archived_count"] = int(summary["archived_count"]) + int(result["archived_count"])
             summary["bootstrap_count"] = int(summary["bootstrap_count"]) + int(result["bootstrap_count"])
@@ -198,3 +208,29 @@ def _parse_iso_timestamp(value: str | None) -> int | None:
         return int(datetime.fromisoformat(value).timestamp())
     except ValueError:
         return None
+
+
+def _build_new_item_summary(
+    *,
+    archive_path: Path,
+    channel: object,
+    video: VideoMetadata,
+    transcript: TranscriptPayload,
+) -> ArchivedItemSummary:
+    description = (video.description or "").strip()
+    excerpt = description[:280].strip()
+    if excerpt and len(description) > len(excerpt):
+        excerpt = f"{excerpt}..."
+    return ArchivedItemSummary(
+        archive_path=str(archive_path),
+        channel_slug=getattr(channel, "slug"),
+        channel_handle=getattr(channel, "handle"),
+        channel_name=video.channel_name,
+        video_id=video.video_id,
+        title=video.title,
+        webpage_url=video.webpage_url,
+        published_at=video.published_at,
+        source_kind=video.source_kind,
+        transcript_status=transcript.status,
+        description_excerpt=excerpt,
+    )
