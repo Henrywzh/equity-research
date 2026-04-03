@@ -140,7 +140,7 @@ MODELS = {
 # Groq entries reference MODELS above to avoid duplication.
 # ---------------------------------------------------------------------------
 MARITIME_ANALYST_MODELS = {
-    # ── Groq (free-tier, via GROK_API_KEY) ───────────────────────────────
+    # ── Groq (free-tier, via GROQ_API_KEY) ───────────────────────────────
     # Primary vision QA model: sees the annotated map, runs STEP A
     "llama_4_scout": MODELS["llama_4_scout"],
     # Best reasoning model: no vision, runs STEP B+C on CSV trend data only

@@ -476,9 +476,9 @@ def _run_groq(model_id: str, image_data: str | None, user_text: str,
               has_vision: bool, current_state: str = "NORMAL", news: str = "") -> str:
     """Call a Groq model."""
     from groq import Groq
-    api_key = os.getenv("GROK_API_KEY")
+    api_key = os.getenv("GROQ_API_KEY")
     if not api_key:
-        raise RuntimeError("GROK_API_KEY is not set in .config")
+        raise RuntimeError("GROQ_API_KEY is not set in .config")
     client = Groq(api_key=api_key)
     response = client.chat.completions.create(
         model=model_id,
