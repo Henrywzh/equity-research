@@ -26,7 +26,7 @@ class CliTests(unittest.TestCase):
     def test_run_passes_override_paths(self) -> None:
         with patch(
             "youtube_intake.cli.run_sync",
-            return_value={"status": "success", "channels": {}, "errors": []},
+            return_value={"status": "success", "channels": {}, "errors": [], "run_notes": []},
         ) as mock_run_sync:
             exit_code = main(["run", "--config-path", "/tmp/config.json", "--state-path", "/tmp/state.json"])
 
@@ -58,6 +58,19 @@ class CliTests(unittest.TestCase):
             analysis_result_path="/tmp/analysis-result.json",
             data_dir=None,
         )
+
+    def test_preflight_returns_nonzero_on_missing_required_env(self) -> None:
+        with patch(
+            "youtube_intake.cli.run_preflight",
+            return_value={"status": "failed", "missing_required": ["GROQ_API_KEY"]},
+        ):
+            buffer = io.StringIO()
+            with redirect_stdout(buffer):
+                exit_code = main(["preflight"])
+
+        self.assertEqual(exit_code, 1)
+        payload = json.loads(buffer.getvalue())
+        self.assertEqual(payload["status"], "failed")
 
 
 if __name__ == "__main__":

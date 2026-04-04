@@ -37,6 +37,8 @@ def run_sync(
     summary: dict[str, object] = {
         "status": "success",
         "run_started_at": run_started_at,
+        "discovery_source": getattr(client, "discovery_source", "unknown"),
+        "yt_cookies_available": bool(getattr(client, "yt_cookies_available", False)),
         "archived_count": 0,
         "bootstrap_count": 0,
         "transcript_unavailable_count": 0,
@@ -44,6 +46,7 @@ def run_sync(
         "analysis_artifact_dir": None,
         "channels": {},
         "errors": [],
+        "run_notes": [],
         "new_items": [],
     }
 
@@ -54,6 +57,7 @@ def run_sync(
             "noop": False,
             "transcript_unavailable_count": 0,
             "errors": [],
+            "notes": [],
         }
         state = state_by_slug.get(channel.slug, ChannelState())
 
@@ -97,6 +101,10 @@ def run_sync(
                 result["archived_count"] += 1
                 if transcript.status != "fetched":
                     result["transcript_unavailable_count"] += 1
+                    note = _build_transcript_note(channel_slug=channel.slug, video_id=video.video_id, transcript=transcript)
+                    if note:
+                        result["notes"].append(note)
+                        summary["run_notes"].append(note)
                 if bootstrap_mode:
                     result["bootstrap_count"] = 1
                 summary["new_items"].append(
@@ -120,6 +128,7 @@ def run_sync(
 
         summary["channels"][channel.slug] = result
 
+    summary["run_notes"] = _dedupe_preserve_order(summary["run_notes"])
     return summary
 
 
@@ -150,6 +159,26 @@ def run_smoke(
             "latest_source_kind": latest_video.source_kind if latest_video else None,
         }
     return payload
+
+
+def _build_transcript_note(*, channel_slug: str, video_id: str, transcript: TranscriptPayload) -> str | None:
+    if transcript.status == "fetched":
+        return None
+    error = (transcript.error or "").strip()
+    if not error:
+        return None
+    return f"{channel_slug}/{video_id}: {error}"
+
+
+def _dedupe_preserve_order(items: list[str]) -> list[str]:
+    seen: set[str] = set()
+    deduped: list[str] = []
+    for item in items:
+        if item in seen:
+            continue
+        seen.add(item)
+        deduped.append(item)
+    return deduped
 
 
 def utc_now() -> str:

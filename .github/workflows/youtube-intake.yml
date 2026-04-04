@@ -37,9 +37,19 @@ jobs:
           python -m pip install --upgrade pip
           python -m pip install .
 
+      - name: Run preflight checks
+        env:
+          GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
+          GMAIL_SENDER: ${{ secrets.GMAIL_SENDER }}
+          GMAIL_APP_PASSWORD: ${{ secrets.GMAIL_APP_PASSWORD }}
+          GMAIL_RECIPIENT: ${{ secrets.GMAIL_RECIPIENT }}
+          YOUTUBE_INTAKE_YT_COOKIES: ${{ secrets.YOUTUBE_INTAKE_YT_COOKIES }}
+        run: python -m youtube_intake preflight
+
       - name: Run intake pipeline
         env:
           GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
+          YOUTUBE_INTAKE_YT_COOKIES: ${{ secrets.YOUTUBE_INTAKE_YT_COOKIES }}
         run: python -m youtube_intake run --result-path run-result.json
 
       - name: Analyze newly archived videos
@@ -49,9 +59,9 @@ jobs:
 
       - name: Send Gmail analyst summary
         env:
-          YOUTUBE_INTAKE_GMAIL_SENDER: ${{ secrets.YOUTUBE_INTAKE_GMAIL_SENDER }}
-          YOUTUBE_INTAKE_GMAIL_APP_PASSWORD: ${{ secrets.YOUTUBE_INTAKE_GMAIL_APP_PASSWORD }}
-          YOUTUBE_INTAKE_GMAIL_RECIPIENT: ${{ secrets.YOUTUBE_INTAKE_GMAIL_RECIPIENT }}
+          GMAIL_SENDER: ${{ secrets.GMAIL_SENDER }}
+          GMAIL_APP_PASSWORD: ${{ secrets.GMAIL_APP_PASSWORD }}
+          GMAIL_RECIPIENT: ${{ secrets.GMAIL_RECIPIENT }}
         run: python -m youtube_intake notify --result-path analysis-result.json
 
       - name: Commit updated state and archives

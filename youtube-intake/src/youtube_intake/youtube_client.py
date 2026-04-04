@@ -5,6 +5,7 @@ import re
 import tempfile
 import time
 import xml.etree.ElementTree as ET
+from contextlib import nullcontext
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Iterable
@@ -20,6 +21,7 @@ from .runtime_env import load_local_config, read_env
 
 
 GROQ_API_KEY_ENV = "GROQ_API_KEY"
+YT_COOKIES_ENV = "YOUTUBE_INTAKE_YT_COOKIES"
 GROQ_AUDIO_TRANSCRIPTIONS_URL = "https://api.groq.com/openai/v1/audio/transcriptions"
 PRIMARY_STT_MODEL_ID = "whisper-large-v3-turbo"
 FALLBACK_STT_MODEL_ID = "whisper-large-v3"
@@ -30,6 +32,8 @@ MAX_STT_AUDIO_BYTES = 24 * 1024 * 1024
 TRANSIENT_STATUS_CODES = {408, 429, 500, 502, 503, 504}
 TRANSIENT_EXCEPTION_TYPES = (requests.Timeout, requests.ConnectionError)
 DEFAULT_BACKOFF_SECONDS = (2.0, 5.0, 10.0)
+YOUTUBE_FEED_URL_TEMPLATE = "https://www.youtube.com/feeds/videos.xml?channel_id={channel_id}"
+ATOM_NAMESPACE = {"atom": "http://www.w3.org/2005/Atom", "yt": "http://www.youtube.com/xml/schemas/2015", "media": "http://search.yahoo.com/mrss/"}
 
 
 class YoutubeClient:
@@ -44,6 +48,8 @@ class YoutubeClient:
         sleep_fn: Any | None = None,
         jitter_fn: Any | None = None,
         transcription_transport: Any | None = None,
+        http_get: Any | None = None,
+        yt_cookies: str | None = None,
     ) -> None:
         load_local_config()
         self.recent_limit = recent_limit
@@ -51,10 +57,14 @@ class YoutubeClient:
         self.transcript_languages = tuple(transcript_languages)
         self.transcript_api = YouTubeTranscriptApi()
         self.groq_api_key = (groq_api_key or read_env(GROQ_API_KEY_ENV)).strip()
+        self.yt_cookies = (yt_cookies or read_env(YT_COOKIES_ENV)).strip()
         self.stt_timeout = stt_timeout
         self.sleep_fn = sleep_fn or time.sleep
         self.jitter_fn = jitter_fn or (lambda: random.uniform(0.0, 0.75))
         self.transcription_transport = transcription_transport or requests.post
+        self.http_get = http_get or requests.get
+        self.discovery_source = "youtube_rss"
+        self.yt_cookies_available = bool(self.yt_cookies)
 
     def list_recent_candidates(
         self,
@@ -62,52 +72,37 @@ class YoutubeClient:
         *,
         stop_id: str | None = None,
     ) -> list[FlatPlaylistEntry]:
-        candidates: dict[str, FlatPlaylistEntry] = {}
-        for source_tab, url in (("videos", channel.videos_url), ("streams", channel.streams_url)):
-            entries = self._list_tab_entries(url)
-            for index, entry in enumerate(entries, start=1):
-                video_id = str(entry.get("id") or "").strip()
-                if not video_id:
-                    continue
-                if stop_id and video_id == stop_id:
-                    break
-                if video_id in candidates:
-                    continue
-                candidates[video_id] = FlatPlaylistEntry(
-                    video_id=video_id,
-                    url=entry.get("url") or f"https://www.youtube.com/watch?v={video_id}",
-                    title=entry.get("title"),
-                    source_tab=source_tab,
-                    position=index,
-                )
-        return list(candidates.values())
+        candidates: list[FlatPlaylistEntry] = []
+        for index, entry in enumerate(self._fetch_feed_entries(channel), start=1):
+            if stop_id and entry.video_id == stop_id:
+                break
+            entry.position = index
+            candidates.append(entry)
+            if len(candidates) >= self.recent_limit:
+                break
+        return candidates
 
     def fetch_video_metadata(self, candidate: FlatPlaylistEntry) -> VideoMetadata:
-        info = self._extract_info(candidate.url)
-        published_at, published_timestamp = _resolve_published_at(info)
-        thumbnails = info.get("thumbnails") or []
-        thumbnail_url = thumbnails[-1].get("url") if thumbnails else None
-
         return VideoMetadata(
-            video_id=str(info.get("id") or candidate.video_id),
-            title=info.get("title") or candidate.title or candidate.video_id,
-            channel_id=info.get("channel_id"),
-            channel_name=info.get("channel") or info.get("uploader"),
-            channel_handle=info.get("uploader_id"),
-            webpage_url=info.get("webpage_url") or candidate.url,
-            description=info.get("description"),
-            published_at=published_at,
-            published_timestamp=published_timestamp,
-            duration_seconds=_coerce_int(info.get("duration")),
-            view_count=_coerce_int(info.get("view_count")),
-            live_status=info.get("live_status"),
-            was_live=bool(info.get("was_live")),
-            is_live=bool(info.get("is_live")),
-            media_type=info.get("media_type"),
-            thumbnail_url=thumbnail_url,
+            video_id=candidate.video_id,
+            title=candidate.title or candidate.video_id,
+            channel_id=candidate.channel_id,
+            channel_name=candidate.channel_name,
+            channel_handle=None,
+            webpage_url=candidate.url,
+            description=candidate.description,
+            published_at=candidate.published_at,
+            published_timestamp=candidate.published_timestamp,
+            duration_seconds=None,
+            view_count=None,
+            live_status=None,
+            was_live=False,
+            is_live=False,
+            media_type="video",
+            thumbnail_url=candidate.thumbnail_url,
             source_tab=candidate.source_tab,
-            subtitles=info.get("subtitles") or {},
-            automatic_captions=info.get("automatic_captions") or {},
+            subtitles={},
+            automatic_captions={},
         )
 
     def fetch_transcript(self, video: VideoMetadata) -> TranscriptPayload:
@@ -155,7 +150,7 @@ class YoutubeClient:
                     if not url or ext not in {"vtt", "srt", "ttml"}:
                         continue
                     try:
-                        response = requests.get(url, timeout=self.request_timeout)
+                        response = self.http_get(url, timeout=self.request_timeout)
                         response.raise_for_status()
                         segments = _parse_caption_segments(response.text, ext)
                         transcript_text = _segments_to_text(segments)
@@ -195,6 +190,12 @@ class YoutubeClient:
             )
             return _build_unavailable_transcript(errors)
 
+        if not self.yt_cookies:
+            errors.append(
+                "Groq STT skipped because YOUTUBE_INTAKE_YT_COOKIES is not configured for audio fallback."
+            )
+            return _build_unavailable_transcript(errors)
+
         if not self.groq_api_key:
             errors.append("Groq STT skipped because GROQ_API_KEY is not configured.")
             return _build_unavailable_transcript(errors)
@@ -204,7 +205,11 @@ class YoutubeClient:
             try:
                 audio_path = self._download_audio(video, temp_dir=temp_dir)
             except Exception as exc:  # pragma: no cover - yt-dlp/provider variability
-                errors.append(f"Groq STT audio download failed: {exc}")
+                message = str(exc).strip()
+                if message.startswith("Groq STT skipped due to duration limit"):
+                    errors.append(message)
+                else:
+                    errors.append(f"Groq STT audio download failed: {exc}")
                 return _build_unavailable_transcript(errors)
 
             transcript, stt_errors = self._transcribe_audio_with_fallback(audio_path)
@@ -214,30 +219,43 @@ class YoutubeClient:
             return _build_unavailable_transcript(errors)
 
     def _download_audio(self, video: VideoMetadata, *, temp_dir: Path) -> Path:
-        info = self._extract_info(video.webpage_url)
-        format_id = _select_audio_format_id(info.get("formats") or [], max_bytes=MAX_STT_AUDIO_BYTES)
-        outtmpl = str(temp_dir / "%(id)s.%(ext)s")
-        options = {
-            "quiet": True,
-            "no_warnings": True,
-            "noplaylist": True,
-            "ignoreerrors": False,
-            "format": (
-                format_id
-                or "worstaudio[ext=m4a]/worstaudio[ext=webm]/worstaudio/"
-                "bestaudio[filesize<24500000]/bestaudio[filesize_approx<24500000]/bestaudio/best"
-            ),
-            "outtmpl": outtmpl,
-        }
-        with YoutubeDL(options) as ydl:
-            downloaded_info = ydl.extract_info(video.webpage_url, download=True)
-            if not isinstance(downloaded_info, dict):
-                raise RuntimeError(f"Unable to download audio for {video.webpage_url}")
-            prepared = Path(ydl.prepare_filename(downloaded_info))
-            if prepared.exists():
-                return prepared
+        with self._temporary_cookie_file(temp_dir) as cookiefile:
+            info = self._extract_info(video.webpage_url, cookiefile=cookiefile)
+            duration_seconds = _coerce_int(info.get("duration"))
+            if duration_seconds is not None and duration_seconds > MAX_STT_VIDEO_DURATION_SECONDS:
+                raise RuntimeError(
+                    "Groq STT skipped due to duration limit "
+                    f"({duration_seconds}s > {MAX_STT_VIDEO_DURATION_SECONDS}s)."
+                )
+            format_id = _select_audio_format_id(info.get("formats") or [], max_bytes=MAX_STT_AUDIO_BYTES)
+            outtmpl = str(temp_dir / "%(id)s.%(ext)s")
+            options = {
+                "quiet": True,
+                "no_warnings": True,
+                "noplaylist": True,
+                "ignoreerrors": False,
+                "format": (
+                    format_id
+                    or "worstaudio[ext=m4a]/worstaudio[ext=webm]/worstaudio/"
+                    "bestaudio[filesize<24500000]/bestaudio[filesize_approx<24500000]/bestaudio/best"
+                ),
+                "outtmpl": outtmpl,
+            }
+            if cookiefile is not None:
+                options["cookiefile"] = str(cookiefile)
+            with YoutubeDL(options) as ydl:
+                downloaded_info = ydl.extract_info(video.webpage_url, download=True)
+                if not isinstance(downloaded_info, dict):
+                    raise RuntimeError(f"Unable to download audio for {video.webpage_url}")
+                prepared = Path(ydl.prepare_filename(downloaded_info))
+                if prepared.exists():
+                    return prepared
 
-        candidates = sorted(path for path in temp_dir.iterdir() if path.is_file())
+        candidates = sorted(
+            path
+            for path in temp_dir.iterdir()
+            if path.is_file() and path.name != "youtube-cookies.txt"
+        )
         if not candidates:
             raise RuntimeError(f"No audio file was downloaded for {video.video_id}")
         return candidates[0]
@@ -341,41 +359,39 @@ class YoutubeClient:
             key=lambda item: priorities.get(str(item.get("ext")), 99),
         )
 
-    def _list_tab_entries(self, url: str) -> list[dict[str, Any]]:
-        options = {
-            "quiet": True,
-            "extract_flat": "in_playlist",
-            "skip_download": True,
-            "playlistend": self.recent_limit,
-            "lazy_playlist": False,
-            "ignoreerrors": True,
-        }
-        try:
-            with YoutubeDL(options) as ydl:
-                info = ydl.extract_info(url, download=False)
-        except DownloadError as exc:
-            if _is_missing_channel_tab_error(exc):
-                return []
-            raise
+    def _fetch_feed_entries(self, channel: ChannelTarget) -> list[FlatPlaylistEntry]:
+        response = self.http_get(
+            YOUTUBE_FEED_URL_TEMPLATE.format(channel_id=channel.channel_id),
+            timeout=self.request_timeout,
+        )
+        response.raise_for_status()
+        return _parse_youtube_feed(
+            response.text,
+            channel=channel,
+            recent_limit=self.recent_limit,
+        )
 
-        if not isinstance(info, dict):
-            return []
-
-        entries = info.get("entries") or []
-        return [entry for entry in entries if isinstance(entry, dict)]
-
-    def _extract_info(self, url: str) -> dict[str, Any]:
+    def _extract_info(self, url: str, *, cookiefile: Path | None = None) -> dict[str, Any]:
         options = {
             "quiet": True,
             "skip_download": True,
             "noplaylist": True,
             "ignoreerrors": False,
         }
+        if cookiefile is not None:
+            options["cookiefile"] = str(cookiefile)
         with YoutubeDL(options) as ydl:
             info = ydl.extract_info(url, download=False)
         if not isinstance(info, dict):
             raise RuntimeError(f"Unable to extract metadata for {url}")
         return info
+
+    def _temporary_cookie_file(self, temp_dir: Path):
+        if not self.yt_cookies:
+            return nullcontext(None)
+        cookie_path = temp_dir / "youtube-cookies.txt"
+        cookie_path.write_text(self.yt_cookies + ("\n" if not self.yt_cookies.endswith("\n") else ""), encoding="utf-8")
+        return nullcontext(cookie_path)
 
 
 def _coerce_int(value: Any) -> int | None:
@@ -398,6 +414,61 @@ def _resolve_published_at(info: dict[str, Any]) -> tuple[str | None, int | None]
         return dt.isoformat(), int(dt.timestamp())
 
     return None, None
+
+
+def _parse_youtube_feed(
+    payload: str,
+    *,
+    channel: ChannelTarget,
+    recent_limit: int,
+) -> list[FlatPlaylistEntry]:
+    root = ET.fromstring(payload)
+    entries: list[FlatPlaylistEntry] = []
+    for position, entry in enumerate(root.findall("atom:entry", ATOM_NAMESPACE), start=1):
+        video_id = _xml_text(entry.find("yt:videoId", ATOM_NAMESPACE))
+        if not video_id:
+            continue
+        title = _xml_text(entry.find("atom:title", ATOM_NAMESPACE))
+        published_at = _xml_text(entry.find("atom:published", ATOM_NAMESPACE))
+        description = _xml_text(entry.find("media:group/media:description", ATOM_NAMESPACE))
+        thumbnail_url = None
+        thumbnail = entry.find("media:group/media:thumbnail", ATOM_NAMESPACE)
+        if thumbnail is not None:
+            thumbnail_url = str(thumbnail.attrib.get("url") or "").strip() or None
+        entries.append(
+            FlatPlaylistEntry(
+                video_id=video_id,
+                url=f"https://www.youtube.com/watch?v={video_id}",
+                title=title,
+                source_tab="rss",
+                position=position,
+                channel_id=channel.channel_id,
+                channel_name=_xml_text(entry.find("atom:author/atom:name", ATOM_NAMESPACE)) or channel.slug,
+                published_at=published_at,
+                published_timestamp=_parse_feed_published_timestamp(published_at),
+                description=description,
+                thumbnail_url=thumbnail_url,
+            )
+        )
+        if len(entries) >= recent_limit:
+            break
+    return entries
+
+
+def _xml_text(element: ET.Element | None) -> str | None:
+    if element is None or element.text is None:
+        return None
+    value = element.text.strip()
+    return value or None
+
+
+def _parse_feed_published_timestamp(value: str | None) -> int | None:
+    if not value:
+        return None
+    try:
+        return int(datetime.fromisoformat(value.replace("Z", "+00:00")).timestamp())
+    except ValueError:
+        return None
 
 
 def _join_transcript_lines(lines: Iterable[str]) -> str | None:

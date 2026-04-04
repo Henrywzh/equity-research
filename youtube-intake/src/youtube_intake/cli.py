@@ -3,11 +3,11 @@ from __future__ import annotations
 import argparse
 import json
 import logging
-from pathlib import Path
 
 from .analyst import analyze_run
 from .notifier import load_analysis_result, send_analysis_summary_email, send_test_email
 from .pipeline import run_smoke, run_sync
+from .preflight import run_preflight
 from .storage import write_json_document
 
 
@@ -32,6 +32,8 @@ def build_parser() -> argparse.ArgumentParser:
 
     smoke_parser = subparsers.add_parser("smoke", help="Validate the watched channels and fetch their latest IDs.")
     smoke_parser.add_argument("--config-path", default=None, help="Override the channel config path.")
+
+    subparsers.add_parser("preflight", help="Validate required environment variables for the GitHub Actions flow.")
 
     notify_parser = subparsers.add_parser("notify", help="Send a Gmail analyst summary for a prior analysis result.")
     notify_parser.add_argument("--result-path", required=True, help="Path to the JSON analysis result.")
@@ -71,6 +73,11 @@ def main(argv: list[str] | None = None) -> int:
             payload = run_smoke(config_path=args.config_path)
             print(json.dumps(payload, ensure_ascii=False, indent=2))
             return 0
+
+        if args.command == "preflight":
+            payload = run_preflight()
+            print(json.dumps(payload, ensure_ascii=False, indent=2))
+            return 0 if payload.get("status") == "success" else 1
 
         if args.command == "notify":
             sent, message = send_analysis_summary_email(load_analysis_result(args.result_path))

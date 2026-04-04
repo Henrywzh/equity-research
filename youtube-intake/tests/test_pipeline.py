@@ -24,6 +24,8 @@ class FakeYoutubeClient:
         self.transcript_by_id = transcript_by_id or {}
         self.failing_channels = failing_channels or set()
         self.transcript_calls: list[str] = []
+        self.discovery_source = "youtube_rss"
+        self.yt_cookies_available = False
 
     def list_recent_candidates(self, channel, *, stop_id=None):
         if channel.slug in self.failing_channels:
@@ -223,6 +225,39 @@ class PipelineTests(unittest.TestCase):
 
         self.assertEqual(result["archived_count"], 0)
         self.assertEqual(result["new_items"], [])
+
+    def test_run_surfaces_discovery_diagnostics_and_transcript_notes(self) -> None:
+        client = FakeYoutubeClient(
+            candidates_by_slug={
+                "top3pct": [_candidate("stt-skipped")],
+                "meitou-news": [],
+            },
+            metadata_by_id={
+                "stt-skipped": _video("stt-skipped", published_timestamp=200, source_tab="rss"),
+            },
+            transcript_by_id={
+                "stt-skipped": TranscriptPayload(
+                    status="unavailable",
+                    language=None,
+                    text=None,
+                    source=None,
+                    segments=[],
+                    error="Groq STT skipped because YOUTUBE_INTAKE_YT_COOKIES is not configured for audio fallback.",
+                )
+            },
+        )
+
+        result = run_sync(
+            config_path=self.config_path,
+            state_path=self.state_path,
+            data_dir=self.data_dir,
+            client=client,
+        )
+
+        self.assertEqual(result["discovery_source"], "youtube_rss")
+        self.assertFalse(result["yt_cookies_available"])
+        self.assertEqual(len(result["run_notes"]), 1)
+        self.assertIn("YOUTUBE_INTAKE_YT_COOKIES", result["run_notes"][0])
 
 
 def _candidate(video_id: str, *, source_tab: str = "videos") -> FlatPlaylistEntry:

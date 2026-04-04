@@ -2,13 +2,15 @@ from __future__ import annotations
 
 import unittest
 from pathlib import Path
+from unittest.mock import Mock
 
-from youtube_intake.models import TranscriptPayload, VideoMetadata
+from youtube_intake.models import ChannelTarget, TranscriptPayload, VideoMetadata
 from youtube_intake.youtube_client import (
     FALLBACK_STT_MODEL_ID,
     MAX_STT_AUDIO_BYTES,
     PRIMARY_STT_MODEL_ID,
     YoutubeClient,
+    _parse_youtube_feed,
     _select_audio_format_id,
 )
 
@@ -27,7 +29,12 @@ class StubYoutubeClient(YoutubeClient):
         stt_errors: dict[str, Exception] | None = None,
         groq_api_key: str = "test-key",
     ) -> None:
-        super().__init__(groq_api_key=groq_api_key, sleep_fn=lambda _: None, jitter_fn=lambda: 0.0)
+        super().__init__(
+            groq_api_key=groq_api_key,
+            yt_cookies="# Netscape HTTP Cookie File",
+            sleep_fn=lambda _: None,
+            jitter_fn=lambda: 0.0,
+        )
         self.caption_fallback = caption_fallback
         self.stt_payloads = stt_payloads or {}
         self.stt_errors = stt_errors or {}
@@ -54,6 +61,79 @@ class StubYoutubeClient(YoutubeClient):
 
 
 class YoutubeClientTests(unittest.TestCase):
+    def test_parse_youtube_feed_extracts_rss_metadata(self) -> None:
+        entries = _parse_youtube_feed(
+            """<?xml version="1.0" encoding="UTF-8"?>
+            <feed xmlns:yt="http://www.youtube.com/xml/schemas/2015"
+                  xmlns:media="http://search.yahoo.com/mrss/"
+                  xmlns="http://www.w3.org/2005/Atom">
+              <entry>
+                <id>yt:video:abc123</id>
+                <yt:videoId>abc123</yt:videoId>
+                <title>Test title</title>
+                <published>2026-04-04T11:00:29+00:00</published>
+                <author><name>Test Channel</name></author>
+                <media:group>
+                  <media:description>Test description</media:description>
+                  <media:thumbnail url="https://img.youtube.com/vi/abc123/hqdefault.jpg" />
+                </media:group>
+              </entry>
+            </feed>
+            """,
+            channel=ChannelTarget(
+                slug="top3pct",
+                handle="@top3pct",
+                channel_id="UC123",
+                videos_url="https://example.com/videos",
+                streams_url="https://example.com/streams",
+            ),
+            recent_limit=80,
+        )
+
+        self.assertEqual(len(entries), 1)
+        self.assertEqual(entries[0].video_id, "abc123")
+        self.assertEqual(entries[0].title, "Test title")
+        self.assertEqual(entries[0].channel_name, "Test Channel")
+        self.assertEqual(entries[0].description, "Test description")
+        self.assertEqual(entries[0].thumbnail_url, "https://img.youtube.com/vi/abc123/hqdefault.jpg")
+
+    def test_list_recent_candidates_uses_rss_feed(self) -> None:
+        response = Mock()
+        response.raise_for_status.return_value = None
+        response.text = """<?xml version="1.0" encoding="UTF-8"?>
+        <feed xmlns:yt="http://www.youtube.com/xml/schemas/2015" xmlns:media="http://search.yahoo.com/mrss/" xmlns="http://www.w3.org/2005/Atom">
+          <entry>
+            <yt:videoId>new-video</yt:videoId>
+            <title>Newest</title>
+            <published>2026-04-04T11:00:29+00:00</published>
+            <author><name>Channel Name</name></author>
+            <media:group><media:description>Newest description</media:description></media:group>
+          </entry>
+          <entry>
+            <yt:videoId>old-video</yt:videoId>
+            <title>Older</title>
+            <published>2026-04-03T11:00:29+00:00</published>
+            <author><name>Channel Name</name></author>
+            <media:group><media:description>Older description</media:description></media:group>
+          </entry>
+        </feed>
+        """
+        client = YoutubeClient(http_get=Mock(return_value=response))
+
+        entries = client.list_recent_candidates(
+            ChannelTarget(
+                slug="top3pct",
+                handle="@top3pct",
+                channel_id="UC123",
+                videos_url="https://example.com/videos",
+                streams_url="https://example.com/streams",
+            ),
+            stop_id="old-video",
+        )
+
+        self.assertEqual([entry.video_id for entry in entries], ["new-video"])
+        self.assertEqual(entries[0].source_tab, "rss")
+
     def test_audio_format_selection_prefers_best_quality_within_size_limit(self) -> None:
         format_id = _select_audio_format_id(
             [
@@ -132,6 +212,16 @@ class YoutubeClientTests(unittest.TestCase):
         self.assertEqual(transcript.status, "unavailable")
         self.assertEqual(client.download_calls, [])
         self.assertIn("duration limit", transcript.error or "")
+
+    def test_missing_cookies_skips_stt_and_keeps_metadata_only(self) -> None:
+        client = YoutubeClient(groq_api_key="test-key", yt_cookies=" ", sleep_fn=lambda _: None, jitter_fn=lambda: 0.0)
+        client.transcript_api = FakeTranscriptApi()
+        client._fetch_caption_fallback = lambda video, transcript_api_error=None: _unavailable_transcript("no captions")  # type: ignore[method-assign]
+
+        transcript = client.fetch_transcript(_video("abc", duration_seconds=1800))
+
+        self.assertEqual(transcript.status, "unavailable")
+        self.assertIn("YOUTUBE_INTAKE_YT_COOKIES", transcript.error or "")
 
 
 def _video(video_id: str, *, duration_seconds: int) -> VideoMetadata:

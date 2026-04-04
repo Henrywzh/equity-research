@@ -47,6 +47,12 @@ class FlatPlaylistEntry:
     title: str | None
     source_tab: str
     position: int
+    channel_id: str | None = None
+    channel_name: str | None = None
+    published_at: str | None = None
+    published_timestamp: int | None = None
+    description: str | None = None
+    thumbnail_url: str | None = None
 
 
 @dataclass(slots=True)
