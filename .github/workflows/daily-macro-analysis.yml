@@ -147,15 +147,15 @@ jobs:
           git diff --staged --quiet || git commit -m "data: refresh daily macro analysis $(date -u +%Y-%m-%dT%H:%M:%SZ) [skip ci]"
           git push
 
-      - name: Notify when analysis succeeds
-        if: ${{ steps.analyze.outputs.report_status == 'success' }}
+      - name: Notify when analysis is sendable
+        if: ${{ steps.analyze.outputs.report_status == 'success' || steps.analyze.outputs.report_status == 'partial' }}
         env:
           GMAIL_SENDER: ${{ secrets.GMAIL_SENDER }}
           GMAIL_APP_PASSWORD: ${{ secrets.GMAIL_APP_PASSWORD }}
           GMAIL_RECIPIENT: ${{ secrets.GMAIL_RECIPIENT }}
         run: python -m daily_macro notify --result-path "${{ steps.analyze.outputs.report_path }}"
 
-      - name: Skip notification for non-success report
-        if: ${{ steps.analyze.outputs.report_status != 'success' }}
+      - name: Skip notification for unsupported report status
+        if: ${{ steps.analyze.outputs.report_status != 'success' && steps.analyze.outputs.report_status != 'partial' }}
         run: |
           echo "Skipping Gmail because analysis report status was ${{ steps.analyze.outputs.report_status }}."

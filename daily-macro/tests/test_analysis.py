@@ -280,14 +280,16 @@ class AnalysisTests(unittest.TestCase):
         self.assertEqual(report["input"]["category_count"], 2)
         self.assertEqual(report["totals"]["article_count"], 3)
         self.assertEqual(session.calls, 5)
-        self.assertEqual(session.models_used, ["qwen/qwen3-32b"] * 5)
+        self.assertEqual(session.models_used, ["meta-llama/llama-4-scout-17b-16e-instruct"] * 5)
         self.assertEqual(report["diagnostics"]["batch_count"], 5)
 
         pulse = next(category for category in report["categories"] if category["category"] == "時事脈搏")
         self.assertEqual(pulse["status"], "success")
-        self.assertEqual(pulse["sub_batch_count"], 2)
+        self.assertEqual(pulse["sub_batch_count"], 3)
         self.assertTrue(any(article["content_truncated"] for article in pulse["articles"]))
-        self.assertTrue(all(article["model_used"] == "qwen/qwen3-32b" for article in pulse["articles"]))
+        self.assertTrue(
+            all(article["model_used"] == "meta-llama/llama-4-scout-17b-16e-instruct" for article in pulse["articles"])
+        )
         self.assertIn("estimated_input_tokens_max", pulse["diagnostics"])
         self.assertIn("serialized_request_bytes_max", pulse["diagnostics"])
 
@@ -840,13 +842,13 @@ class AnalysisTests(unittest.TestCase):
             report = run_analysis(date_string="2026-04-03", data_dir=self.data_dir, db_path=self.db_path)
 
         category = report["categories"][0]
-        self.assertEqual(category["sub_batch_count"], 2)
+        self.assertEqual(category["sub_batch_count"], 3)
         self.assertEqual(len(category["articles"]), 4)
         self.assertEqual(session.calls, 4)
         self.assertEqual(report["diagnostics"]["response_413_split_count"], 1)
         self.assertIn("response_413", category["diagnostics"]["split_reasons"])
 
-    def test_run_analysis_switches_to_fallback_for_rest_of_run_after_qwen_429(self) -> None:
+    def test_run_analysis_switches_to_next_model_for_rest_of_run_after_primary_429(self) -> None:
         self._insert_article(
             title="China one",
             source_article_id="3001",
@@ -955,17 +957,91 @@ class AnalysisTests(unittest.TestCase):
         self.assertEqual(
             session.models_used,
             [
+                "meta-llama/llama-4-scout-17b-16e-instruct",
                 "qwen/qwen3-32b",
-                "llama-3.1-8b-instant",
-                "llama-3.1-8b-instant",
+                "qwen/qwen3-32b",
+                "qwen/qwen3-32b",
+                "qwen/qwen3-32b",
+            ],
+        )
+        self.assertEqual(len(report["model_switches"]), 1)
+        self.assertEqual(report["model_switches"][0]["to_model"], "qwen/qwen3-32b")
+        self.assertEqual(report["diagnostics"]["fallback_switch_count"], 1)
+        self.assertIn("qwen/qwen3-32b", report["categories"][0]["diagnostics"]["models_attempted"])
+
+    def test_run_analysis_switches_from_qwen_to_instant_after_second_429(self) -> None:
+        self._insert_article(
+            title="China one",
+            source_article_id="3001",
+            section="中國財經",
+            published_at="2026-04-03T08:00:00+08:00",
+            content_text="a" * 800,
+        )
+
+        session = _FakeGroqSession(
+            [
+                _FakeResponse(429, headers={"Retry-After": "0"}),
+                _FakeResponse(429, headers={"Retry-After": "0"}),
+                _FakeResponse(
+                    200,
+                    payload={
+                        "choices": [
+                            {
+                                "message": {
+                                    "content": json.dumps(
+                                        {
+                                            "articles": [
+                                                {
+                                                    "source_article_id": "3001",
+                                                    "canonical_url": "https://example.com/3001",
+                                                    "novelty_score": 6,
+                                                    "relevance_score": 8,
+                                                    "urgency_score": 7,
+                                                    "named_entities": [],
+                                                    "key_points": ["China point"],
+                                                }
+                                            ]
+                                        },
+                                        ensure_ascii=False,
+                                    )
+                                }
+                            }
+                        ]
+                    },
+                ),
+                _FakeResponse(
+                    200,
+                    payload={
+                        "choices": [
+                            {
+                                "message": {
+                                    "content": json.dumps({"key_developments": ["China development"], "named_entities": []})
+                                }
+                            }
+                        ]
+                    },
+                ),
+            ]
+        )
+
+        with patch("daily_macro.analysis.load_groq_api_key", return_value="test-key"), patch(
+            "daily_macro.analysis._build_groq_session", return_value=session
+        ):
+            report = run_analysis(date_string="2026-04-03", data_dir=self.data_dir, db_path=self.db_path)
+
+        self.assertEqual(report["status"], "success")
+        self.assertEqual(
+            session.models_used,
+            [
+                "meta-llama/llama-4-scout-17b-16e-instruct",
+                "qwen/qwen3-32b",
                 "llama-3.1-8b-instant",
                 "llama-3.1-8b-instant",
             ],
         )
-        self.assertEqual(len(report["model_switches"]), 1)
-        self.assertEqual(report["model_switches"][0]["to_model"], "llama-3.1-8b-instant")
-        self.assertEqual(report["diagnostics"]["fallback_switch_count"], 1)
-        self.assertIn("llama-3.1-8b-instant", report["categories"][0]["diagnostics"]["models_attempted"])
+        self.assertEqual(len(report["model_switches"]), 2)
+        self.assertEqual(report["model_switches"][0]["to_model"], "qwen/qwen3-32b")
+        self.assertEqual(report["model_switches"][1]["to_model"], "llama-3.1-8b-instant")
 
 
 if __name__ == "__main__":

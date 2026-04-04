@@ -282,7 +282,14 @@ def _print_analysis_result(result: dict[str, object]) -> None:
     print(f"Report date: {result['report_date']}")
     print(f"Status: {result['status']}")
     print(f"Primary model: {result['model']['provider']}/{result['model']['primary_model']}")
-    print(f"Fallback model: {result['model']['provider']}/{result['model']['fallback_model']}")
+    fallback_models = result["model"].get("fallback_models") or []
+    if fallback_models:
+        print(
+            "Fallback models: "
+            + ", ".join(f"{result['model']['provider']}/{model_id}" for model_id in fallback_models)
+        )
+    else:
+        print(f"Fallback model: {result['model']['provider']}/{result['model']['fallback_model']}")
     print(f"Articles analyzed: {result['totals']['article_count']}")
     print(f"Categories: {result['input']['category_count']}")
     print(f"Full-text articles: {result['totals']['full_text_article_count']}")

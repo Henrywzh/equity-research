@@ -24,7 +24,7 @@ def load_analysis_result(result_path: str | Path) -> dict[str, Any]:
 
 def send_analysis_summary_email(summary: dict[str, Any]) -> tuple[bool, str]:
     status = str(summary.get("status") or "").strip().lower()
-    if status != "success":
+    if status not in {"success", "partial"}:
         return False, f"Skipped email because report status is {status or 'unknown'}."
 
     categories = list(summary.get("categories") or [])
@@ -59,17 +59,17 @@ def send_test_email() -> tuple[bool, str]:
         {
             "report_date": "2026-04-04",
             "generated_at": "2026-04-04T07:05:00+00:00",
-            "status": "success",
+            "status": "partial",
             "model": {
                 "provider": "groq",
-                "primary_model": "qwen/qwen3-32b",
-                "fallback_model": "llama-3.1-8b-instant",
+                "primary_model": "meta-llama/llama-4-scout-17b-16e-instruct",
+                "fallback_models": ["qwen/qwen3-32b", "llama-3.1-8b-instant"],
             },
             "model_switches": [
                 {
-                    "from_model": "qwen/qwen3-32b",
-                    "to_model": "llama-3.1-8b-instant",
-                    "reason": "Primary model returned 429 rate_limit_exceeded.",
+                    "from_model": "meta-llama/llama-4-scout-17b-16e-instruct",
+                    "to_model": "qwen/qwen3-32b",
+                    "reason": "Model meta-llama/llama-4-scout-17b-16e-instruct returned 429 rate_limit_exceeded.",
                 }
             ],
             "input": {"article_count": 4, "category_count": 2},
@@ -85,19 +85,27 @@ def send_test_email() -> tuple[bool, str]:
             },
             "totals": {
                 "article_count": 4,
-                "successful_article_analyses": 4,
-                "failed_article_analyses": 0,
+                "successful_article_analyses": 3,
+                "failed_article_analyses": 1,
                 "full_text_article_count": 3,
                 "truncated_article_count": 1,
-                "successful_categories": 2,
-                "partial_categories": 0,
+                "successful_categories": 1,
+                "partial_categories": 1,
                 "failed_categories": 0,
             },
+            "errors": [
+                {
+                    "type": "article",
+                    "target": "https://example.com/2",
+                    "classification": "incomplete_model_output",
+                    "message": "Model response omitted this article from the category batch.",
+                }
+            ],
             "categories": [
                 {
                     "category": "國際財經",
                     "article_count": 2,
-                    "status": "success",
+                    "status": "partial",
                     "key_developments": [
                         "Markets focused on fresh geopolitical risk around Iran-related escalation.",
                         "Major global banks tightened operations and contingency planning in Europe.",
@@ -146,7 +154,9 @@ def _build_subject(summary: dict[str, Any]) -> str:
     report_date = summary.get("report_date") or "Unknown date"
     category_count = int((summary.get("input") or {}).get("category_count") or 0)
     article_count = int((summary.get("totals") or {}).get("article_count") or 0)
-    return f"[DAILY MACRO] {report_date} | {article_count} article(s), {category_count} categorie(s)"
+    status = str(summary.get("status") or "unknown").upper()
+    suffix = f"[{status}] " if status != "SUCCESS" else ""
+    return f"[DAILY MACRO] {suffix}{report_date} | {article_count} article(s), {category_count} categorie(s)"
 
 
 def _build_plain_body(summary: dict[str, Any]) -> str:
@@ -158,7 +168,7 @@ def _build_plain_body(summary: dict[str, Any]) -> str:
         f"Generated at: {summary.get('generated_at') or 'Unknown'}",
         f"Status: {summary.get('status') or 'Unknown'}",
         f"Primary model: {_model_label(summary, 'primary_model')}",
-        f"Fallback model: {_model_label(summary, 'fallback_model')}",
+        f"Fallback models: {_fallback_model_labels(summary)}",
         f"Article count: {(summary.get('totals') or {}).get('article_count') or 0}",
         f"Category count: {(summary.get('input') or {}).get('category_count') or 0}",
         "",
@@ -232,7 +242,7 @@ def _build_html_body(summary: dict[str, Any]) -> str:
           </p>
           <p style="margin:6px 0 20px;color:#4b5563;">
             Primary model: {_escape_html(_model_label(summary, "primary_model"))} |
-            Fallback model: {_escape_html(_model_label(summary, "fallback_model"))}
+            Fallback models: {_escape_html(_fallback_model_labels(summary))}
           </p>
           {notes_html}
           {"".join(category_blocks)}
@@ -244,7 +254,11 @@ def _build_html_body(summary: dict[str, Any]) -> str:
 
 def _build_run_notes(summary: dict[str, Any]) -> list[str]:
     diagnostics = summary.get("diagnostics") or {}
+    totals = summary.get("totals") or {}
     notes: list[str] = []
+    if str(summary.get("status") or "").lower() == "partial":
+        unresolved_count = int(totals.get("failed_article_analyses") or 0)
+        notes.append(f"This digest is partial. {unresolved_count} article(s) remained unresolved after analysis salvage.")
     truncated_count = int((summary.get("totals") or {}).get("truncated_article_count") or 0)
     if truncated_count > 0:
         notes.append(f"{truncated_count} article(s) were truncated to fit the working request budget.")
@@ -267,6 +281,9 @@ def _build_run_notes(summary: dict[str, Any]) -> list[str]:
             f"Model switch: {item.get('from_model')} -> {item.get('to_model')} ({item.get('reason')})"
             for item in summary.get("model_switches") or []
         )
+    error_classes = sorted({str(item.get("classification") or "unclassified") for item in summary.get("errors") or []})
+    if error_classes:
+        notes.append("Failure classifications present: " + ", ".join(error_classes))
     output_path = summary.get("output_path")
     if output_path:
         notes.append(f"Stored analysis report: {output_path}")
@@ -278,6 +295,18 @@ def _model_label(summary: dict[str, Any], key: str) -> str:
     provider = str(model.get("provider") or "groq")
     model_id = str(model.get(key) or "unknown")
     return f"{provider}/{model_id}"
+
+
+def _fallback_model_labels(summary: dict[str, Any]) -> str:
+    model = summary.get("model") or {}
+    provider = str(model.get("provider") or "groq")
+    fallback_models = list(model.get("fallback_models") or [])
+    if fallback_models:
+        return ", ".join(f"{provider}/{model_id}" for model_id in fallback_models)
+    legacy = model.get("fallback_model")
+    if legacy:
+        return f"{provider}/{legacy}"
+    return f"{provider}/unknown"
 
 
 def _get_gmail_credentials() -> tuple[str, str, str]:

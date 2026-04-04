@@ -49,14 +49,14 @@ def _success_report() -> dict[str, object]:
         "status": "success",
         "model": {
             "provider": "groq",
-            "primary_model": "qwen/qwen3-32b",
-            "fallback_model": "llama-3.1-8b-instant",
+            "primary_model": "meta-llama/llama-4-scout-17b-16e-instruct",
+            "fallback_models": ["qwen/qwen3-32b", "llama-3.1-8b-instant"],
         },
         "model_switches": [
             {
-                "from_model": "qwen/qwen3-32b",
-                "to_model": "llama-3.1-8b-instant",
-                "reason": "Primary model returned 429 rate_limit_exceeded.",
+                "from_model": "meta-llama/llama-4-scout-17b-16e-instruct",
+                "to_model": "qwen/qwen3-32b",
+                "reason": "Model meta-llama/llama-4-scout-17b-16e-instruct returned 429 rate_limit_exceeded.",
             }
         ],
         "input": {"article_count": 3, "category_count": 2},
@@ -138,12 +138,36 @@ class NotifierTests(unittest.TestCase):
         self.assertIn("Pulse development", rendered_text)
         self.assertIn("Model switch", rendered_text)
 
-    def test_send_analysis_summary_email_skips_partial(self) -> None:
+    def test_send_analysis_summary_email_sends_partial_with_warning(self) -> None:
         report = _success_report()
         report["status"] = "partial"
-        sent, message = send_analysis_summary_email(report)
-        self.assertFalse(sent)
-        self.assertIn("Skipped email because report status is partial", message)
+        report["errors"] = [
+            {
+                "type": "article",
+                "target": "https://example.com/2",
+                "classification": "incomplete_model_output",
+                "message": "Model response omitted this article from the category batch.",
+            }
+        ]
+        report["totals"]["failed_article_analyses"] = 1
+
+        with patch.dict(
+            os.environ,
+            {
+                "DAILY_MACRO_GMAIL_SENDER": "sender@example.com",
+                "DAILY_MACRO_GMAIL_APP_PASSWORD": "app-password",
+                "DAILY_MACRO_GMAIL_RECIPIENT": "recipient@example.com",
+            },
+            clear=False,
+        ), patch("daily_macro.notifier._load_local_config", return_value={}), patch(
+            "daily_macro.notifier.smtplib.SMTP_SSL", _FakeSMTP
+        ):
+            sent, message = send_analysis_summary_email(report)
+
+        self.assertTrue(sent)
+        self.assertIn("Sent daily macro Gmail summary", message)
+        email_payload = message_from_string(_FakeSMTP.sent_messages[0]["payload"])
+        self.assertIn("[PARTIAL]", email_payload["Subject"])
 
     def test_send_analysis_summary_email_skips_empty_categories(self) -> None:
         report = _success_report()

@@ -23,18 +23,22 @@ GROQ_CHAT_COMPLETIONS_URL = "https://api.groq.com/openai/v1/chat/completions"
 REPORT_FILE_NAME = "hkej-news-analysis.json"
 REPORT_SCHEMA_VERSION = 4
 DEFAULT_PROVIDER = "groq"
-PRIMARY_MODEL_ID = "qwen/qwen3-32b"
-FALLBACK_MODEL_ID = "llama-3.1-8b-instant"
+PRIMARY_MODEL_ID = "meta-llama/llama-4-scout-17b-16e-instruct"
+FALLBACK_MODEL_IDS = ["qwen/qwen3-32b", "llama-3.1-8b-instant"]
 DEFAULT_OUTPUT_TOKENS = 1200
 DEFAULT_INPUT_BUDGET_TOKENS = 4500
+DEFAULT_SYNTHESIS_INPUT_BUDGET_TOKENS = 2400
 DEFAULT_PROMPT_OVERHEAD_TOKENS = 900
 SHORT_ARTICLE_FULL_TEXT_THRESHOLD = 1500
 DEFAULT_CHAT_RETRIES = 4
 RATE_LIMIT_REQUEST_FLOOR = 0
 RATE_LIMIT_TOKEN_FLOOR = 800
 DEFAULT_REQUEST_BYTE_BUDGET = 12000
+DEFAULT_SYNTHESIS_REQUEST_BYTE_BUDGET = 8000
 MIN_REQUEST_BYTE_BUDGET = 4000
+MIN_SYNTHESIS_REQUEST_BYTE_BUDGET = 3000
 MIN_INPUT_BUDGET_TOKENS = 1200
+MIN_SYNTHESIS_INPUT_BUDGET_TOKENS = 800
 CATEGORY_SHRINK_STEP_CHARS = 400
 CATEGORY_MIN_CONTENT_CHARS = 0
 CATEGORY_ORDER = [
@@ -76,8 +80,10 @@ class ModelRateLimitState:
 
 @dataclass(slots=True)
 class CategoryBudgetState:
-    input_budget_tokens: int = DEFAULT_INPUT_BUDGET_TOKENS
-    request_byte_budget: int = DEFAULT_REQUEST_BYTE_BUDGET
+    article_input_budget_tokens: int = DEFAULT_INPUT_BUDGET_TOKENS
+    article_request_byte_budget: int = DEFAULT_REQUEST_BYTE_BUDGET
+    synthesis_input_budget_tokens: int = DEFAULT_SYNTHESIS_INPUT_BUDGET_TOKENS
+    synthesis_request_byte_budget: int = DEFAULT_SYNTHESIS_REQUEST_BYTE_BUDGET
 
 
 @dataclass(slots=True)
@@ -209,34 +215,62 @@ class RateLimitGovernor:
 class AnalysisRuntime:
     session: requests.Session
     governor: RateLimitGovernor
-    primary_model: ModelConfig
-    fallback_model: ModelConfig
-    current_model: ModelConfig
+    model_chain: list[ModelConfig]
+    current_model_index: int = 0
     model_switches: list[dict[str, Any]] = field(default_factory=list)
     last_attempted_model: str | None = None
     diagnostics: RuntimeDiagnostics = field(default_factory=RuntimeDiagnostics)
     category_diagnostics: dict[str, CategoryDiagnostics] = field(default_factory=dict)
     category_budgets: dict[str, CategoryBudgetState] = field(default_factory=dict)
 
-    def switch_to_fallback(self, reason: str) -> None:
-        if self.current_model.model_id == self.fallback_model.model_id:
-            return
+    @property
+    def primary_model(self) -> ModelConfig:
+        return self.model_chain[0]
+
+    @property
+    def fallback_models(self) -> list[ModelConfig]:
+        return self.model_chain[1:]
+
+    @property
+    def current_model(self) -> ModelConfig:
+        return self.model_chain[self.current_model_index]
+
+    def get_model_config(self, model_id: str) -> ModelConfig:
+        for model in self.model_chain:
+            if model.model_id == model_id:
+                return model
+        raise KeyError(model_id)
+
+    def next_model_after(self, model_id: str) -> ModelConfig | None:
+        for index, model in enumerate(self.model_chain):
+            if model.model_id == model_id:
+                next_index = index + 1
+                if next_index < len(self.model_chain):
+                    return self.model_chain[next_index]
+                return None
+        return None
+
+    def switch_to_next_model(self, reason: str) -> bool:
+        next_model = self.next_model_after(self.current_model.model_id)
+        if next_model is None:
+            return False
         self.diagnostics.fallback_switch_count += 1
         self.model_switches.append(
             {
                 "switched_at": datetime.now().astimezone().isoformat(),
                 "from_model": self.current_model.model_id,
-                "to_model": self.fallback_model.model_id,
+                "to_model": next_model.model_id,
                 "reason": reason,
             }
         )
         LOGGER.info(
             "Switching Groq model from %s to %s: %s",
             self.current_model.model_id,
-            self.fallback_model.model_id,
+            next_model.model_id,
             reason,
         )
-        self.current_model = self.fallback_model
+        self.current_model_index += 1
+        return True
 
     def get_category_diagnostics(self, category_name: str) -> CategoryDiagnostics:
         return self.category_diagnostics.setdefault(category_name, CategoryDiagnostics())
@@ -280,16 +314,29 @@ class AnalysisRuntime:
     def record_failed_batch(self) -> None:
         self.diagnostics.failed_batch_count += 1
 
-    def tighten_category_budget(self, category_name: str, classification: str) -> None:
+    def tighten_category_budget(self, category_name: str, classification: str, *, batch_kind: str = "article_batch") -> None:
         state = self.get_category_budget(category_name)
-        if classification == "payload_too_large":
-            state.request_byte_budget = max(MIN_REQUEST_BYTE_BUDGET, state.request_byte_budget // 2)
-        elif classification == "rate_limited":
-            state.input_budget_tokens = max(MIN_INPUT_BUDGET_TOKENS, state.input_budget_tokens // 2)
-            state.request_byte_budget = max(MIN_REQUEST_BYTE_BUDGET, int(state.request_byte_budget * 0.75))
+        if batch_kind == "synthesis":
+            token_attr = "synthesis_input_budget_tokens"
+            byte_attr = "synthesis_request_byte_budget"
+            min_tokens = MIN_SYNTHESIS_INPUT_BUDGET_TOKENS
+            min_bytes = MIN_SYNTHESIS_REQUEST_BYTE_BUDGET
         else:
-            state.input_budget_tokens = max(MIN_INPUT_BUDGET_TOKENS, int(state.input_budget_tokens * 0.8))
-            state.request_byte_budget = max(MIN_REQUEST_BYTE_BUDGET, int(state.request_byte_budget * 0.8))
+            token_attr = "article_input_budget_tokens"
+            byte_attr = "article_request_byte_budget"
+            min_tokens = MIN_INPUT_BUDGET_TOKENS
+            min_bytes = MIN_REQUEST_BYTE_BUDGET
+
+        current_tokens = getattr(state, token_attr)
+        current_bytes = getattr(state, byte_attr)
+        if classification == "payload_too_large":
+            setattr(state, byte_attr, max(min_bytes, current_bytes // 2))
+        elif classification == "rate_limited":
+            setattr(state, token_attr, max(min_tokens, current_tokens // 2))
+            setattr(state, byte_attr, max(min_bytes, int(current_bytes * 0.75)))
+        else:
+            setattr(state, token_attr, max(min_tokens, int(current_tokens * 0.8)))
+            setattr(state, byte_attr, max(min_bytes, int(current_bytes * 0.8)))
 
 
 def run_analysis(
@@ -331,9 +378,7 @@ def run_analysis(
     runtime = AnalysisRuntime(
         session=_build_groq_session(load_groq_api_key()),
         governor=RateLimitGovernor(),
-        primary_model=ModelConfig(PRIMARY_MODEL_ID),
-        fallback_model=ModelConfig(FALLBACK_MODEL_ID),
-        current_model=ModelConfig(PRIMARY_MODEL_ID),
+        model_chain=[ModelConfig(PRIMARY_MODEL_ID), *(ModelConfig(model_id) for model_id in FALLBACK_MODEL_IDS)],
     )
 
     category_reports: list[dict[str, Any]] = []
@@ -369,7 +414,7 @@ def run_analysis(
         "model": {
             "provider": DEFAULT_PROVIDER,
             "primary_model": runtime.primary_model.model_id,
-            "fallback_model": runtime.fallback_model.model_id,
+            "fallback_models": [model.model_id for model in runtime.fallback_models],
         },
         "model_switches": runtime.model_switches,
         "input": {
@@ -523,7 +568,12 @@ def _analyze_category(
 
     if successful_articles:
         try:
-            synthesis_payload, synthesis_model = _invoke_synthesis(runtime, category_name, successful_articles)
+            synthesis_payload, synthesis_model, synthesis_batch_count = _synthesize_category(
+                runtime,
+                category_name,
+                successful_articles,
+            )
+            sub_batch_count += synthesis_batch_count
             key_developments = _normalize_string_list(synthesis_payload.get("key_developments"), limit=5)
             named_entities = _normalize_entities(synthesis_payload.get("named_entities"))
         except Exception as exc:
@@ -583,21 +633,26 @@ def _process_batch_recursive(
     batch_label: str = "1",
     *,
     allow_salvage: bool = True,
+    model_override: ModelConfig | None = None,
 ) -> tuple[list[dict[str, Any]], list[dict[str, Any]], int]:
     working_batch = [_clone_prepared_article(article) for article in batch_articles]
     budget_state = runtime.get_category_budget(category_name)
+    active_model = model_override or runtime.current_model
     content_shrunk = _shrink_batch_to_budget(
         category_name,
         working_batch,
-        input_budget_tokens=budget_state.input_budget_tokens,
-        request_byte_budget=budget_state.request_byte_budget,
-        model_id=runtime.current_model.model_id,
+        input_budget_tokens=budget_state.article_input_budget_tokens,
+        request_byte_budget=budget_state.article_request_byte_budget,
+        model_id=active_model.model_id,
     )
     estimated_input_tokens = _estimate_batch_request_tokens(category_name, working_batch)
-    request_bytes = _estimate_batch_request_bytes(category_name, working_batch, runtime.current_model.model_id)
+    request_bytes = _estimate_batch_request_bytes(category_name, working_batch, active_model.model_id)
 
     if (
-        (estimated_input_tokens > budget_state.input_budget_tokens or request_bytes > budget_state.request_byte_budget)
+        (
+            estimated_input_tokens > budget_state.article_input_budget_tokens
+            or request_bytes > budget_state.article_request_byte_budget
+        )
         and len(working_batch) > 1
     ):
         runtime.record_split(category_name, "pre_send_budget")
@@ -610,8 +665,12 @@ def _process_batch_recursive(
             len(working_batch),
         )
         left, right = _split_batch(working_batch)
-        left_results, left_errors, left_count = _process_batch_recursive(runtime, category_name, left, f"{batch_label}a")
-        right_results, right_errors, right_count = _process_batch_recursive(runtime, category_name, right, f"{batch_label}b")
+        left_results, left_errors, left_count = _process_batch_recursive(
+            runtime, category_name, left, f"{batch_label}a", model_override=model_override
+        )
+        right_results, right_errors, right_count = _process_batch_recursive(
+            runtime, category_name, right, f"{batch_label}b", model_override=model_override
+        )
         return left_results + right_results, left_errors + right_errors, left_count + right_count
 
     try:
@@ -622,6 +681,7 @@ def _process_batch_recursive(
             estimated_input_tokens,
             batch_label=batch_label,
             content_shrunk=content_shrunk,
+            model_override=model_override,
         )
         merged_results, missing_articles = _merge_batch_article_results(working_batch, payload, model_used)
         if missing_articles:
@@ -654,7 +714,7 @@ def _process_batch_recursive(
                 category_name,
                 batch_label,
             )
-            runtime.tighten_category_budget(category_name, "incomplete_model_output")
+            runtime.tighten_category_budget(category_name, "incomplete_model_output", batch_kind="article_batch")
             if len(missing_articles) == 1:
                 salvage_results, salvage_errors, salvage_count = _process_batch_recursive(
                     runtime,
@@ -662,6 +722,7 @@ def _process_batch_recursive(
                     missing_articles,
                     f"{batch_label}m",
                     allow_salvage=False,
+                    model_override=model_override,
                 )
             else:
                 left, right = _split_batch(missing_articles)
@@ -670,16 +731,64 @@ def _process_batch_recursive(
                     category_name,
                     left,
                     f"{batch_label}ma",
+                    model_override=model_override,
                 )
                 right_results, right_errors, right_count = _process_batch_recursive(
                     runtime,
                     category_name,
                     right,
                     f"{batch_label}mb",
+                    model_override=model_override,
                 )
                 salvage_results = left_results + right_results
                 salvage_errors = left_errors + right_errors
                 salvage_count = left_count + right_count
+            unresolved_results = [result for result in salvage_results if result.get("error")]
+            if unresolved_results:
+                next_model = runtime.next_model_after(active_model.model_id)
+                if next_model is not None:
+                    unresolved_articles = [
+                        article
+                        for article in missing_articles
+                        if any(
+                            _article_key(result.get("source_article_id"), result.get("canonical_url"))
+                            == _article_key(article.get("source_article_id"), article.get("canonical_url"))
+                            for result in unresolved_results
+                        )
+                    ]
+                    if unresolved_articles:
+                        LOGGER.info(
+                            "Escalating %s omitted article(s) in category %s batch %s from %s to %s.",
+                            len(unresolved_articles),
+                            category_name,
+                            batch_label,
+                            active_model.model_id,
+                            next_model.model_id,
+                        )
+                        retry_results, retry_errors, retry_count = _process_batch_recursive(
+                            runtime,
+                            category_name,
+                            unresolved_articles,
+                            f"{batch_label}e",
+                            allow_salvage=False,
+                            model_override=next_model,
+                        )
+                        salvage_results = [
+                            result
+                            for result in salvage_results
+                            if _article_key(result.get("source_article_id"), result.get("canonical_url"))
+                            not in {
+                                _article_key(article.get("source_article_id"), article.get("canonical_url"))
+                                for article in unresolved_articles
+                            }
+                        ] + retry_results
+                        salvage_errors = [
+                            error
+                            for error in salvage_errors
+                            if error.get("target")
+                            not in {article.get("canonical_url") for article in unresolved_articles}
+                        ] + retry_errors
+                        salvage_count += retry_count
             combined = _order_results_like_input(working_batch, merged_results + salvage_results)
             return combined, salvage_errors, 1 + salvage_count
         return merged_results, [], 1
@@ -688,7 +797,7 @@ def _process_batch_recursive(
         classification = _classify_exception(exc)
         if status_code == 413 and len(working_batch) > 1:
             runtime.record_split(category_name, "response_413")
-            runtime.tighten_category_budget(category_name, classification)
+            runtime.tighten_category_budget(category_name, classification, batch_kind="article_batch")
             LOGGER.info(
                 "Splitting category %s batch %s after HTTP 413: article_count=%s.",
                 category_name,
@@ -696,14 +805,18 @@ def _process_batch_recursive(
                 len(working_batch),
             )
             left, right = _split_batch(working_batch)
-            left_results, left_errors, left_count = _process_batch_recursive(runtime, category_name, left, f"{batch_label}a")
-            right_results, right_errors, right_count = _process_batch_recursive(runtime, category_name, right, f"{batch_label}b")
+            left_results, left_errors, left_count = _process_batch_recursive(
+                runtime, category_name, left, f"{batch_label}a", model_override=model_override
+            )
+            right_results, right_errors, right_count = _process_batch_recursive(
+                runtime, category_name, right, f"{batch_label}b", model_override=model_override
+            )
             return left_results + right_results, left_errors + right_errors, left_count + right_count
 
-        model_used = runtime.last_attempted_model or runtime.current_model.model_id
+        model_used = runtime.last_attempted_model or active_model.model_id
         message = str(exc)
         if len(working_batch) > 1 and classification in {"rate_limited", "http_error", "unexpected_error"}:
-            runtime.tighten_category_budget(category_name, classification)
+            runtime.tighten_category_budget(category_name, classification, batch_kind="article_batch")
             LOGGER.info(
                 "Retrying category %s batch %s as smaller sub-batches after %s.",
                 category_name,
@@ -711,8 +824,12 @@ def _process_batch_recursive(
                 classification,
             )
             left, right = _split_batch(working_batch)
-            left_results, left_errors, left_count = _process_batch_recursive(runtime, category_name, left, f"{batch_label}a")
-            right_results, right_errors, right_count = _process_batch_recursive(runtime, category_name, right, f"{batch_label}b")
+            left_results, left_errors, left_count = _process_batch_recursive(
+                runtime, category_name, left, f"{batch_label}a", model_override=model_override
+            )
+            right_results, right_errors, right_count = _process_batch_recursive(
+                runtime, category_name, right, f"{batch_label}b", model_override=model_override
+            )
             return left_results + right_results, left_errors + right_errors, left_count + right_count
         runtime.record_failed_batch()
         failed_results = [
@@ -735,11 +852,11 @@ def _process_batch_recursive(
         ]
         return failed_results, failed_errors, 1
     except Exception as exc:
-        model_used = runtime.last_attempted_model or runtime.current_model.model_id
+        model_used = runtime.last_attempted_model or active_model.model_id
         message = str(exc)
         classification = _classify_exception(exc)
         if len(working_batch) > 1 and classification in {"invalid_json", "unexpected_error"}:
-            runtime.tighten_category_budget(category_name, classification)
+            runtime.tighten_category_budget(category_name, classification, batch_kind="article_batch")
             LOGGER.info(
                 "Retrying category %s batch %s as smaller sub-batches after %s.",
                 category_name,
@@ -747,9 +864,32 @@ def _process_batch_recursive(
                 classification,
             )
             left, right = _split_batch(working_batch)
-            left_results, left_errors, left_count = _process_batch_recursive(runtime, category_name, left, f"{batch_label}a")
-            right_results, right_errors, right_count = _process_batch_recursive(runtime, category_name, right, f"{batch_label}b")
+            left_results, left_errors, left_count = _process_batch_recursive(
+                runtime, category_name, left, f"{batch_label}a", model_override=model_override
+            )
+            right_results, right_errors, right_count = _process_batch_recursive(
+                runtime, category_name, right, f"{batch_label}b", model_override=model_override
+            )
             return left_results + right_results, left_errors + right_errors, left_count + right_count
+        if len(working_batch) == 1 and classification in {"invalid_json", "incomplete_model_output", "unexpected_error"}:
+            next_model = runtime.next_model_after(active_model.model_id)
+            if next_model is not None:
+                LOGGER.info(
+                    "Escalating category %s batch %s from %s to %s after %s.",
+                    category_name,
+                    batch_label,
+                    active_model.model_id,
+                    next_model.model_id,
+                    classification,
+                )
+                return _process_batch_recursive(
+                    runtime,
+                    category_name,
+                    working_batch,
+                    f"{batch_label}n",
+                    allow_salvage=False,
+                    model_override=next_model,
+                )
         runtime.record_failed_batch()
         failed_results = [
             _build_failed_article_result(
@@ -780,37 +920,20 @@ def _invoke_article_batch(
     *,
     batch_label: str,
     content_shrunk: bool,
+    model_override: ModelConfig | None = None,
 ) -> tuple[dict[str, Any], str]:
     messages = _build_article_batch_messages(category_name, batch_articles)
+    active_model = model_override or runtime.current_model
     context = BatchContext(
         category_name=category_name,
         batch_kind="article_batch",
         batch_label=batch_label,
         article_count=len(batch_articles),
         estimated_input_tokens=estimated_input_tokens,
-        serialized_request_bytes=_estimate_request_payload_bytes(PRIMARY_MODEL_ID, messages, DEFAULT_OUTPUT_TOKENS),
+        serialized_request_bytes=_estimate_request_payload_bytes(active_model.model_id, messages, active_model.max_completion_tokens),
         content_shrunk=content_shrunk,
     )
-    return _invoke_json_with_retry(runtime, messages, estimated_input_tokens, context)
-
-
-def _invoke_synthesis(
-    runtime: AnalysisRuntime,
-    category_name: str,
-    successful_articles: list[dict[str, Any]],
-) -> tuple[dict[str, Any], str]:
-    messages = _build_synthesis_messages(category_name, successful_articles)
-    estimated_input_tokens = _estimate_messages_tokens(messages)
-    context = BatchContext(
-        category_name=category_name,
-        batch_kind="synthesis",
-        batch_label="summary",
-        article_count=len(successful_articles),
-        estimated_input_tokens=estimated_input_tokens,
-        serialized_request_bytes=_estimate_request_payload_bytes(PRIMARY_MODEL_ID, messages, DEFAULT_OUTPUT_TOKENS),
-        content_shrunk=False,
-    )
-    return _invoke_json_with_retry(runtime, messages, estimated_input_tokens, context)
+    return _invoke_json_with_retry(runtime, messages, estimated_input_tokens, context, model_override=model_override)
 
 
 def _invoke_json_with_retry(
@@ -818,8 +941,16 @@ def _invoke_json_with_retry(
     messages: list[dict[str, Any]],
     estimated_input_tokens: int,
     context: BatchContext,
+    *,
+    model_override: ModelConfig | None = None,
 ) -> tuple[dict[str, Any], str]:
-    raw_text, model_used = _chat_completion(runtime, messages, estimated_input_tokens, context)
+    raw_text, model_used = _chat_completion(
+        runtime,
+        messages,
+        estimated_input_tokens,
+        context,
+        model_override=model_override,
+    )
     try:
         return _parse_json_content(raw_text), model_used
     except ValueError:
@@ -844,10 +975,20 @@ def _invoke_json_with_retry(
             batch_label=context.batch_label,
             article_count=context.article_count,
             estimated_input_tokens=repaired_tokens,
-            serialized_request_bytes=_estimate_request_payload_bytes(PRIMARY_MODEL_ID, repair_messages, DEFAULT_OUTPUT_TOKENS),
+            serialized_request_bytes=_estimate_request_payload_bytes(
+                (model_override or runtime.current_model).model_id,
+                repair_messages,
+                (model_override or runtime.current_model).max_completion_tokens,
+            ),
             content_shrunk=context.content_shrunk,
         )
-        repaired_text, repaired_model = _chat_completion(runtime, repair_messages, repaired_tokens, repair_context)
+        repaired_text, repaired_model = _chat_completion(
+            runtime,
+            repair_messages,
+            repaired_tokens,
+            repair_context,
+            model_override=model_override,
+        )
         return _parse_json_content(repaired_text), repaired_model
 
 
@@ -856,10 +997,12 @@ def _chat_completion(
     messages: list[dict[str, Any]],
     estimated_input_tokens: int,
     context: BatchContext,
+    *,
+    model_override: ModelConfig | None = None,
 ) -> tuple[str, str]:
     response: requests.Response | None = None
     for attempt in range(DEFAULT_CHAT_RETRIES):
-        model = runtime.current_model
+        model = model_override or runtime.current_model
         runtime.last_attempted_model = model.model_id
         attempt_context = BatchContext(
             category_name=context.category_name,
@@ -924,16 +1067,20 @@ def _chat_completion(
             )
             response.raise_for_status()
 
-        if response.status_code == 429 and model.model_id == runtime.primary_model.model_id:
+        if response.status_code == 429 and model_override is None:
             LOGGER.info(
                 "Groq returned HTTP 429 for category %s batch=%s on %s.",
                 attempt_context.category_name,
                 attempt_context.batch_label,
                 model.model_id,
             )
-            runtime.tighten_category_budget(attempt_context.category_name, "rate_limited")
-            runtime.switch_to_fallback("Primary model returned 429 rate_limit_exceeded.")
-            continue
+            runtime.tighten_category_budget(
+                attempt_context.category_name,
+                "rate_limited",
+                batch_kind="synthesis" if attempt_context.batch_kind.startswith("synthesis") else "article_batch",
+            )
+            if runtime.switch_to_next_model(f"Model {model.model_id} returned 429 rate_limit_exceeded."):
+                continue
 
         if response.status_code in {429, 500, 502, 503, 504}:
             if response.status_code == 429:
@@ -943,7 +1090,11 @@ def _chat_completion(
                     attempt_context.batch_label,
                     model.model_id,
                 )
-                runtime.tighten_category_budget(attempt_context.category_name, "rate_limited")
+                runtime.tighten_category_budget(
+                    attempt_context.category_name,
+                    "rate_limited",
+                    batch_kind="synthesis" if attempt_context.batch_kind.startswith("synthesis") else "article_batch",
+                )
             if attempt == DEFAULT_CHAT_RETRIES - 1:
                 response.raise_for_status()
             delay_seconds = runtime.governor.apply_backoff(model.model_id, response, attempt)
@@ -1031,13 +1182,121 @@ def _build_article_batch_messages(category_name: str, batch_articles: list[dict[
     ]
 
 
-def _build_synthesis_messages(category_name: str, successful_articles: list[dict[str, Any]]) -> list[dict[str, Any]]:
+def _synthesize_category(
+    runtime: AnalysisRuntime,
+    category_name: str,
+    successful_articles: list[dict[str, Any]],
+) -> tuple[dict[str, Any], str, int]:
+    synthesis_items = [_article_to_synthesis_item(article) for article in successful_articles]
+    return _synthesize_summary_items(runtime, category_name, synthesis_items, batch_label_prefix="summary")
+
+
+def _synthesize_summary_items(
+    runtime: AnalysisRuntime,
+    category_name: str,
+    synthesis_items: list[dict[str, Any]],
+    *,
+    batch_label_prefix: str,
+    model_override: ModelConfig | None = None,
+) -> tuple[dict[str, Any], str, int]:
+    active_model = model_override or runtime.current_model
+    planned_batches = _plan_synthesis_batches(runtime, category_name, synthesis_items, model_id=active_model.model_id)
+    partial_summaries: list[dict[str, Any]] = []
+    total_batch_count = 0
+    model_used = active_model.model_id
+
+    for index, batch in enumerate(planned_batches, start=1):
+        batch_label = batch_label_prefix if len(planned_batches) == 1 else f"{batch_label_prefix}{index}"
+        try:
+            payload, batch_model = _invoke_synthesis_batch(
+                runtime,
+                category_name,
+                batch,
+                batch_label=batch_label,
+                model_override=model_override,
+            )
+            partial_summaries.append(_summary_to_synthesis_item(payload, len(batch), batch_label))
+            model_used = batch_model
+            total_batch_count += 1
+        except Exception as exc:
+            classification = _classify_exception(exc)
+            if len(batch) > 1 and classification in {"payload_too_large", "invalid_json", "unexpected_error"}:
+                if classification == "payload_too_large":
+                    runtime.record_split(category_name, "response_413")
+                runtime.tighten_category_budget(category_name, classification, batch_kind="synthesis")
+                left, right = _split_batch(batch)
+                left_payload, left_model, left_count = _synthesize_summary_items(
+                    runtime,
+                    category_name,
+                    left,
+                    batch_label_prefix=f"{batch_label}a",
+                    model_override=model_override,
+                )
+                right_payload, right_model, right_count = _synthesize_summary_items(
+                    runtime,
+                    category_name,
+                    right,
+                    batch_label_prefix=f"{batch_label}b",
+                    model_override=model_override,
+                )
+                partial_summaries.extend(
+                    [
+                        _summary_to_synthesis_item(left_payload, len(left), f"{batch_label}a"),
+                        _summary_to_synthesis_item(right_payload, len(right), f"{batch_label}b"),
+                    ]
+                )
+                model_used = right_model or left_model
+                total_batch_count += left_count + right_count
+                continue
+            raise
+
+    if len(partial_summaries) == 1:
+        summary = partial_summaries[0]
+        return {
+            "key_developments": summary["key_developments"],
+            "named_entities": summary["named_entities"],
+        }, model_used, total_batch_count
+
+    merged_payload, merged_model, merged_count = _synthesize_summary_items(
+        runtime,
+        category_name,
+        partial_summaries,
+        batch_label_prefix=f"{batch_label_prefix}m",
+        model_override=model_override,
+    )
+    return merged_payload, merged_model, total_batch_count + merged_count
+
+
+def _invoke_synthesis_batch(
+    runtime: AnalysisRuntime,
+    category_name: str,
+    synthesis_items: list[dict[str, Any]],
+    *,
+    batch_label: str,
+    model_override: ModelConfig | None = None,
+) -> tuple[dict[str, Any], str]:
+    active_model = model_override or runtime.current_model
+    messages = _build_synthesis_messages(category_name, synthesis_items)
+    estimated_input_tokens = _estimate_messages_tokens(messages)
+    context = BatchContext(
+        category_name=category_name,
+        batch_kind="synthesis",
+        batch_label=batch_label,
+        article_count=len(synthesis_items),
+        estimated_input_tokens=estimated_input_tokens,
+        serialized_request_bytes=_estimate_request_payload_bytes(active_model.model_id, messages, active_model.max_completion_tokens),
+        content_shrunk=False,
+    )
+    return _invoke_json_with_retry(runtime, messages, estimated_input_tokens, context, model_override=model_override)
+
+
+def _build_synthesis_messages(category_name: str, synthesis_items: list[dict[str, Any]]) -> list[dict[str, Any]]:
     return [
         {
             "role": "system",
             "content": (
                 "You are a financial news analyst. Return one valid JSON object only. "
-                "Summarize the category using only the provided article analyses."
+                "Summarize the category using only the provided article analyses or prior summary blocks."
             ),
         },
         {
@@ -1052,22 +1311,7 @@ def _build_synthesis_messages(category_name: str, successful_articles: list[dict
                         ],
                     },
                     "category": category_name,
-                    "articles": [
-                        {
-                            "source_article_id": article["source_article_id"],
-                            "canonical_url": article["canonical_url"],
-                            "title": article["title"],
-                            "published_at": article["published_at"],
-                            "scores": {
-                                "novelty_score": article["novelty_score"],
-                                "relevance_score": article["relevance_score"],
-                                "urgency_score": article["urgency_score"],
-                            },
-                            "named_entities": article["named_entities"],
-                            "key_points": article["key_points"],
-                        }
-                        for article in successful_articles
-                    ],
+                    "inputs": synthesis_items,
                 },
                 ensure_ascii=False,
             ),
@@ -1089,8 +1333,8 @@ def _plan_category_batches(
         if current and not _batch_within_budget(
             category_name,
             candidate,
-            input_budget_tokens=budget_state.input_budget_tokens,
-            request_byte_budget=budget_state.request_byte_budget,
+            input_budget_tokens=budget_state.article_input_budget_tokens,
+            request_byte_budget=budget_state.article_request_byte_budget,
             model_id=runtime.current_model.model_id,
         ):
             runtime.record_split(category_name, "pre_send_budget")
@@ -1108,6 +1352,64 @@ def _plan_category_batches(
     if current:
         planned.append(current)
     return planned or [prepared_articles]
+
+
+def _plan_synthesis_batches(
+    runtime: AnalysisRuntime,
+    category_name: str,
+    synthesis_items: list[dict[str, Any]],
+    *,
+    model_id: str,
+) -> list[list[dict[str, Any]]]:
+    budget_state = runtime.get_category_budget(category_name)
+    planned: list[list[dict[str, Any]]] = []
+    current: list[dict[str, Any]] = []
+
+    for item in synthesis_items:
+        candidate = current + [item]
+        if current and not _synthesis_within_budget(
+            category_name,
+            candidate,
+            input_budget_tokens=budget_state.synthesis_input_budget_tokens,
+            request_byte_budget=budget_state.synthesis_request_byte_budget,
+            model_id=model_id,
+        ):
+            runtime.record_split(category_name, "pre_send_budget")
+            planned.append(current)
+            current = [item]
+        else:
+            current = candidate
+
+    if current:
+        planned.append(current)
+    return planned or [synthesis_items]
+
+
+def _article_to_synthesis_item(article: dict[str, Any]) -> dict[str, Any]:
+    return {
+        "kind": "article",
+        "source_article_id": article["source_article_id"],
+        "canonical_url": article["canonical_url"],
+        "title": article["title"],
+        "published_at": article["published_at"],
+        "scores": {
+            "novelty_score": article["novelty_score"],
+            "relevance_score": article["relevance_score"],
+            "urgency_score": article["urgency_score"],
+        },
+        "named_entities": article["named_entities"][:5],
+        "key_points": article["key_points"][:3],
+    }
+
+
+def _summary_to_synthesis_item(payload: dict[str, Any], article_count: int, label: str) -> dict[str, Any]:
+    return {
+        "kind": "summary",
+        "label": label,
+        "article_count": article_count,
+        "key_developments": _normalize_string_list(payload.get("key_developments"), limit=5),
+        "named_entities": _normalize_entities(payload.get("named_entities"))[:6],
+    }
 
 
 def _shrink_batch_to_budget(
@@ -1145,6 +1447,18 @@ def _estimate_batch_request_bytes(category_name: str, batch_articles: list[dict[
     )
 
 
+def _estimate_synthesis_request_tokens(category_name: str, synthesis_items: list[dict[str, Any]]) -> int:
+    return _estimate_messages_tokens(_build_synthesis_messages(category_name, synthesis_items))
+
+
+def _estimate_synthesis_request_bytes(category_name: str, synthesis_items: list[dict[str, Any]], model_id: str) -> int:
+    return _estimate_request_payload_bytes(
+        model_id,
+        _build_synthesis_messages(category_name, synthesis_items),
+        DEFAULT_OUTPUT_TOKENS,
+    )
+
+
 def _batch_within_budget(
     category_name: str,
     batch_articles: list[dict[str, Any]],
@@ -1156,6 +1470,20 @@ def _batch_within_budget(
     return (
         _estimate_batch_request_tokens(category_name, batch_articles) <= input_budget_tokens
         and _estimate_batch_request_bytes(category_name, batch_articles, model_id) <= request_byte_budget
+    )
+
+
+def _synthesis_within_budget(
+    category_name: str,
+    synthesis_items: list[dict[str, Any]],
+    *,
+    input_budget_tokens: int,
+    request_byte_budget: int,
+    model_id: str,
+) -> bool:
+    return (
+        _estimate_synthesis_request_tokens(category_name, synthesis_items) <= input_budget_tokens
+        and _estimate_synthesis_request_bytes(category_name, synthesis_items, model_id) <= request_byte_budget
     )
 
 
@@ -1341,7 +1669,7 @@ def _build_empty_report(target_date: str) -> dict[str, Any]:
         "model": {
             "provider": DEFAULT_PROVIDER,
             "primary_model": PRIMARY_MODEL_ID,
-            "fallback_model": FALLBACK_MODEL_ID,
+            "fallback_models": list(FALLBACK_MODEL_IDS),
         },
         "model_switches": [],
         "input": {
