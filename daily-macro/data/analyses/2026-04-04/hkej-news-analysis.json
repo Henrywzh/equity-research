@@ -1,0 +1,1179 @@
+{
+  "report_schema_version": 4,
+  "report_date": "2026-04-04",
+  "generated_at": "2026-04-04T15:50:42.301728+00:00",
+  "source_site": "hkej",
+  "status": "partial",
+  "model": {
+    "provider": "groq",
+    "primary_model": "qwen/qwen3-32b",
+    "fallback_model": "llama-3.1-8b-instant"
+  },
+  "model_switches": [
+    {
+      "switched_at": "2026-04-04T15:48:17.430375+00:00",
+      "from_model": "qwen/qwen3-32b",
+      "to_model": "llama-3.1-8b-instant",
+      "reason": "Primary model returned 429 rate_limit_exceeded."
+    }
+  ],
+  "input": {
+    "article_count": 32,
+    "category_count": 3
+  },
+  "diagnostics": {
+    "rate_limit_wait_count": 5,
+    "rate_limit_wait_seconds_total": 222.853,
+    "fallback_switch_count": 1,
+    "pre_send_split_count": 0,
+    "response_413_split_count": 2,
+    "json_repair_retry_count": 0,
+    "batch_count": 10,
+    "failed_batch_count": 0
+  },
+  "totals": {
+    "article_count": 32,
+    "successful_article_analyses": 10,
+    "failed_article_analyses": 22,
+    "full_text_article_count": 18,
+    "truncated_article_count": 14,
+    "successful_categories": 1,
+    "partial_categories": 1,
+    "failed_categories": 1
+  },
+  "categories": [
+    {
+      "category": "中國財經",
+      "article_count": 1,
+      "status": "success",
+      "key_developments": [
+        "北京至平壤航線復飛後因需求不足及成本壓力4月再度暫停",
+        "國際油價飆升推高航線運營成本",
+        "復飛首日乘客不足20人暴露市場需求疲軟",
+        "5月航班雖已排期但出現機票銷售異常現象"
+      ],
+      "named_entities": [
+        {
+          "name": "中国国航",
+          "type": "company"
+        },
+        {
+          "name": "北京",
+          "type": "country"
+        },
+        {
+          "name": "平壤",
+          "type": "country"
+        },
+        {
+          "name": "北京首都机场",
+          "type": "institution"
+        },
+        {
+          "name": "平壤顺安机场",
+          "type": "institution"
+        }
+      ],
+      "articles": [
+        {
+          "source_article_id": "4365269",
+          "title": "北京至平壤航線剛復飛即傳4月暫停",
+          "canonical_url": "https://www.hkej.com/instantnews/china/article/4365269/%E5%8C%97%E4%BA%AC%E8%87%B3%E5%B9%B3%E5%A3%A4%E8%88%AA%E7%B7%9A%E5%89%9B%E5%BE%A9%E9%A3%9B%E5%8D%B3%E5%82%B34%E6%9C%88%E6%9A%AB%E5%81%9C",
+          "published_at": "2026-04-04T04:57:00+08:00",
+          "section": "中國財經",
+          "novelty_score": 7,
+          "relevance_score": 6,
+          "urgency_score": 5,
+          "named_entities": [
+            {
+              "name": "中国国航",
+              "type": "company"
+            },
+            {
+              "name": "北京",
+              "type": "country"
+            },
+            {
+              "name": "平壤",
+              "type": "country"
+            },
+            {
+              "name": "北京首都机场",
+              "type": "institution"
+            },
+            {
+              "name": "平壤顺安机场",
+              "type": "institution"
+            }
+          ],
+          "key_points": [
+            "北京至平壤航线复飞后4月再次暂停运营",
+            "国际油价飙升导致运营成本压力",
+            "航线需求不足，复飞首日仅10余名乘客",
+            "5月航班虽已排期但机票无法购买"
+          ],
+          "content_truncated": false,
+          "original_content_length_chars": 272,
+          "analyzed_content_length_chars": 272,
+          "original_content_token_estimate": 68,
+          "analyzed_content_token_estimate": 68,
+          "truncation_reason": null,
+          "analysis_method": "full_text",
+          "model_used": "qwen/qwen3-32b",
+          "error_classification": null,
+          "error": null
+        }
+      ],
+      "model_used": "qwen/qwen3-32b",
+      "sub_batch_count": 1,
+      "diagnostics": {
+        "sub_batch_count": 1,
+        "split_reasons": [],
+        "models_attempted": [
+          "qwen/qwen3-32b"
+        ],
+        "estimated_input_tokens_max": 528,
+        "serialized_request_bytes_max": 2893,
+        "rate_limit_waits": 0,
+        "partial_article_count": 0
+      },
+      "error": null
+    },
+    {
+      "category": "國際財經",
+      "article_count": 5,
+      "status": "failed",
+      "key_developments": [],
+      "named_entities": [],
+      "articles": [
+        {
+          "source_article_id": "4365272",
+          "title": "3月就業強勁難望減息 美債即跌",
+          "canonical_url": "https://www.hkej.com/instantnews/international/article/4365272/3%E6%9C%88%E5%B0%B1%E6%A5%AD%E5%BC%B7%E5%8B%81%E9%9B%A3%E6%9C%9B%E6%B8%9B%E6%81%AF+%E7%BE%8E%E5%82%B5%E5%8D%B3%E8%B7%8C",
+          "published_at": "2026-04-04T05:51:00+08:00",
+          "section": "國際財經",
+          "novelty_score": null,
+          "relevance_score": null,
+          "urgency_score": null,
+          "named_entities": [],
+          "key_points": [],
+          "content_truncated": false,
+          "original_content_length_chars": 307,
+          "analyzed_content_length_chars": 307,
+          "original_content_token_estimate": 77,
+          "analyzed_content_token_estimate": 77,
+          "truncation_reason": null,
+          "analysis_method": "full_text",
+          "model_used": "qwen/qwen3-32b",
+          "error_classification": "incomplete_model_output",
+          "error": "Model response omitted this article from the category batch."
+        },
+        {
+          "source_article_id": "4365270",
+          "title": "意大利央行降今明年經濟增長預測至0.5%",
+          "canonical_url": "https://www.hkej.com/instantnews/international/article/4365270/%E6%84%8F%E5%A4%A7%E5%88%A9%E5%A4%AE%E8%A1%8C%E9%99%8D%E4%BB%8A%E6%98%8E%E5%B9%B4%E7%B6%93%E6%BF%9F%E5%A2%9E%E9%95%B7%E9%A0%90%E6%B8%AC%E8%87%B30.5%25",
+          "published_at": "2026-04-04T05:43:00+08:00",
+          "section": "國際財經",
+          "novelty_score": null,
+          "relevance_score": null,
+          "urgency_score": null,
+          "named_entities": [],
+          "key_points": [],
+          "content_truncated": false,
+          "original_content_length_chars": 279,
+          "analyzed_content_length_chars": 279,
+          "original_content_token_estimate": 70,
+          "analyzed_content_token_estimate": 70,
+          "truncation_reason": null,
+          "analysis_method": "full_text",
+          "model_used": "qwen/qwen3-32b",
+          "error_classification": "incomplete_model_output",
+          "error": "Model response omitted this article from the category batch."
+        },
+        {
+          "source_article_id": "4365263",
+          "title": "阿聯酋全球最大鋁廠全面復產需時一年",
+          "canonical_url": "https://www.hkej.com/instantnews/international/article/4365263/%E9%98%BF%E8%81%AF%E9%85%8B%E5%85%A8%E7%90%83%E6%9C%80%E5%A4%A7%E9%8B%81%E5%BB%A0%E5%85%A8%E9%9D%A2%E5%BE%A9%E7%94%A2%E9%9C%80%E6%99%82%E4%B8%80%E5%B9%B4",
+          "published_at": "2026-04-04T02:00:00+08:00",
+          "section": "國際財經",
+          "novelty_score": null,
+          "relevance_score": null,
+          "urgency_score": null,
+          "named_entities": [],
+          "key_points": [],
+          "content_truncated": false,
+          "original_content_length_chars": 202,
+          "analyzed_content_length_chars": 202,
+          "original_content_token_estimate": 51,
+          "analyzed_content_token_estimate": 51,
+          "truncation_reason": null,
+          "analysis_method": "full_text",
+          "model_used": "qwen/qwen3-32b",
+          "error_classification": "incomplete_model_output",
+          "error": "Model response omitted this article from the category batch."
+        },
+        {
+          "source_article_id": "4365259",
+          "title": "美國政府擬擴大打壓中國科技設備",
+          "canonical_url": "https://www.hkej.com/instantnews/international/article/4365259/%E7%BE%8E%E5%9C%8B%E6%94%BF%E5%BA%9C%E6%93%AC%E6%93%B4%E5%A4%A7%E6%89%93%E5%A3%93%E4%B8%AD%E5%9C%8B%E7%A7%91%E6%8A%80%E8%A8%AD%E5%82%99",
+          "published_at": "2026-04-04T01:18:00+08:00",
+          "section": "國際財經",
+          "novelty_score": null,
+          "relevance_score": null,
+          "urgency_score": null,
+          "named_entities": [],
+          "key_points": [],
+          "content_truncated": false,
+          "original_content_length_chars": 273,
+          "analyzed_content_length_chars": 273,
+          "original_content_token_estimate": 69,
+          "analyzed_content_token_estimate": 69,
+          "truncation_reason": null,
+          "analysis_method": "full_text",
+          "model_used": "qwen/qwen3-32b",
+          "error_classification": "incomplete_model_output",
+          "error": "Model response omitted this article from the category batch."
+        },
+        {
+          "source_article_id": "4365257",
+          "title": "美3月非農職位增17.8萬 遠勝預期",
+          "canonical_url": "https://www.hkej.com/instantnews/international/article/4365257/%E7%BE%8E3%E6%9C%88%E9%9D%9E%E8%BE%B2%E8%81%B7%E4%BD%8D%E5%A2%9E17.8%E8%90%AC+%E9%81%A0%E5%8B%9D%E9%A0%90%E6%9C%9F",
+          "published_at": "2026-04-04T00:05:00+08:00",
+          "section": "國際財經",
+          "novelty_score": null,
+          "relevance_score": null,
+          "urgency_score": null,
+          "named_entities": [],
+          "key_points": [],
+          "content_truncated": false,
+          "original_content_length_chars": 185,
+          "analyzed_content_length_chars": 185,
+          "original_content_token_estimate": 47,
+          "analyzed_content_token_estimate": 47,
+          "truncation_reason": null,
+          "analysis_method": "full_text",
+          "model_used": "qwen/qwen3-32b",
+          "error_classification": "incomplete_model_output",
+          "error": "Model response omitted this article from the category batch."
+        }
+      ],
+      "model_used": "qwen/qwen3-32b",
+      "sub_batch_count": 1,
+      "diagnostics": {
+        "sub_batch_count": 1,
+        "split_reasons": [],
+        "models_attempted": [
+          "qwen/qwen3-32b"
+        ],
+        "estimated_input_tokens_max": 1318,
+        "serialized_request_bytes_max": 8183,
+        "rate_limit_waits": 1,
+        "partial_article_count": 5
+      },
+      "error": "No successful article analyses available for synthesis."
+    },
+    {
+      "category": "時事脈搏",
+      "article_count": 26,
+      "status": "partial",
+      "key_developments": [
+        "特朗普新年度預算勁增軍費至1.5萬億美元",
+        "本港未來一兩小時部分地區料雨勢較大及有幾陣狂風雷暴",
+        "阿布達比天然氣設施遇襲一死 伊無人機炸鄰國",
+        "教宗為戰爭孤兒及被逐移民兒童祈禱",
+        "加國財長訪華見何立峰 謀擴金融服務助出口"
+      ],
+      "named_entities": [
+        {
+          "name": "特朗普",
+          "type": "person"
+        },
+        {
+          "name": "香港",
+          "type": "country"
+        },
+        {
+          "name": "阿布達比",
+          "type": "country"
+        },
+        {
+          "name": "教宗",
+          "type": "person"
+        },
+        {
+          "name": "加拿大",
+          "type": "country"
+        },
+        {
+          "name": "何立峰",
+          "type": "person"
+        }
+      ],
+      "articles": [
+        {
+          "source_article_id": "4365288",
+          "title": "醫管局丨病人資料外洩涉逾5.6萬人 警網罪科接手調查",
+          "canonical_url": "https://www.hkej.com/instantnews/current/article/4365288/%E9%86%AB%E7%AE%A1%E5%B1%80%E4%B8%A8%E7%97%85%E4%BA%BA%E8%B3%87%E6%96%99%E5%A4%96%E6%B4%A9%E6%B6%89%E9%80%BE5.6%E8%90%AC%E4%BA%BA+%E8%AD%A6%E7%B6%B2%E7%BD%AA%E7%A7%91%E6%8E%A5%E6%89%8B%E8%AA%BF%E6%9F%A5",
+          "published_at": "2026-04-04T15:24:00+08:00",
+          "section": "時事脈搏",
+          "novelty_score": null,
+          "relevance_score": null,
+          "urgency_score": null,
+          "named_entities": [],
+          "key_points": [],
+          "content_truncated": true,
+          "original_content_length_chars": 183,
+          "analyzed_content_length_chars": 0,
+          "original_content_token_estimate": 46,
+          "analyzed_content_token_estimate": 0,
+          "truncation_reason": "Category batch request exceeded the working request budget; article content was shortened to fit.",
+          "analysis_method": "truncated_text",
+          "model_used": "llama-3.1-8b-instant",
+          "error_classification": "incomplete_model_output",
+          "error": "Model response omitted this article from the category batch."
+        },
+        {
+          "source_article_id": "4365287",
+          "title": "簡約公屋一周年丨近萬戶入伙 何永賢:續為市民幸福努力",
+          "canonical_url": "https://www.hkej.com/instantnews/current/article/4365287/%E7%B0%A1%E7%B4%84%E5%85%AC%E5%B1%8B%E4%B8%80%E5%91%A8%E5%B9%B4%E4%B8%A8%E8%BF%91%E8%90%AC%E6%88%B6%E5%85%A5%E4%BC%99+%E4%BD%95%E6%B0%B8%E8%B3%A2%3A%E7%BA%8C%E7%82%BA%E5%B8%82%E6%B0%91%E5%B9%B8%E7%A6%8F%E5%8A%AA%E5%8A%9B",
+          "published_at": "2026-04-04T15:04:00+08:00",
+          "section": "時事脈搏",
+          "novelty_score": 6,
+          "relevance_score": 8,
+          "urgency_score": 7,
+          "named_entities": [
+            {
+              "name": "簡約公屋",
+              "type": "asset"
+            },
+            {
+              "name": "何永賢",
+              "type": "person"
+            },
+            {
+              "name": "市民",
+              "type": "other"
+            }
+          ],
+          "key_points": [
+            "房屋局局長何永賢在社交平台發文",
+            "回顧簡約公屋一周年",
+            "包括元朗攸壆路、牛頭角彩興路、觀塘順安道、上水彩"
+          ],
+          "content_truncated": true,
+          "original_content_length_chars": 338,
+          "analyzed_content_length_chars": 0,
+          "original_content_token_estimate": 85,
+          "analyzed_content_token_estimate": 0,
+          "truncation_reason": "Category batch request exceeded the working request budget; article content was shortened to fit.",
+          "analysis_method": "truncated_text",
+          "model_used": "llama-3.1-8b-instant",
+          "error_classification": null,
+          "error": null
+        },
+        {
+          "source_article_id": "4365286",
+          "title": "天文台取消黃色暴雨警告訊號",
+          "canonical_url": "https://www.hkej.com/instantnews/current/article/4365286/%E5%A4%A9%E6%96%87%E5%8F%B0%E5%8F%96%E6%B6%88%E9%BB%83%E8%89%B2%E6%9A%B4%E9%9B%A8%E8%AD%A6%E5%91%8A%E8%A8%8A%E8%99%9F",
+          "published_at": "2026-04-04T13:50:00+08:00",
+          "section": "時事脈搏",
+          "novelty_score": null,
+          "relevance_score": null,
+          "urgency_score": null,
+          "named_entities": [],
+          "key_points": [],
+          "content_truncated": false,
+          "original_content_length_chars": 22,
+          "analyzed_content_length_chars": 22,
+          "original_content_token_estimate": 6,
+          "analyzed_content_token_estimate": 6,
+          "truncation_reason": null,
+          "analysis_method": "full_text",
+          "model_used": "llama-3.1-8b-instant",
+          "error_classification": "incomplete_model_output",
+          "error": "Model response omitted this article from the category batch."
+        },
+        {
+          "source_article_id": "4365285",
+          "title": "兩蚊兩折｜拍卡機故障 孫玉菡強調長者及政府無損失",
+          "canonical_url": "https://www.hkej.com/instantnews/current/article/4365285/%E5%85%A9%E8%9A%8A%E5%85%A9%E6%8A%98%EF%BD%9C%E6%8B%8D%E5%8D%A1%E6%A9%9F%E6%95%85%E9%9A%9C+%E5%AD%AB%E7%8E%89%E8%8F%A1%E5%BC%B7%E8%AA%BF%E9%95%B7%E8%80%85%E5%8F%8A%E6%94%BF%E5%BA%9C%E7%84%A1%E6%90%8D%E5%A4%B1",
+          "published_at": "2026-04-04T13:27:00+08:00",
+          "section": "時事脈搏",
+          "novelty_score": null,
+          "relevance_score": null,
+          "urgency_score": null,
+          "named_entities": [],
+          "key_points": [],
+          "content_truncated": true,
+          "original_content_length_chars": 218,
+          "analyzed_content_length_chars": 0,
+          "original_content_token_estimate": 55,
+          "analyzed_content_token_estimate": 0,
+          "truncation_reason": "Category batch request exceeded the working request budget; article content was shortened to fit.",
+          "analysis_method": "truncated_text",
+          "model_used": "llama-3.1-8b-instant",
+          "error_classification": "incomplete_model_output",
+          "error": "Model response omitted this article from the category batch."
+        },
+        {
+          "source_article_id": "4365284",
+          "title": "六合彩｜復活節金多寶今晚攪珠 頭獎8000萬",
+          "canonical_url": "https://www.hkej.com/instantnews/current/article/4365284/%E5%85%AD%E5%90%88%E5%BD%A9%EF%BD%9C%E5%BE%A9%E6%B4%BB%E7%AF%80%E9%87%91%E5%A4%9A%E5%AF%B6%E4%BB%8A%E6%99%9A%E6%94%AA%E7%8F%A0+%E9%A0%AD%E7%8D%8E8000%E8%90%AC",
+          "published_at": "2026-04-04T12:33:00+08:00",
+          "section": "時事脈搏",
+          "novelty_score": null,
+          "relevance_score": null,
+          "urgency_score": null,
+          "named_entities": [],
+          "key_points": [],
+          "content_truncated": false,
+          "original_content_length_chars": 171,
+          "analyzed_content_length_chars": 171,
+          "original_content_token_estimate": 43,
+          "analyzed_content_token_estimate": 43,
+          "truncation_reason": null,
+          "analysis_method": "full_text",
+          "model_used": "llama-3.1-8b-instant",
+          "error_classification": "incomplete_model_output",
+          "error": "Model response omitted this article from the category batch."
+        },
+        {
+          "source_article_id": "4365280",
+          "title": "智慧綠色運輸丨陳美寶:向立法會介紹新規管框架 便民出行",
+          "canonical_url": "https://www.hkej.com/instantnews/current/article/4365280/%E6%99%BA%E6%85%A7%E7%B6%A0%E8%89%B2%E9%81%8B%E8%BC%B8%E4%B8%A8%E9%99%B3%E7%BE%8E%E5%AF%B6%3A%E5%90%91%E7%AB%8B%E6%B3%95%E6%9C%83%E4%BB%8B%E7%B4%B9%E6%96%B0%E8%A6%8F%E7%AE%A1%E6%A1%86%E6%9E%B6+%E4%BE%BF%E6%B0%91%E5%87%BA%E8%A1%8C",
+          "published_at": "2026-04-04T12:05:00+08:00",
+          "section": "時事脈搏",
+          "novelty_score": null,
+          "relevance_score": null,
+          "urgency_score": null,
+          "named_entities": [],
+          "key_points": [],
+          "content_truncated": true,
+          "original_content_length_chars": 572,
+          "analyzed_content_length_chars": 172,
+          "original_content_token_estimate": 143,
+          "analyzed_content_token_estimate": 43,
+          "truncation_reason": "Category batch request exceeded the working request budget; article content was shortened to fit.",
+          "analysis_method": "truncated_text",
+          "model_used": "llama-3.1-8b-instant",
+          "error_classification": "incomplete_model_output",
+          "error": "Model response omitted this article from the category batch."
+        },
+        {
+          "source_article_id": "4365283",
+          "title": "黃雨丨天文台:大埔區雨勢特別大 或嚴重水浸",
+          "canonical_url": "https://www.hkej.com/instantnews/current/article/4365283/%E9%BB%83%E9%9B%A8%E4%B8%A8%E5%A4%A9%E6%96%87%E5%8F%B0%3A%E5%A4%A7%E5%9F%94%E5%8D%80%E9%9B%A8%E5%8B%A2%E7%89%B9%E5%88%A5%E5%A4%A7+%E6%88%96%E5%9A%B4%E9%87%8D%E6%B0%B4%E6%B5%B8",
+          "published_at": "2026-04-04T12:01:00+08:00",
+          "section": "時事脈搏",
+          "novelty_score": null,
+          "relevance_score": null,
+          "urgency_score": null,
+          "named_entities": [],
+          "key_points": [],
+          "content_truncated": false,
+          "original_content_length_chars": 159,
+          "analyzed_content_length_chars": 159,
+          "original_content_token_estimate": 40,
+          "analyzed_content_token_estimate": 40,
+          "truncation_reason": null,
+          "analysis_method": "full_text",
+          "model_used": "llama-3.1-8b-instant",
+          "error_classification": "incomplete_model_output",
+          "error": "Model response omitted this article from the category batch."
+        },
+        {
+          "source_article_id": "4365282",
+          "title": "復活節｜截至早上10時 約15萬人次港人出境",
+          "canonical_url": "https://www.hkej.com/instantnews/current/article/4365282/%E5%BE%A9%E6%B4%BB%E7%AF%80%EF%BD%9C%E6%88%AA%E8%87%B3%E6%97%A9%E4%B8%8A10%E6%99%82+%E7%B4%8415%E8%90%AC%E4%BA%BA%E6%AC%A1%E6%B8%AF%E4%BA%BA%E5%87%BA%E5%A2%83",
+          "published_at": "2026-04-04T11:58:00+08:00",
+          "section": "時事脈搏",
+          "novelty_score": null,
+          "relevance_score": null,
+          "urgency_score": null,
+          "named_entities": [],
+          "key_points": [],
+          "content_truncated": true,
+          "original_content_length_chars": 333,
+          "analyzed_content_length_chars": 0,
+          "original_content_token_estimate": 84,
+          "analyzed_content_token_estimate": 0,
+          "truncation_reason": "Category batch request exceeded the working request budget; article content was shortened to fit.",
+          "analysis_method": "truncated_text",
+          "model_used": "llama-3.1-8b-instant",
+          "error_classification": "incomplete_model_output",
+          "error": "Model response omitted this article from the category batch."
+        },
+        {
+          "source_article_id": "4365281",
+          "title": "天氣丨黃色暴雨警告訊號生效",
+          "canonical_url": "https://www.hkej.com/instantnews/current/article/4365281/%E5%A4%A9%E6%B0%A3%E4%B8%A8%E9%BB%83%E8%89%B2%E6%9A%B4%E9%9B%A8%E8%AD%A6%E5%91%8A%E8%A8%8A%E8%99%9F%E7%94%9F%E6%95%88",
+          "published_at": "2026-04-04T11:35:00+08:00",
+          "section": "時事脈搏",
+          "novelty_score": null,
+          "relevance_score": null,
+          "urgency_score": null,
+          "named_entities": [],
+          "key_points": [],
+          "content_truncated": false,
+          "original_content_length_chars": 103,
+          "analyzed_content_length_chars": 103,
+          "original_content_token_estimate": 26,
+          "analyzed_content_token_estimate": 26,
+          "truncation_reason": null,
+          "analysis_method": "full_text",
+          "model_used": "llama-3.1-8b-instant",
+          "error_classification": "incomplete_model_output",
+          "error": "Model response omitted this article from the category batch."
+        },
+        {
+          "source_article_id": "4365278",
+          "title": "澀谷縱火案丨50多歲男子警署自首 原因未明",
+          "canonical_url": "https://www.hkej.com/instantnews/current/article/4365278/%E6%BE%80%E8%B0%B7%E7%B8%B1%E7%81%AB%E6%A1%88%E4%B8%A850%E5%A4%9A%E6%AD%B2%E7%94%B7%E5%AD%90%E8%AD%A6%E7%BD%B2%E8%87%AA%E9%A6%96+%E5%8E%9F%E5%9B%A0%E6%9C%AA%E6%98%8E",
+          "published_at": "2026-04-04T10:41:00+08:00",
+          "section": "時事脈搏",
+          "novelty_score": null,
+          "relevance_score": null,
+          "urgency_score": null,
+          "named_entities": [],
+          "key_points": [],
+          "content_truncated": true,
+          "original_content_length_chars": 269,
+          "analyzed_content_length_chars": 0,
+          "original_content_token_estimate": 68,
+          "analyzed_content_token_estimate": 0,
+          "truncation_reason": "Category batch request exceeded the working request budget; article content was shortened to fit.",
+          "analysis_method": "truncated_text",
+          "model_used": "llama-3.1-8b-instant",
+          "error_classification": "incomplete_model_output",
+          "error": "Model response omitted this article from the category batch."
+        },
+        {
+          "source_article_id": "4365279",
+          "title": "醫管局有病人資料外洩 逾5.6萬人受影響",
+          "canonical_url": "https://www.hkej.com/instantnews/current/article/4365279/%E9%86%AB%E7%AE%A1%E5%B1%80%E6%9C%89%E7%97%85%E4%BA%BA%E8%B3%87%E6%96%99%E5%A4%96%E6%B4%A9+%E9%80%BE5.6%E8%90%AC%E4%BA%BA%E5%8F%97%E5%BD%B1%E9%9F%BF",
+          "published_at": "2026-04-04T10:17:00+08:00",
+          "section": "時事脈搏",
+          "novelty_score": null,
+          "relevance_score": null,
+          "urgency_score": null,
+          "named_entities": [],
+          "key_points": [],
+          "content_truncated": true,
+          "original_content_length_chars": 277,
+          "analyzed_content_length_chars": 0,
+          "original_content_token_estimate": 70,
+          "analyzed_content_token_estimate": 0,
+          "truncation_reason": "Category batch request exceeded the working request budget; article content was shortened to fit.",
+          "analysis_method": "truncated_text",
+          "model_used": "llama-3.1-8b-instant",
+          "error_classification": "incomplete_model_output",
+          "error": "Model response omitted this article from the category batch."
+        },
+        {
+          "source_article_id": "4365275",
+          "title": "在校課後託管計劃丨李家超:喜見成效超預期 研進一步擴展",
+          "canonical_url": "https://www.hkej.com/instantnews/current/article/4365275/%E5%9C%A8%E6%A0%A1%E8%AA%B2%E5%BE%8C%E8%A8%97%E7%AE%A1%E8%A8%88%E5%8A%83%E4%B8%A8%E6%9D%8E%E5%AE%B6%E8%B6%85%3A%E5%96%9C%E8%A6%8B%E6%88%90%E6%95%88%E8%B6%85%E9%A0%90%E6%9C%9F+%E7%A0%94%E9%80%B2%E4%B8%80%E6%AD%A5%E6%93%B4%E5%B1%95",
+          "published_at": "2026-04-04T10:00:00+08:00",
+          "section": "時事脈搏",
+          "novelty_score": null,
+          "relevance_score": null,
+          "urgency_score": null,
+          "named_entities": [],
+          "key_points": [],
+          "content_truncated": true,
+          "original_content_length_chars": 403,
+          "analyzed_content_length_chars": 3,
+          "original_content_token_estimate": 101,
+          "analyzed_content_token_estimate": 1,
+          "truncation_reason": "Category batch request exceeded the working request budget; article content was shortened to fit.",
+          "analysis_method": "truncated_text",
+          "model_used": "llama-3.1-8b-instant",
+          "error_classification": "incomplete_model_output",
+          "error": "Model response omitted this article from the category batch."
+        },
+        {
+          "source_article_id": "4365277",
+          "title": "兩蚊兩折丨九巴:車費回贈機故障已處理 不會令政府額外補貼",
+          "canonical_url": "https://www.hkej.com/instantnews/current/article/4365277/%E5%85%A9%E8%9A%8A%E5%85%A9%E6%8A%98%E4%B8%A8%E4%B9%9D%E5%B7%B4%3A%E8%BB%8A%E8%B2%BB%E5%9B%9E%E8%B4%88%E6%A9%9F%E6%95%85%E9%9A%9C%E5%B7%B2%E8%99%95%E7%90%86+%E4%B8%8D%E6%9C%83%E4%BB%A4%E6%94%BF%E5%BA%9C%E9%A1%8D%E5%A4%96%E8%A3%9C%E8%B2%BC",
+          "published_at": "2026-04-04T09:58:00+08:00",
+          "section": "時事脈搏",
+          "novelty_score": null,
+          "relevance_score": null,
+          "urgency_score": null,
+          "named_entities": [],
+          "key_points": [],
+          "content_truncated": true,
+          "original_content_length_chars": 311,
+          "analyzed_content_length_chars": 0,
+          "original_content_token_estimate": 78,
+          "analyzed_content_token_estimate": 0,
+          "truncation_reason": "Category batch request exceeded the working request budget; article content was shortened to fit.",
+          "analysis_method": "truncated_text",
+          "model_used": "llama-3.1-8b-instant",
+          "error_classification": "incomplete_model_output",
+          "error": "Model response omitted this article from the category batch."
+        },
+        {
+          "source_article_id": "4365276",
+          "title": "本港未來一兩小時部分地區料雨勢較大及有幾陣狂風雷暴",
+          "canonical_url": "https://www.hkej.com/instantnews/current/article/4365276/%E6%9C%AC%E6%B8%AF%E6%9C%AA%E4%BE%86%E4%B8%80%E5%85%A9%E5%B0%8F%E6%99%82%E9%83%A8%E5%88%86%E5%9C%B0%E5%8D%80%E6%96%99%E9%9B%A8%E5%8B%A2%E8%BC%83%E5%A4%A7%E5%8F%8A%E6%9C%89%E5%B9%BE%E9%99%A3%E7%8B%82%E9%A2%A8%E9%9B%B7%E6%9A%B4",
+          "published_at": "2026-04-04T09:46:00+08:00",
+          "section": "時事脈搏",
+          "novelty_score": 8,
+          "relevance_score": 6,
+          "urgency_score": 9,
+          "named_entities": [
+            {
+              "name": "香港",
+              "type": "country"
+            },
+            {
+              "name": "天文台",
+              "type": "institution"
+            },
+            {
+              "name": "珠江口",
+              "type": "other"
+            }
+          ],
+          "key_points": [
+            "天文台發出特別天氣提示",
+            "受低壓槽影響",
+            "珠江口一帶持續有雷雨區發展"
+          ],
+          "content_truncated": false,
+          "original_content_length_chars": 70,
+          "analyzed_content_length_chars": 70,
+          "original_content_token_estimate": 18,
+          "analyzed_content_token_estimate": 18,
+          "truncation_reason": null,
+          "analysis_method": "full_text",
+          "model_used": "llama-3.1-8b-instant",
+          "error_classification": null,
+          "error": null
+        },
+        {
+          "source_article_id": "4365274",
+          "title": "羅淑佩:世界動盪突顯香港安全 冀人氣來財氣來",
+          "canonical_url": "https://www.hkej.com/instantnews/current/article/4365274/%E7%BE%85%E6%B7%91%E4%BD%A9%3A%E4%B8%96%E7%95%8C%E5%8B%95%E7%9B%AA%E7%AA%81%E9%A1%AF%E9%A6%99%E6%B8%AF%E5%AE%89%E5%85%A8+%E5%86%80%E4%BA%BA%E6%B0%A3%E4%BE%86%E8%B2%A1%E6%B0%A3%E4%BE%86",
+          "published_at": "2026-04-04T09:43:00+08:00",
+          "section": "時事脈搏",
+          "novelty_score": 5,
+          "relevance_score": 8,
+          "urgency_score": 6,
+          "named_entities": [
+            {
+              "name": "羅淑佩",
+              "type": "person"
+            },
+            {
+              "name": "香港",
+              "type": "country"
+            },
+            {
+              "name": "世界",
+              "type": "other"
+            }
+          ],
+          "key_points": [
+            "本港首3個月訪港旅客有1431萬人次",
+            "按年升17%",
+            "預計今年全年旅客將達5380萬人次"
+          ],
+          "content_truncated": true,
+          "original_content_length_chars": 459,
+          "analyzed_content_length_chars": 59,
+          "original_content_token_estimate": 115,
+          "analyzed_content_token_estimate": 15,
+          "truncation_reason": "Category batch request exceeded the working request budget; article content was shortened to fit.",
+          "analysis_method": "truncated_text",
+          "model_used": "llama-3.1-8b-instant",
+          "error_classification": null,
+          "error": null
+        },
+        {
+          "source_article_id": "4365273",
+          "title": "特朗普:戰機被擊落不影響與伊朗談判",
+          "canonical_url": "https://www.hkej.com/instantnews/current/article/4365273/%E7%89%B9%E6%9C%97%E6%99%AE%3A%E6%88%B0%E6%A9%9F%E8%A2%AB%E6%93%8A%E8%90%BD%E4%B8%8D%E5%BD%B1%E9%9F%BF%E8%88%87%E4%BC%8A%E6%9C%97%E8%AB%87%E5%88%A4",
+          "published_at": "2026-04-04T05:56:00+08:00",
+          "section": "時事脈搏",
+          "novelty_score": 9,
+          "relevance_score": 9,
+          "urgency_score": 10,
+          "named_entities": [
+            {
+              "name": "特朗普",
+              "type": "person"
+            },
+            {
+              "name": "美國",
+              "type": "country"
+            },
+            {
+              "name": "伊朗",
+              "type": "country"
+            }
+          ],
+          "key_points": [
+            "美軍戰機被擊落",
+            "不會影響與伊朗的談判",
+            "美軍先後有1架F15E及1架A10戰機被擊中墜毀"
+          ],
+          "content_truncated": false,
+          "original_content_length_chars": 154,
+          "analyzed_content_length_chars": 154,
+          "original_content_token_estimate": 39,
+          "analyzed_content_token_estimate": 39,
+          "truncation_reason": null,
+          "analysis_method": "full_text",
+          "model_used": "llama-3.1-8b-instant",
+          "error_classification": null,
+          "error": null
+        },
+        {
+          "source_article_id": "4365271",
+          "title": "教宗為戰爭孤兒及被逐移民兒童祈禱",
+          "canonical_url": "https://www.hkej.com/instantnews/current/article/4365271/%E6%95%99%E5%AE%97%E7%82%BA%E6%88%B0%E7%88%AD%E5%AD%A4%E5%85%92%E5%8F%8A%E8%A2%AB%E9%80%90%E7%A7%BB%E6%B0%91%E5%85%92%E7%AB%A5%E7%A5%88%E7%A6%B1",
+          "published_at": "2026-04-04T05:49:00+08:00",
+          "section": "時事脈搏",
+          "novelty_score": 7,
+          "relevance_score": 7,
+          "urgency_score": 8,
+          "named_entities": [
+            {
+              "name": "教宗",
+              "type": "person"
+            },
+            {
+              "name": "耶穌",
+              "type": "other"
+            },
+            {
+              "name": "羅馬",
+              "type": "other"
+            }
+          ],
+          "key_points": [],
+          "content_truncated": false,
+          "original_content_length_chars": 99,
+          "analyzed_content_length_chars": 99,
+          "original_content_token_estimate": 25,
+          "analyzed_content_token_estimate": 25,
+          "truncation_reason": null,
+          "analysis_method": "full_text",
+          "model_used": "llama-3.1-8b-instant",
+          "error_classification": null,
+          "error": null
+        },
+        {
+          "source_article_id": "4365268",
+          "title": "以軍對黎巴嫩展開新攻勢 美促公民速離開",
+          "canonical_url": "https://www.hkej.com/instantnews/current/article/4365268/%E4%BB%A5%E8%BB%8D%E5%B0%8D%E9%BB%8E%E5%B7%B4%E5%AB%A9%E5%B1%95%E9%96%8B%E6%96%B0%E6%94%BB%E5%8B%A2+%E7%BE%8E%E4%BF%83%E5%85%AC%E6%B0%91%E9%80%9F%E9%9B%A2%E9%96%8B",
+          "published_at": "2026-04-04T04:19:00+08:00",
+          "section": "時事脈搏",
+          "novelty_score": null,
+          "relevance_score": null,
+          "urgency_score": null,
+          "named_entities": [],
+          "key_points": [],
+          "content_truncated": false,
+          "original_content_length_chars": 131,
+          "analyzed_content_length_chars": 131,
+          "original_content_token_estimate": 33,
+          "analyzed_content_token_estimate": 33,
+          "truncation_reason": null,
+          "analysis_method": "full_text",
+          "model_used": "llama-3.1-8b-instant",
+          "error_classification": "incomplete_model_output",
+          "error": "Model response omitted this article from the category batch."
+        },
+        {
+          "source_article_id": "4365267",
+          "title": "美軍周五再有戰機墜毀機師獲救 一天第2架",
+          "canonical_url": "https://www.hkej.com/instantnews/current/article/4365267/%E7%BE%8E%E8%BB%8D%E5%91%A8%E4%BA%94%E5%86%8D%E6%9C%89%E6%88%B0%E6%A9%9F%E5%A2%9C%E6%AF%80%E6%A9%9F%E5%B8%AB%E7%8D%B2%E6%95%91+%E4%B8%80%E5%A4%A9%E7%AC%AC2%E6%9E%B6",
+          "published_at": "2026-04-04T03:53:00+08:00",
+          "section": "時事脈搏",
+          "novelty_score": null,
+          "relevance_score": null,
+          "urgency_score": null,
+          "named_entities": [],
+          "key_points": [],
+          "content_truncated": false,
+          "original_content_length_chars": 144,
+          "analyzed_content_length_chars": 144,
+          "original_content_token_estimate": 36,
+          "analyzed_content_token_estimate": 36,
+          "truncation_reason": null,
+          "analysis_method": "full_text",
+          "model_used": "llama-3.1-8b-instant",
+          "error_classification": "incomplete_model_output",
+          "error": "Model response omitted this article from the category batch."
+        },
+        {
+          "source_article_id": "4365266",
+          "title": "阿布達比天然氣設施遇襲一死 伊無人機炸鄰國",
+          "canonical_url": "https://www.hkej.com/instantnews/current/article/4365266/%E9%98%BF%E5%B8%83%E9%81%94%E6%AF%94%E5%A4%A9%E7%84%B6%E6%B0%A3%E8%A8%AD%E6%96%BD%E9%81%87%E8%A5%B2%E4%B8%80%E6%AD%BB+%E4%BC%8A%E7%84%A1%E4%BA%BA%E6%A9%9F%E7%82%B8%E9%84%B0%E5%9C%8B",
+          "published_at": "2026-04-04T03:48:00+08:00",
+          "section": "時事脈搏",
+          "novelty_score": 8,
+          "relevance_score": 9,
+          "urgency_score": 9,
+          "named_entities": [
+            {
+              "name": "阿布達比",
+              "type": "country"
+            },
+            {
+              "name": "伊朗",
+              "type": "country"
+            }
+          ],
+          "key_points": [
+            "阿布達比天然氣設施遇襲",
+            "一死四傷",
+            "伊朗拒見美官員"
+          ],
+          "content_truncated": true,
+          "original_content_length_chars": 280,
+          "analyzed_content_length_chars": 0,
+          "original_content_token_estimate": 70,
+          "analyzed_content_token_estimate": 0,
+          "truncation_reason": "Category batch request exceeded the working request budget; article content was shortened to fit.",
+          "analysis_method": "truncated_text",
+          "model_used": "llama-3.1-8b-instant",
+          "error_classification": null,
+          "error": null
+        },
+        {
+          "source_article_id": "4365265",
+          "title": "WSJ:停火談判陷僵局 伊朗拒見美官員",
+          "canonical_url": "https://www.hkej.com/instantnews/current/article/4365265/WSJ%3A%E5%81%9C%E7%81%AB%E8%AB%87%E5%88%A4%E9%99%B7%E5%83%B5%E5%B1%80+%E4%BC%8A%E6%9C%97%E6%8B%92%E8%A6%8B%E7%BE%8E%E5%AE%98%E5%93%A1",
+          "published_at": "2026-04-04T03:20:00+08:00",
+          "section": "時事脈搏",
+          "novelty_score": 7,
+          "relevance_score": 8,
+          "urgency_score": 8,
+          "named_entities": [
+            {
+              "name": "WSJ",
+              "type": "organization"
+            },
+            {
+              "name": "伊朗",
+              "type": "country"
+            },
+            {
+              "name": "美國",
+              "type": "country"
+            }
+          ],
+          "key_points": [
+            "停火談判陷僵局",
+            "伊朗拒見美官員"
+          ],
+          "content_truncated": false,
+          "original_content_length_chars": 102,
+          "analyzed_content_length_chars": 102,
+          "original_content_token_estimate": 26,
+          "analyzed_content_token_estimate": 26,
+          "truncation_reason": null,
+          "analysis_method": "full_text",
+          "model_used": "llama-3.1-8b-instant",
+          "error_classification": null,
+          "error": null
+        },
+        {
+          "source_article_id": "4365265",
+          "title": "WSJ：停火談判陷僵局 伊朗拒見美官員",
+          "canonical_url": "https://www.hkej.com/instantnews/current/article/4365265/WSJ%EF%BC%9A%E5%81%9C%E7%81%AB%E8%AB%87%E5%88%A4%E9%99%B7%E5%83%B5%E5%B1%80+%E4%BC%8A%E6%9C%97%E6%8B%92%E8%A6%8B%E7%BE%8E%E5%AE%98%E5%93%A1",
+          "published_at": "2026-04-04T03:20:00+08:00",
+          "section": "時事脈搏",
+          "novelty_score": null,
+          "relevance_score": null,
+          "urgency_score": null,
+          "named_entities": [],
+          "key_points": [],
+          "content_truncated": false,
+          "original_content_length_chars": 102,
+          "analyzed_content_length_chars": 102,
+          "original_content_token_estimate": 26,
+          "analyzed_content_token_estimate": 26,
+          "truncation_reason": null,
+          "analysis_method": "full_text",
+          "model_used": "llama-3.1-8b-instant",
+          "error_classification": "incomplete_model_output",
+          "error": "Model response omitted this article from the category batch."
+        },
+        {
+          "source_article_id": "4365264",
+          "title": "加國財長訪華見何立峰 謀擴金融服務助出口",
+          "canonical_url": "https://www.hkej.com/instantnews/current/article/4365264/%E5%8A%A0%E5%9C%8B%E8%B2%A1%E9%95%B7%E8%A8%AA%E8%8F%AF%E8%A6%8B%E4%BD%95%E7%AB%8B%E5%B3%B0+%E8%AC%80%E6%93%B4%E9%87%91%E8%9E%8D%E6%9C%8D%E5%8B%99%E5%8A%A9%E5%87%BA%E5%8F%A3",
+          "published_at": "2026-04-04T02:12:00+08:00",
+          "section": "時事脈搏",
+          "novelty_score": 6,
+          "relevance_score": 7,
+          "urgency_score": 7,
+          "named_entities": [
+            {
+              "name": "加拿大",
+              "type": "country"
+            },
+            {
+              "name": "何立峰",
+              "type": "person"
+            }
+          ],
+          "key_points": [
+            "加國財長訪華",
+            "謀擴金融服務助出口"
+          ],
+          "content_truncated": true,
+          "original_content_length_chars": 387,
+          "analyzed_content_length_chars": 0,
+          "original_content_token_estimate": 97,
+          "analyzed_content_token_estimate": 0,
+          "truncation_reason": "Category batch request exceeded the working request budget; article content was shortened to fit.",
+          "analysis_method": "truncated_text",
+          "model_used": "llama-3.1-8b-instant",
+          "error_classification": null,
+          "error": null
+        },
+        {
+          "source_article_id": "4365262",
+          "title": "特朗普新年度預算勁增軍費至1.5萬億美元",
+          "canonical_url": "https://www.hkej.com/instantnews/current/article/4365262/%E7%89%B9%E6%9C%97%E6%99%AE%E6%96%B0%E5%B9%B4%E5%BA%A6%E9%A0%90%E7%AE%97%E5%8B%81%E5%A2%9E%E8%BB%8D%E8%B2%BB%E8%87%B31.5%E8%90%AC%E5%84%84%E7%BE%8E%E5%85%83",
+          "published_at": "2026-04-04T01:32:00+08:00",
+          "section": "時事脈搏",
+          "novelty_score": 5,
+          "relevance_score": 6,
+          "urgency_score": 6,
+          "named_entities": [
+            {
+              "name": "特朗普",
+              "type": "person"
+            },
+            {
+              "name": "美國",
+              "type": "country"
+            }
+          ],
+          "key_points": [
+            "特朗普新年度預算",
+            "軍費增至1.5萬億美元"
+          ],
+          "content_truncated": true,
+          "original_content_length_chars": 289,
+          "analyzed_content_length_chars": 0,
+          "original_content_token_estimate": 73,
+          "analyzed_content_token_estimate": 0,
+          "truncation_reason": "Category batch request exceeded the working request budget; article content was shortened to fit.",
+          "analysis_method": "truncated_text",
+          "model_used": "llama-3.1-8b-instant",
+          "error_classification": null,
+          "error": null
+        },
+        {
+          "source_article_id": "4365261",
+          "title": "日本首相謀訪澳洲尋稀土 LNG船順利過海峽",
+          "canonical_url": "https://www.hkej.com/instantnews/current/article/4365261/%E6%97%A5%E6%9C%AC%E9%A6%96%E7%9B%B8%E8%AC%80%E8%A8%AA%E6%BE%B3%E6%B4%B2%E5%B0%8B%E7%A8%80%E5%9C%9F+LNG%E8%88%B9%E9%A0%86%E5%88%A9%E9%81%8E%E6%B5%B7%E5%B3%BD",
+          "published_at": "2026-04-04T01:29:00+08:00",
+          "section": "時事脈搏",
+          "novelty_score": null,
+          "relevance_score": null,
+          "urgency_score": null,
+          "named_entities": [],
+          "key_points": [],
+          "content_truncated": false,
+          "original_content_length_chars": 140,
+          "analyzed_content_length_chars": 140,
+          "original_content_token_estimate": 35,
+          "analyzed_content_token_estimate": 35,
+          "truncation_reason": null,
+          "analysis_method": "full_text",
+          "model_used": "llama-3.1-8b-instant",
+          "error_classification": "incomplete_model_output",
+          "error": "Model response omitted this article from the category batch."
+        },
+        {
+          "source_article_id": "4365258",
+          "title": "美國戰機被伊朗擊落已救回1人 伊懸賞追捕",
+          "canonical_url": "https://www.hkej.com/instantnews/current/article/4365258/%E7%BE%8E%E5%9C%8B%E6%88%B0%E6%A9%9F%E8%A2%AB%E4%BC%8A%E6%9C%97%E6%93%8A%E8%90%BD%E5%B7%B2%E6%95%91%E5%9B%9E1%E4%BA%BA+%E4%BC%8A%E6%87%B8%E8%B3%9E%E8%BF%BD%E6%8D%95",
+          "published_at": "2026-04-04T00:10:00+08:00",
+          "section": "時事脈搏",
+          "novelty_score": null,
+          "relevance_score": null,
+          "urgency_score": null,
+          "named_entities": [],
+          "key_points": [],
+          "content_truncated": true,
+          "original_content_length_chars": 262,
+          "analyzed_content_length_chars": 0,
+          "original_content_token_estimate": 66,
+          "analyzed_content_token_estimate": 0,
+          "truncation_reason": "Category batch request exceeded the working request budget; article content was shortened to fit.",
+          "analysis_method": "truncated_text",
+          "model_used": "llama-3.1-8b-instant",
+          "error_classification": "incomplete_model_output",
+          "error": "Model response omitted this article from the category batch."
+        }
+      ],
+      "model_used": "llama-3.1-8b-instant",
+      "sub_batch_count": 3,
+      "diagnostics": {
+        "sub_batch_count": 3,
+        "split_reasons": [
+          "response_413"
+        ],
+        "models_attempted": [
+          "qwen/qwen3-32b",
+          "llama-3.1-8b-instant"
+        ],
+        "estimated_input_tokens_max": 4462,
+        "serialized_request_bytes_max": 24230,
+        "rate_limit_waits": 4,
+        "partial_article_count": 17
+      },
+      "error": null
+    }
+  ],
+  "errors": [
+    {
+      "type": "article",
+      "target": "https://www.hkej.com/instantnews/international/article/4365272/3%E6%9C%88%E5%B0%B1%E6%A5%AD%E5%BC%B7%E5%8B%81%E9%9B%A3%E6%9C%9B%E6%B8%9B%E6%81%AF+%E7%BE%8E%E5%82%B5%E5%8D%B3%E8%B7%8C",
+      "message": "Model response omitted this article from the category batch.",
+      "classification": "incomplete_model_output"
+    },
+    {
+      "type": "article",
+      "target": "https://www.hkej.com/instantnews/international/article/4365270/%E6%84%8F%E5%A4%A7%E5%88%A9%E5%A4%AE%E8%A1%8C%E9%99%8D%E4%BB%8A%E6%98%8E%E5%B9%B4%E7%B6%93%E6%BF%9F%E5%A2%9E%E9%95%B7%E9%A0%90%E6%B8%AC%E8%87%B30.5%25",
+      "message": "Model response omitted this article from the category batch.",
+      "classification": "incomplete_model_output"
+    },
+    {
+      "type": "article",
+      "target": "https://www.hkej.com/instantnews/international/article/4365263/%E9%98%BF%E8%81%AF%E9%85%8B%E5%85%A8%E7%90%83%E6%9C%80%E5%A4%A7%E9%8B%81%E5%BB%A0%E5%85%A8%E9%9D%A2%E5%BE%A9%E7%94%A2%E9%9C%80%E6%99%82%E4%B8%80%E5%B9%B4",
+      "message": "Model response omitted this article from the category batch.",
+      "classification": "incomplete_model_output"
+    },
+    {
+      "type": "article",
+      "target": "https://www.hkej.com/instantnews/international/article/4365259/%E7%BE%8E%E5%9C%8B%E6%94%BF%E5%BA%9C%E6%93%AC%E6%93%B4%E5%A4%A7%E6%89%93%E5%A3%93%E4%B8%AD%E5%9C%8B%E7%A7%91%E6%8A%80%E8%A8%AD%E5%82%99",
+      "message": "Model response omitted this article from the category batch.",
+      "classification": "incomplete_model_output"
+    },
+    {
+      "type": "article",
+      "target": "https://www.hkej.com/instantnews/international/article/4365257/%E7%BE%8E3%E6%9C%88%E9%9D%9E%E8%BE%B2%E8%81%B7%E4%BD%8D%E5%A2%9E17.8%E8%90%AC+%E9%81%A0%E5%8B%9D%E9%A0%90%E6%9C%9F",
+      "message": "Model response omitted this article from the category batch.",
+      "classification": "incomplete_model_output"
+    },
+    {
+      "type": "category",
+      "target": "國際財經",
+      "message": "No successful article analyses available for synthesis.",
+      "classification": "incomplete_model_output"
+    },
+    {
+      "type": "article",
+      "target": "https://www.hkej.com/instantnews/current/article/4365288/%E9%86%AB%E7%AE%A1%E5%B1%80%E4%B8%A8%E7%97%85%E4%BA%BA%E8%B3%87%E6%96%99%E5%A4%96%E6%B4%A9%E6%B6%89%E9%80%BE5.6%E8%90%AC%E4%BA%BA+%E8%AD%A6%E7%B6%B2%E7%BD%AA%E7%A7%91%E6%8E%A5%E6%89%8B%E8%AA%BF%E6%9F%A5",
+      "message": "Model response omitted this article from the category batch.",
+      "classification": "incomplete_model_output"
+    },
+    {
+      "type": "article",
+      "target": "https://www.hkej.com/instantnews/current/article/4365286/%E5%A4%A9%E6%96%87%E5%8F%B0%E5%8F%96%E6%B6%88%E9%BB%83%E8%89%B2%E6%9A%B4%E9%9B%A8%E8%AD%A6%E5%91%8A%E8%A8%8A%E8%99%9F",
+      "message": "Model response omitted this article from the category batch.",
+      "classification": "incomplete_model_output"
+    },
+    {
+      "type": "article",
+      "target": "https://www.hkej.com/instantnews/current/article/4365285/%E5%85%A9%E8%9A%8A%E5%85%A9%E6%8A%98%EF%BD%9C%E6%8B%8D%E5%8D%A1%E6%A9%9F%E6%95%85%E9%9A%9C+%E5%AD%AB%E7%8E%89%E8%8F%A1%E5%BC%B7%E8%AA%BF%E9%95%B7%E8%80%85%E5%8F%8A%E6%94%BF%E5%BA%9C%E7%84%A1%E6%90%8D%E5%A4%B1",
+      "message": "Model response omitted this article from the category batch.",
+      "classification": "incomplete_model_output"
+    },
+    {
+      "type": "article",
+      "target": "https://www.hkej.com/instantnews/current/article/4365284/%E5%85%AD%E5%90%88%E5%BD%A9%EF%BD%9C%E5%BE%A9%E6%B4%BB%E7%AF%80%E9%87%91%E5%A4%9A%E5%AF%B6%E4%BB%8A%E6%99%9A%E6%94%AA%E7%8F%A0+%E9%A0%AD%E7%8D%8E8000%E8%90%AC",
+      "message": "Model response omitted this article from the category batch.",
+      "classification": "incomplete_model_output"
+    },
+    {
+      "type": "article",
+      "target": "https://www.hkej.com/instantnews/current/article/4365280/%E6%99%BA%E6%85%A7%E7%B6%A0%E8%89%B2%E9%81%8B%E8%BC%B8%E4%B8%A8%E9%99%B3%E7%BE%8E%E5%AF%B6%3A%E5%90%91%E7%AB%8B%E6%B3%95%E6%9C%83%E4%BB%8B%E7%B4%B9%E6%96%B0%E8%A6%8F%E7%AE%A1%E6%A1%86%E6%9E%B6+%E4%BE%BF%E6%B0%91%E5%87%BA%E8%A1%8C",
+      "message": "Model response omitted this article from the category batch.",
+      "classification": "incomplete_model_output"
+    },
+    {
+      "type": "article",
+      "target": "https://www.hkej.com/instantnews/current/article/4365283/%E9%BB%83%E9%9B%A8%E4%B8%A8%E5%A4%A9%E6%96%87%E5%8F%B0%3A%E5%A4%A7%E5%9F%94%E5%8D%80%E9%9B%A8%E5%8B%A2%E7%89%B9%E5%88%A5%E5%A4%A7+%E6%88%96%E5%9A%B4%E9%87%8D%E6%B0%B4%E6%B5%B8",
+      "message": "Model response omitted this article from the category batch.",
+      "classification": "incomplete_model_output"
+    },
+    {
+      "type": "article",
+      "target": "https://www.hkej.com/instantnews/current/article/4365282/%E5%BE%A9%E6%B4%BB%E7%AF%80%EF%BD%9C%E6%88%AA%E8%87%B3%E6%97%A9%E4%B8%8A10%E6%99%82+%E7%B4%8415%E8%90%AC%E4%BA%BA%E6%AC%A1%E6%B8%AF%E4%BA%BA%E5%87%BA%E5%A2%83",
+      "message": "Model response omitted this article from the category batch.",
+      "classification": "incomplete_model_output"
+    },
+    {
+      "type": "article",
+      "target": "https://www.hkej.com/instantnews/current/article/4365281/%E5%A4%A9%E6%B0%A3%E4%B8%A8%E9%BB%83%E8%89%B2%E6%9A%B4%E9%9B%A8%E8%AD%A6%E5%91%8A%E8%A8%8A%E8%99%9F%E7%94%9F%E6%95%88",
+      "message": "Model response omitted this article from the category batch.",
+      "classification": "incomplete_model_output"
+    },
+    {
+      "type": "article",
+      "target": "https://www.hkej.com/instantnews/current/article/4365278/%E6%BE%80%E8%B0%B7%E7%B8%B1%E7%81%AB%E6%A1%88%E4%B8%A850%E5%A4%9A%E6%AD%B2%E7%94%B7%E5%AD%90%E8%AD%A6%E7%BD%B2%E8%87%AA%E9%A6%96+%E5%8E%9F%E5%9B%A0%E6%9C%AA%E6%98%8E",
+      "message": "Model response omitted this article from the category batch.",
+      "classification": "incomplete_model_output"
+    },
+    {
+      "type": "article",
+      "target": "https://www.hkej.com/instantnews/current/article/4365279/%E9%86%AB%E7%AE%A1%E5%B1%80%E6%9C%89%E7%97%85%E4%BA%BA%E8%B3%87%E6%96%99%E5%A4%96%E6%B4%A9+%E9%80%BE5.6%E8%90%AC%E4%BA%BA%E5%8F%97%E5%BD%B1%E9%9F%BF",
+      "message": "Model response omitted this article from the category batch.",
+      "classification": "incomplete_model_output"
+    },
+    {
+      "type": "article",
+      "target": "https://www.hkej.com/instantnews/current/article/4365275/%E5%9C%A8%E6%A0%A1%E8%AA%B2%E5%BE%8C%E8%A8%97%E7%AE%A1%E8%A8%88%E5%8A%83%E4%B8%A8%E6%9D%8E%E5%AE%B6%E8%B6%85%3A%E5%96%9C%E8%A6%8B%E6%88%90%E6%95%88%E8%B6%85%E9%A0%90%E6%9C%9F+%E7%A0%94%E9%80%B2%E4%B8%80%E6%AD%A5%E6%93%B4%E5%B1%95",
+      "message": "Model response omitted this article from the category batch.",
+      "classification": "incomplete_model_output"
+    },
+    {
+      "type": "article",
+      "target": "https://www.hkej.com/instantnews/current/article/4365277/%E5%85%A9%E8%9A%8A%E5%85%A9%E6%8A%98%E4%B8%A8%E4%B9%9D%E5%B7%B4%3A%E8%BB%8A%E8%B2%BB%E5%9B%9E%E8%B4%88%E6%A9%9F%E6%95%85%E9%9A%9C%E5%B7%B2%E8%99%95%E7%90%86+%E4%B8%8D%E6%9C%83%E4%BB%A4%E6%94%BF%E5%BA%9C%E9%A1%8D%E5%A4%96%E8%A3%9C%E8%B2%BC",
+      "message": "Model response omitted this article from the category batch.",
+      "classification": "incomplete_model_output"
+    },
+    {
+      "type": "article",
+      "target": "https://www.hkej.com/instantnews/current/article/4365268/%E4%BB%A5%E8%BB%8D%E5%B0%8D%E9%BB%8E%E5%B7%B4%E5%AB%A9%E5%B1%95%E9%96%8B%E6%96%B0%E6%94%BB%E5%8B%A2+%E7%BE%8E%E4%BF%83%E5%85%AC%E6%B0%91%E9%80%9F%E9%9B%A2%E9%96%8B",
+      "message": "Model response omitted this article from the category batch.",
+      "classification": "incomplete_model_output"
+    },
+    {
+      "type": "article",
+      "target": "https://www.hkej.com/instantnews/current/article/4365267/%E7%BE%8E%E8%BB%8D%E5%91%A8%E4%BA%94%E5%86%8D%E6%9C%89%E6%88%B0%E6%A9%9F%E5%A2%9C%E6%AF%80%E6%A9%9F%E5%B8%AB%E7%8D%B2%E6%95%91+%E4%B8%80%E5%A4%A9%E7%AC%AC2%E6%9E%B6",
+      "message": "Model response omitted this article from the category batch.",
+      "classification": "incomplete_model_output"
+    },
+    {
+      "type": "article",
+      "target": "https://www.hkej.com/instantnews/current/article/4365265/WSJ%EF%BC%9A%E5%81%9C%E7%81%AB%E8%AB%87%E5%88%A4%E9%99%B7%E5%83%B5%E5%B1%80+%E4%BC%8A%E6%9C%97%E6%8B%92%E8%A6%8B%E7%BE%8E%E5%AE%98%E5%93%A1",
+      "message": "Model response omitted this article from the category batch.",
+      "classification": "incomplete_model_output"
+    },
+    {
+      "type": "article",
+      "target": "https://www.hkej.com/instantnews/current/article/4365261/%E6%97%A5%E6%9C%AC%E9%A6%96%E7%9B%B8%E8%AC%80%E8%A8%AA%E6%BE%B3%E6%B4%B2%E5%B0%8B%E7%A8%80%E5%9C%9F+LNG%E8%88%B9%E9%A0%86%E5%88%A9%E9%81%8E%E6%B5%B7%E5%B3%BD",
+      "message": "Model response omitted this article from the category batch.",
+      "classification": "incomplete_model_output"
+    },
+    {
+      "type": "article",
+      "target": "https://www.hkej.com/instantnews/current/article/4365258/%E7%BE%8E%E5%9C%8B%E6%88%B0%E6%A9%9F%E8%A2%AB%E4%BC%8A%E6%9C%97%E6%93%8A%E8%90%BD%E5%B7%B2%E6%95%91%E5%9B%9E1%E4%BA%BA+%E4%BC%8A%E6%87%B8%E8%B3%9E%E8%BF%BD%E6%8D%95",
+      "message": "Model response omitted this article from the category batch.",
+      "classification": "incomplete_model_output"
+    }
+  ]
+}
