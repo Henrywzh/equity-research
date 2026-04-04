@@ -1,44 +1,46 @@
 {
   "report_schema_version": 4,
   "report_date": "2026-04-04",
-  "generated_at": "2026-04-04T17:46:52.660804+00:00",
+  "generated_at": "2026-04-04T18:23:12.290664+00:00",
   "source_site": "hkej",
-  "status": "partial",
+  "status": "success",
   "model": {
     "provider": "groq",
-    "primary_model": "qwen/qwen3-32b",
-    "fallback_model": "llama-3.1-8b-instant"
+    "primary_model": "meta-llama/llama-4-scout-17b-16e-instruct",
+    "fallback_models": [
+      "qwen/qwen3-32b",
+      "llama-3.1-8b-instant"
+    ]
   },
-  "model_switches": [
-    {
-      "switched_at": "2026-04-04T17:38:16.335752+00:00",
-      "from_model": "qwen/qwen3-32b",
-      "to_model": "llama-3.1-8b-instant",
-      "reason": "Primary model returned 429 rate_limit_exceeded."
-    }
-  ],
+  "model_switches": [],
   "input": {
     "article_count": 38,
     "category_count": 3
   },
   "diagnostics": {
-    "rate_limit_wait_count": 10,
-    "rate_limit_wait_seconds_total": 514.884,
-    "fallback_switch_count": 1,
-    "pre_send_split_count": 12,
+    "rate_limit_wait_count": 0,
+    "rate_limit_wait_seconds_total": 0.0,
+    "fallback_switch_count": 0,
+    "pre_send_split_count": 4,
     "response_413_split_count": 0,
     "json_repair_retry_count": 0,
-    "batch_count": 37,
+    "batch_count": 21,
     "failed_batch_count": 0
+  },
+  "incremental": {
+    "reused_successful_articles": 34,
+    "new_articles_analyzed": 4,
+    "retried_previous_day_articles": 0,
+    "previous_day_retry_successes": 0
   },
   "totals": {
     "article_count": 38,
-    "successful_article_analyses": 34,
-    "failed_article_analyses": 4,
-    "full_text_article_count": 12,
-    "truncated_article_count": 26,
-    "successful_categories": 1,
-    "partial_categories": 2,
+    "successful_article_analyses": 38,
+    "failed_article_analyses": 0,
+    "full_text_article_count": 13,
+    "truncated_article_count": 25,
+    "successful_categories": 3,
+    "partial_categories": 0,
     "failed_categories": 0
   },
   "categories": [
@@ -150,13 +152,11 @@
     {
       "category": "國際財經",
       "article_count": 5,
-      "status": "partial",
+      "status": "success",
       "key_developments": [
         "美國3月就業數據強勁，失業率意外下降",
-        "市場放棄對2027年減息預期，美債孳息上漲",
-        "美國政府擬擴大打壓中國科技設備",
-        "美3月非農職位增17.8萬 遠勝預期",
-        "失業率降至4.3%，低於預期和前值"
+        "市場預期美聯儲今年減息次數降低，美債收益率上升",
+        "意大利央行下調經濟增長預測，通脹風險上升"
       ],
       "named_entities": [
         {
@@ -168,32 +168,16 @@
           "type": "institution"
         },
         {
+          "name": "意大利央行",
+          "type": "institution"
+        },
+        {
+          "name": "歐羅區",
+          "type": "organization"
+        },
+        {
           "name": "美債",
           "type": "asset"
-        },
-        {
-          "name": "華為",
-          "type": "company"
-        },
-        {
-          "name": "中興",
-          "type": "company"
-        },
-        {
-          "name": "海能達",
-          "type": "company"
-        },
-        {
-          "name": "海康威視",
-          "type": "company"
-        },
-        {
-          "name": "大華",
-          "type": "company"
-        },
-        {
-          "name": "中國",
-          "type": "country"
         }
       ],
       "articles": [
@@ -242,11 +226,36 @@
           "canonical_url": "https://www.hkej.com/instantnews/international/article/4365270/%E6%84%8F%E5%A4%A7%E5%88%A9%E5%A4%AE%E8%A1%8C%E9%99%8D%E4%BB%8A%E6%98%8E%E5%B9%B4%E7%B6%93%E6%BF%9F%E5%A2%9E%E9%95%B7%E9%A0%90%E6%B8%AC%E8%87%B30.5%25",
           "published_at": "2026-04-04T05:43:00+08:00",
           "section": "國際財經",
-          "novelty_score": null,
-          "relevance_score": null,
-          "urgency_score": null,
-          "named_entities": [],
-          "key_points": [],
+          "novelty_score": 6,
+          "relevance_score": 8,
+          "urgency_score": 7,
+          "named_entities": [
+            {
+              "name": "意大利",
+              "type": "country"
+            },
+            {
+              "name": "歐羅區",
+              "type": "organization"
+            },
+            {
+              "name": "伊朗",
+              "type": "country"
+            },
+            {
+              "name": "歐盟",
+              "type": "organization"
+            },
+            {
+              "name": "意大利央行",
+              "type": "institution"
+            }
+          ],
+          "key_points": [
+            "意大利央行下修2026及2027年GDP成長預測至0.5%",
+            "衝突與能源價格上漲壓縮短期經濟需求",
+            "2026年通膨預測升至2.6%，2027年回落至2%以下"
+          ],
           "content_truncated": false,
           "original_content_length_chars": 279,
           "analyzed_content_length_chars": 279,
@@ -254,9 +263,9 @@
           "analyzed_content_token_estimate": 70,
           "truncation_reason": null,
           "analysis_method": "full_text",
-          "model_used": "llama-3.1-8b-instant",
-          "error_classification": "incomplete_model_output",
-          "error": "Model response omitted this article from the category batch."
+          "model_used": "qwen/qwen3-32b",
+          "error_classification": null,
+          "error": null
         },
         {
           "source_article_id": "4365263",
@@ -264,11 +273,37 @@
           "canonical_url": "https://www.hkej.com/instantnews/international/article/4365263/%E9%98%BF%E8%81%AF%E9%85%8B%E5%85%A8%E7%90%83%E6%9C%80%E5%A4%A7%E9%8B%81%E5%BB%A0%E5%85%A8%E9%9D%A2%E5%BE%A9%E7%94%A2%E9%9C%80%E6%99%82%E4%B8%80%E5%B9%B4",
           "published_at": "2026-04-04T02:00:00+08:00",
           "section": "國際財經",
-          "novelty_score": null,
-          "relevance_score": null,
-          "urgency_score": null,
-          "named_entities": [],
-          "key_points": [],
+          "novelty_score": 8,
+          "relevance_score": 9,
+          "urgency_score": 7,
+          "named_entities": [
+            {
+              "name": "阿聯酋",
+              "type": "country"
+            },
+            {
+              "name": "伊朗",
+              "type": "country"
+            },
+            {
+              "name": "Al Taweelah冶煉廠",
+              "type": "company"
+            },
+            {
+              "name": "阿聯酋環球鋁業",
+              "type": "company"
+            },
+            {
+              "name": "阿布扎比哈利法經濟區",
+              "type": "institution"
+            }
+          ],
+          "key_points": [
+            "伊朗襲擊阿聯酋全球最大鋁廠Al Taweelah",
+            "全面復產需時12個月，基礎設施損壞嚴重",
+            "該廠為全球第二大單一廠址鋁冶煉廠",
+            "事件影響全球鋁供應鏈與市場穩定"
+          ],
           "content_truncated": false,
           "original_content_length_chars": 202,
           "analyzed_content_length_chars": 202,
@@ -276,9 +311,9 @@
           "analyzed_content_token_estimate": 51,
           "truncation_reason": null,
           "analysis_method": "full_text",
-          "model_used": "llama-3.1-8b-instant",
-          "error_classification": "incomplete_model_output",
-          "error": "Model response omitted this article from the category batch."
+          "model_used": "qwen/qwen3-32b",
+          "error_classification": null,
+          "error": null
         },
         {
           "source_article_id": "4365259",
@@ -368,55 +403,40 @@
           "error": null
         }
       ],
-      "model_used": "llama-3.1-8b-instant",
-      "sub_batch_count": 7,
+      "model_used": "meta-llama/llama-4-scout-17b-16e-instruct",
+      "sub_batch_count": 9,
       "diagnostics": {
-        "sub_batch_count": 7,
+        "sub_batch_count": 9,
         "split_reasons": [],
         "models_attempted": [
-          "qwen/qwen3-32b",
-          "llama-3.1-8b-instant"
+          "meta-llama/llama-4-scout-17b-16e-instruct",
+          "qwen/qwen3-32b"
         ],
-        "estimated_input_tokens_max": 1318,
-        "serialized_request_bytes_max": 8183,
-        "rate_limit_waits": 3,
-        "partial_article_count": 2
+        "estimated_input_tokens_max": 727,
+        "serialized_request_bytes_max": 4105,
+        "rate_limit_waits": 0,
+        "partial_article_count": 0
       },
       "error": null
     },
     {
       "category": "時事脈搏",
       "article_count": 32,
-      "status": "partial",
-      "key_developments": [],
+      "status": "success",
+      "key_developments": [
+        "九巴車費回贈機曾故障，政府指示九巴向受影響乘客發還分段收費回贈",
+        "復活清明長假第二日，逾42萬人次港人出境",
+        "伊朗局勢升級，中國駐以色列使館下周二再組織撤離公民",
+        "醫管局病人資料外洩，涉5.6萬人，醫管局致歉"
+      ],
       "named_entities": [
         {
           "name": "九巴",
           "type": "organization"
         },
         {
-          "name": "愉翠苑",
-          "type": "other"
-        },
-        {
           "name": "政府",
           "type": "organization"
-        },
-        {
-          "name": "復活清明長假",
-          "type": "other"
-        },
-        {
-          "name": "香港",
-          "type": "other"
-        },
-        {
-          "name": "內地",
-          "type": "other"
-        },
-        {
-          "name": "伊朗",
-          "type": "other"
         },
         {
           "name": "中國",
@@ -427,236 +447,12 @@
           "type": "other"
         },
         {
-          "name": "東涌",
+          "name": "伊朗",
           "type": "other"
-        },
-        {
-          "name": "大嶼山警區",
-          "type": "organization"
-        },
-        {
-          "name": "陳家瑩",
-          "type": "person"
-        },
-        {
-          "name": "李夏茵",
-          "type": "person"
-        },
-        {
-          "name": "九龍東醫院聯網",
-          "type": "institution"
         },
         {
           "name": "醫管局",
           "type": "institution"
-        },
-        {
-          "name": "逾5.6萬人",
-          "type": "other"
-        },
-        {
-          "name": "警網罪科",
-          "type": "organization"
-        },
-        {
-          "name": "房屋局局長",
-          "type": "person"
-        },
-        {
-          "name": "何永賢",
-          "type": "person"
-        },
-        {
-          "name": "簡約公屋",
-          "type": "other"
-        },
-        {
-          "name": "天文台",
-          "type": "institution"
-        },
-        {
-          "name": "黃色暴雨警告訊號",
-          "type": "other"
-        },
-        {
-          "name": "孫玉菡",
-          "type": "person"
-        },
-        {
-          "name": "政府",
-          "type": "institution"
-        },
-        {
-          "name": "長者",
-          "type": "other"
-        },
-        {
-          "name": "六合彩",
-          "type": "index"
-        },
-        {
-          "name": "復活節",
-          "type": "other"
-        },
-        {
-          "name": "金多寶",
-          "type": "asset"
-        },
-        {
-          "name": "陳美寶",
-          "type": "person"
-        },
-        {
-          "name": "啟德智慧綠色集體運輸系統",
-          "type": "asset"
-        },
-        {
-          "name": "行政長官",
-          "type": "institution"
-        },
-        {
-          "name": "運輸及物流局",
-          "type": "organization"
-        },
-        {
-          "name": "黃雨",
-          "type": "other"
-        },
-        {
-          "name": "大埔區",
-          "type": "other"
-        },
-        {
-          "name": "Hong Kong",
-          "type": "country"
-        },
-        {
-          "name": "Easter",
-          "type": "other"
-        },
-        {
-          "name": "Weather",
-          "type": "other"
-        },
-        {
-          "name": "Shibuya",
-          "type": "other"
-        },
-        {
-          "name": "Arson",
-          "type": "other"
-        },
-        {
-          "name": "李家超",
-          "type": "person"
-        },
-        {
-          "name": "本港",
-          "type": "country"
-        },
-        {
-          "name": "羅淑佩",
-          "type": "person"
-        },
-        {
-          "name": "香港",
-          "type": "country"
-        },
-        {
-          "name": "世界",
-          "type": "other"
-        },
-        {
-          "name": "特朗普",
-          "type": "person"
-        },
-        {
-          "name": "伊朗",
-          "type": "country"
-        },
-        {
-          "name": "美軍",
-          "type": "institution"
-        },
-        {
-          "name": "教宗良十四世",
-          "type": "person"
-        },
-        {
-          "name": "耶穌受難日",
-          "type": "other"
-        },
-        {
-          "name": "羅馬",
-          "type": "other"
-        },
-        {
-          "name": "黎巴嫩",
-          "type": "other"
-        },
-        {
-          "name": "貝魯特",
-          "type": "other"
-        },
-        {
-          "name": "美國空軍",
-          "type": "organization"
-        },
-        {
-          "name": "波斯灣",
-          "type": "other"
-        },
-        {
-          "name": "紐約時報",
-          "type": "organization"
-        },
-        {
-          "name": "阿布達比",
-          "type": "other"
-        },
-        {
-          "name": "埃及",
-          "type": "other"
-        },
-        {
-          "name": "哈布山",
-          "type": "other"
-        },
-        {
-          "name": "WSJ",
-          "type": "organization"
-        },
-        {
-          "name": "巴基斯坦",
-          "type": "country"
-        },
-        {
-          "name": "美官員",
-          "type": "person"
-        },
-        {
-          "name": "加拿大",
-          "type": "country"
-        },
-        {
-          "name": "何立峰",
-          "type": "person"
-        },
-        {
-          "name": "中加經濟財金戰略對話",
-          "type": "organization"
-        },
-        {
-          "name": "美國",
-          "type": "country"
-        },
-        {
-          "name": "國防",
-          "type": "institution"
-        },
-        {
-          "name": "F 15E",
-          "type": "asset"
         }
       ],
       "articles": [
@@ -857,11 +653,29 @@
           "canonical_url": "https://www.hkej.com/instantnews/current/article/4365289/%E7%97%85%E4%BA%BA%E8%B3%87%E6%96%99%E5%A4%96%E6%B4%A9%E4%B8%A8%E6%B6%89%E4%B9%9D%E9%BE%8D%E6%9D%B1%E8%81%AF%E7%B6%B25.6%E8%90%AC%E4%BA%BA+%E9%86%AB%E7%AE%A1%E5%B1%80%E8%87%B4%E6%AD%89%E7%A8%B1%E9%9D%9E%E7%B6%B2%E7%B5%A1%E6%94%BB%E6%93%8A",
           "published_at": "2026-04-04T16:12:00+08:00",
           "section": "時事脈搏",
-          "novelty_score": null,
-          "relevance_score": null,
-          "urgency_score": null,
-          "named_entities": [],
-          "key_points": [],
+          "novelty_score": 7,
+          "relevance_score": 8,
+          "urgency_score": 6,
+          "named_entities": [
+            {
+              "name": "醫管局",
+              "type": "organization"
+            },
+            {
+              "name": "九龍東醫院聯網",
+              "type": "institution"
+            },
+            {
+              "name": "HA Go",
+              "type": "other"
+            }
+          ],
+          "key_points": [
+            "5.6萬名病人資料外洩，涉及九龍東聯網",
+            "外洩資料含姓名、身份證號碼及醫療紀錄",
+            "醫管局否認網絡攻擊，已暫停承辦商維護工作",
+            "加強網絡安全措施及通知受影響病人"
+          ],
           "content_truncated": false,
           "original_content_length_chars": 350,
           "analyzed_content_length_chars": 350,
@@ -869,9 +683,9 @@
           "analyzed_content_token_estimate": 88,
           "truncation_reason": null,
           "analysis_method": "full_text",
-          "model_used": "llama-3.1-8b-instant",
-          "error_classification": "incomplete_model_output",
-          "error": "Model response omitted this article from the category batch."
+          "model_used": "qwen/qwen3-32b",
+          "error_classification": null,
+          "error": null
         },
         {
           "source_article_id": "4365288",
@@ -1797,21 +1611,38 @@
           "canonical_url": "https://www.hkej.com/instantnews/current/article/4365261/%E6%97%A5%E6%9C%AC%E9%A6%96%E7%9B%B8%E8%AC%80%E8%A8%AA%E6%BE%B3%E6%B4%B2%E5%B0%8B%E7%A8%80%E5%9C%9F+LNG%E8%88%B9%E9%A0%86%E5%88%A9%E9%81%8E%E6%B5%B7%E5%B3%BD",
           "published_at": "2026-04-04T01:29:00+08:00",
           "section": "時事脈搏",
-          "novelty_score": null,
-          "relevance_score": null,
-          "urgency_score": null,
-          "named_entities": [],
-          "key_points": [],
-          "content_truncated": true,
+          "novelty_score": 5,
+          "relevance_score": 3,
+          "urgency_score": 6,
+          "named_entities": [
+            {
+              "name": "日本",
+              "type": "country"
+            },
+            {
+              "name": "澳洲",
+              "type": "country"
+            },
+            {
+              "name": "高市早苗",
+              "type": "person"
+            }
+          ],
+          "key_points": [
+            "日本首相訪澳洲",
+            "稀土供應鏈安排",
+            "LNG船通過霍爾木茲海峽"
+          ],
+          "content_truncated": false,
           "original_content_length_chars": 140,
-          "analyzed_content_length_chars": 0,
+          "analyzed_content_length_chars": 140,
           "original_content_token_estimate": 35,
-          "analyzed_content_token_estimate": 0,
-          "truncation_reason": "Category batch request exceeded the working request budget; article content was shortened to fit.",
-          "analysis_method": "truncated_text",
-          "model_used": "llama-3.1-8b-instant",
-          "error_classification": "incomplete_model_output",
-          "error": "Model response omitted this article from the category batch."
+          "analyzed_content_token_estimate": 35,
+          "truncation_reason": null,
+          "analysis_method": "full_text",
+          "model_used": "meta-llama/llama-4-scout-17b-16e-instruct",
+          "error_classification": null,
+          "error": null
         },
         {
           "source_article_id": "4365258",
@@ -1853,54 +1684,22 @@
           "error": null
         }
       ],
-      "model_used": "llama-3.1-8b-instant",
-      "sub_batch_count": 20,
+      "model_used": "meta-llama/llama-4-scout-17b-16e-instruct",
+      "sub_batch_count": 10,
       "diagnostics": {
-        "sub_batch_count": 20,
-        "split_reasons": [
-          "pre_send_budget"
-        ],
+        "sub_batch_count": 10,
+        "split_reasons": [],
         "models_attempted": [
-          "llama-3.1-8b-instant"
+          "meta-llama/llama-4-scout-17b-16e-instruct",
+          "qwen/qwen3-32b"
         ],
-        "estimated_input_tokens_max": 5306,
-        "serialized_request_bytes_max": 25054,
-        "rate_limit_waits": 7,
-        "partial_article_count": 2
+        "estimated_input_tokens_max": 753,
+        "serialized_request_bytes_max": 4384,
+        "rate_limit_waits": 0,
+        "partial_article_count": 0
       },
-      "error": "413 Client Error: Payload Too Large for url: https://api.groq.com/openai/v1/chat/completions"
+      "error": null
     }
   ],
-  "errors": [
-    {
-      "type": "article",
-      "target": "https://www.hkej.com/instantnews/international/article/4365270/%E6%84%8F%E5%A4%A7%E5%88%A9%E5%A4%AE%E8%A1%8C%E9%99%8D%E4%BB%8A%E6%98%8E%E5%B9%B4%E7%B6%93%E6%BF%9F%E5%A2%9E%E9%95%B7%E9%A0%90%E6%B8%AC%E8%87%B30.5%25",
-      "message": "Model response omitted this article from the category batch.",
-      "classification": "incomplete_model_output"
-    },
-    {
-      "type": "article",
-      "target": "https://www.hkej.com/instantnews/international/article/4365263/%E9%98%BF%E8%81%AF%E9%85%8B%E5%85%A8%E7%90%83%E6%9C%80%E5%A4%A7%E9%8B%81%E5%BB%A0%E5%85%A8%E9%9D%A2%E5%BE%A9%E7%94%A2%E9%9C%80%E6%99%82%E4%B8%80%E5%B9%B4",
-      "message": "Model response omitted this article from the category batch.",
-      "classification": "incomplete_model_output"
-    },
-    {
-      "type": "article",
-      "target": "https://www.hkej.com/instantnews/current/article/4365289/%E7%97%85%E4%BA%BA%E8%B3%87%E6%96%99%E5%A4%96%E6%B4%A9%E4%B8%A8%E6%B6%89%E4%B9%9D%E9%BE%8D%E6%9D%B1%E8%81%AF%E7%B6%B25.6%E8%90%AC%E4%BA%BA+%E9%86%AB%E7%AE%A1%E5%B1%80%E8%87%B4%E6%AD%89%E7%A8%B1%E9%9D%9E%E7%B6%B2%E7%B5%A1%E6%94%BB%E6%93%8A",
-      "message": "Model response omitted this article from the category batch.",
-      "classification": "incomplete_model_output"
-    },
-    {
-      "type": "article",
-      "target": "https://www.hkej.com/instantnews/current/article/4365261/%E6%97%A5%E6%9C%AC%E9%A6%96%E7%9B%B8%E8%AC%80%E8%A8%AA%E6%BE%B3%E6%B4%B2%E5%B0%8B%E7%A8%80%E5%9C%9F+LNG%E8%88%B9%E9%A0%86%E5%88%A9%E9%81%8E%E6%B5%B7%E5%B3%BD",
-      "message": "Model response omitted this article from the category batch.",
-      "classification": "incomplete_model_output"
-    },
-    {
-      "type": "category",
-      "target": "時事脈搏",
-      "message": "413 Client Error: Payload Too Large for url: https://api.groq.com/openai/v1/chat/completions",
-      "classification": "payload_too_large"
-    }
-  ]
+  "errors": []
 }
