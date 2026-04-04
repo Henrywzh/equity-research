@@ -182,6 +182,35 @@ class CliTests(unittest.TestCase):
         self.assertEqual(exit_code, 0)
         self.assertIn("No scrape runs found.", buffer.getvalue())
 
+    def test_notify_command_outputs_json(self) -> None:
+        with patch(
+            "daily_macro.cli.load_analysis_result",
+            return_value={"status": "success"},
+        ), patch(
+            "daily_macro.cli.send_analysis_summary_email",
+            return_value=(True, "Sent daily macro Gmail summary to me@example.com."),
+        ):
+            buffer = io.StringIO()
+            with redirect_stdout(buffer):
+                exit_code = main(["notify", "--result-path", "/tmp/report.json"])
+
+        self.assertEqual(exit_code, 0)
+        payload = json.loads(buffer.getvalue())
+        self.assertTrue(payload["sent"])
+
+    def test_test_email_command_outputs_json(self) -> None:
+        with patch(
+            "daily_macro.cli.send_test_email",
+            return_value=(True, "Sent daily macro Gmail summary to me@example.com."),
+        ):
+            buffer = io.StringIO()
+            with redirect_stdout(buffer):
+                exit_code = main(["test-email"])
+
+        self.assertEqual(exit_code, 0)
+        payload = json.loads(buffer.getvalue())
+        self.assertTrue(payload["sent"])
+
     def test_query_date_json_output(self) -> None:
         with patch(
             "daily_macro.cli.run_query_command",

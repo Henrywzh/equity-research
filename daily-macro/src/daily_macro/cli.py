@@ -6,6 +6,7 @@ import logging
 
 from .analysis import run_analysis
 from .config import DEFAULT_RETENTION_DAYS, get_db_path
+from .notifier import load_analysis_result, send_analysis_summary_email, send_test_email
 from .pipeline import cleanup_old_snapshots, run_scrape, run_smoke
 from .storage import Storage
 
@@ -36,6 +37,11 @@ def build_parser() -> argparse.ArgumentParser:
     analyze_parser.add_argument("--verbose", action="store_true", help="Enable detailed analysis diagnostics logging.")
     analyze_parser.add_argument("--data-dir", default=None, help="Override the data directory.")
     analyze_parser.add_argument("--db-path", default=None, help="Override the SQLite database path.")
+
+    notify_parser = subparsers.add_parser("notify", help="Send a Gmail summary for a prior analysis result.")
+    notify_parser.add_argument("--result-path", required=True, help="Path to the JSON analysis result.")
+
+    subparsers.add_parser("test-email", help="Send a Gmail connectivity test email.")
 
     smoke_parser = subparsers.add_parser("smoke", help="Validate homepage parsing without writing data.")
     smoke_parser.add_argument("--json", action="store_true", help="Print the result as JSON.")
@@ -117,6 +123,16 @@ def main(argv: list[str] | None = None) -> int:
         else:
             _print_analysis_result(result)
         return 0 if result["status"] != "failed" else 1
+
+    if args.command == "notify":
+        sent, message = send_analysis_summary_email(load_analysis_result(args.result_path))
+        print(json.dumps({"sent": sent, "message": message}, ensure_ascii=False, indent=2))
+        return 0
+
+    if args.command == "test-email":
+        sent, message = send_test_email()
+        print(json.dumps({"sent": sent, "message": message}, ensure_ascii=False, indent=2))
+        return 0
 
     if args.command == "inspect":
         result = inspect_latest_run(
