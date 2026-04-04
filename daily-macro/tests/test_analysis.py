@@ -9,7 +9,13 @@ from unittest.mock import patch
 import requests
 
 import daily_macro.analysis as analysis_module
-from daily_macro.analysis import DEFAULT_INPUT_BUDGET_TOKENS, RateLimitGovernor, run_analysis, select_content_for_analysis
+from daily_macro.analysis import (
+    DEFAULT_INPUT_BUDGET_TOKENS,
+    REPORT_SCHEMA_VERSION,
+    RateLimitGovernor,
+    run_analysis,
+    select_content_for_analysis,
+)
 from daily_macro.models import ArticleDetails
 from daily_macro.storage import Storage
 
@@ -80,6 +86,44 @@ class AnalysisTests(unittest.TestCase):
         )
         self.storage.upsert_article(article, "2026-04-03T00:00:00+00:00")
 
+    def _report_article(
+        self,
+        *,
+        source_article_id: str,
+        title: str,
+        section: str,
+        published_at: str,
+        success: bool,
+    ) -> dict[str, object]:
+        return {
+            "source_article_id": source_article_id,
+            "title": title,
+            "canonical_url": f"https://example.com/{source_article_id}",
+            "published_at": published_at,
+            "section": section,
+            "novelty_score": 6 if success else None,
+            "relevance_score": 7 if success else None,
+            "urgency_score": 5 if success else None,
+            "named_entities": [],
+            "key_points": ["Existing point"] if success else [],
+            "content_truncated": False,
+            "original_content_length_chars": 100,
+            "analyzed_content_length_chars": 100,
+            "original_content_token_estimate": 25,
+            "analyzed_content_token_estimate": 25,
+            "truncation_reason": None,
+            "analysis_method": "full_text",
+            "model_used": "meta-llama/llama-4-scout-17b-16e-instruct",
+            "error_classification": None if success else "incomplete_model_output",
+            "error": None if success else "Model response omitted this article from the category batch.",
+        }
+
+    def _write_report_file(self, date_string: str, payload: dict[str, object]) -> Path:
+        report_path = self.data_dir / "analyses" / date_string / "hkej-news-analysis.json"
+        report_path.parent.mkdir(parents=True, exist_ok=True)
+        report_path.write_text(json.dumps(payload, ensure_ascii=False, indent=2), encoding="utf-8")
+        return report_path
+
     def test_select_content_uses_full_text_for_short_articles(self) -> None:
         selected = select_content_for_analysis("a" * 1200)
         self.assertFalse(selected["content_truncated"])
@@ -123,8 +167,405 @@ class AnalysisTests(unittest.TestCase):
         self.assertEqual(report["status"], "empty")
         self.assertEqual(report["totals"]["article_count"], 0)
         self.assertEqual(report["diagnostics"]["batch_count"], 0)
+        self.assertEqual(report["incremental"]["new_articles_analyzed"], 0)
         report_path = self.data_dir / "analyses" / "2026-04-03" / "hkej-news-analysis.json"
         self.assertTrue(report_path.exists())
+
+    def test_run_analysis_force_reuses_fully_successful_today_report_without_api_calls(self) -> None:
+        self._insert_article(
+            title="Pulse one",
+            source_article_id="1001",
+            section="時事脈搏",
+            published_at="2026-04-03T08:00:00+08:00",
+            content_text="a" * 800,
+        )
+        self._write_report_file(
+            "2026-04-03",
+            {
+                "report_schema_version": REPORT_SCHEMA_VERSION,
+                "report_date": "2026-04-03",
+                "generated_at": "2026-04-03T10:00:00+00:00",
+                "source_site": "hkej",
+                "status": "success",
+                "model": {"provider": "groq", "primary_model": "meta-llama/llama-4-scout-17b-16e-instruct", "fallback_models": []},
+                "model_switches": [],
+                "input": {"article_count": 1, "category_count": 1},
+                "diagnostics": {},
+                "incremental": {"reused_successful_articles": 1, "new_articles_analyzed": 0, "retried_previous_day_articles": 0, "previous_day_retry_successes": 0},
+                "totals": {"article_count": 1, "successful_article_analyses": 1, "failed_article_analyses": 0, "full_text_article_count": 1, "truncated_article_count": 0, "successful_categories": 1, "partial_categories": 0, "failed_categories": 0},
+                "categories": [
+                    {
+                        "category": "時事脈搏",
+                        "article_count": 1,
+                        "status": "success",
+                        "key_developments": ["Existing category summary"],
+                        "named_entities": [],
+                        "articles": [
+                            self._report_article(
+                                source_article_id="1001",
+                                title="Pulse one",
+                                section="時事脈搏",
+                                published_at="2026-04-03T08:00:00+08:00",
+                                success=True,
+                            )
+                        ],
+                        "model_used": "meta-llama/llama-4-scout-17b-16e-instruct",
+                        "sub_batch_count": 1,
+                        "diagnostics": {},
+                        "error": None,
+                    }
+                ],
+                "errors": [],
+            },
+        )
+
+        with patch("daily_macro.analysis.load_groq_api_key", side_effect=AssertionError("API key should not be loaded")), patch(
+            "daily_macro.analysis._build_groq_session", side_effect=AssertionError("Groq session should not be built")
+        ):
+            report = run_analysis(date_string="2026-04-03", data_dir=self.data_dir, db_path=self.db_path, force=True)
+
+        self.assertEqual(report["status"], "success")
+        self.assertEqual(report["incremental"]["reused_successful_articles"], 1)
+        self.assertEqual(report["incremental"]["new_articles_analyzed"], 0)
+        self.assertEqual(report["totals"]["article_count"], 1)
+
+    def test_run_analysis_retries_previous_day_failed_articles_when_today_is_empty(self) -> None:
+        self._insert_article(
+            title="Yesterday global",
+            source_article_id="2001",
+            section="國際財經",
+            published_at="2026-04-03T09:00:00+08:00",
+            content_text="b" * 800,
+        )
+        yesterday_path = self._write_report_file(
+            "2026-04-03",
+            {
+                "report_schema_version": REPORT_SCHEMA_VERSION,
+                "report_date": "2026-04-03",
+                "generated_at": "2026-04-03T10:00:00+00:00",
+                "source_site": "hkej",
+                "status": "partial",
+                "model": {"provider": "groq", "primary_model": "meta-llama/llama-4-scout-17b-16e-instruct", "fallback_models": []},
+                "model_switches": [],
+                "input": {"article_count": 1, "category_count": 1},
+                "diagnostics": {},
+                "incremental": {"reused_successful_articles": 0, "new_articles_analyzed": 1, "retried_previous_day_articles": 0, "previous_day_retry_successes": 0},
+                "totals": {"article_count": 1, "successful_article_analyses": 0, "failed_article_analyses": 1, "full_text_article_count": 1, "truncated_article_count": 0, "successful_categories": 0, "partial_categories": 1, "failed_categories": 0},
+                "categories": [
+                    {
+                        "category": "國際財經",
+                        "article_count": 1,
+                        "status": "partial",
+                        "key_developments": [],
+                        "named_entities": [],
+                        "articles": [self._report_article(source_article_id="2001", title="Yesterday global", section="國際財經", published_at="2026-04-03T09:00:00+08:00", success=False)],
+                        "model_used": "meta-llama/llama-4-scout-17b-16e-instruct",
+                        "sub_batch_count": 1,
+                        "diagnostics": {},
+                        "error": "Model response omitted this article from the category batch.",
+                    }
+                ],
+                "errors": [{"type": "article", "target": "https://example.com/2001", "message": "Model response omitted this article from the category batch.", "classification": "incomplete_model_output"}],
+            },
+        )
+
+        session = _FakeGroqSession(
+            [
+                _FakeResponse(
+                    200,
+                    payload={"choices": [{"message": {"content": json.dumps({"articles": [{"source_article_id": "2001", "canonical_url": "https://example.com/2001", "novelty_score": 7, "relevance_score": 8, "urgency_score": 6, "named_entities": [], "key_points": ["Yesterday recovered"]}]}, ensure_ascii=False)}}]},
+                ),
+                _FakeResponse(
+                    200,
+                    payload={"choices": [{"message": {"content": json.dumps({"key_developments": ["Yesterday summary"], "named_entities": []}, ensure_ascii=False)}}]},
+                ),
+            ]
+        )
+
+        with patch("daily_macro.analysis.load_groq_api_key", return_value="test-key"), patch(
+            "daily_macro.analysis._build_groq_session", return_value=session
+        ):
+            report = run_analysis(date_string="2026-04-04", data_dir=self.data_dir, db_path=self.db_path, force=True)
+
+        self.assertEqual(report["status"], "empty")
+        self.assertEqual(report["incremental"]["retried_previous_day_articles"], 1)
+        self.assertEqual(report["incremental"]["previous_day_retry_successes"], 1)
+        updated_yesterday = json.loads(yesterday_path.read_text(encoding="utf-8"))
+        self.assertEqual(updated_yesterday["status"], "success")
+
+    def test_run_analysis_reuses_successful_today_articles_and_only_analyzes_new_ones(self) -> None:
+        self._insert_article(
+            title="Pulse one",
+            source_article_id="1001",
+            section="時事脈搏",
+            published_at="2026-04-03T08:00:00+08:00",
+            content_text="a" * 800,
+        )
+        self._insert_article(
+            title="Pulse two",
+            source_article_id="1002",
+            section="時事脈搏",
+            published_at="2026-04-03T07:00:00+08:00",
+            content_text="b" * 800,
+        )
+        self._write_report_file(
+            "2026-04-03",
+            {
+                "report_schema_version": REPORT_SCHEMA_VERSION,
+                "report_date": "2026-04-03",
+                "generated_at": "2026-04-03T10:00:00+00:00",
+                "source_site": "hkej",
+                "status": "partial",
+                "model": {"provider": "groq", "primary_model": "meta-llama/llama-4-scout-17b-16e-instruct", "fallback_models": []},
+                "model_switches": [],
+                "input": {"article_count": 2, "category_count": 1},
+                "diagnostics": {},
+                "totals": {"article_count": 1, "successful_article_analyses": 1, "failed_article_analyses": 0, "full_text_article_count": 1, "truncated_article_count": 0, "successful_categories": 0, "partial_categories": 1, "failed_categories": 0},
+                "categories": [
+                    {
+                        "category": "時事脈搏",
+                        "article_count": 1,
+                        "status": "partial",
+                        "key_developments": ["Existing category summary"],
+                        "named_entities": [],
+                        "articles": [
+                            self._report_article(
+                                source_article_id="1001",
+                                title="Pulse one",
+                                section="時事脈搏",
+                                published_at="2026-04-03T08:00:00+08:00",
+                                success=True,
+                            )
+                        ],
+                        "model_used": "meta-llama/llama-4-scout-17b-16e-instruct",
+                        "sub_batch_count": 1,
+                        "diagnostics": {},
+                        "error": None,
+                    }
+                ],
+                "errors": [],
+            },
+        )
+
+        session = _FakeGroqSession(
+            [
+                _FakeResponse(
+                    200,
+                    payload={
+                        "choices": [
+                            {"message": {"content": json.dumps({"articles": [{"source_article_id": "1002", "canonical_url": "https://example.com/1002", "novelty_score": 6, "relevance_score": 8, "urgency_score": 7, "named_entities": [], "key_points": ["Pulse point two"]}]}, ensure_ascii=False)}}
+                        ]
+                    },
+                ),
+                _FakeResponse(
+                    200,
+                    payload={"choices": [{"message": {"content": json.dumps({"key_developments": ["Merged pulse development"], "named_entities": []}, ensure_ascii=False)}}]},
+                ),
+                _FakeResponse(
+                    200,
+                    payload={"choices": [{"message": {"content": json.dumps({"key_developments": ["Final merged pulse development"], "named_entities": []}, ensure_ascii=False)}}]},
+                ),
+            ]
+        )
+
+        with patch("daily_macro.analysis.load_groq_api_key", return_value="test-key"), patch(
+            "daily_macro.analysis._build_groq_session", return_value=session
+        ):
+            report = run_analysis(date_string="2026-04-03", data_dir=self.data_dir, db_path=self.db_path, force=True)
+
+        self.assertEqual(session.calls, 3)
+        self.assertEqual(report["status"], "success")
+        self.assertEqual(report["incremental"]["reused_successful_articles"], 1)
+        self.assertEqual(report["incremental"]["new_articles_analyzed"], 1)
+        self.assertEqual(report["totals"]["article_count"], 2)
+        self.assertEqual(len(report["categories"][0]["articles"]), 2)
+        reused = next(article for article in report["categories"][0]["articles"] if article["source_article_id"] == "1001")
+        self.assertEqual(reused["key_points"], ["Existing point"])
+
+    def test_run_analysis_retries_failed_today_articles_but_not_successful_ones(self) -> None:
+        self._insert_article(
+            title="Pulse one",
+            source_article_id="1001",
+            section="時事脈搏",
+            published_at="2026-04-03T08:00:00+08:00",
+            content_text="a" * 800,
+        )
+        self._insert_article(
+            title="Pulse two",
+            source_article_id="1002",
+            section="時事脈搏",
+            published_at="2026-04-03T07:00:00+08:00",
+            content_text="b" * 800,
+        )
+        self._write_report_file(
+            "2026-04-03",
+            {
+                "report_schema_version": REPORT_SCHEMA_VERSION,
+                "report_date": "2026-04-03",
+                "generated_at": "2026-04-03T10:00:00+00:00",
+                "source_site": "hkej",
+                "status": "partial",
+                "model": {"provider": "groq", "primary_model": "meta-llama/llama-4-scout-17b-16e-instruct", "fallback_models": []},
+                "model_switches": [],
+                "input": {"article_count": 2, "category_count": 1},
+                "diagnostics": {},
+                "totals": {"article_count": 2, "successful_article_analyses": 1, "failed_article_analyses": 1, "full_text_article_count": 2, "truncated_article_count": 0, "successful_categories": 0, "partial_categories": 1, "failed_categories": 0},
+                "categories": [
+                    {
+                        "category": "時事脈搏",
+                        "article_count": 2,
+                        "status": "partial",
+                        "key_developments": ["Old summary"],
+                        "named_entities": [],
+                        "articles": [
+                            self._report_article(source_article_id="1001", title="Pulse one", section="時事脈搏", published_at="2026-04-03T08:00:00+08:00", success=True),
+                            self._report_article(source_article_id="1002", title="Pulse two", section="時事脈搏", published_at="2026-04-03T07:00:00+08:00", success=False),
+                        ],
+                        "model_used": "meta-llama/llama-4-scout-17b-16e-instruct",
+                        "sub_batch_count": 1,
+                        "diagnostics": {},
+                        "error": "Model response omitted this article from the category batch.",
+                    }
+                ],
+                "errors": [{"type": "article", "target": "https://example.com/1002", "message": "Model response omitted this article from the category batch.", "classification": "incomplete_model_output"}],
+            },
+        )
+
+        session = _FakeGroqSession(
+            [
+                _FakeResponse(
+                    200,
+                    payload={"choices": [{"message": {"content": json.dumps({"articles": [{"source_article_id": "1002", "canonical_url": "https://example.com/1002", "novelty_score": 6, "relevance_score": 8, "urgency_score": 7, "named_entities": [], "key_points": ["Recovered point"]}]}, ensure_ascii=False)}}]},
+                ),
+                _FakeResponse(
+                    200,
+                    payload={"choices": [{"message": {"content": json.dumps({"key_developments": ["Recovered category"], "named_entities": []}, ensure_ascii=False)}}]},
+                ),
+                _FakeResponse(
+                    200,
+                    payload={"choices": [{"message": {"content": json.dumps({"key_developments": ["Merged recovered category"], "named_entities": []}, ensure_ascii=False)}}]},
+                ),
+            ]
+        )
+
+        with patch("daily_macro.analysis.load_groq_api_key", return_value="test-key"), patch(
+            "daily_macro.analysis._build_groq_session", return_value=session
+        ):
+            report = run_analysis(date_string="2026-04-03", data_dir=self.data_dir, db_path=self.db_path, force=True)
+
+        self.assertEqual(session.calls, 3)
+        self.assertEqual(report["incremental"]["reused_successful_articles"], 1)
+        self.assertEqual(report["incremental"]["new_articles_analyzed"], 1)
+        self.assertEqual(report["status"], "success")
+        retried = next(article for article in report["categories"][0]["articles"] if article["source_article_id"] == "1002")
+        self.assertEqual(retried["error"], None)
+        self.assertEqual(retried["key_points"], ["Recovered point"])
+
+    def test_run_analysis_retries_previous_day_failed_articles_and_updates_previous_report(self) -> None:
+        self._insert_article(
+            title="Today pulse",
+            source_article_id="3001",
+            section="時事脈搏",
+            published_at="2026-04-04T08:00:00+08:00",
+            content_text="a" * 800,
+        )
+        self._insert_article(
+            title="Yesterday global",
+            source_article_id="2001",
+            section="國際財經",
+            published_at="2026-04-03T09:00:00+08:00",
+            content_text="b" * 800,
+        )
+        self._write_report_file(
+            "2026-04-04",
+            {
+                "report_schema_version": REPORT_SCHEMA_VERSION,
+                "report_date": "2026-04-04",
+                "generated_at": "2026-04-04T10:00:00+00:00",
+                "source_site": "hkej",
+                "status": "success",
+                "model": {"provider": "groq", "primary_model": "meta-llama/llama-4-scout-17b-16e-instruct", "fallback_models": []},
+                "model_switches": [],
+                "input": {"article_count": 1, "category_count": 1},
+                "diagnostics": {},
+                "totals": {"article_count": 1, "successful_article_analyses": 1, "failed_article_analyses": 0, "full_text_article_count": 1, "truncated_article_count": 0, "successful_categories": 1, "partial_categories": 0, "failed_categories": 0},
+                "categories": [
+                    {
+                        "category": "時事脈搏",
+                        "article_count": 1,
+                        "status": "success",
+                        "key_developments": ["Today summary"],
+                        "named_entities": [],
+                        "articles": [self._report_article(source_article_id="3001", title="Today pulse", section="時事脈搏", published_at="2026-04-04T08:00:00+08:00", success=True)],
+                        "model_used": "meta-llama/llama-4-scout-17b-16e-instruct",
+                        "sub_batch_count": 1,
+                        "diagnostics": {},
+                        "error": None,
+                    }
+                ],
+                "errors": [],
+            },
+        )
+        yesterday_path = self._write_report_file(
+            "2026-04-03",
+            {
+                "report_schema_version": REPORT_SCHEMA_VERSION,
+                "report_date": "2026-04-03",
+                "generated_at": "2026-04-03T10:00:00+00:00",
+                "source_site": "hkej",
+                "status": "partial",
+                "model": {"provider": "groq", "primary_model": "meta-llama/llama-4-scout-17b-16e-instruct", "fallback_models": []},
+                "model_switches": [],
+                "input": {"article_count": 1, "category_count": 1},
+                "diagnostics": {},
+                "totals": {"article_count": 1, "successful_article_analyses": 0, "failed_article_analyses": 1, "full_text_article_count": 1, "truncated_article_count": 0, "successful_categories": 0, "partial_categories": 1, "failed_categories": 0},
+                "categories": [
+                    {
+                        "category": "國際財經",
+                        "article_count": 1,
+                        "status": "partial",
+                        "key_developments": [],
+                        "named_entities": [],
+                        "articles": [self._report_article(source_article_id="2001", title="Yesterday global", section="國際財經", published_at="2026-04-03T09:00:00+08:00", success=False)],
+                        "model_used": "meta-llama/llama-4-scout-17b-16e-instruct",
+                        "sub_batch_count": 1,
+                        "diagnostics": {},
+                        "error": "Model response omitted this article from the category batch.",
+                    }
+                ],
+                "errors": [{"type": "article", "target": "https://example.com/2001", "message": "Model response omitted this article from the category batch.", "classification": "incomplete_model_output"}],
+            },
+        )
+
+        session = _FakeGroqSession(
+            [
+                _FakeResponse(
+                    200,
+                    payload={"choices": [{"message": {"content": json.dumps({"articles": [{"source_article_id": "2001", "canonical_url": "https://example.com/2001", "novelty_score": 7, "relevance_score": 8, "urgency_score": 6, "named_entities": [], "key_points": ["Yesterday recovered"]}]}, ensure_ascii=False)}}]},
+                ),
+                _FakeResponse(
+                    200,
+                    payload={"choices": [{"message": {"content": json.dumps({"key_developments": ["Yesterday summary"], "named_entities": []}, ensure_ascii=False)}}]},
+                ),
+            ]
+        )
+
+        with patch("daily_macro.analysis.load_groq_api_key", return_value="test-key"), patch(
+            "daily_macro.analysis._build_groq_session", return_value=session
+        ):
+            report = run_analysis(date_string="2026-04-04", data_dir=self.data_dir, db_path=self.db_path, force=True)
+
+        self.assertEqual(session.calls, 2)
+        self.assertEqual(report["status"], "success")
+        self.assertEqual(report["incremental"]["reused_successful_articles"], 1)
+        self.assertEqual(report["incremental"]["new_articles_analyzed"], 0)
+        self.assertEqual(report["incremental"]["retried_previous_day_articles"], 1)
+        self.assertEqual(report["incremental"]["previous_day_retry_successes"], 1)
+        self.assertEqual(report["totals"]["article_count"], 1)
+        updated_yesterday = json.loads(yesterday_path.read_text(encoding="utf-8"))
+        self.assertEqual(updated_yesterday["status"], "success")
+        self.assertEqual(updated_yesterday["categories"][0]["articles"][0]["error"], None)
+        self.assertEqual(updated_yesterday["categories"][0]["articles"][0]["key_points"], ["Yesterday recovered"])
 
     def test_run_analysis_batches_by_category_and_preserves_article_scores(self) -> None:
         self._insert_article(

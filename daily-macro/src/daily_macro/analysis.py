@@ -8,7 +8,7 @@ import random
 import time
 from collections import defaultdict
 from dataclasses import dataclass, field
-from datetime import datetime
+from datetime import datetime, timedelta
 from pathlib import Path
 from typing import Any
 
@@ -351,90 +351,86 @@ def run_analysis(
     resolved_db_path = get_db_path(db_path, resolved_data_dir)
     analysis_dir = get_analysis_dir(resolved_data_dir)
     report_path = analysis_dir / target_date / REPORT_FILE_NAME
+    existing_report = _load_existing_report(report_path)
 
-    if report_path.exists() and not force:
-        cached = json.loads(report_path.read_text(encoding="utf-8"))
-        if cached.get("report_schema_version") == REPORT_SCHEMA_VERSION:
-            cached["output_path"] = str(report_path)
-            cached["cached"] = True
-            return cached
+    if existing_report is not None and not force:
+        cached = dict(existing_report)
+        cached["output_path"] = str(report_path)
+        cached["cached"] = True
+        return cached
 
     LOGGER.info("Starting daily analysis for %s.", target_date)
 
     storage = Storage(resolved_db_path)
     try:
         articles = storage.fetch_published_articles_for_date(target_date, source_site=DEFAULT_SOURCE_SITE)
+        previous_date = (datetime.fromisoformat(target_date).date() - timedelta(days=1)).isoformat()
+        previous_report_path = analysis_dir / previous_date / REPORT_FILE_NAME
+        previous_report = _load_existing_report(previous_report_path)
+        previous_articles = (
+            storage.fetch_published_articles_for_date(previous_date, source_site=DEFAULT_SOURCE_SITE)
+            if previous_report is not None
+            else []
+        )
     finally:
         storage.close()
 
-    if not articles:
-        empty_report = _build_empty_report(target_date)
-        _write_report(report_path, empty_report)
-        empty_report["output_path"] = str(report_path)
-        empty_report["cached"] = False
-        LOGGER.info("No published articles found for %s.", target_date)
-        return empty_report
+    today_plan = _build_today_incremental_plan(articles, existing_report)
+    previous_retry_plan = _build_previous_retry_plan(previous_articles, previous_report)
+    runtime: AnalysisRuntime | None = None
+    if today_plan["new_articles_analyzed"] > 0 or previous_retry_plan["retried_previous_day_articles"] > 0:
+        runtime = AnalysisRuntime(
+            session=_build_groq_session(load_groq_api_key()),
+            governor=RateLimitGovernor(),
+            model_chain=[ModelConfig(PRIMARY_MODEL_ID), *(ModelConfig(model_id) for model_id in FALLBACK_MODEL_IDS)],
+        )
 
-    runtime = AnalysisRuntime(
-        session=_build_groq_session(load_groq_api_key()),
-        governor=RateLimitGovernor(),
-        model_chain=[ModelConfig(PRIMARY_MODEL_ID), *(ModelConfig(model_id) for model_id in FALLBACK_MODEL_IDS)],
-    )
-
-    category_reports: list[dict[str, Any]] = []
-    errors: list[dict[str, Any]] = []
     try:
-        for category_name, category_articles in _group_source_articles(articles):
-            prepared_articles = [_prepare_single_article(article) for article in category_articles]
-            category_report, category_errors = _analyze_category(runtime, category_name, prepared_articles)
-            category_reports.append(category_report)
-            errors.extend(category_errors)
+        category_reports = _build_incremental_report_categories(
+            runtime=runtime,
+            db_articles=articles,
+            existing_report=existing_report,
+            plan=today_plan,
+            retry_only=False,
+        )
+        previous_day_retry_successes = 0
+        if previous_report is not None and previous_retry_plan["retried_previous_day_articles"] > 0:
+            updated_previous_report, previous_day_retry_successes = _retry_previous_report(
+                runtime=runtime,
+                previous_date=previous_date,
+                db_articles=previous_articles,
+                existing_report=previous_report,
+                retry_plan=previous_retry_plan,
+            )
+            if previous_day_retry_successes > 0:
+                _write_report(previous_report_path, updated_previous_report)
     finally:
-        runtime.session.close()
+        if runtime is not None:
+            runtime.session.close()
 
-    all_articles = [article for category in category_reports for article in category["articles"]]
-    successful_article_analyses = sum(1 for article in all_articles if not article.get("error"))
-    failed_article_analyses = len(all_articles) - successful_article_analyses
-    full_text_count = sum(1 for article in all_articles if not article.get("content_truncated"))
-    truncated_count = len(all_articles) - full_text_count
-    successful_categories = sum(1 for category in category_reports if category["status"] == "success")
-    partial_categories = sum(1 for category in category_reports if category["status"] == "partial")
-    failed_categories = sum(1 for category in category_reports if category["status"] == "failed")
-
-    status = "success"
-    if errors:
-        status = "partial"
-
-    report: dict[str, Any] = {
-        "report_schema_version": REPORT_SCHEMA_VERSION,
-        "report_date": target_date,
-        "generated_at": datetime.now().astimezone().isoformat(),
-        "source_site": DEFAULT_SOURCE_SITE,
-        "status": status,
-        "model": {
-            "provider": DEFAULT_PROVIDER,
-            "primary_model": runtime.primary_model.model_id,
-            "fallback_models": [model.model_id for model in runtime.fallback_models],
-        },
-        "model_switches": runtime.model_switches,
-        "input": {
-            "article_count": len(articles),
-            "category_count": len(category_reports),
-        },
-        "diagnostics": runtime.diagnostics.as_dict(),
-        "totals": {
-            "article_count": len(all_articles),
-            "successful_article_analyses": successful_article_analyses,
-            "failed_article_analyses": failed_article_analyses,
-            "full_text_article_count": full_text_count,
-            "truncated_article_count": truncated_count,
-            "successful_categories": successful_categories,
-            "partial_categories": partial_categories,
-            "failed_categories": failed_categories,
-        },
-        "categories": category_reports,
-        "errors": errors,
+    incremental = {
+        "reused_successful_articles": today_plan["reused_successful_articles"],
+        "new_articles_analyzed": today_plan["new_articles_analyzed"],
+        "retried_previous_day_articles": previous_retry_plan["retried_previous_day_articles"],
+        "previous_day_retry_successes": previous_day_retry_successes,
     }
+
+    if not articles:
+        report = _build_empty_report(target_date, incremental=incremental)
+        _write_report(report_path, report)
+        report["output_path"] = str(report_path)
+        report["cached"] = False
+        LOGGER.info("No published articles found for %s.", target_date)
+        return report
+
+    report = _finalize_report(
+        target_date=target_date,
+        source_site=DEFAULT_SOURCE_SITE,
+        input_article_count=len(articles),
+        category_reports=category_reports,
+        runtime=runtime,
+        incremental=incremental,
+    )
 
     _write_report(report_path, report)
     report["output_path"] = str(report_path)
@@ -442,9 +438,9 @@ def run_analysis(
     LOGGER.info(
         "Finished daily analysis for %s with status %s. Categories=%s, articles=%s.",
         target_date,
-        status,
+        report["status"],
         len(category_reports),
-        len(all_articles),
+        report["totals"]["article_count"],
     )
     return report
 
@@ -537,6 +533,375 @@ def _prepare_single_article(article: dict[str, Any]) -> dict[str, Any]:
         "original_content_token_estimate": selected["original_content_token_estimate"],
         "analyzed_content_token_estimate": selected["analyzed_content_token_estimate"],
         "truncation_reason": selected["truncation_reason"],
+    }
+
+
+def _load_existing_report(report_path: Path) -> dict[str, Any] | None:
+    if not report_path.exists():
+        return None
+    payload = json.loads(report_path.read_text(encoding="utf-8"))
+    if payload.get("report_schema_version") != REPORT_SCHEMA_VERSION:
+        return None
+    return payload
+
+
+def _build_today_incremental_plan(
+    articles: list[dict[str, Any]],
+    existing_report: dict[str, Any] | None,
+) -> dict[str, Any]:
+    successful_keys = _successful_report_article_keys(existing_report)
+    work_articles: list[dict[str, Any]] = []
+    reused_successful_articles = 0
+    for article in articles:
+        key = _article_key(article.get("source_article_id"), article.get("canonical_url"))
+        if key in successful_keys:
+            reused_successful_articles += 1
+        else:
+            work_articles.append(article)
+    return {
+        "work_articles": work_articles,
+        "reused_successful_articles": reused_successful_articles,
+        "new_articles_analyzed": len(work_articles),
+    }
+
+
+def _build_previous_retry_plan(
+    previous_articles: list[dict[str, Any]],
+    previous_report: dict[str, Any] | None,
+) -> dict[str, Any]:
+    if previous_report is None:
+        return {"work_articles": [], "retried_previous_day_articles": 0}
+
+    unresolved_keys = _unresolved_report_article_keys(previous_report)
+    work_articles = [
+        article
+        for article in previous_articles
+        if _article_key(article.get("source_article_id"), article.get("canonical_url")) in unresolved_keys
+    ]
+    return {
+        "work_articles": work_articles,
+        "retried_previous_day_articles": len(work_articles),
+    }
+
+
+def _build_incremental_report_categories(
+    *,
+    runtime: AnalysisRuntime | None,
+    db_articles: list[dict[str, Any]],
+    existing_report: dict[str, Any] | None,
+    plan: dict[str, Any],
+    retry_only: bool,
+) -> list[dict[str, Any]]:
+    existing_categories = _existing_categories_by_name(existing_report)
+    existing_articles = _existing_articles_by_key(existing_report)
+    work_by_key = {
+        _article_key(article.get("source_article_id"), article.get("canonical_url")): article
+        for article in plan["work_articles"]
+    }
+    analyzed_categories: dict[str, dict[str, Any]] = {}
+
+    if runtime is not None and plan["work_articles"]:
+        for category_name, category_articles in _group_source_articles(plan["work_articles"]):
+            prepared_articles = [_prepare_single_article(article) for article in category_articles]
+            category_report, _ = _analyze_category(runtime, category_name, prepared_articles)
+            analyzed_categories[category_name] = category_report
+
+    if retry_only:
+        category_order = [category["category"] for category in existing_report.get("categories", [])] if existing_report else []
+        source_groups = [(name, []) for name in category_order]
+    else:
+        source_groups = _group_source_articles(db_articles)
+
+    category_reports: list[dict[str, Any]] = []
+    for category_name, category_articles in source_groups:
+        db_keys = [
+            _article_key(article.get("source_article_id"), article.get("canonical_url"))
+            for article in category_articles
+        ]
+        existing_category = existing_categories.get(category_name)
+        analyzed_category = analyzed_categories.get(category_name)
+        changed = analyzed_category is not None
+        final_articles: list[dict[str, Any]] = []
+        used_existing_results = False
+
+        if retry_only and existing_category is not None:
+            existing_category_articles = existing_category.get("articles") or []
+            for article_result in existing_category_articles:
+                key = _article_key(article_result.get("source_article_id"), article_result.get("canonical_url"))
+                if analyzed_category is not None:
+                    replacement = _article_result_by_key(analyzed_category["articles"]).get(key)
+                    if replacement is not None:
+                        final_articles.append(replacement)
+                        continue
+                final_articles.append(article_result)
+                used_existing_results = True
+        else:
+            analyzed_results = _article_result_by_key(analyzed_category["articles"] if analyzed_category else [])
+            for article in category_articles:
+                key = _article_key(article.get("source_article_id"), article.get("canonical_url"))
+                if key in analyzed_results:
+                    final_articles.append(analyzed_results[key])
+                else:
+                    existing_result = existing_articles.get(key)
+                    if existing_result is not None:
+                        final_articles.append(existing_result)
+                        used_existing_results = True
+
+        if not final_articles:
+            continue
+
+        category_reports.append(
+            _merge_category_report(
+                runtime=runtime,
+                category_name=category_name,
+                final_articles=final_articles,
+                existing_category=existing_category,
+                analyzed_category=analyzed_category,
+                changed=changed,
+                used_existing_results=used_existing_results,
+            )
+        )
+
+    return category_reports
+
+
+def _retry_previous_report(
+    *,
+    runtime: AnalysisRuntime | None,
+    previous_date: str,
+    db_articles: list[dict[str, Any]],
+    existing_report: dict[str, Any],
+    retry_plan: dict[str, Any],
+) -> tuple[dict[str, Any], int]:
+    if runtime is None or not retry_plan["work_articles"]:
+        return existing_report, 0
+
+    category_reports = _build_incremental_report_categories(
+        runtime=runtime,
+        db_articles=db_articles,
+        existing_report=existing_report,
+        plan=retry_plan,
+        retry_only=True,
+    )
+    updated_report = _finalize_report(
+        target_date=previous_date,
+        source_site=DEFAULT_SOURCE_SITE,
+        input_article_count=int((existing_report.get("input") or {}).get("article_count") or len(db_articles)),
+        category_reports=category_reports,
+        runtime=runtime,
+        incremental={
+            "reused_successful_articles": 0,
+            "new_articles_analyzed": 0,
+            "retried_previous_day_articles": retry_plan["retried_previous_day_articles"],
+            "previous_day_retry_successes": 0,
+        },
+    )
+
+    existing_articles = _existing_articles_by_key(existing_report)
+    updated_articles = _existing_articles_by_key(updated_report)
+    previous_day_retry_successes = 0
+    for article in retry_plan["work_articles"]:
+        key = _article_key(article.get("source_article_id"), article.get("canonical_url"))
+        before = existing_articles.get(key)
+        after = updated_articles.get(key)
+        if before is not None and after is not None and before.get("error") and not after.get("error"):
+            previous_day_retry_successes += 1
+
+    updated_report["incremental"]["previous_day_retry_successes"] = previous_day_retry_successes
+    if previous_day_retry_successes == 0:
+        return existing_report, 0
+    return updated_report, previous_day_retry_successes
+
+
+def _merge_category_report(
+    *,
+    runtime: AnalysisRuntime | None,
+    category_name: str,
+    final_articles: list[dict[str, Any]],
+    existing_category: dict[str, Any] | None,
+    analyzed_category: dict[str, Any] | None,
+    changed: bool,
+    used_existing_results: bool,
+) -> dict[str, Any]:
+    if changed and analyzed_category is not None and not used_existing_results:
+        merged = dict(analyzed_category)
+        merged["article_count"] = len(final_articles)
+        merged["articles"] = final_articles
+        return merged
+
+    successful_articles = [article for article in final_articles if not article.get("error")]
+    diagnostics = dict((analyzed_category or existing_category or {}).get("diagnostics") or {})
+    sub_batch_count = int((analyzed_category or existing_category or {}).get("sub_batch_count") or diagnostics.get("sub_batch_count") or 0)
+    key_developments = list((existing_category or {}).get("key_developments") or [])
+    named_entities = list((existing_category or {}).get("named_entities") or [])
+    model_used = str((existing_category or {}).get("model_used") or PRIMARY_MODEL_ID)
+    category_error_message: str | None = None
+
+    if changed:
+        diagnostics = dict((analyzed_category or {}).get("diagnostics") or diagnostics)
+        sub_batch_count = int((analyzed_category or {}).get("sub_batch_count") or sub_batch_count)
+        if successful_articles and runtime is not None:
+            try:
+                synthesis_payload, synthesis_model, synthesis_batch_count = _synthesize_category(
+                    runtime,
+                    category_name,
+                    successful_articles,
+                )
+                key_developments = _normalize_string_list(synthesis_payload.get("key_developments"), limit=5)
+                named_entities = _normalize_entities(synthesis_payload.get("named_entities"))
+                model_used = synthesis_model
+                sub_batch_count += synthesis_batch_count
+            except Exception as exc:
+                category_error_message = str(exc)
+        elif not successful_articles:
+            category_error_message = "No successful article analyses available for synthesis."
+    diagnostics["sub_batch_count"] = sub_batch_count
+    diagnostics["partial_article_count"] = sum(1 for article in final_articles if article.get("error"))
+
+    if successful_articles:
+        status = "success" if all(not article.get("error") for article in final_articles) and not category_error_message else "partial"
+    else:
+        status = "failed"
+        if category_error_message is None:
+            category_error_message = "No successful article analyses available for synthesis."
+
+    return {
+        "category": category_name,
+        "article_count": len(final_articles),
+        "status": status,
+        "key_developments": key_developments,
+        "named_entities": named_entities if successful_articles else [],
+        "articles": final_articles,
+        "model_used": model_used,
+        "sub_batch_count": sub_batch_count,
+        "diagnostics": diagnostics,
+        "error": category_error_message,
+    }
+
+
+def _finalize_report(
+    *,
+    target_date: str,
+    source_site: str,
+    input_article_count: int,
+    category_reports: list[dict[str, Any]],
+    runtime: AnalysisRuntime | None,
+    incremental: dict[str, int],
+) -> dict[str, Any]:
+    all_articles = [article for category in category_reports for article in category["articles"]]
+    successful_article_analyses = sum(1 for article in all_articles if not article.get("error"))
+    failed_article_analyses = len(all_articles) - successful_article_analyses
+    full_text_count = sum(1 for article in all_articles if not article.get("content_truncated"))
+    truncated_count = len(all_articles) - full_text_count
+    successful_categories = sum(1 for category in category_reports if category["status"] == "success")
+    partial_categories = sum(1 for category in category_reports if category["status"] == "partial")
+    failed_categories = sum(1 for category in category_reports if category["status"] == "failed")
+    errors = _collect_report_errors(category_reports)
+    status = "success" if not errors else "partial"
+
+    return {
+        "report_schema_version": REPORT_SCHEMA_VERSION,
+        "report_date": target_date,
+        "generated_at": datetime.now().astimezone().isoformat(),
+        "source_site": source_site,
+        "status": status,
+        "model": {
+            "provider": DEFAULT_PROVIDER,
+            "primary_model": PRIMARY_MODEL_ID,
+            "fallback_models": list(FALLBACK_MODEL_IDS),
+        },
+        "model_switches": list(runtime.model_switches if runtime is not None else []),
+        "input": {
+            "article_count": input_article_count,
+            "category_count": len(category_reports),
+        },
+        "diagnostics": runtime.diagnostics.as_dict() if runtime is not None else RuntimeDiagnostics().as_dict(),
+        "incremental": incremental,
+        "totals": {
+            "article_count": len(all_articles),
+            "successful_article_analyses": successful_article_analyses,
+            "failed_article_analyses": failed_article_analyses,
+            "full_text_article_count": full_text_count,
+            "truncated_article_count": truncated_count,
+            "successful_categories": successful_categories,
+            "partial_categories": partial_categories,
+            "failed_categories": failed_categories,
+        },
+        "categories": category_reports,
+        "errors": errors,
+    }
+
+
+def _collect_report_errors(category_reports: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    errors: list[dict[str, Any]] = []
+    for category in category_reports:
+        for article in category.get("articles") or []:
+            if article.get("error"):
+                errors.append(
+                    {
+                        "type": "article",
+                        "target": article.get("canonical_url"),
+                        "message": article.get("error"),
+                        "classification": article.get("error_classification") or "unexpected_error",
+                    }
+                )
+        if category.get("error"):
+            errors.append(
+                {
+                    "type": "category",
+                    "target": category.get("category"),
+                    "message": category.get("error"),
+                    "classification": _category_error_classification(category),
+                }
+            )
+    return errors
+
+
+def _category_error_classification(category: dict[str, Any]) -> str:
+    message = str(category.get("error") or "")
+    if "413" in message:
+        return "payload_too_large"
+    if category.get("status") == "failed":
+        return "incomplete_model_output"
+    return "unexpected_error"
+
+
+def _existing_articles_by_key(report: dict[str, Any] | None) -> dict[tuple[str | None, str], dict[str, Any]]:
+    if report is None:
+        return {}
+    items: dict[tuple[str | None, str], dict[str, Any]] = {}
+    for category in report.get("categories") or []:
+        for article in category.get("articles") or []:
+            items[_article_key(article.get("source_article_id"), article.get("canonical_url"))] = article
+    return items
+
+
+def _existing_categories_by_name(report: dict[str, Any] | None) -> dict[str, dict[str, Any]]:
+    if report is None:
+        return {}
+    return {category.get("category"): category for category in report.get("categories") or []}
+
+
+def _successful_report_article_keys(report: dict[str, Any] | None) -> set[tuple[str | None, str]]:
+    return {
+        key
+        for key, article in _existing_articles_by_key(report).items()
+        if not article.get("error") and not article.get("error_classification")
+    }
+
+
+def _unresolved_report_article_keys(report: dict[str, Any] | None) -> set[tuple[str | None, str]]:
+    return {
+        key
+        for key, article in _existing_articles_by_key(report).items()
+        if article.get("error") or article.get("error_classification")
+    }
+
+
+def _article_result_by_key(items: list[dict[str, Any]]) -> dict[tuple[str | None, str], dict[str, Any]]:
+    return {
+        _article_key(item.get("source_article_id"), item.get("canonical_url")): item
+        for item in items
     }
 
 
@@ -1659,7 +2024,7 @@ def _category_model_used(article_results: list[dict[str, Any]]) -> str:
     return ",".join(sorted(model_ids))
 
 
-def _build_empty_report(target_date: str) -> dict[str, Any]:
+def _build_empty_report(target_date: str, *, incremental: dict[str, int] | None = None) -> dict[str, Any]:
     return {
         "report_schema_version": REPORT_SCHEMA_VERSION,
         "report_date": target_date,
@@ -1677,6 +2042,13 @@ def _build_empty_report(target_date: str) -> dict[str, Any]:
             "category_count": 0,
         },
         "diagnostics": RuntimeDiagnostics().as_dict(),
+        "incremental": incremental
+        or {
+            "reused_successful_articles": 0,
+            "new_articles_analyzed": 0,
+            "retried_previous_day_articles": 0,
+            "previous_day_retry_successes": 0,
+        },
         "totals": {
             "article_count": 0,
             "successful_article_analyses": 0,
