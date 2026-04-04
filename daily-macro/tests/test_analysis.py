@@ -214,6 +214,24 @@ class AnalysisTests(unittest.TestCase):
                                                     "named_entities": [{"name": "香港", "type": "country"}],
                                                     "key_points": ["Pulse point one"],
                                                 },
+                                            ]
+                                        },
+                                        ensure_ascii=False,
+                                    )
+                                }
+                            }
+                        ]
+                    },
+                ),
+                _FakeResponse(
+                    200,
+                    payload={
+                        "choices": [
+                            {
+                                "message": {
+                                    "content": json.dumps(
+                                        {
+                                            "articles": [
                                                 {
                                                     "source_article_id": "1002",
                                                     "canonical_url": "https://example.com/1002",
@@ -261,13 +279,13 @@ class AnalysisTests(unittest.TestCase):
         self.assertEqual(report["status"], "success")
         self.assertEqual(report["input"]["category_count"], 2)
         self.assertEqual(report["totals"]["article_count"], 3)
-        self.assertEqual(session.calls, 4)
-        self.assertEqual(session.models_used, ["qwen/qwen3-32b"] * 4)
-        self.assertEqual(report["diagnostics"]["batch_count"], 4)
+        self.assertEqual(session.calls, 5)
+        self.assertEqual(session.models_used, ["qwen/qwen3-32b"] * 5)
+        self.assertEqual(report["diagnostics"]["batch_count"], 5)
 
         pulse = next(category for category in report["categories"] if category["category"] == "時事脈搏")
         self.assertEqual(pulse["status"], "success")
-        self.assertEqual(pulse["sub_batch_count"], 1)
+        self.assertEqual(pulse["sub_batch_count"], 2)
         self.assertTrue(any(article["content_truncated"] for article in pulse["articles"]))
         self.assertTrue(all(article["model_used"] == "qwen/qwen3-32b" for article in pulse["articles"]))
         self.assertIn("estimated_input_tokens_max", pulse["diagnostics"])
@@ -342,6 +360,210 @@ class AnalysisTests(unittest.TestCase):
         self.assertEqual(session.calls, 3)
         self.assertEqual(report["categories"][0]["articles"][0]["key_points"][0], "Pulse point one")
         self.assertEqual(report["diagnostics"]["json_repair_retry_count"], 1)
+
+    def test_run_analysis_salvages_omitted_articles_from_missing_subset(self) -> None:
+        self._insert_article(
+            title="Global one",
+            source_article_id="2001",
+            section="國際財經",
+            published_at="2026-04-03T09:00:00+08:00",
+            content_text="a" * 900,
+        )
+        self._insert_article(
+            title="Global two",
+            source_article_id="2002",
+            section="國際財經",
+            published_at="2026-04-03T08:00:00+08:00",
+            content_text="b" * 900,
+        )
+
+        session = _FakeGroqSession(
+            [
+                _FakeResponse(
+                    200,
+                    payload={
+                        "choices": [
+                            {
+                                "message": {
+                                    "content": json.dumps(
+                                        {
+                                            "articles": [
+                                                {
+                                                    "source_article_id": "2001",
+                                                    "canonical_url": "https://example.com/2001",
+                                                    "novelty_score": 7,
+                                                    "relevance_score": 8,
+                                                    "urgency_score": 6,
+                                                    "named_entities": [],
+                                                    "key_points": ["Global point one"],
+                                                }
+                                            ]
+                                        },
+                                        ensure_ascii=False,
+                                    )
+                                }
+                            }
+                        ]
+                    },
+                ),
+                _FakeResponse(
+                    200,
+                    payload={
+                        "choices": [
+                            {
+                                "message": {
+                                    "content": json.dumps(
+                                        {
+                                            "articles": [
+                                                {
+                                                    "source_article_id": "2002",
+                                                    "canonical_url": "https://example.com/2002",
+                                                    "novelty_score": 6,
+                                                    "relevance_score": 7,
+                                                    "urgency_score": 5,
+                                                    "named_entities": [],
+                                                    "key_points": ["Global point two"],
+                                                }
+                                            ]
+                                        },
+                                        ensure_ascii=False,
+                                    )
+                                }
+                            }
+                        ]
+                    },
+                ),
+                _FakeResponse(
+                    200,
+                    payload={
+                        "choices": [
+                            {
+                                "message": {
+                                    "content": json.dumps(
+                                        {"key_developments": ["Global development"], "named_entities": []},
+                                        ensure_ascii=False,
+                                    )
+                                }
+                            }
+                        ]
+                    },
+                ),
+            ]
+        )
+
+        with patch("daily_macro.analysis.load_groq_api_key", return_value="test-key"), patch(
+            "daily_macro.analysis._build_groq_session", return_value=session
+        ):
+            report = run_analysis(date_string="2026-04-03", data_dir=self.data_dir, db_path=self.db_path)
+
+        category = report["categories"][0]
+        self.assertEqual(report["status"], "success")
+        self.assertEqual(category["status"], "success")
+        self.assertEqual(len(category["articles"]), 2)
+        self.assertTrue(all(not article["error"] for article in category["articles"]))
+        self.assertEqual(session.calls, 3)
+
+    def test_run_analysis_retries_smaller_batches_after_invalid_json_failure(self) -> None:
+        self._insert_article(
+            title="Pulse one",
+            source_article_id="1001",
+            section="時事脈搏",
+            published_at="2026-04-03T08:00:00+08:00",
+            content_text="a" * 800,
+        )
+        self._insert_article(
+            title="Pulse two",
+            source_article_id="1002",
+            section="時事脈搏",
+            published_at="2026-04-03T07:00:00+08:00",
+            content_text="b" * 800,
+        )
+
+        session = _FakeGroqSession(
+            [
+                _FakeResponse(200, payload={"choices": [{"message": {"content": "not-json"}}]}),
+                _FakeResponse(200, payload={"choices": [{"message": {"content": "still-not-json"}}]}),
+                _FakeResponse(
+                    200,
+                    payload={
+                        "choices": [
+                            {
+                                "message": {
+                                    "content": json.dumps(
+                                        {
+                                            "articles": [
+                                                {
+                                                    "source_article_id": "1001",
+                                                    "canonical_url": "https://example.com/1001",
+                                                    "novelty_score": 5,
+                                                    "relevance_score": 7,
+                                                    "urgency_score": 6,
+                                                    "named_entities": [],
+                                                    "key_points": ["Pulse point one"],
+                                                }
+                                            ]
+                                        },
+                                        ensure_ascii=False,
+                                    )
+                                }
+                            }
+                        ]
+                    },
+                ),
+                _FakeResponse(
+                    200,
+                    payload={
+                        "choices": [
+                            {
+                                "message": {
+                                    "content": json.dumps(
+                                        {
+                                            "articles": [
+                                                {
+                                                    "source_article_id": "1002",
+                                                    "canonical_url": "https://example.com/1002",
+                                                    "novelty_score": 6,
+                                                    "relevance_score": 8,
+                                                    "urgency_score": 7,
+                                                    "named_entities": [],
+                                                    "key_points": ["Pulse point two"],
+                                                }
+                                            ]
+                                        },
+                                        ensure_ascii=False,
+                                    )
+                                }
+                            }
+                        ]
+                    },
+                ),
+                _FakeResponse(
+                    200,
+                    payload={
+                        "choices": [
+                            {
+                                "message": {
+                                    "content": json.dumps(
+                                        {"key_developments": ["Pulse development"], "named_entities": []},
+                                        ensure_ascii=False,
+                                    )
+                                }
+                            }
+                        ]
+                    },
+                ),
+            ]
+        )
+
+        with patch("daily_macro.analysis.load_groq_api_key", return_value="test-key"), patch(
+            "daily_macro.analysis._build_groq_session", return_value=session
+        ):
+            report = run_analysis(date_string="2026-04-03", data_dir=self.data_dir, db_path=self.db_path)
+
+        self.assertEqual(report["status"], "success")
+        self.assertEqual(report["categories"][0]["status"], "success")
+        self.assertEqual(len(report["categories"][0]["articles"]), 2)
+        self.assertEqual(session.calls, 5)
 
     def test_run_analysis_records_pre_send_split_diagnostics(self) -> None:
         self._insert_article(

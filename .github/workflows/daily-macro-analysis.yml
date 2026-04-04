@@ -39,6 +39,10 @@ jobs:
           cache: "pip"
           cache-dependency-path: daily-macro/pyproject.toml
 
+      - name: Set up report date
+        id: report-date
+        run: echo "report_date=$(date -u +%F)" >> "$GITHUB_OUTPUT"
+
       - name: Install package
         run: |
           python -m pip install --upgrade pip
@@ -60,6 +64,79 @@ jobs:
               handle.write(f"report_path={result['output_path']}\n")
               handle.write(f"report_status={result['status']}\n")
           PY
+
+      - name: Summarize analysis outcome
+        if: ${{ always() }}
+        run: |
+          python - <<'PY'
+          import json
+          import os
+          from collections import Counter
+          from pathlib import Path
+
+          result_path = Path("analysis-result.json")
+          if not result_path.exists():
+              summary = "## Daily Macro Analysis\n\nNo analysis-result.json was produced.\n"
+              Path(os.environ["GITHUB_STEP_SUMMARY"]).write_text(summary, encoding="utf-8")
+              print(summary)
+              raise SystemExit(0)
+
+          result = json.loads(result_path.read_text(encoding="utf-8"))
+          errors = list(result.get("errors") or [])
+          classifications = [str(item.get("classification") or "unclassified") for item in errors]
+          counts = Counter(classifications)
+          lines = [
+              "## Daily Macro Analysis",
+              "",
+              f"- Report date: `{result.get('report_date')}`",
+              f"- Status: `{result.get('status')}`",
+              f"- Articles: `{(result.get('totals') or {}).get('article_count', 0)}`",
+              f"- Categories: `{(result.get('input') or {}).get('category_count', 0)}`",
+              f"- Report path: `{result.get('output_path')}`",
+              "",
+              "### Category outcomes",
+          ]
+
+          for category in result.get("categories") or []:
+              diagnostics = category.get("diagnostics") or {}
+              lines.append(
+                  "- "
+                  f"{category.get('category')}: status=`{category.get('status')}`, "
+                  f"sub_batches=`{diagnostics.get('sub_batch_count', category.get('sub_batch_count', 0))}`, "
+                  f"split_reasons=`{','.join(diagnostics.get('split_reasons') or []) or 'none'}`"
+              )
+
+          lines.extend(["", "### Failure classifications"])
+          if counts:
+              for key, value in sorted(counts.items()):
+                  lines.append(f"- `{key}`: {value}")
+          else:
+              lines.append("- none")
+
+          if errors:
+              lines.extend(["", "### Error details"])
+              for item in errors:
+                  lines.append(
+                      "- "
+                      f"{item.get('type')} target=`{item.get('target')}` "
+                      f"classification=`{item.get('classification') or 'unclassified'}` "
+                      f"message={json.dumps(str(item.get('message') or ''))}"
+                  )
+
+          text = "\n".join(lines) + "\n"
+          Path(os.environ["GITHUB_STEP_SUMMARY"]).write_text(text, encoding="utf-8")
+          print(text)
+          PY
+
+      - name: Upload analysis artifacts
+        if: ${{ always() }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: daily-macro-analysis-${{ steps.report-date.outputs.report_date }}
+          if-no-files-found: warn
+          path: |
+            daily-macro/analysis-result.json
+            daily-macro/data/analyses/${{ steps.report-date.outputs.report_date }}/hkej-news-analysis.json
 
       - name: Commit updated analysis artifacts
         working-directory: .

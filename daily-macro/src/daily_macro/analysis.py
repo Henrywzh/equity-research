@@ -32,6 +32,9 @@ SHORT_ARTICLE_FULL_TEXT_THRESHOLD = 1500
 DEFAULT_CHAT_RETRIES = 4
 RATE_LIMIT_REQUEST_FLOOR = 0
 RATE_LIMIT_TOKEN_FLOOR = 800
+DEFAULT_REQUEST_BYTE_BUDGET = 12000
+MIN_REQUEST_BYTE_BUDGET = 4000
+MIN_INPUT_BUDGET_TOKENS = 1200
 CATEGORY_SHRINK_STEP_CHARS = 400
 CATEGORY_MIN_CONTENT_CHARS = 0
 CATEGORY_ORDER = [
@@ -69,6 +72,12 @@ class ModelRateLimitState:
     reset_requests_at: float | None = None
     remaining_tokens: int | None = None
     reset_tokens_at: float | None = None
+
+
+@dataclass(slots=True)
+class CategoryBudgetState:
+    input_budget_tokens: int = DEFAULT_INPUT_BUDGET_TOKENS
+    request_byte_budget: int = DEFAULT_REQUEST_BYTE_BUDGET
 
 
 @dataclass(slots=True)
@@ -207,6 +216,7 @@ class AnalysisRuntime:
     last_attempted_model: str | None = None
     diagnostics: RuntimeDiagnostics = field(default_factory=RuntimeDiagnostics)
     category_diagnostics: dict[str, CategoryDiagnostics] = field(default_factory=dict)
+    category_budgets: dict[str, CategoryBudgetState] = field(default_factory=dict)
 
     def switch_to_fallback(self, reason: str) -> None:
         if self.current_model.model_id == self.fallback_model.model_id:
@@ -230,6 +240,9 @@ class AnalysisRuntime:
 
     def get_category_diagnostics(self, category_name: str) -> CategoryDiagnostics:
         return self.category_diagnostics.setdefault(category_name, CategoryDiagnostics())
+
+    def get_category_budget(self, category_name: str) -> CategoryBudgetState:
+        return self.category_budgets.setdefault(category_name, CategoryBudgetState())
 
     def record_wait(self, category_name: str, delay_seconds: float) -> None:
         if delay_seconds <= 0:
@@ -266,6 +279,17 @@ class AnalysisRuntime:
 
     def record_failed_batch(self) -> None:
         self.diagnostics.failed_batch_count += 1
+
+    def tighten_category_budget(self, category_name: str, classification: str) -> None:
+        state = self.get_category_budget(category_name)
+        if classification == "payload_too_large":
+            state.request_byte_budget = max(MIN_REQUEST_BYTE_BUDGET, state.request_byte_budget // 2)
+        elif classification == "rate_limited":
+            state.input_budget_tokens = max(MIN_INPUT_BUDGET_TOKENS, state.input_budget_tokens // 2)
+            state.request_byte_budget = max(MIN_REQUEST_BYTE_BUDGET, int(state.request_byte_budget * 0.75))
+        else:
+            state.input_budget_tokens = max(MIN_INPUT_BUDGET_TOKENS, int(state.input_budget_tokens * 0.8))
+            state.request_byte_budget = max(MIN_REQUEST_BYTE_BUDGET, int(state.request_byte_budget * 0.8))
 
 
 def run_analysis(
@@ -477,7 +501,15 @@ def _analyze_category(
     prepared_articles: list[dict[str, Any]],
 ) -> tuple[dict[str, Any], list[dict[str, Any]]]:
     LOGGER.info("Analyzing category %s with %s article(s).", category_name, len(prepared_articles))
-    article_results, article_errors, sub_batch_count = _process_batch_recursive(runtime, category_name, prepared_articles)
+    planned_batches = _plan_category_batches(runtime, category_name, prepared_articles)
+    article_results: list[dict[str, Any]] = []
+    article_errors: list[dict[str, Any]] = []
+    sub_batch_count = 0
+    for index, batch in enumerate(planned_batches, start=1):
+        batch_results, batch_errors, batch_count = _process_batch_recursive(runtime, category_name, batch, str(index))
+        article_results.extend(batch_results)
+        article_errors.extend(batch_errors)
+        sub_batch_count += batch_count
     successful_articles = [article for article in article_results if not article.get("error")]
     category_errors = list(article_errors)
     key_developments: list[str] = []
@@ -549,18 +581,32 @@ def _process_batch_recursive(
     category_name: str,
     batch_articles: list[dict[str, Any]],
     batch_label: str = "1",
+    *,
+    allow_salvage: bool = True,
 ) -> tuple[list[dict[str, Any]], list[dict[str, Any]], int]:
     working_batch = [_clone_prepared_article(article) for article in batch_articles]
-    content_shrunk = _shrink_batch_to_budget(category_name, working_batch)
+    budget_state = runtime.get_category_budget(category_name)
+    content_shrunk = _shrink_batch_to_budget(
+        category_name,
+        working_batch,
+        input_budget_tokens=budget_state.input_budget_tokens,
+        request_byte_budget=budget_state.request_byte_budget,
+        model_id=runtime.current_model.model_id,
+    )
     estimated_input_tokens = _estimate_batch_request_tokens(category_name, working_batch)
+    request_bytes = _estimate_batch_request_bytes(category_name, working_batch, runtime.current_model.model_id)
 
-    if estimated_input_tokens > DEFAULT_INPUT_BUDGET_TOKENS and len(working_batch) > 1:
+    if (
+        (estimated_input_tokens > budget_state.input_budget_tokens or request_bytes > budget_state.request_byte_budget)
+        and len(working_batch) > 1
+    ):
         runtime.record_split(category_name, "pre_send_budget")
         LOGGER.info(
-            "Splitting category %s batch %s before send: estimated_input_tokens=%s article_count=%s.",
+            "Splitting category %s batch %s before send: estimated_input_tokens=%s request_bytes=%s article_count=%s.",
             category_name,
             batch_label,
             estimated_input_tokens,
+            request_bytes,
             len(working_batch),
         )
         left, right = _split_batch(working_batch)
@@ -577,12 +623,72 @@ def _process_batch_recursive(
             batch_label=batch_label,
             content_shrunk=content_shrunk,
         )
-        merged_results, merge_errors = _merge_batch_article_results(working_batch, payload, model_used)
-        return merged_results, merge_errors, 1
+        merged_results, missing_articles = _merge_batch_article_results(working_batch, payload, model_used)
+        if missing_articles:
+            if not allow_salvage:
+                message = "Model response omitted this article from the category batch."
+                failed_results = [
+                    _build_failed_article_result(
+                        article=article,
+                        error_message=message,
+                        model_used=model_used,
+                        error_classification="incomplete_model_output",
+                    )
+                    for article in missing_articles
+                ]
+                failed_errors = [
+                    {
+                        "type": "article",
+                        "target": article.get("canonical_url"),
+                        "message": message,
+                        "classification": "incomplete_model_output",
+                    }
+                    for article in missing_articles
+                ]
+                combined = _order_results_like_input(working_batch, merged_results + failed_results)
+                return combined, failed_errors, 1
+
+            LOGGER.info(
+                "Salvaging %s omitted article(s) from category %s batch %s.",
+                len(missing_articles),
+                category_name,
+                batch_label,
+            )
+            runtime.tighten_category_budget(category_name, "incomplete_model_output")
+            if len(missing_articles) == 1:
+                salvage_results, salvage_errors, salvage_count = _process_batch_recursive(
+                    runtime,
+                    category_name,
+                    missing_articles,
+                    f"{batch_label}m",
+                    allow_salvage=False,
+                )
+            else:
+                left, right = _split_batch(missing_articles)
+                left_results, left_errors, left_count = _process_batch_recursive(
+                    runtime,
+                    category_name,
+                    left,
+                    f"{batch_label}ma",
+                )
+                right_results, right_errors, right_count = _process_batch_recursive(
+                    runtime,
+                    category_name,
+                    right,
+                    f"{batch_label}mb",
+                )
+                salvage_results = left_results + right_results
+                salvage_errors = left_errors + right_errors
+                salvage_count = left_count + right_count
+            combined = _order_results_like_input(working_batch, merged_results + salvage_results)
+            return combined, salvage_errors, 1 + salvage_count
+        return merged_results, [], 1
     except requests.HTTPError as exc:
         status_code = exc.response.status_code if exc.response is not None else None
+        classification = _classify_exception(exc)
         if status_code == 413 and len(working_batch) > 1:
             runtime.record_split(category_name, "response_413")
+            runtime.tighten_category_budget(category_name, classification)
             LOGGER.info(
                 "Splitting category %s batch %s after HTTP 413: article_count=%s.",
                 category_name,
@@ -596,7 +702,18 @@ def _process_batch_recursive(
 
         model_used = runtime.last_attempted_model or runtime.current_model.model_id
         message = str(exc)
-        classification = _classify_exception(exc)
+        if len(working_batch) > 1 and classification in {"rate_limited", "http_error", "unexpected_error"}:
+            runtime.tighten_category_budget(category_name, classification)
+            LOGGER.info(
+                "Retrying category %s batch %s as smaller sub-batches after %s.",
+                category_name,
+                batch_label,
+                classification,
+            )
+            left, right = _split_batch(working_batch)
+            left_results, left_errors, left_count = _process_batch_recursive(runtime, category_name, left, f"{batch_label}a")
+            right_results, right_errors, right_count = _process_batch_recursive(runtime, category_name, right, f"{batch_label}b")
+            return left_results + right_results, left_errors + right_errors, left_count + right_count
         runtime.record_failed_batch()
         failed_results = [
             _build_failed_article_result(
@@ -621,6 +738,18 @@ def _process_batch_recursive(
         model_used = runtime.last_attempted_model or runtime.current_model.model_id
         message = str(exc)
         classification = _classify_exception(exc)
+        if len(working_batch) > 1 and classification in {"invalid_json", "unexpected_error"}:
+            runtime.tighten_category_budget(category_name, classification)
+            LOGGER.info(
+                "Retrying category %s batch %s as smaller sub-batches after %s.",
+                category_name,
+                batch_label,
+                classification,
+            )
+            left, right = _split_batch(working_batch)
+            left_results, left_errors, left_count = _process_batch_recursive(runtime, category_name, left, f"{batch_label}a")
+            right_results, right_errors, right_count = _process_batch_recursive(runtime, category_name, right, f"{batch_label}b")
+            return left_results + right_results, left_errors + right_errors, left_count + right_count
         runtime.record_failed_batch()
         failed_results = [
             _build_failed_article_result(
@@ -796,10 +925,25 @@ def _chat_completion(
             response.raise_for_status()
 
         if response.status_code == 429 and model.model_id == runtime.primary_model.model_id:
+            LOGGER.info(
+                "Groq returned HTTP 429 for category %s batch=%s on %s.",
+                attempt_context.category_name,
+                attempt_context.batch_label,
+                model.model_id,
+            )
+            runtime.tighten_category_budget(attempt_context.category_name, "rate_limited")
             runtime.switch_to_fallback("Primary model returned 429 rate_limit_exceeded.")
             continue
 
         if response.status_code in {429, 500, 502, 503, 504}:
+            if response.status_code == 429:
+                LOGGER.info(
+                    "Groq returned HTTP 429 for category %s batch=%s on %s.",
+                    attempt_context.category_name,
+                    attempt_context.batch_label,
+                    model.model_id,
+                )
+                runtime.tighten_category_budget(attempt_context.category_name, "rate_limited")
             if attempt == DEFAULT_CHAT_RETRIES - 1:
                 response.raise_for_status()
             delay_seconds = runtime.governor.apply_backoff(model.model_id, response, attempt)
@@ -931,9 +1075,55 @@ def _build_synthesis_messages(category_name: str, successful_articles: list[dict
     ]
 
 
-def _shrink_batch_to_budget(category_name: str, batch_articles: list[dict[str, Any]]) -> bool:
+def _plan_category_batches(
+    runtime: AnalysisRuntime,
+    category_name: str,
+    prepared_articles: list[dict[str, Any]],
+) -> list[list[dict[str, Any]]]:
+    budget_state = runtime.get_category_budget(category_name)
+    planned: list[list[dict[str, Any]]] = []
+    current: list[dict[str, Any]] = []
+
+    for article in prepared_articles:
+        candidate = current + [article]
+        if current and not _batch_within_budget(
+            category_name,
+            candidate,
+            input_budget_tokens=budget_state.input_budget_tokens,
+            request_byte_budget=budget_state.request_byte_budget,
+            model_id=runtime.current_model.model_id,
+        ):
+            runtime.record_split(category_name, "pre_send_budget")
+            LOGGER.info(
+                "Planning smaller batch for category %s before send: current_articles=%s next_article=%s.",
+                category_name,
+                len(current),
+                article.get("source_article_id") or article.get("canonical_url"),
+            )
+            planned.append(current)
+            current = [article]
+        else:
+            current = candidate
+
+    if current:
+        planned.append(current)
+    return planned or [prepared_articles]
+
+
+def _shrink_batch_to_budget(
+    category_name: str,
+    batch_articles: list[dict[str, Any]],
+    *,
+    input_budget_tokens: int,
+    request_byte_budget: int,
+    model_id: str,
+) -> bool:
     shrunk = False
-    while _estimate_batch_request_tokens(category_name, batch_articles) > DEFAULT_INPUT_BUDGET_TOKENS:
+    while True:
+        estimated_tokens = _estimate_batch_request_tokens(category_name, batch_articles)
+        estimated_bytes = _estimate_batch_request_bytes(category_name, batch_articles, model_id)
+        if estimated_tokens <= input_budget_tokens and estimated_bytes <= request_byte_budget:
+            break
         candidate = _largest_shrinkable_article(batch_articles)
         if candidate is None:
             break
@@ -945,6 +1135,28 @@ def _shrink_batch_to_budget(category_name: str, batch_articles: list[dict[str, A
 
 def _estimate_batch_request_tokens(category_name: str, batch_articles: list[dict[str, Any]]) -> int:
     return _estimate_messages_tokens(_build_article_batch_messages(category_name, batch_articles))
+
+
+def _estimate_batch_request_bytes(category_name: str, batch_articles: list[dict[str, Any]], model_id: str) -> int:
+    return _estimate_request_payload_bytes(
+        model_id,
+        _build_article_batch_messages(category_name, batch_articles),
+        DEFAULT_OUTPUT_TOKENS,
+    )
+
+
+def _batch_within_budget(
+    category_name: str,
+    batch_articles: list[dict[str, Any]],
+    *,
+    input_budget_tokens: int,
+    request_byte_budget: int,
+    model_id: str,
+) -> bool:
+    return (
+        _estimate_batch_request_tokens(category_name, batch_articles) <= input_budget_tokens
+        and _estimate_batch_request_bytes(category_name, batch_articles, model_id) <= request_byte_budget
+    )
 
 
 def _estimate_messages_tokens(messages: list[dict[str, Any]]) -> int:
@@ -1001,28 +1213,12 @@ def _merge_batch_article_results(
             response_by_key[_article_key(item.get("source_article_id"), item.get("canonical_url"))] = item
 
     merged_results: list[dict[str, Any]] = []
-    errors: list[dict[str, Any]] = []
+    missing_articles: list[dict[str, Any]] = []
     for article in batch_articles:
         key = _article_key(article.get("source_article_id"), article.get("canonical_url"))
         match = response_by_key.get(key)
         if match is None:
-            message = "Model response omitted this article from the category batch."
-            merged_results.append(
-                _build_failed_article_result(
-                    article=article,
-                    error_message=message,
-                    model_used=model_used,
-                    error_classification="incomplete_model_output",
-                )
-            )
-            errors.append(
-                {
-                    "type": "article",
-                    "target": article.get("canonical_url"),
-                    "message": message,
-                    "classification": "incomplete_model_output",
-                }
-            )
+            missing_articles.append(article)
             continue
 
         merged_results.append(
@@ -1050,7 +1246,24 @@ def _merge_batch_article_results(
             }
         )
 
-    return merged_results, errors
+    return merged_results, missing_articles
+
+
+def _order_results_like_input(
+    batch_articles: list[dict[str, Any]],
+    results: list[dict[str, Any]],
+) -> list[dict[str, Any]]:
+    results_by_key = {
+        _article_key(result.get("source_article_id"), result.get("canonical_url")): result
+        for result in results
+    }
+    ordered: list[dict[str, Any]] = []
+    for article in batch_articles:
+        key = _article_key(article.get("source_article_id"), article.get("canonical_url"))
+        result = results_by_key.get(key)
+        if result is not None:
+            ordered.append(result)
+    return ordered
 
 
 def _build_failed_article_result(
