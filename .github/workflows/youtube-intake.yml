@@ -70,8 +70,6 @@ jobs:
           set -euo pipefail
           git config user.name "youtube-intake[bot]"
           git config user.email "youtube-intake[bot]@users.noreply.github.com"
-          git fetch origin main
-          git pull --rebase origin main
           git add -A youtube-intake/data youtube-intake/state
           if git diff --staged --quiet; then
             exit 0
