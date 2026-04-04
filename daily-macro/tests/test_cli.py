@@ -211,6 +211,81 @@ class CliTests(unittest.TestCase):
         payload = json.loads(buffer.getvalue())
         self.assertTrue(payload["sent"])
 
+    def test_local_test_runs_scrape_analyze_and_notify(self) -> None:
+        with patch(
+            "daily_macro.cli.run_scrape",
+            return_value={
+                "run_id": 1,
+                "status": "success",
+                "article_count": 5,
+                "placement_count": 12,
+                "errors": [],
+            },
+        ) as mock_scrape, patch(
+            "daily_macro.cli.run_analysis",
+            return_value={
+                "report_date": "2026-04-04",
+                "status": "partial",
+                "input": {"category_count": 3},
+                "totals": {"article_count": 5},
+                "output_path": "/tmp/report.json",
+                "cached": False,
+            },
+        ) as mock_analyze, patch(
+            "daily_macro.cli.send_analysis_summary_email",
+            return_value=(True, "Sent daily macro Gmail summary to me@example.com."),
+        ) as mock_notify:
+            buffer = io.StringIO()
+            with redirect_stdout(buffer):
+                exit_code = main(["local-test", "--json", "--data-dir", "/tmp/data", "--db-path", "/tmp/data/news.sqlite"])
+
+        self.assertEqual(exit_code, 0)
+        payload = json.loads(buffer.getvalue())
+        self.assertEqual(payload["scrape"]["status"], "success")
+        self.assertEqual(payload["analysis"]["status"], "partial")
+        self.assertTrue(payload["notify"]["sent"])
+        mock_scrape.assert_called_once_with(data_dir="/tmp/data", db_path="/tmp/data/news.sqlite")
+        mock_analyze.assert_called_once_with(
+            date_string=None,
+            data_dir="/tmp/data",
+            db_path="/tmp/data/news.sqlite",
+            force=True,
+        )
+        mock_notify.assert_called_once()
+
+    def test_local_test_can_skip_email(self) -> None:
+        with patch(
+            "daily_macro.cli.run_scrape",
+            return_value={
+                "run_id": 1,
+                "status": "success",
+                "article_count": 2,
+                "placement_count": 4,
+                "errors": [],
+            },
+        ), patch(
+            "daily_macro.cli.run_analysis",
+            return_value={
+                "report_date": "2026-04-04",
+                "status": "success",
+                "input": {"category_count": 1},
+                "totals": {"article_count": 2},
+                "output_path": "/tmp/report.json",
+                "cached": False,
+            },
+        ), patch(
+            "daily_macro.cli.send_analysis_summary_email",
+        ) as mock_notify:
+            buffer = io.StringIO()
+            with redirect_stdout(buffer):
+                exit_code = main(["local-test", "--json", "--skip-email"])
+
+        self.assertEqual(exit_code, 0)
+        payload = json.loads(buffer.getvalue())
+        self.assertFalse(payload["notify"]["attempted"])
+        self.assertFalse(payload["notify"]["sent"])
+        mock_notify.assert_not_called()
+
     def test_query_date_json_output(self) -> None:
         with patch(
             "daily_macro.cli.run_query_command",

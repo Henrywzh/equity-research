@@ -10,9 +10,10 @@ from collections import defaultdict
 from dataclasses import dataclass, field
 from datetime import datetime, timedelta
 from pathlib import Path
-from typing import Any
+from typing import Any, NotRequired, TypedDict
 
 import requests
+from langgraph.graph import END, START, StateGraph
 
 from .config import DEFAULT_SOURCE_SITE, get_analysis_dir, get_data_dir, get_db_path, get_project_root
 from .storage import Storage
@@ -61,6 +62,85 @@ FAILURE_CLASSIFICATIONS = {
     "http_error",
     "unexpected_error",
 }
+LIGHT_ANALYSIS_SECTIONS = {"時事脈搏", "地產新聞"}
+ATTENTION_TIERS = ("high", "medium", "light")
+ATTENTION_TIER_RANK = {"high": 0, "medium": 1, "light": 2}
+ROUTER_LLM_MIN_ARTICLES = 5
+HIGH_ATTENTION_THEME_KEYWORDS = {
+    "stocks": ("業績", "盈喜", "盈警", "回購", "配股", "供股", "新股", "上市", "股份", "股價", "股東", "盈利", "profit", "earnings", "guidance", "buyback", "placement", "ipo", "shares"),
+    "macro": ("聯儲", "聯儲局", "人行", "央行", "利率", "通脹", "經濟", "衰退", "增長", "國債", "收益率", "匯率", "美元", "人民幣", "油價", "gdp", "inflation", "rates", "yield", "fx", "oil", "economy"),
+    "geopolitics": ("戰爭", "制裁", "關稅", "貿易戰", "軍事", "衝突", "伊朗", "俄羅斯", "烏克蘭", "中東", "tariff", "sanction", "war", "trade", "conflict", "geopolit"),
+    "property": ("樓市", "地產", "樓價", "按揭", "租金", "土地", "property", "housing", "mortgage", "real estate"),
+}
+
+
+@dataclass(frozen=True, slots=True)
+class SectionProfile:
+    name: str
+    article_key_points_limit: int
+    article_key_points_instruction: str
+    entity_limit: int
+    category_bullet_limit: int
+    subgroup_bullet_limit: int
+    article_input_budget_tokens: int
+    article_request_byte_budget: int
+    synthesis_input_budget_tokens: int
+    synthesis_request_byte_budget: int
+    subgroup_threshold: int
+    subgroup_target_size: int
+    salvage_max_depth: int
+
+
+STANDARD_SECTION_PROFILE = SectionProfile(
+    name="standard",
+    article_key_points_limit=4,
+    article_key_points_instruction="2 to 4 concise strings",
+    entity_limit=6,
+    category_bullet_limit=5,
+    subgroup_bullet_limit=4,
+    article_input_budget_tokens=DEFAULT_INPUT_BUDGET_TOKENS,
+    article_request_byte_budget=DEFAULT_REQUEST_BYTE_BUDGET,
+    synthesis_input_budget_tokens=DEFAULT_SYNTHESIS_INPUT_BUDGET_TOKENS,
+    synthesis_request_byte_budget=DEFAULT_SYNTHESIS_REQUEST_BYTE_BUDGET,
+    subgroup_threshold=5,
+    subgroup_target_size=3,
+    salvage_max_depth=3,
+)
+
+LIGHT_SECTION_PROFILE = SectionProfile(
+    name="light",
+    article_key_points_limit=2,
+    article_key_points_instruction="1 to 2 concise strings",
+    entity_limit=4,
+    category_bullet_limit=3,
+    subgroup_bullet_limit=3,
+    article_input_budget_tokens=3000,
+    article_request_byte_budget=9000,
+    synthesis_input_budget_tokens=1600,
+    synthesis_request_byte_budget=5600,
+    subgroup_threshold=7,
+    subgroup_target_size=4,
+    salvage_max_depth=2,
+)
+
+
+class AnalysisGraphState(TypedDict):
+    target_date: str
+    source_site: str
+    report_path: Path
+    previous_report_path: Path
+    articles: list[dict[str, Any]]
+    previous_articles: list[dict[str, Any]]
+    existing_report: dict[str, Any] | None
+    previous_report: dict[str, Any] | None
+    today_plan: dict[str, Any]
+    previous_retry_plan: dict[str, Any]
+    runtime: AnalysisRuntime | None
+    category_reports: list[dict[str, Any]]
+    previous_day_retry_successes: int
+    updated_previous_report: NotRequired[dict[str, Any] | None]
+    incremental: dict[str, int]
+    report: dict[str, Any]
 
 
 @dataclass(frozen=True, slots=True)
@@ -276,7 +356,15 @@ class AnalysisRuntime:
         return self.category_diagnostics.setdefault(category_name, CategoryDiagnostics())
 
     def get_category_budget(self, category_name: str) -> CategoryBudgetState:
-        return self.category_budgets.setdefault(category_name, CategoryBudgetState())
+        if category_name not in self.category_budgets:
+            profile = _section_profile(category_name)
+            self.category_budgets[category_name] = CategoryBudgetState(
+                article_input_budget_tokens=profile.article_input_budget_tokens,
+                article_request_byte_budget=profile.article_request_byte_budget,
+                synthesis_input_budget_tokens=profile.synthesis_input_budget_tokens,
+                synthesis_request_byte_budget=profile.synthesis_request_byte_budget,
+            )
+        return self.category_budgets[category_name]
 
     def record_wait(self, category_name: str, delay_seconds: float) -> None:
         if delay_seconds <= 0:
@@ -374,9 +462,57 @@ def run_analysis(
         )
     finally:
         storage.close()
+    graph = _build_analysis_graph()
+    state: AnalysisGraphState = {
+        "target_date": target_date,
+        "source_site": DEFAULT_SOURCE_SITE,
+        "report_path": report_path,
+        "previous_report_path": previous_report_path,
+        "articles": articles,
+        "previous_articles": previous_articles,
+        "existing_report": existing_report,
+        "previous_report": previous_report,
+        "today_plan": {},
+        "previous_retry_plan": {},
+        "runtime": None,
+        "category_reports": [],
+        "previous_day_retry_successes": 0,
+        "incremental": {},
+        "report": {},
+    }
+    final_state = graph.invoke(state)
+    report = final_state["report"]
+    report["output_path"] = str(report_path)
+    report["cached"] = False
+    LOGGER.info(
+        "Finished daily analysis for %s with status %s. Categories=%s, articles=%s.",
+        target_date,
+        report["status"],
+        len(report.get("categories") or []),
+        int((report.get("totals") or {}).get("article_count") or 0),
+    )
+    return report
 
-    today_plan = _build_today_incremental_plan(articles, existing_report)
-    previous_retry_plan = _build_previous_retry_plan(previous_articles, previous_report)
+
+def _build_analysis_graph():
+    graph = StateGraph(AnalysisGraphState)
+    graph.add_node("initialize", _graph_initialize)
+    graph.add_node("route_attention", _graph_route_attention)
+    graph.add_node("analyze_today", _graph_analyze_today)
+    graph.add_node("retry_previous_day", _graph_retry_previous_day)
+    graph.add_node("finalize", _graph_finalize)
+    graph.add_edge(START, "initialize")
+    graph.add_edge("initialize", "route_attention")
+    graph.add_edge("route_attention", "analyze_today")
+    graph.add_edge("analyze_today", "retry_previous_day")
+    graph.add_edge("retry_previous_day", "finalize")
+    graph.add_edge("finalize", END)
+    return graph.compile()
+
+
+def _graph_initialize(state: AnalysisGraphState) -> AnalysisGraphState:
+    today_plan = _build_today_incremental_plan(state["articles"], state["existing_report"])
+    previous_retry_plan = _build_previous_retry_plan(state["previous_articles"], state["previous_report"])
     runtime: AnalysisRuntime | None = None
     if today_plan["new_articles_analyzed"] > 0 or previous_retry_plan["retried_previous_day_articles"] > 0:
         runtime = AnalysisRuntime(
@@ -384,65 +520,86 @@ def run_analysis(
             governor=RateLimitGovernor(),
             model_chain=[ModelConfig(PRIMARY_MODEL_ID), *(ModelConfig(model_id) for model_id in FALLBACK_MODEL_IDS)],
         )
-
-    try:
-        category_reports = _build_incremental_report_categories(
-            runtime=runtime,
-            db_articles=articles,
-            existing_report=existing_report,
-            plan=today_plan,
-            retry_only=False,
-        )
-        previous_day_retry_successes = 0
-        if previous_report is not None and previous_retry_plan["retried_previous_day_articles"] > 0:
-            updated_previous_report, previous_day_retry_successes = _retry_previous_report(
-                runtime=runtime,
-                previous_date=previous_date,
-                db_articles=previous_articles,
-                existing_report=previous_report,
-                retry_plan=previous_retry_plan,
-            )
-            if previous_day_retry_successes > 0:
-                _write_report(previous_report_path, updated_previous_report)
-    finally:
-        if runtime is not None:
-            runtime.session.close()
-
-    incremental = {
+    state["today_plan"] = today_plan
+    state["previous_retry_plan"] = previous_retry_plan
+    state["runtime"] = runtime
+    state["incremental"] = {
         "reused_successful_articles": today_plan["reused_successful_articles"],
         "new_articles_analyzed": today_plan["new_articles_analyzed"],
         "retried_previous_day_articles": previous_retry_plan["retried_previous_day_articles"],
-        "previous_day_retry_successes": previous_day_retry_successes,
+        "previous_day_retry_successes": 0,
     }
+    return state
 
-    if not articles:
-        report = _build_empty_report(target_date, incremental=incremental)
-        _write_report(report_path, report)
-        report["output_path"] = str(report_path)
-        report["cached"] = False
-        LOGGER.info("No published articles found for %s.", target_date)
-        return report
+
+def _graph_route_attention(state: AnalysisGraphState) -> AnalysisGraphState:
+    runtime = state["runtime"]
+    today_plan = dict(state["today_plan"])
+    previous_retry_plan = dict(state["previous_retry_plan"])
+    if today_plan.get("work_articles"):
+        today_plan["work_articles"] = _route_articles(runtime, list(today_plan["work_articles"]))
+    if previous_retry_plan.get("work_articles"):
+        previous_retry_plan["work_articles"] = _route_articles(runtime, list(previous_retry_plan["work_articles"]))
+    state["today_plan"] = today_plan
+    state["previous_retry_plan"] = previous_retry_plan
+    return state
+
+
+def _graph_analyze_today(state: AnalysisGraphState) -> AnalysisGraphState:
+    if not state["articles"]:
+        state["category_reports"] = []
+        return state
+    state["category_reports"] = _build_incremental_report_categories(
+        runtime=state["runtime"],
+        db_articles=state["articles"],
+        existing_report=state["existing_report"],
+        plan=state["today_plan"],
+        retry_only=False,
+    )
+    return state
+
+
+def _graph_retry_previous_day(state: AnalysisGraphState) -> AnalysisGraphState:
+    runtime = state["runtime"]
+    try:
+        if state["previous_report"] is not None and state["previous_retry_plan"]["retried_previous_day_articles"] > 0:
+            updated_previous_report, previous_day_retry_successes = _retry_previous_report(
+                runtime=runtime,
+                previous_date=(datetime.fromisoformat(state["target_date"]).date() - timedelta(days=1)).isoformat(),
+                db_articles=state["previous_articles"],
+                existing_report=state["previous_report"],
+                retry_plan=state["previous_retry_plan"],
+            )
+            state["previous_day_retry_successes"] = previous_day_retry_successes
+            state["incremental"]["previous_day_retry_successes"] = previous_day_retry_successes
+            if previous_day_retry_successes > 0:
+                _write_report(state["previous_report_path"], updated_previous_report)
+                state["updated_previous_report"] = updated_previous_report
+    finally:
+        if runtime is not None:
+            runtime.session.close()
+    return state
+
+
+def _graph_finalize(state: AnalysisGraphState) -> AnalysisGraphState:
+    if not state["articles"]:
+        report = _build_empty_report(state["target_date"], incremental=state["incremental"])
+        _write_report(state["report_path"], report)
+        LOGGER.info("No published articles found for %s.", state["target_date"])
+        state["report"] = report
+        return state
 
     report = _finalize_report(
-        target_date=target_date,
-        source_site=DEFAULT_SOURCE_SITE,
-        input_article_count=len(articles),
-        category_reports=category_reports,
-        runtime=runtime,
-        incremental=incremental,
+        target_date=state["target_date"],
+        source_site=state["source_site"],
+        input_article_count=len(state["articles"]),
+        category_reports=state["category_reports"],
+        runtime=state["runtime"],
+        incremental=state["incremental"],
     )
-
-    _write_report(report_path, report)
-    report["output_path"] = str(report_path)
-    report["cached"] = False
-    LOGGER.info(
-        "Finished daily analysis for %s with status %s. Categories=%s, articles=%s.",
-        target_date,
-        report["status"],
-        len(category_reports),
-        report["totals"]["article_count"],
-    )
-    return report
+    _write_report(state["report_path"], report)
+    state["report"] = report
+    return state
 
 
 def load_groq_api_key() -> str:
@@ -518,6 +675,7 @@ def select_content_for_analysis(content_text: str) -> dict[str, Any]:
 
 def _prepare_single_article(article: dict[str, Any]) -> dict[str, Any]:
     selected = select_content_for_analysis(article.get("content_text") or "")
+    attention = _article_attention_defaults(article)
     return {
         "source_article_id": article.get("source_article_id"),
         "title": article.get("title"),
@@ -533,7 +691,105 @@ def _prepare_single_article(article: dict[str, Any]) -> dict[str, Any]:
         "original_content_token_estimate": selected["original_content_token_estimate"],
         "analyzed_content_token_estimate": selected["analyzed_content_token_estimate"],
         "truncation_reason": selected["truncation_reason"],
+        "attention_tier": attention["attention_tier"],
+        "theme": attention["theme"],
+        "attention_reason": attention["attention_reason"],
+        "must_keep": attention["must_keep"],
     }
+
+
+def _article_attention_defaults(article: dict[str, Any]) -> dict[str, Any]:
+    return _normalize_attention_metadata(
+        {
+            "attention_tier": article.get("attention_tier"),
+            "theme": article.get("theme"),
+            "attention_reason": article.get("attention_reason"),
+            "must_keep": article.get("must_keep"),
+        },
+        article,
+    )
+
+
+def _heuristic_attention_metadata(article: dict[str, Any]) -> dict[str, Any]:
+    title = str(article.get("title") or "").strip()
+    snippet = str(article.get("summary_snippet") or "").strip()
+    section = str(article.get("article_section") or article.get("section") or "").strip()
+    haystack = f"{title} {snippet} {section}".lower()
+
+    matched_theme = "general"
+    high_signal = False
+    for theme, keywords in HIGH_ATTENTION_THEME_KEYWORDS.items():
+        if any(keyword.lower() in haystack for keyword in keywords):
+            matched_theme = theme
+            high_signal = theme in {"stocks", "macro", "geopolitics"}
+            break
+
+    if high_signal:
+        tier = "high"
+        must_keep = True
+        reason = f"High-signal {matched_theme} headline based on title/summary keywords."
+    elif section in LIGHT_ANALYSIS_SECTIONS:
+        tier = "light"
+        must_keep = False
+        if matched_theme == "general" and section == "地產新聞":
+            matched_theme = "property"
+        reason = f"Lighter treatment because this story sits in the {section} section without strong market-moving signals."
+    else:
+        tier = "medium"
+        must_keep = False
+        reason = "Default medium attention because the story is relevant but not an obvious top-priority market mover."
+
+    return {
+        "attention_tier": tier,
+        "theme": matched_theme,
+        "attention_reason": reason,
+        "must_keep": must_keep,
+    }
+
+
+def _normalize_attention_metadata(metadata: dict[str, Any], article: dict[str, Any]) -> dict[str, Any]:
+    heuristic = _heuristic_attention_metadata(article)
+    attention_tier = str(metadata.get("attention_tier") or heuristic["attention_tier"]).strip().lower()
+    if attention_tier not in ATTENTION_TIERS:
+        attention_tier = heuristic["attention_tier"]
+    theme = str(metadata.get("theme") or heuristic["theme"]).strip().lower() or heuristic["theme"]
+    attention_reason = str(metadata.get("attention_reason") or heuristic["attention_reason"]).strip() or heuristic["attention_reason"]
+    must_keep_value = metadata.get("must_keep")
+    if isinstance(must_keep_value, bool):
+        must_keep = must_keep_value
+    elif must_keep_value is None:
+        must_keep = bool(heuristic["must_keep"])
+    else:
+        must_keep = str(must_keep_value).strip().lower() in {"1", "true", "yes"}
+    if must_keep and attention_tier == "light":
+        attention_tier = "medium"
+    return {
+        "attention_tier": attention_tier,
+        "theme": theme,
+        "attention_reason": attention_reason,
+        "must_keep": must_keep,
+    }
+
+
+def _apply_attention_metadata(article: dict[str, Any], metadata: dict[str, Any]) -> dict[str, Any]:
+    applied = dict(article)
+    normalized = _normalize_attention_metadata(metadata, applied)
+    applied.update(normalized)
+    return applied
+
+
+def _order_articles_like_input(
+    input_articles: list[dict[str, Any]],
+    routed_articles: list[dict[str, Any]],
+) -> list[dict[str, Any]]:
+    routed_by_key = {
+        _article_key(article.get("source_article_id"), article.get("canonical_url")): article
+        for article in routed_articles
+    }
+    return [
+        routed_by_key.get(_article_key(article.get("source_article_id"), article.get("canonical_url")), article)
+        for article in input_articles
+    ]
 
 
 def _load_existing_report(report_path: Path) -> dict[str, Any] | None:
@@ -584,6 +840,198 @@ def _build_previous_retry_plan(
     }
 
 
+def _route_articles(runtime: AnalysisRuntime | None, articles: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    seeded = [_apply_attention_metadata(article, _heuristic_attention_metadata(article)) for article in articles]
+    if runtime is None or not seeded:
+        return seeded
+
+    routed_by_key = {
+        _article_key(article.get("source_article_id"), article.get("canonical_url")): article
+        for article in seeded
+    }
+    for category_name, category_articles in _group_source_articles(seeded):
+        if not _should_use_llm_router(category_name, category_articles):
+            continue
+        routed_batch = _route_articles_with_llm(runtime, category_name, category_articles)
+        for article in routed_batch:
+            routed_by_key[_article_key(article.get("source_article_id"), article.get("canonical_url"))] = article
+    return [
+        routed_by_key[_article_key(article.get("source_article_id"), article.get("canonical_url"))]
+        for article in seeded
+    ]
+
+
+def _should_use_llm_router(category_name: str, category_articles: list[dict[str, Any]]) -> bool:
+    if category_name in LIGHT_ANALYSIS_SECTIONS:
+        return False
+    return len(category_articles) >= ROUTER_LLM_MIN_ARTICLES
+
+
+def _route_articles_with_llm(
+    runtime: AnalysisRuntime,
+    category_name: str,
+    articles: list[dict[str, Any]],
+) -> list[dict[str, Any]]:
+    return _route_batch_recursive(runtime, category_name, articles, batch_label="route")
+
+
+def _route_batch_recursive(
+    runtime: AnalysisRuntime,
+    category_name: str,
+    batch_articles: list[dict[str, Any]],
+    *,
+    batch_label: str,
+    depth: int = 0,
+) -> list[dict[str, Any]]:
+    if not batch_articles:
+        return []
+
+    messages = _build_attention_routing_messages(category_name, batch_articles)
+    budget_state = runtime.get_category_budget(category_name)
+    estimated_input_tokens = _estimate_messages_tokens(messages)
+    request_bytes = _estimate_request_payload_bytes(runtime.current_model.model_id, messages, runtime.current_model.max_completion_tokens)
+    if (
+        len(batch_articles) > 1
+        and (
+            estimated_input_tokens > budget_state.synthesis_input_budget_tokens
+            or request_bytes > budget_state.synthesis_request_byte_budget
+        )
+    ):
+        runtime.record_split(category_name, "pre_send_budget")
+        left, right = _split_batch(batch_articles)
+        return _route_batch_recursive(runtime, category_name, left, batch_label=f"{batch_label}a", depth=depth + 1) + _route_batch_recursive(
+            runtime, category_name, right, batch_label=f"{batch_label}b", depth=depth + 1
+        )
+
+    context = BatchContext(
+        category_name=category_name,
+        batch_kind="routing",
+        batch_label=batch_label,
+        article_count=len(batch_articles),
+        estimated_input_tokens=estimated_input_tokens,
+        serialized_request_bytes=request_bytes,
+        content_shrunk=False,
+    )
+
+    try:
+        payload, _ = _invoke_json_with_retry(runtime, messages, estimated_input_tokens, context)
+        merged_results, missing_articles = _merge_attention_results(batch_articles, payload)
+        if not missing_articles:
+            return merged_results
+        if len(missing_articles) == 1 or depth >= 1:
+            fallback_results = [
+                _apply_attention_metadata(article, _heuristic_attention_metadata(article))
+                for article in missing_articles
+            ]
+            return _order_articles_like_input(batch_articles, merged_results + fallback_results)
+        left, right = _split_batch(missing_articles)
+        salvage_results = _route_batch_recursive(runtime, category_name, left, batch_label=f"{batch_label}m1", depth=depth + 1) + _route_batch_recursive(
+            runtime, category_name, right, batch_label=f"{batch_label}m2", depth=depth + 1
+        )
+        return _order_articles_like_input(batch_articles, merged_results + salvage_results)
+    except Exception as exc:
+        classification = _classify_exception(exc)
+        runtime.tighten_category_budget(category_name, classification, batch_kind="synthesis")
+        if classification == "payload_too_large":
+            runtime.record_split(category_name, "response_413")
+        if len(batch_articles) > 1 and depth < 1:
+            left, right = _split_batch(batch_articles)
+            return _route_batch_recursive(runtime, category_name, left, batch_label=f"{batch_label}a", depth=depth + 1) + _route_batch_recursive(
+                runtime, category_name, right, batch_label=f"{batch_label}b", depth=depth + 1
+            )
+        return [_apply_attention_metadata(article, _heuristic_attention_metadata(article)) for article in batch_articles]
+
+
+def _build_attention_routing_messages(category_name: str, batch_articles: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    return [
+        {
+            "role": "system",
+            "content": (
+                "You are a financial news triage router. Return one valid JSON object only. "
+                "Route every article into an attention tier and compact theme. Do not omit any article."
+            ),
+        },
+        {
+            "role": "user",
+            "content": json.dumps(
+                {
+                    "task": "Assign compact routing metadata before deeper article analysis.",
+                    "required_schema": {
+                        "routes": [
+                            {
+                                "source_article_id": "string or null",
+                                "canonical_url": "string",
+                                "attention_tier": "high|medium|light",
+                                "theme": "short theme such as stocks|macro|geopolitics|property|general",
+                                "reason": "one short sentence",
+                                "must_keep": "boolean",
+                            }
+                        ]
+                    },
+                    "routing_policy": {
+                        "high": [
+                            "stocks, earnings, guidance, placements, buybacks, capital markets",
+                            "macro, central banks, inflation, rates, growth, FX, oil",
+                            "geopolitics, sanctions, tariffs, war, trade restrictions",
+                        ],
+                        "light": [
+                            "softer pulse-style or local-interest items",
+                            "stories in 時事脈搏 or 地產新聞 without obvious market-moving signals",
+                        ],
+                        "default": "Use medium when ambiguous.",
+                    },
+                    "category": category_name,
+                    "articles": [
+                        {
+                            "source_article_id": article.get("source_article_id"),
+                            "canonical_url": article.get("canonical_url"),
+                            "title": article.get("title"),
+                            "summary_snippet": article.get("summary_snippet"),
+                            "article_section": article.get("article_section") or article.get("section"),
+                            "published_at": article.get("published_at"),
+                        }
+                        for article in batch_articles
+                    ],
+                },
+                ensure_ascii=False,
+            ),
+        },
+    ]
+
+
+def _merge_attention_results(
+    batch_articles: list[dict[str, Any]],
+    payload: dict[str, Any],
+) -> tuple[list[dict[str, Any]], list[dict[str, Any]]]:
+    response_items = payload.get("routes")
+    response_list = response_items if isinstance(response_items, list) else []
+    response_by_key: dict[tuple[str | None, str], dict[str, Any]] = {}
+    for item in response_list:
+        if isinstance(item, dict):
+            response_by_key[_article_key(item.get("source_article_id"), item.get("canonical_url"))] = item
+
+    merged: list[dict[str, Any]] = []
+    missing: list[dict[str, Any]] = []
+    for article in batch_articles:
+        key = _article_key(article.get("source_article_id"), article.get("canonical_url"))
+        routed = response_by_key.get(key)
+        if routed is None:
+            missing.append(article)
+            continue
+        merged.append(
+            _apply_attention_metadata(
+                article,
+                {
+                    "attention_tier": routed.get("attention_tier"),
+                    "theme": routed.get("theme"),
+                    "attention_reason": routed.get("reason"),
+                    "must_keep": routed.get("must_keep"),
+                },
+            )
+        )
+    return merged, missing
+
+
 def _build_incremental_report_categories(
     *,
     runtime: AnalysisRuntime | None,
@@ -594,6 +1042,10 @@ def _build_incremental_report_categories(
 ) -> list[dict[str, Any]]:
     existing_categories = _existing_categories_by_name(existing_report)
     existing_articles = _existing_articles_by_key(existing_report)
+    db_articles_by_key = {
+        _article_key(article.get("source_article_id"), article.get("canonical_url")): article
+        for article in db_articles
+    }
     work_by_key = {
         _article_key(article.get("source_article_id"), article.get("canonical_url")): article
         for article in plan["work_articles"]
@@ -633,7 +1085,7 @@ def _build_incremental_report_categories(
                     if replacement is not None:
                         final_articles.append(replacement)
                         continue
-                final_articles.append(article_result)
+                final_articles.append(_ensure_attention_fields(article_result, db_articles_by_key.get(key)))
                 used_existing_results = True
         else:
             analyzed_results = _article_result_by_key(analyzed_category["articles"] if analyzed_category else [])
@@ -644,7 +1096,7 @@ def _build_incremental_report_categories(
                 else:
                     existing_result = existing_articles.get(key)
                     if existing_result is not None:
-                        final_articles.append(existing_result)
+                        final_articles.append(_ensure_attention_fields(existing_result, article))
                         used_existing_results = True
 
         if not final_articles:
@@ -729,12 +1181,14 @@ def _merge_category_report(
         merged["articles"] = final_articles
         return merged
 
+    profile = _section_profile(category_name)
     successful_articles = [article for article in final_articles if not article.get("error")]
     diagnostics = dict((analyzed_category or existing_category or {}).get("diagnostics") or {})
     sub_batch_count = int((analyzed_category or existing_category or {}).get("sub_batch_count") or diagnostics.get("sub_batch_count") or 0)
     key_developments = list((existing_category or {}).get("key_developments") or [])
     named_entities = list((existing_category or {}).get("named_entities") or [])
     model_used = str((existing_category or {}).get("model_used") or PRIMARY_MODEL_ID)
+    subgroups = list((existing_category or {}).get("subgroups") or [])
     category_error_message: str | None = None
 
     if changed:
@@ -742,13 +1196,14 @@ def _merge_category_report(
         sub_batch_count = int((analyzed_category or {}).get("sub_batch_count") or sub_batch_count)
         if successful_articles and runtime is not None:
             try:
-                synthesis_payload, synthesis_model, synthesis_batch_count = _synthesize_category(
+                synthesis_payload, synthesis_model, synthesis_batch_count, subgroup_reports = _build_category_outputs(
                     runtime,
                     category_name,
                     successful_articles,
                 )
-                key_developments = _normalize_string_list(synthesis_payload.get("key_developments"), limit=5)
-                named_entities = _normalize_entities(synthesis_payload.get("named_entities"))
+                key_developments = _normalize_string_list(synthesis_payload.get("key_developments"), limit=profile.category_bullet_limit)
+                named_entities = _normalize_entities(synthesis_payload.get("named_entities"))[: profile.entity_limit]
+                subgroups = subgroup_reports
                 model_used = synthesis_model
                 sub_batch_count += synthesis_batch_count
             except Exception as exc:
@@ -772,6 +1227,8 @@ def _merge_category_report(
         "key_developments": key_developments,
         "named_entities": named_entities if successful_articles else [],
         "articles": final_articles,
+        "subgroups": subgroups if successful_articles else [],
+        "analysis_profile": profile.name,
         "model_used": model_used,
         "sub_batch_count": sub_batch_count,
         "diagnostics": diagnostics,
@@ -905,12 +1362,28 @@ def _article_result_by_key(items: list[dict[str, Any]]) -> dict[tuple[str | None
     }
 
 
+def _ensure_attention_fields(article_result: dict[str, Any], source_article: dict[str, Any] | None) -> dict[str, Any]:
+    hydrated = dict(article_result)
+    article_context = {
+        "source_article_id": hydrated.get("source_article_id"),
+        "canonical_url": hydrated.get("canonical_url"),
+        "title": hydrated.get("title") or (source_article or {}).get("title"),
+        "summary_snippet": hydrated.get("summary_snippet") or (source_article or {}).get("summary_snippet"),
+        "article_section": hydrated.get("section") or (source_article or {}).get("article_section"),
+        "section": hydrated.get("section") or (source_article or {}).get("article_section"),
+        "published_at": hydrated.get("published_at") or (source_article or {}).get("published_at"),
+    }
+    hydrated.update(_article_attention_defaults({**article_context, **hydrated}))
+    return hydrated
+
+
 def _analyze_category(
     runtime: AnalysisRuntime,
     category_name: str,
     prepared_articles: list[dict[str, Any]],
 ) -> tuple[dict[str, Any], list[dict[str, Any]]]:
     LOGGER.info("Analyzing category %s with %s article(s).", category_name, len(prepared_articles))
+    profile = _section_profile(category_name)
     planned_batches = _plan_category_batches(runtime, category_name, prepared_articles)
     article_results: list[dict[str, Any]] = []
     article_errors: list[dict[str, Any]] = []
@@ -920,10 +1393,12 @@ def _analyze_category(
         article_results.extend(batch_results)
         article_errors.extend(batch_errors)
         sub_batch_count += batch_count
+    article_results = _order_results_like_input(prepared_articles, article_results)
     successful_articles = [article for article in article_results if not article.get("error")]
     category_errors = list(article_errors)
     key_developments: list[str] = []
     named_entities: list[dict[str, str]] = _collect_entities_from_articles(successful_articles)
+    subgroup_reports: list[dict[str, Any]] = []
     synthesis_model = _category_model_used(article_results)
     category_status = "success"
     category_error_message: str | None = None
@@ -933,14 +1408,14 @@ def _analyze_category(
 
     if successful_articles:
         try:
-            synthesis_payload, synthesis_model, synthesis_batch_count = _synthesize_category(
+            synthesis_payload, synthesis_model, synthesis_batch_count, subgroup_reports = _build_category_outputs(
                 runtime,
                 category_name,
                 successful_articles,
             )
             sub_batch_count += synthesis_batch_count
-            key_developments = _normalize_string_list(synthesis_payload.get("key_developments"), limit=5)
-            named_entities = _normalize_entities(synthesis_payload.get("named_entities"))
+            key_developments = _normalize_string_list(synthesis_payload.get("key_developments"), limit=profile.category_bullet_limit)
+            named_entities = _normalize_entities(synthesis_payload.get("named_entities"))[: profile.entity_limit]
         except Exception as exc:
             category_status = "partial"
             category_error_message = str(exc)
@@ -982,6 +1457,8 @@ def _analyze_category(
             "key_developments": key_developments,
             "named_entities": named_entities,
             "articles": article_results,
+            "subgroups": subgroup_reports,
+            "analysis_profile": profile.name,
             "model_used": synthesis_model,
             "sub_batch_count": sub_batch_count,
             "diagnostics": diagnostics.as_dict(),
@@ -999,15 +1476,18 @@ def _process_batch_recursive(
     *,
     allow_salvage: bool = True,
     model_override: ModelConfig | None = None,
+    depth: int = 0,
 ) -> tuple[list[dict[str, Any]], list[dict[str, Any]], int]:
+    profile = _section_profile(category_name)
     working_batch = [_clone_prepared_article(article) for article in batch_articles]
     budget_state = runtime.get_category_budget(category_name)
+    effective_budget = _effective_batch_budget(profile, budget_state, working_batch)
     active_model = model_override or runtime.current_model
     content_shrunk = _shrink_batch_to_budget(
         category_name,
         working_batch,
-        input_budget_tokens=budget_state.article_input_budget_tokens,
-        request_byte_budget=budget_state.article_request_byte_budget,
+        input_budget_tokens=effective_budget["input_budget_tokens"],
+        request_byte_budget=effective_budget["request_byte_budget"],
         model_id=active_model.model_id,
     )
     estimated_input_tokens = _estimate_batch_request_tokens(category_name, working_batch)
@@ -1015,8 +1495,8 @@ def _process_batch_recursive(
 
     if (
         (
-            estimated_input_tokens > budget_state.article_input_budget_tokens
-            or request_bytes > budget_state.article_request_byte_budget
+            estimated_input_tokens > effective_budget["input_budget_tokens"]
+            or request_bytes > effective_budget["request_byte_budget"]
         )
         and len(working_batch) > 1
     ):
@@ -1031,10 +1511,20 @@ def _process_batch_recursive(
         )
         left, right = _split_batch(working_batch)
         left_results, left_errors, left_count = _process_batch_recursive(
-            runtime, category_name, left, f"{batch_label}a", model_override=model_override
+            runtime,
+            category_name,
+            left,
+            f"{batch_label}a",
+            model_override=model_override,
+            depth=depth + 1,
         )
         right_results, right_errors, right_count = _process_batch_recursive(
-            runtime, category_name, right, f"{batch_label}b", model_override=model_override
+            runtime,
+            category_name,
+            right,
+            f"{batch_label}b",
+            model_override=model_override,
+            depth=depth + 1,
         )
         return left_results + right_results, left_errors + right_errors, left_count + right_count
 
@@ -1081,14 +1571,38 @@ def _process_batch_recursive(
             )
             runtime.tighten_category_budget(category_name, "incomplete_model_output", batch_kind="article_batch")
             if len(missing_articles) == 1:
+                next_model = runtime.next_model_after(active_model.model_id)
+                salvage_model = next_model if profile.name == "light" and next_model is not None else model_override
                 salvage_results, salvage_errors, salvage_count = _process_batch_recursive(
                     runtime,
                     category_name,
                     missing_articles,
                     f"{batch_label}m",
                     allow_salvage=False,
-                    model_override=model_override,
+                    model_override=salvage_model,
+                    depth=depth + 1,
                 )
+            elif depth + 1 >= effective_budget["salvage_max_depth"]:
+                message = "Model response omitted this article from the category batch."
+                salvage_results = [
+                    _build_failed_article_result(
+                        article=article,
+                        error_message=message,
+                        model_used=model_used,
+                        error_classification="incomplete_model_output",
+                    )
+                    for article in missing_articles
+                ]
+                salvage_errors = [
+                    {
+                        "type": "article",
+                        "target": article.get("canonical_url"),
+                        "message": message,
+                        "classification": "incomplete_model_output",
+                    }
+                    for article in missing_articles
+                ]
+                salvage_count = 0
             else:
                 left, right = _split_batch(missing_articles)
                 left_results, left_errors, left_count = _process_batch_recursive(
@@ -1097,6 +1611,7 @@ def _process_batch_recursive(
                     left,
                     f"{batch_label}ma",
                     model_override=model_override,
+                    depth=depth + 1,
                 )
                 right_results, right_errors, right_count = _process_batch_recursive(
                     runtime,
@@ -1104,22 +1619,24 @@ def _process_batch_recursive(
                     right,
                     f"{batch_label}mb",
                     model_override=model_override,
+                    depth=depth + 1,
                 )
                 salvage_results = left_results + right_results
                 salvage_errors = left_errors + right_errors
                 salvage_count = left_count + right_count
+
             unresolved_results = [result for result in salvage_results if result.get("error")]
             if unresolved_results:
                 next_model = runtime.next_model_after(active_model.model_id)
                 if next_model is not None:
+                    unresolved_keys = {
+                        _article_key(result.get("source_article_id"), result.get("canonical_url"))
+                        for result in unresolved_results
+                    }
                     unresolved_articles = [
                         article
                         for article in missing_articles
-                        if any(
-                            _article_key(result.get("source_article_id"), result.get("canonical_url"))
-                            == _article_key(article.get("source_article_id"), article.get("canonical_url"))
-                            for result in unresolved_results
-                        )
+                        if _article_key(article.get("source_article_id"), article.get("canonical_url")) in unresolved_keys
                     ]
                     if unresolved_articles:
                         LOGGER.info(
@@ -1137,23 +1654,20 @@ def _process_batch_recursive(
                             f"{batch_label}e",
                             allow_salvage=False,
                             model_override=next_model,
+                            depth=depth + 1,
                         )
                         salvage_results = [
                             result
                             for result in salvage_results
-                            if _article_key(result.get("source_article_id"), result.get("canonical_url"))
-                            not in {
-                                _article_key(article.get("source_article_id"), article.get("canonical_url"))
-                                for article in unresolved_articles
-                            }
+                            if _article_key(result.get("source_article_id"), result.get("canonical_url")) not in unresolved_keys
                         ] + retry_results
                         salvage_errors = [
                             error
                             for error in salvage_errors
-                            if error.get("target")
-                            not in {article.get("canonical_url") for article in unresolved_articles}
+                            if error.get("target") not in {article.get("canonical_url") for article in unresolved_articles}
                         ] + retry_errors
                         salvage_count += retry_count
+
             combined = _order_results_like_input(working_batch, merged_results + salvage_results)
             return combined, salvage_errors, 1 + salvage_count
         return merged_results, [], 1
@@ -1171,16 +1685,26 @@ def _process_batch_recursive(
             )
             left, right = _split_batch(working_batch)
             left_results, left_errors, left_count = _process_batch_recursive(
-                runtime, category_name, left, f"{batch_label}a", model_override=model_override
+                runtime,
+                category_name,
+                left,
+                f"{batch_label}a",
+                model_override=model_override,
+                depth=depth + 1,
             )
             right_results, right_errors, right_count = _process_batch_recursive(
-                runtime, category_name, right, f"{batch_label}b", model_override=model_override
+                runtime,
+                category_name,
+                right,
+                f"{batch_label}b",
+                model_override=model_override,
+                depth=depth + 1,
             )
             return left_results + right_results, left_errors + right_errors, left_count + right_count
 
         model_used = runtime.last_attempted_model or active_model.model_id
         message = str(exc)
-        if len(working_batch) > 1 and classification in {"rate_limited", "http_error", "unexpected_error"}:
+        if len(working_batch) > 1 and classification in {"rate_limited", "http_error", "unexpected_error"} and depth + 1 < effective_budget["salvage_max_depth"]:
             runtime.tighten_category_budget(category_name, classification, batch_kind="article_batch")
             LOGGER.info(
                 "Retrying category %s batch %s as smaller sub-batches after %s.",
@@ -1190,10 +1714,20 @@ def _process_batch_recursive(
             )
             left, right = _split_batch(working_batch)
             left_results, left_errors, left_count = _process_batch_recursive(
-                runtime, category_name, left, f"{batch_label}a", model_override=model_override
+                runtime,
+                category_name,
+                left,
+                f"{batch_label}a",
+                model_override=model_override,
+                depth=depth + 1,
             )
             right_results, right_errors, right_count = _process_batch_recursive(
-                runtime, category_name, right, f"{batch_label}b", model_override=model_override
+                runtime,
+                category_name,
+                right,
+                f"{batch_label}b",
+                model_override=model_override,
+                depth=depth + 1,
             )
             return left_results + right_results, left_errors + right_errors, left_count + right_count
         runtime.record_failed_batch()
@@ -1220,7 +1754,7 @@ def _process_batch_recursive(
         model_used = runtime.last_attempted_model or active_model.model_id
         message = str(exc)
         classification = _classify_exception(exc)
-        if len(working_batch) > 1 and classification in {"invalid_json", "unexpected_error"}:
+        if len(working_batch) > 1 and classification in {"invalid_json", "unexpected_error"} and depth + 1 < effective_budget["salvage_max_depth"]:
             runtime.tighten_category_budget(category_name, classification, batch_kind="article_batch")
             LOGGER.info(
                 "Retrying category %s batch %s as smaller sub-batches after %s.",
@@ -1230,13 +1764,23 @@ def _process_batch_recursive(
             )
             left, right = _split_batch(working_batch)
             left_results, left_errors, left_count = _process_batch_recursive(
-                runtime, category_name, left, f"{batch_label}a", model_override=model_override
+                runtime,
+                category_name,
+                left,
+                f"{batch_label}a",
+                model_override=model_override,
+                depth=depth + 1,
             )
             right_results, right_errors, right_count = _process_batch_recursive(
-                runtime, category_name, right, f"{batch_label}b", model_override=model_override
+                runtime,
+                category_name,
+                right,
+                f"{batch_label}b",
+                model_override=model_override,
+                depth=depth + 1,
             )
             return left_results + right_results, left_errors + right_errors, left_count + right_count
-        if len(working_batch) == 1 and classification in {"invalid_json", "incomplete_model_output", "unexpected_error"}:
+        if len(working_batch) == 1 and classification in {"invalid_json", "incomplete_model_output", "unexpected_error"} and depth + 1 < effective_budget["salvage_max_depth"]:
             next_model = runtime.next_model_after(active_model.model_id)
             if next_model is not None:
                 LOGGER.info(
@@ -1254,6 +1798,7 @@ def _process_batch_recursive(
                     f"{batch_label}n",
                     allow_salvage=False,
                     model_override=next_model,
+                    depth=depth + 1,
                 )
         runtime.record_failed_batch()
         failed_results = [
@@ -1486,13 +2031,16 @@ def _chat_completion(
 
 
 def _build_article_batch_messages(category_name: str, batch_articles: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    profile = _section_profile(category_name)
+    batch_tier = _batch_attention_tier(batch_articles)
     return [
         {
             "role": "system",
             "content": (
                 "You are a financial news analyst. Return one valid JSON object only. "
                 "Analyze every article in the batch. Use integer scores from 1 to 10. "
-                "Do not omit any article."
+                "Do not omit any article. "
+                f"This batch is primarily {batch_tier}-attention; keep low-attention stories concise."
             ),
         },
         {
@@ -1511,7 +2059,7 @@ def _build_article_batch_messages(category_name: str, batch_articles: list[dict[
                                 "named_entities": [
                                     {"name": "entity name", "type": "person|company|country|institution|index|organization|asset|other"}
                                 ],
-                                "key_points": ["2 to 4 concise strings"],
+                                "key_points": [profile.article_key_points_instruction],
                             }
                         ]
                     },
@@ -1519,6 +2067,7 @@ def _build_article_batch_messages(category_name: str, batch_articles: list[dict[
                         "Return one article result for every input article.",
                         "Match article results by source_article_id when available and also include canonical_url.",
                         "Do not include category-level summary in this response.",
+                        "If an article is tagged as light attention, keep key points especially concise.",
                     ],
                     "scoring_rubric": {
                         "novelty_score": "How new or non-repetitive this development is within the current news flow.",
@@ -1537,6 +2086,9 @@ def _build_article_batch_messages(category_name: str, batch_articles: list[dict[
                             "content_text": article["content_text"],
                             "content_truncated": article["content_truncated"],
                             "analysis_method": article["analysis_method"],
+                            "attention_tier": article.get("attention_tier"),
+                            "theme": article.get("theme"),
+                            "must_keep": article.get("must_keep"),
                         }
                         for article in batch_articles
                     ],
@@ -1547,13 +2099,201 @@ def _build_article_batch_messages(category_name: str, batch_articles: list[dict[
     ]
 
 
-def _synthesize_category(
+def _build_category_outputs(
     runtime: AnalysisRuntime,
     category_name: str,
     successful_articles: list[dict[str, Any]],
-) -> tuple[dict[str, Any], str, int]:
-    synthesis_items = [_article_to_synthesis_item(article) for article in successful_articles]
-    return _synthesize_summary_items(runtime, category_name, synthesis_items, batch_label_prefix="summary")
+) -> tuple[dict[str, Any], str, int, list[dict[str, Any]]]:
+    profile = _section_profile(category_name)
+    if len(successful_articles) < profile.subgroup_threshold:
+        summary_payload, summary_model, summary_batches = _synthesize_summary_items(
+            runtime,
+            category_name,
+            [_article_to_synthesis_item(article) for article in successful_articles],
+            batch_label_prefix="summary",
+            bullet_limit=profile.category_bullet_limit,
+            scope_kind="category",
+            scope_title=category_name,
+        )
+        subgroup = {
+            "title": f"{category_name} overview",
+            "theme_rationale": "Single subgroup because the category size did not require thematic splitting.",
+            "article_count": len(successful_articles),
+            "key_developments": _normalize_string_list(summary_payload.get("key_developments"), limit=profile.subgroup_bullet_limit),
+            "named_entities": _normalize_entities(summary_payload.get("named_entities"))[: profile.entity_limit],
+            "articles": successful_articles,
+            "model_used": summary_model,
+        }
+        return summary_payload, summary_model, summary_batches, [subgroup]
+
+    subgroup_specs = _assign_article_subgroups(runtime, category_name, successful_articles)
+    subgroup_reports: list[dict[str, Any]] = []
+    subgroup_summary_items: list[dict[str, Any]] = []
+    total_batches = 0
+    model_used = runtime.current_model.model_id
+
+    for index, subgroup in enumerate(subgroup_specs, start=1):
+        subgroup_payload, subgroup_model, subgroup_batches = _synthesize_summary_items(
+            runtime,
+            category_name,
+            [_article_to_synthesis_item(article) for article in subgroup["articles"]],
+            batch_label_prefix=f"subgroup{index}",
+            bullet_limit=profile.subgroup_bullet_limit,
+            scope_kind="subgroup",
+            scope_title=str(subgroup["title"]),
+        )
+        subgroup_reports.append(
+            {
+                "title": subgroup["title"],
+                "theme_rationale": subgroup["theme_rationale"],
+                "article_count": len(subgroup["articles"]),
+                "key_developments": _normalize_string_list(subgroup_payload.get("key_developments"), limit=profile.subgroup_bullet_limit),
+                "named_entities": _normalize_entities(subgroup_payload.get("named_entities"))[: profile.entity_limit],
+                "articles": subgroup["articles"],
+                "model_used": subgroup_model,
+            }
+        )
+        subgroup_summary_items.append(
+            {
+                "kind": "summary",
+                "label": subgroup["title"],
+                "article_count": len(subgroup["articles"]),
+                "theme_rationale": subgroup["theme_rationale"],
+                "key_developments": _normalize_string_list(subgroup_payload.get("key_developments"), limit=profile.subgroup_bullet_limit),
+                "named_entities": _normalize_entities(subgroup_payload.get("named_entities"))[: profile.entity_limit],
+            }
+        )
+        total_batches += subgroup_batches
+        model_used = subgroup_model
+
+    if len(subgroup_summary_items) == 1:
+        only_group = subgroup_reports[0]
+        return {
+            "key_developments": only_group["key_developments"],
+            "named_entities": only_group["named_entities"],
+        }, model_used, total_batches, subgroup_reports
+
+    category_payload, category_model, category_batches = _synthesize_summary_items(
+        runtime,
+        category_name,
+        subgroup_summary_items,
+        batch_label_prefix="summary",
+        bullet_limit=profile.category_bullet_limit,
+        scope_kind="category",
+        scope_title=category_name,
+    )
+    return category_payload, category_model, total_batches + category_batches, subgroup_reports
+
+
+def _assign_article_subgroups(
+    runtime: AnalysisRuntime,
+    category_name: str,
+    successful_articles: list[dict[str, Any]],
+    *,
+    batch_label: str = "groups",
+    model_override: ModelConfig | None = None,
+    depth: int = 0,
+) -> list[dict[str, Any]]:
+    profile = _section_profile(category_name)
+    items = [_article_to_grouping_item(article) for article in successful_articles]
+    messages = _build_grouping_messages(category_name, items)
+    active_model = model_override or runtime.current_model
+    estimated_input_tokens = _estimate_messages_tokens(messages)
+    serialized_bytes = _estimate_request_payload_bytes(active_model.model_id, messages, active_model.max_completion_tokens)
+    budget_state = runtime.get_category_budget(category_name)
+    grouping_input_budget = max(budget_state.synthesis_input_budget_tokens, 2000)
+    grouping_request_byte_budget = max(budget_state.synthesis_request_byte_budget, 7000)
+
+    if (
+        len(successful_articles) > 1
+        and (
+            estimated_input_tokens > grouping_input_budget
+            or serialized_bytes > grouping_request_byte_budget
+        )
+    ):
+        runtime.record_split(category_name, "pre_send_budget")
+        left, right = _split_batch(successful_articles)
+        return _assign_article_subgroups(runtime, category_name, left, batch_label=f"{batch_label}a", model_override=model_override, depth=depth) + _assign_article_subgroups(
+            runtime, category_name, right, batch_label=f"{batch_label}b", model_override=model_override, depth=depth
+        )
+
+    context = BatchContext(
+        category_name=category_name,
+        batch_kind="synthesis_grouping",
+        batch_label=batch_label,
+        article_count=len(successful_articles),
+        estimated_input_tokens=estimated_input_tokens,
+        serialized_request_bytes=serialized_bytes,
+        content_shrunk=False,
+    )
+
+    try:
+        payload, _ = _invoke_json_with_retry(
+            runtime,
+            messages,
+            estimated_input_tokens,
+            context,
+            model_override=model_override,
+        )
+        normalized, missing_articles = _normalize_grouping_payload(payload, successful_articles, category_name)
+        if not missing_articles:
+            return normalized
+        runtime.tighten_category_budget(category_name, "incomplete_model_output", batch_kind="synthesis")
+        if len(missing_articles) == 1:
+            next_model = runtime.next_model_after(active_model.model_id)
+            if next_model is not None:
+                return normalized + _assign_article_subgroups(
+                    runtime,
+                    category_name,
+                    missing_articles,
+                    batch_label=f"{batch_label}m",
+                    model_override=next_model,
+                    depth=depth + 1,
+                )
+            return normalized + _fallback_subgroups(category_name, missing_articles)
+
+        if depth + 1 >= profile.salvage_max_depth:
+            return normalized + _fallback_subgroups(category_name, missing_articles)
+
+        left, right = _split_batch(missing_articles)
+        return normalized + _assign_article_subgroups(
+            runtime,
+            category_name,
+            left,
+            batch_label=f"{batch_label}ma",
+            model_override=model_override,
+            depth=depth + 1,
+        ) + _assign_article_subgroups(
+            runtime,
+            category_name,
+            right,
+            batch_label=f"{batch_label}mb",
+            model_override=model_override,
+            depth=depth + 1,
+        )
+    except Exception as exc:
+        classification = _classify_exception(exc)
+        runtime.tighten_category_budget(category_name, classification, batch_kind="synthesis")
+        if len(successful_articles) > 1 and depth + 1 < profile.salvage_max_depth:
+            if classification == "payload_too_large":
+                runtime.record_split(category_name, "response_413")
+            left, right = _split_batch(successful_articles)
+            return _assign_article_subgroups(
+                runtime,
+                category_name,
+                left,
+                batch_label=f"{batch_label}a",
+                model_override=model_override,
+                depth=depth + 1,
+            ) + _assign_article_subgroups(
+                runtime,
+                category_name,
+                right,
+                batch_label=f"{batch_label}b",
+                model_override=model_override,
+                depth=depth + 1,
+            )
+        return _fallback_subgroups(category_name, successful_articles)
 
 
 def _synthesize_summary_items(
@@ -1562,6 +2302,9 @@ def _synthesize_summary_items(
     synthesis_items: list[dict[str, Any]],
     *,
     batch_label_prefix: str,
+    bullet_limit: int,
+    scope_kind: str,
+    scope_title: str,
     model_override: ModelConfig | None = None,
 ) -> tuple[dict[str, Any], str, int]:
     active_model = model_override or runtime.current_model
@@ -1578,6 +2321,9 @@ def _synthesize_summary_items(
                 category_name,
                 batch,
                 batch_label=batch_label,
+                bullet_limit=bullet_limit,
+                scope_kind=scope_kind,
+                scope_title=scope_title,
                 model_override=model_override,
             )
             partial_summaries.append(_summary_to_synthesis_item(payload, len(batch), batch_label))
@@ -1595,6 +2341,9 @@ def _synthesize_summary_items(
                     category_name,
                     left,
                     batch_label_prefix=f"{batch_label}a",
+                    bullet_limit=bullet_limit,
+                    scope_kind=scope_kind,
+                    scope_title=scope_title,
                     model_override=model_override,
                 )
                 right_payload, right_model, right_count = _synthesize_summary_items(
@@ -1602,6 +2351,9 @@ def _synthesize_summary_items(
                     category_name,
                     right,
                     batch_label_prefix=f"{batch_label}b",
+                    bullet_limit=bullet_limit,
+                    scope_kind=scope_kind,
+                    scope_title=scope_title,
                     model_override=model_override,
                 )
                 partial_summaries.extend(
@@ -1627,6 +2379,9 @@ def _synthesize_summary_items(
         category_name,
         partial_summaries,
         batch_label_prefix=f"{batch_label_prefix}m",
+        bullet_limit=bullet_limit,
+        scope_kind=scope_kind,
+        scope_title=scope_title,
         model_override=model_override,
     )
     return merged_payload, merged_model, total_batch_count + merged_count
@@ -1638,10 +2393,19 @@ def _invoke_synthesis_batch(
     synthesis_items: list[dict[str, Any]],
     *,
     batch_label: str,
+    bullet_limit: int,
+    scope_kind: str,
+    scope_title: str,
     model_override: ModelConfig | None = None,
 ) -> tuple[dict[str, Any], str]:
     active_model = model_override or runtime.current_model
-    messages = _build_synthesis_messages(category_name, synthesis_items)
+    messages = _build_synthesis_messages(
+        category_name,
+        synthesis_items,
+        bullet_limit=bullet_limit,
+        scope_kind=scope_kind,
+        scope_title=scope_title,
+    )
     estimated_input_tokens = _estimate_messages_tokens(messages)
     context = BatchContext(
         category_name=category_name,
@@ -1655,28 +2419,76 @@ def _invoke_synthesis_batch(
     return _invoke_json_with_retry(runtime, messages, estimated_input_tokens, context, model_override=model_override)
 
 
-def _build_synthesis_messages(category_name: str, synthesis_items: list[dict[str, Any]]) -> list[dict[str, Any]]:
+def _build_synthesis_messages(
+    category_name: str,
+    synthesis_items: list[dict[str, Any]],
+    *,
+    bullet_limit: int,
+    scope_kind: str,
+    scope_title: str,
+) -> list[dict[str, Any]]:
     return [
         {
             "role": "system",
             "content": (
                 "You are a financial news analyst. Return one valid JSON object only. "
-                "Summarize the category using only the provided article analyses or prior summary blocks."
+                f"Summarize the {scope_kind} using only the provided article analyses or prior summary blocks."
             ),
         },
         {
             "role": "user",
             "content": json.dumps(
                 {
-                    "task": "Synthesize one fixed news category from already-analyzed article results.",
+                    "task": f"Synthesize one {scope_kind} from already-analyzed article results.",
                     "required_schema": {
-                        "key_developments": ["3 to 5 concise category-level developments"],
+                        "key_developments": [f"2 to {bullet_limit} concise developments"],
                         "named_entities": [
                             {"name": "entity name", "type": "person|company|country|institution|index|organization|asset|other"}
                         ],
                     },
                     "category": category_name,
+                    "scope_title": scope_title,
                     "inputs": synthesis_items,
+                },
+                ensure_ascii=False,
+            ),
+        },
+    ]
+
+
+def _build_grouping_messages(category_name: str, grouping_items: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    profile = _section_profile(category_name)
+    return [
+        {
+            "role": "system",
+            "content": (
+                "You are a financial news analyst. Return one valid JSON object only. "
+                "Assign every article to one thematic subgroup. Do not omit any article."
+            ),
+        },
+        {
+            "role": "user",
+            "content": json.dumps(
+                {
+                    "task": "Create thematic subgroups inside one financial news category from compact article analyses.",
+                    "required_schema": {
+                        "subgroups": [
+                            {
+                                "title": "short subgroup title",
+                                "theme_rationale": "one sentence theme explanation",
+                                "article_keys": ["article key strings"],
+                            }
+                        ]
+                    },
+                    "rules": [
+                        "Every input article must appear in exactly one subgroup.",
+                        "Prefer fewer, coherent groups over many tiny groups.",
+                        f"Target around {profile.subgroup_target_size} article(s) per subgroup when possible.",
+                        "Use the provided theme and attention tier as hints when forming subgroups.",
+                    ],
+                    "category": category_name,
+                    "analysis_profile": profile.name,
+                    "articles": grouping_items,
                 },
                 ensure_ascii=False,
             ),
@@ -1690,16 +2502,22 @@ def _plan_category_batches(
     prepared_articles: list[dict[str, Any]],
 ) -> list[list[dict[str, Any]]]:
     budget_state = runtime.get_category_budget(category_name)
+    profile = _section_profile(category_name)
     planned: list[list[dict[str, Any]]] = []
     current: list[dict[str, Any]] = []
 
     for article in prepared_articles:
+        if current and _batch_attention_tier(current) != _batch_attention_tier([article]):
+            planned.append(current)
+            current = [article]
+            continue
         candidate = current + [article]
+        effective_budget = _effective_batch_budget(profile, budget_state, candidate)
         if current and not _batch_within_budget(
             category_name,
             candidate,
-            input_budget_tokens=budget_state.article_input_budget_tokens,
-            request_byte_budget=budget_state.article_request_byte_budget,
+            input_budget_tokens=effective_budget["input_budget_tokens"],
+            request_byte_budget=effective_budget["request_byte_budget"],
             model_id=runtime.current_model.model_id,
         ):
             runtime.record_split(category_name, "pre_send_budget")
@@ -1717,6 +2535,66 @@ def _plan_category_batches(
     if current:
         planned.append(current)
     return planned or [prepared_articles]
+
+
+def _order_articles_for_analysis(prepared_articles: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    return sorted(
+        prepared_articles,
+        key=lambda article: (
+            ATTENTION_TIER_RANK.get(str(article.get("attention_tier") or "medium"), ATTENTION_TIER_RANK["medium"]),
+            -(int(article.get("must_keep") or False)),
+            article.get("published_at") or "",
+        ),
+    )
+
+
+def _batch_attention_tier(batch_articles: list[dict[str, Any]]) -> str:
+    if not batch_articles:
+        return "medium"
+    return min(
+        (
+            str(article.get("attention_tier") or "medium")
+            for article in batch_articles
+        ),
+        key=lambda tier: ATTENTION_TIER_RANK.get(tier, ATTENTION_TIER_RANK["medium"]),
+    )
+
+
+def _effective_batch_budget(
+    profile: SectionProfile,
+    budget_state: CategoryBudgetState,
+    batch_articles: list[dict[str, Any]],
+) -> dict[str, int]:
+    tier = _batch_attention_tier(batch_articles)
+    input_budget = budget_state.article_input_budget_tokens
+    request_budget = budget_state.article_request_byte_budget
+    salvage_depth = profile.salvage_max_depth
+    if tier == "light":
+        if profile.name != "light":
+            input_budget = min(input_budget, max(MIN_INPUT_BUDGET_TOKENS, int(profile.article_input_budget_tokens * 0.7)))
+            request_budget = min(request_budget, max(MIN_REQUEST_BYTE_BUDGET, int(profile.article_request_byte_budget * 0.7)))
+        salvage_depth = max(2, profile.salvage_max_depth - (0 if profile.name == "light" else 1))
+    elif tier == "high":
+        salvage_depth = profile.salvage_max_depth + 1
+    return {
+        "input_budget_tokens": input_budget,
+        "request_byte_budget": request_budget,
+        "salvage_max_depth": salvage_depth,
+    }
+
+
+def _article_key_points_limit(category_name: str, article: dict[str, Any]) -> int:
+    profile = _section_profile(category_name)
+    if str(article.get("attention_tier") or "medium") == "light":
+        return min(profile.article_key_points_limit, 2)
+    return profile.article_key_points_limit
+
+
+def _article_entity_limit(category_name: str, article: dict[str, Any]) -> int:
+    profile = _section_profile(category_name)
+    if str(article.get("attention_tier") or "medium") == "light":
+        return min(profile.entity_limit, 4)
+    return profile.entity_limit
 
 
 def _plan_synthesis_batches(
@@ -1757,13 +2635,37 @@ def _article_to_synthesis_item(article: dict[str, Any]) -> dict[str, Any]:
         "canonical_url": article["canonical_url"],
         "title": article["title"],
         "published_at": article["published_at"],
+        "attention_tier": article.get("attention_tier"),
+        "theme": article.get("theme"),
+        "must_keep": article.get("must_keep"),
         "scores": {
             "novelty_score": article["novelty_score"],
             "relevance_score": article["relevance_score"],
             "urgency_score": article["urgency_score"],
         },
-        "named_entities": article["named_entities"][:5],
-        "key_points": article["key_points"][:3],
+        "named_entities": article["named_entities"][: _article_entity_limit(str(article.get("section") or ""), article)],
+        "key_points": article["key_points"][: _article_key_points_limit(str(article.get("section") or ""), article)],
+    }
+
+
+def _article_to_grouping_item(article: dict[str, Any]) -> dict[str, Any]:
+    return {
+        "article_key": _article_group_key(article),
+        "source_article_id": article["source_article_id"],
+        "canonical_url": article["canonical_url"],
+        "title": article["title"],
+        "published_at": article["published_at"],
+        "attention_tier": article.get("attention_tier"),
+        "theme": article.get("theme"),
+        "must_keep": article.get("must_keep"),
+        "attention_reason": article.get("attention_reason"),
+        "scores": {
+            "novelty_score": article["novelty_score"],
+            "relevance_score": article["relevance_score"],
+            "urgency_score": article["urgency_score"],
+        },
+        "named_entities": article["named_entities"][:4],
+        "key_points": article["key_points"][:2],
     }
 
 
@@ -1775,6 +2677,60 @@ def _summary_to_synthesis_item(payload: dict[str, Any], article_count: int, labe
         "key_developments": _normalize_string_list(payload.get("key_developments"), limit=5),
         "named_entities": _normalize_entities(payload.get("named_entities"))[:6],
     }
+
+
+def _normalize_grouping_payload(
+    payload: dict[str, Any],
+    successful_articles: list[dict[str, Any]],
+    category_name: str,
+) -> tuple[list[dict[str, Any]], list[dict[str, Any]]]:
+    article_lookup = {_article_group_key(article): article for article in successful_articles}
+    assigned_keys: set[str] = set()
+    normalized: list[dict[str, Any]] = []
+    for index, subgroup in enumerate(payload.get("subgroups") or [], start=1):
+        if not isinstance(subgroup, dict):
+            continue
+        subgroup_keys = []
+        subgroup_articles = []
+        for raw_key in subgroup.get("article_keys") or []:
+            key = str(raw_key or "").strip()
+            if not key or key in assigned_keys:
+                continue
+            article = article_lookup.get(key)
+            if article is None:
+                continue
+            assigned_keys.add(key)
+            subgroup_keys.append(key)
+            subgroup_articles.append(article)
+        if not subgroup_articles:
+            continue
+        normalized.append(
+            {
+                "title": str(subgroup.get("title") or f"{category_name} subgroup {index}").strip(),
+                "theme_rationale": str(subgroup.get("theme_rationale") or "Grouped by related theme.").strip(),
+                "articles": subgroup_articles,
+            }
+        )
+    missing_articles = [article for key, article in article_lookup.items() if key not in assigned_keys]
+    return normalized, missing_articles
+
+
+def _fallback_subgroups(category_name: str, successful_articles: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    profile = _section_profile(category_name)
+    if not successful_articles:
+        return []
+    subgroups: list[dict[str, Any]] = []
+    chunk_size = max(1, profile.subgroup_target_size)
+    for index in range(0, len(successful_articles), chunk_size):
+        chunk = successful_articles[index : index + chunk_size]
+        subgroups.append(
+            {
+                "title": f"{category_name} subgroup {len(subgroups) + 1}",
+                "theme_rationale": "Fallback subgroup created from nearby articles after subgroup assignment needed to be localized.",
+                "articles": chunk,
+            }
+        )
+    return subgroups
 
 
 def _shrink_batch_to_budget(
@@ -1813,13 +2769,29 @@ def _estimate_batch_request_bytes(category_name: str, batch_articles: list[dict[
 
 
 def _estimate_synthesis_request_tokens(category_name: str, synthesis_items: list[dict[str, Any]]) -> int:
-    return _estimate_messages_tokens(_build_synthesis_messages(category_name, synthesis_items))
+    profile = _section_profile(category_name)
+    return _estimate_messages_tokens(
+        _build_synthesis_messages(
+            category_name,
+            synthesis_items,
+            bullet_limit=profile.category_bullet_limit,
+            scope_kind="category",
+            scope_title=category_name,
+        )
+    )
 
 
 def _estimate_synthesis_request_bytes(category_name: str, synthesis_items: list[dict[str, Any]], model_id: str) -> int:
+    profile = _section_profile(category_name)
     return _estimate_request_payload_bytes(
         model_id,
-        _build_synthesis_messages(category_name, synthesis_items),
+        _build_synthesis_messages(
+            category_name,
+            synthesis_items,
+            bullet_limit=profile.category_bullet_limit,
+            scope_kind="category",
+            scope_title=category_name,
+        ),
         DEFAULT_OUTPUT_TOKENS,
     )
 
@@ -1898,6 +2870,8 @@ def _merge_batch_article_results(
     payload: dict[str, Any],
     model_used: str,
 ) -> tuple[list[dict[str, Any]], list[dict[str, Any]]]:
+    category_name = batch_articles[0].get("section") if batch_articles else ""
+    profile = _section_profile(str(category_name or ""))
     response_articles = payload.get("articles")
     response_items = response_articles if isinstance(response_articles, list) else []
     response_by_key: dict[tuple[str | None, str], dict[str, Any]] = {}
@@ -1924,8 +2898,8 @@ def _merge_batch_article_results(
                 "novelty_score": _coerce_score(match.get("novelty_score")),
                 "relevance_score": _coerce_score(match.get("relevance_score")),
                 "urgency_score": _coerce_score(match.get("urgency_score")),
-                "named_entities": _normalize_entities(match.get("named_entities")),
-                "key_points": _normalize_string_list(match.get("key_points"), limit=5),
+                "named_entities": _normalize_entities(match.get("named_entities"))[: _article_entity_limit(str(category_name or ""), article)],
+                "key_points": _normalize_string_list(match.get("key_points"), limit=_article_key_points_limit(str(category_name or ""), article)),
                 "content_truncated": article.get("content_truncated"),
                 "original_content_length_chars": article.get("original_content_length_chars"),
                 "analyzed_content_length_chars": article.get("analyzed_content_length_chars"),
@@ -1933,6 +2907,10 @@ def _merge_batch_article_results(
                 "analyzed_content_token_estimate": article.get("analyzed_content_token_estimate"),
                 "truncation_reason": article.get("truncation_reason"),
                 "analysis_method": article.get("analysis_method"),
+                "attention_tier": article.get("attention_tier"),
+                "theme": article.get("theme"),
+                "attention_reason": article.get("attention_reason"),
+                "must_keep": article.get("must_keep"),
                 "model_used": model_used,
                 "error_classification": None,
                 "error": None,
@@ -1984,6 +2962,10 @@ def _build_failed_article_result(
         "analyzed_content_token_estimate": article.get("analyzed_content_token_estimate"),
         "truncation_reason": article.get("truncation_reason"),
         "analysis_method": article.get("analysis_method"),
+        "attention_tier": article.get("attention_tier"),
+        "theme": article.get("theme"),
+        "attention_reason": article.get("attention_reason"),
+        "must_keep": article.get("must_keep"),
         "model_used": model_used,
         "error_classification": error_classification,
         "error": error_message,
@@ -2101,6 +3083,10 @@ def _clone_prepared_article(article: dict[str, Any]) -> dict[str, Any]:
         "original_content_token_estimate": article.get("original_content_token_estimate"),
         "analyzed_content_token_estimate": article.get("analyzed_content_token_estimate"),
         "truncation_reason": article.get("truncation_reason"),
+        "attention_tier": article.get("attention_tier"),
+        "theme": article.get("theme"),
+        "attention_reason": article.get("attention_reason"),
+        "must_keep": article.get("must_keep"),
     }
 
 
@@ -2302,3 +3288,14 @@ def _article_key(source_article_id: Any, canonical_url: Any) -> tuple[str | None
     normalized_id = str(source_article_id) if source_article_id not in {None, ""} else None
     normalized_url = str(canonical_url or "")
     return normalized_id, normalized_url
+
+
+def _article_group_key(article: dict[str, Any]) -> str:
+    source_article_id = str(article.get("source_article_id") or "").strip()
+    if source_article_id:
+        return source_article_id
+    return str(article.get("canonical_url") or "").strip()
+
+
+def _section_profile(category_name: str) -> SectionProfile:
+    return LIGHT_SECTION_PROFILE if category_name in LIGHT_ANALYSIS_SECTIONS else STANDARD_SECTION_PROFILE

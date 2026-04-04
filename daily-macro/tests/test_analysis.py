@@ -144,6 +144,60 @@ class AnalysisTests(unittest.TestCase):
         self.assertLess(selected["analyzed_content_length_chars"], selected["original_content_length_chars"])
         self.assertIsNotNone(selected["truncation_reason"])
 
+    def test_heuristic_attention_router_marks_obvious_macro_story_high(self) -> None:
+        routed = analysis_module._heuristic_attention_metadata(
+            {
+                "title": "聯儲局官員稱利率與通脹前景仍不明朗",
+                "summary_snippet": "市場關注聯儲局利率路徑與通脹走勢",
+                "article_section": "國際財經",
+            }
+        )
+
+        self.assertEqual(routed["attention_tier"], "high")
+        self.assertEqual(routed["theme"], "macro")
+        self.assertTrue(routed["must_keep"])
+
+    def test_merge_attention_results_defaults_missing_items_for_salvage(self) -> None:
+        batch = [
+            {
+                "source_article_id": "1001",
+                "canonical_url": "https://example.com/1001",
+                "title": "銀行回購股份",
+                "summary_snippet": "股份回購與資本配置更新",
+                "article_section": "香港財經",
+                "published_at": "2026-04-04T08:00:00+08:00",
+            },
+            {
+                "source_article_id": "1002",
+                "canonical_url": "https://example.com/1002",
+                "title": "一般本地消息",
+                "summary_snippet": "社區活動摘要",
+                "article_section": "時事脈搏",
+                "published_at": "2026-04-04T08:10:00+08:00",
+            },
+        ]
+
+        merged, missing = analysis_module._merge_attention_results(
+            batch,
+            {
+                "routes": [
+                    {
+                        "source_article_id": "1001",
+                        "canonical_url": "https://example.com/1001",
+                        "attention_tier": "high",
+                        "theme": "stocks",
+                        "reason": "Share buyback headline.",
+                        "must_keep": True,
+                    }
+                ]
+            },
+        )
+
+        self.assertEqual(len(merged), 1)
+        self.assertEqual(merged[0]["attention_tier"], "high")
+        self.assertEqual(len(missing), 1)
+        self.assertEqual(missing[0]["source_article_id"], "1002")
+
     def test_rate_limit_governor_waits_for_reset(self) -> None:
         slept: list[float] = []
         governor = RateLimitGovernor(time_fn=lambda: 10.0, sleep_fn=lambda seconds: slept.append(seconds))
@@ -228,6 +282,9 @@ class AnalysisTests(unittest.TestCase):
         self.assertEqual(report["incremental"]["reused_successful_articles"], 1)
         self.assertEqual(report["incremental"]["new_articles_analyzed"], 0)
         self.assertEqual(report["totals"]["article_count"], 1)
+        reused = report["categories"][0]["articles"][0]
+        self.assertIn(reused["attention_tier"], {"medium", "light", "high"})
+        self.assertIn("theme", reused)
 
     def test_run_analysis_retries_previous_day_failed_articles_when_today_is_empty(self) -> None:
         self._insert_article(
@@ -1483,6 +1540,89 @@ class AnalysisTests(unittest.TestCase):
         self.assertEqual(len(report["model_switches"]), 2)
         self.assertEqual(report["model_switches"][0]["to_model"], "qwen/qwen3-32b")
         self.assertEqual(report["model_switches"][1]["to_model"], "llama-3.1-8b-instant")
+
+    def test_run_analysis_creates_subgroups_for_large_light_section(self) -> None:
+        for index in range(7):
+            self._insert_article(
+                title=f"Pulse {index}",
+                source_article_id=f"700{index}",
+                section="時事脈搏",
+                published_at=f"2026-04-03T0{index}:00:00+08:00",
+                content_text="pulse content " * 40,
+            )
+
+        article_results = [
+            {
+                "source_article_id": f"700{index}",
+                "canonical_url": f"https://example.com/700{index}",
+                "novelty_score": 5 + (index % 3),
+                "relevance_score": 6,
+                "urgency_score": 5,
+                "named_entities": [{"name": f"Entity {index}", "type": "company"}],
+                "key_points": [f"Point {index}a", f"Point {index}b", f"Point {index}c"],
+            }
+            for index in range(7)
+        ]
+
+        session = _FakeGroqSession(
+            [
+                _FakeResponse(
+                    200,
+                    payload={"choices": [{"message": {"content": json.dumps({"articles": article_results}, ensure_ascii=False)}}]},
+                ),
+                _FakeResponse(
+                    200,
+                    payload={
+                        "choices": [
+                            {
+                                "message": {
+                                    "content": json.dumps(
+                                        {
+                                            "subgroups": [
+                                                {
+                                                    "title": "Regional policy pulse",
+                                                    "theme_rationale": "These headlines cluster around policy-sensitive regional developments.",
+                                                    "article_keys": ["7000", "7001", "7002", "7003"],
+                                                },
+                                                {
+                                                    "title": "Corporate reaction",
+                                                    "theme_rationale": "These headlines center on company-facing market reactions.",
+                                                    "article_keys": ["7004", "7005", "7006"],
+                                                },
+                                            ]
+                                        },
+                                        ensure_ascii=False,
+                                    )
+                                }
+                            }
+                        ]
+                    },
+                ),
+                _FakeResponse(
+                    200,
+                    payload={"choices": [{"message": {"content": json.dumps({"key_developments": ["Regional subgroup"], "named_entities": [{"name": "Entity 0", "type": "company"}]}, ensure_ascii=False)}}]},
+                ),
+                _FakeResponse(
+                    200,
+                    payload={"choices": [{"message": {"content": json.dumps({"key_developments": ["Corporate subgroup"], "named_entities": [{"name": "Entity 4", "type": "company"}]}, ensure_ascii=False)}}]},
+                ),
+                _FakeResponse(
+                    200,
+                    payload={"choices": [{"message": {"content": json.dumps({"key_developments": ["Pulse section overview"], "named_entities": [{"name": "Entity 0", "type": "company"}]}, ensure_ascii=False)}}]},
+                ),
+            ]
+        )
+
+        with patch("daily_macro.analysis.load_groq_api_key", return_value="test-key"), patch(
+            "daily_macro.analysis._build_groq_session", return_value=session
+        ):
+            report = run_analysis(date_string="2026-04-03", data_dir=self.data_dir, db_path=self.db_path)
+
+        category = report["categories"][0]
+        self.assertEqual(category["analysis_profile"], "light")
+        self.assertEqual(len(category["subgroups"]), 2)
+        self.assertEqual(category["subgroups"][0]["title"], "Regional policy pulse")
+        self.assertLessEqual(len(category["articles"][0]["key_points"]), 2)
 
 
 if __name__ == "__main__":

@@ -80,12 +80,55 @@ def _success_report() -> dict[str, object]:
                 "article_count": 2,
                 "key_developments": ["International development"],
                 "named_entities": [{"name": "伊朗", "type": "country"}],
+                "subgroups": [
+                    {
+                        "title": "Macro risk",
+                        "theme_rationale": "These stories grouped around international macro risk.",
+                        "article_count": 2,
+                        "key_developments": ["International subgroup development"],
+                        "named_entities": [{"name": "伊朗", "type": "country"}],
+                        "articles": [
+                            {
+                                "title": "Iran market headline",
+                                "canonical_url": "https://example.com/iran",
+                                "published_at": "2026-04-04T07:00:00+00:00",
+                                "attention_tier": "high",
+                                "error": None,
+                            },
+                            {
+                                "title": "Bank contingency update",
+                                "canonical_url": "https://example.com/bank",
+                                "published_at": "2026-04-04T07:05:00+00:00",
+                                "attention_tier": "medium",
+                                "error": None,
+                            },
+                        ],
+                    }
+                ],
             },
             {
                 "category": "時事脈搏",
                 "article_count": 1,
                 "key_developments": ["Pulse development"],
                 "named_entities": [{"name": "Oracle", "type": "company"}],
+                "subgroups": [
+                    {
+                        "title": "Corporate pulse",
+                        "theme_rationale": "Fast company headlines.",
+                        "article_count": 1,
+                        "key_developments": ["Pulse subgroup development"],
+                        "named_entities": [{"name": "Oracle", "type": "company"}],
+                        "articles": [
+                            {
+                                "title": "Oracle pulse headline",
+                                "canonical_url": "https://example.com/oracle",
+                                "published_at": "2026-04-04T07:10:00+00:00",
+                                "attention_tier": "light",
+                                "error": None,
+                            }
+                        ],
+                    }
+                ],
             },
         ],
         "output_path": "/tmp/hkej-news-analysis.json",
@@ -137,6 +180,9 @@ class NotifierTests(unittest.TestCase):
         self.assertIn("International development", rendered_text)
         self.assertIn("Pulse development", rendered_text)
         self.assertIn("Model switch", rendered_text)
+        self.assertIn("https://example.com/iran", rendered_text)
+        self.assertIn("Oracle pulse headline", rendered_text)
+        self.assertIn("[HIGH]", rendered_text)
 
     def test_send_analysis_summary_email_sends_partial_with_warning(self) -> None:
         report = _success_report()

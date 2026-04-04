@@ -114,6 +114,31 @@ def send_test_email() -> tuple[bool, str]:
                         {"name": "伊朗", "type": "country"},
                         {"name": "Amazon", "type": "company"},
                     ],
+                    "subgroups": [
+                        {
+                            "title": "Geopolitical risk",
+                            "theme_rationale": "Articles clustered around conflict-sensitive international macro developments.",
+                            "article_count": 2,
+                            "key_developments": [
+                                "Markets repriced geopolitical risk around Iran-linked developments."
+                            ],
+                            "named_entities": [{"name": "伊朗", "type": "country"}],
+                            "articles": [
+                                {
+                                    "title": "Global risk headline",
+                                    "canonical_url": "https://example.com/global-risk",
+                                    "published_at": "2026-04-04T07:00:00+00:00",
+                                    "error": None,
+                                },
+                                {
+                                    "title": "Amazon contingency note",
+                                    "canonical_url": "https://example.com/amazon",
+                                    "published_at": "2026-04-04T07:10:00+00:00",
+                                    "error": "Model response omitted this article from the category batch.",
+                                },
+                            ],
+                        }
+                    ],
                     "diagnostics": {
                         "sub_batch_count": 1,
                         "split_reasons": [],
@@ -133,6 +158,25 @@ def send_test_email() -> tuple[bool, str]:
                     ],
                     "named_entities": [
                         {"name": "Oracle", "type": "company"},
+                    ],
+                    "subgroups": [
+                        {
+                            "title": "Corporate pulse",
+                            "theme_rationale": "Fast-moving company headlines dominated this lighter section.",
+                            "article_count": 2,
+                            "key_developments": [
+                                "The day’s pulse coverage centered on fast-moving company-sensitive updates."
+                            ],
+                            "named_entities": [{"name": "Oracle", "type": "company"}],
+                            "articles": [
+                                {
+                                    "title": "Oracle pulse headline",
+                                    "canonical_url": "https://example.com/oracle",
+                                    "published_at": "2026-04-04T07:15:00+00:00",
+                                    "error": None,
+                                }
+                            ],
+                        }
                     ],
                     "diagnostics": {
                         "sub_batch_count": 2,
@@ -160,7 +204,6 @@ def _build_subject(summary: dict[str, Any]) -> str:
 
 
 def _build_plain_body(summary: dict[str, Any]) -> str:
-    diagnostics = summary.get("diagnostics") or {}
     lines = [
         "DAILY MACRO ANALYST",
         "",
@@ -187,6 +230,10 @@ def _build_plain_body(summary: dict[str, Any]) -> str:
         entities = category.get("named_entities") or []
         if entities:
             lines.append("Named entities: " + ", ".join(entity["name"] for entity in entities[:8] if entity.get("name")))
+        subgroup_lines = _build_plain_subgroup_lines(category)
+        if subgroup_lines:
+            lines.append("")
+            lines.extend(subgroup_lines)
         lines.append("")
 
     return "\n".join(lines).strip() + "\n"
@@ -204,6 +251,7 @@ def _build_html_body(summary: dict[str, Any]) -> str:
         if entities:
             labels = ", ".join(_escape_html(str(entity.get("name") or "")) for entity in entities[:8] if entity.get("name"))
             entities_html = f"<p style='margin:10px 0 0;color:#4b5563;'><strong>Named entities:</strong> {labels}</p>"
+        subgroup_html = _build_html_subgroups(category)
         category_blocks.append(
             f"""
             <div style="margin:0 0 18px;padding:16px;border:1px solid #e5e7eb;border-radius:12px;background:#ffffff;">
@@ -213,6 +261,7 @@ def _build_html_body(summary: dict[str, Any]) -> str:
               </div>
               <ul style="margin:0;padding-left:18px;color:#374151;line-height:1.6;">{items}</ul>
               {entities_html}
+              {subgroup_html}
             </div>
             """
         )
@@ -250,6 +299,120 @@ def _build_html_body(summary: dict[str, Any]) -> str:
       </body>
     </html>
     """
+
+
+def _build_plain_subgroup_lines(category: dict[str, Any]) -> list[str]:
+    subgroups = list(category.get("subgroups") or [])
+    if not subgroups:
+        return _build_plain_article_lines(category.get("articles") or [])
+
+    lines: list[str] = []
+    for subgroup in subgroups:
+        lines.append(f"Subgroup: {subgroup.get('title') or 'Overview'}")
+        rationale = str(subgroup.get("theme_rationale") or "").strip()
+        if rationale:
+            lines.append(f"  Theme: {rationale}")
+        for item in (subgroup.get("key_developments") or [])[:4]:
+            lines.append(f"  - {item}")
+        entities = subgroup.get("named_entities") or []
+        if entities:
+            labels = ", ".join(entity["name"] for entity in entities[:6] if entity.get("name"))
+            if labels:
+                lines.append(f"  Named entities: {labels}")
+        lines.extend(f"  - {line}" for line in _build_plain_article_lines(subgroup.get("articles") or []))
+    return lines
+
+
+def _build_plain_article_lines(articles: list[dict[str, Any]]) -> list[str]:
+    lines: list[str] = []
+    for article in articles:
+        title = str(article.get("title") or "Untitled")
+        url = str(article.get("canonical_url") or "").strip()
+        unresolved = " [UNRESOLVED]" if article.get("error") else ""
+        attention = _attention_badge(article)
+        if url:
+            lines.append(f"{attention}{title}{unresolved}: {url}")
+        else:
+            lines.append(f"{attention}{title}{unresolved}")
+    return lines
+
+
+def _build_html_subgroups(category: dict[str, Any]) -> str:
+    subgroups = list(category.get("subgroups") or [])
+    if not subgroups:
+        articles_html = _build_html_articles(category.get("articles") or [])
+        return f"<div style='margin-top:14px;'>{articles_html}</div>" if articles_html else ""
+
+    blocks = []
+    for subgroup in subgroups:
+        bullets = "".join(
+            f"<li>{_escape_html(str(item))}</li>"
+            for item in (subgroup.get("key_developments") or [])[:4]
+        )
+        rationale = str(subgroup.get("theme_rationale") or "").strip()
+        rationale_html = (
+            f"<p style='margin:6px 0 8px;color:#6b7280;'><strong>Theme:</strong> {_escape_html(rationale)}</p>"
+            if rationale
+            else ""
+        )
+        entities = subgroup.get("named_entities") or []
+        entity_labels = ", ".join(_escape_html(str(entity.get("name") or "")) for entity in entities[:6] if entity.get("name"))
+        entities_html = (
+            f"<p style='margin:8px 0 0;color:#4b5563;'><strong>Named entities:</strong> {entity_labels}</p>"
+            if entity_labels
+            else ""
+        )
+        article_links = _build_html_articles(subgroup.get("articles") or [])
+        blocks.append(
+            f"""
+            <div style="margin-top:16px;padding-top:14px;border-top:1px solid #f3f4f6;">
+              <div style="font-size:15px;font-weight:700;color:#111827;">{_escape_html(str(subgroup.get("title") or "Overview"))}</div>
+              {rationale_html}
+              <ul style="margin:0;padding-left:18px;color:#374151;line-height:1.6;">{bullets}</ul>
+              {entities_html}
+              {article_links}
+            </div>
+            """
+        )
+    return "".join(blocks)
+
+
+def _build_html_articles(articles: list[dict[str, Any]]) -> str:
+    if not articles:
+        return ""
+    items = []
+    for article in articles:
+        title = _escape_html(str(article.get("title") or "Untitled"))
+        url = str(article.get("canonical_url") or "").strip()
+        unresolved = " <strong style='color:#b91c1c;'>[UNRESOLVED]</strong>" if article.get("error") else ""
+        attention = _attention_badge_html(article)
+        if url:
+            items.append(f"<li>{attention}<a href=\"{_escape_html(url)}\" style=\"color:#2563eb;text-decoration:none;\">{title}</a>{unresolved}</li>")
+        else:
+            items.append(f"<li>{attention}{title}{unresolved}</li>")
+    return "<div style='margin-top:10px;'><div style='font-weight:600;color:#111827;margin-bottom:6px;'>Articles</div><ul style='margin:0;padding-left:18px;line-height:1.7;'>" + "".join(items) + "</ul></div>"
+
+
+def _attention_badge(article: dict[str, Any]) -> str:
+    tier = str(article.get("attention_tier") or "").strip().lower()
+    if tier == "high":
+        return "[HIGH] "
+    if tier == "light":
+        return "[LIGHT] "
+    if tier == "medium":
+        return "[MEDIUM] "
+    return ""
+
+
+def _attention_badge_html(article: dict[str, Any]) -> str:
+    tier = str(article.get("attention_tier") or "").strip().lower()
+    if tier == "high":
+        return "<span style='display:inline-block;margin-right:6px;padding:1px 6px;border-radius:999px;background:#fee2e2;color:#991b1b;font-size:11px;font-weight:700;'>HIGH</span>"
+    if tier == "light":
+        return "<span style='display:inline-block;margin-right:6px;padding:1px 6px;border-radius:999px;background:#e5e7eb;color:#374151;font-size:11px;font-weight:700;'>LIGHT</span>"
+    if tier == "medium":
+        return "<span style='display:inline-block;margin-right:6px;padding:1px 6px;border-radius:999px;background:#dbeafe;color:#1d4ed8;font-size:11px;font-weight:700;'>MEDIUM</span>"
+    return ""
 
 
 def _build_run_notes(summary: dict[str, Any]) -> list[str]:

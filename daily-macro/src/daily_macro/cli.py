@@ -38,6 +38,17 @@ def build_parser() -> argparse.ArgumentParser:
     analyze_parser.add_argument("--data-dir", default=None, help="Override the data directory.")
     analyze_parser.add_argument("--db-path", default=None, help="Override the SQLite database path.")
 
+    local_test_parser = subparsers.add_parser(
+        "local-test",
+        help="Run a local scrape -> analyze -> Gmail test against live news.",
+    )
+    local_test_parser.add_argument("--date", default=None, help="Override the analysis date in YYYY-MM-DD format.")
+    local_test_parser.add_argument("--json", action="store_true", help="Print the end-to-end result as JSON.")
+    local_test_parser.add_argument("--verbose", action="store_true", help="Enable detailed analysis diagnostics logging.")
+    local_test_parser.add_argument("--skip-email", action="store_true", help="Run scrape and analysis only, without Gmail.")
+    local_test_parser.add_argument("--data-dir", default=None, help="Override the data directory.")
+    local_test_parser.add_argument("--db-path", default=None, help="Override the SQLite database path.")
+
     notify_parser = subparsers.add_parser("notify", help="Send a Gmail summary for a prior analysis result.")
     notify_parser.add_argument("--result-path", required=True, help="Path to the JSON analysis result.")
 
@@ -83,7 +94,7 @@ def main(argv: list[str] | None = None) -> int:
     parser = build_parser()
     args = parser.parse_args(argv)
 
-    if args.command == "analyze" and args.verbose:
+    if args.command in {"analyze", "local-test"} and args.verbose:
         logging.getLogger("daily_macro.analysis").setLevel(logging.DEBUG)
 
     if args.command == "scrape":
@@ -123,6 +134,19 @@ def main(argv: list[str] | None = None) -> int:
         else:
             _print_analysis_result(result)
         return 0 if result["status"] != "failed" else 1
+
+    if args.command == "local-test":
+        result = run_local_test(
+            date_string=args.date,
+            data_dir=args.data_dir,
+            db_path=args.db_path,
+            send_email=not args.skip_email,
+        )
+        if args.json:
+            print(json.dumps(result, ensure_ascii=False, indent=2))
+        else:
+            _print_local_test_result(result)
+        return 0 if result["analysis"]["status"] != "failed" else 1
 
     if args.command == "notify":
         sent, message = send_analysis_summary_email(load_analysis_result(args.result_path))
@@ -214,6 +238,45 @@ def run_query_command(args: argparse.Namespace) -> dict[str, object]:
         raise SystemExit(f"Unknown query command: {args.query_command}")
     finally:
         storage.close()
+
+
+def run_local_test(
+    *,
+    date_string: str | None = None,
+    data_dir: str | None = None,
+    db_path: str | None = None,
+    send_email: bool = True,
+) -> dict[str, object]:
+    scrape_result = run_scrape(data_dir=data_dir, db_path=db_path)
+    analysis_result = run_analysis(
+        date_string=date_string,
+        data_dir=data_dir,
+        db_path=db_path,
+        force=True,
+    )
+    notify_result: dict[str, object]
+    if send_email:
+        sent, message = send_analysis_summary_email(analysis_result)
+        notify_result = {"attempted": True, "sent": sent, "message": message}
+    else:
+        notify_result = {
+            "attempted": False,
+            "sent": False,
+            "message": "Skipped Gmail because --skip-email was provided.",
+        }
+
+    return {
+        "scrape": scrape_result,
+        "analysis": {
+            "report_date": analysis_result.get("report_date"),
+            "status": analysis_result.get("status"),
+            "output_path": analysis_result.get("output_path"),
+            "article_count": (analysis_result.get("totals") or {}).get("article_count"),
+            "category_count": (analysis_result.get("input") or {}).get("category_count"),
+            "cached": analysis_result.get("cached", False),
+        },
+        "notify": notify_result,
+    }
 
 
 def _print_inspect_result(result: dict[str, object]) -> None:
@@ -309,3 +372,20 @@ def _print_analysis_result(result: dict[str, object]) -> None:
     if result.get("cached"):
         print("Used cached report: yes")
     print(f"Output: {result['output_path']}")
+
+
+def _print_local_test_result(result: dict[str, object]) -> None:
+    scrape = result["scrape"]
+    analysis = result["analysis"]
+    notify = result["notify"]
+    print("Local test completed")
+    print(f"Scrape status: {scrape['status']}")
+    print(f"Scraped articles: {scrape['article_count']}")
+    print(f"Analysis date: {analysis['report_date']}")
+    print(f"Analysis status: {analysis['status']}")
+    print(f"Analyzed articles: {analysis['article_count']}")
+    print(f"Categories: {analysis['category_count']}")
+    print(f"Report output: {analysis['output_path']}")
+    print(f"Gmail attempted: {'yes' if notify['attempted'] else 'no'}")
+    print(f"Gmail sent: {'yes' if notify['sent'] else 'no'}")
+    print(f"Gmail result: {notify['message']}")
