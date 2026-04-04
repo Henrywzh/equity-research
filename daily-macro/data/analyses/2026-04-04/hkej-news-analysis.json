@@ -1,7 +1,7 @@
 {
   "report_schema_version": 4,
   "report_date": "2026-04-04",
-  "generated_at": "2026-04-04T18:23:12.290664+00:00",
+  "generated_at": "2026-04-04T21:00:05.643732+00:00",
   "source_site": "hkej",
   "status": "success",
   "model": {
@@ -21,15 +21,15 @@
     "rate_limit_wait_count": 0,
     "rate_limit_wait_seconds_total": 0.0,
     "fallback_switch_count": 0,
-    "pre_send_split_count": 4,
+    "pre_send_split_count": 0,
     "response_413_split_count": 0,
     "json_repair_retry_count": 0,
-    "batch_count": 21,
+    "batch_count": 0,
     "failed_batch_count": 0
   },
   "incremental": {
-    "reused_successful_articles": 34,
-    "new_articles_analyzed": 4,
+    "reused_successful_articles": 38,
+    "new_articles_analyzed": 0,
     "retried_previous_day_articles": 0,
     "previous_day_retry_successes": 0
   },
@@ -131,9 +131,15 @@
           "analysis_method": "full_text",
           "model_used": "qwen/qwen3-32b",
           "error_classification": null,
-          "error": null
+          "error": null,
+          "attention_tier": "medium",
+          "theme": "general",
+          "attention_reason": "Default medium attention because the story is relevant but not an obvious top-priority market mover.",
+          "must_keep": false
         }
       ],
+      "subgroups": [],
+      "analysis_profile": "standard",
       "model_used": "qwen/qwen3-32b",
       "sub_batch_count": 1,
       "diagnostics": {
@@ -218,7 +224,11 @@
           "analysis_method": "full_text",
           "model_used": "qwen/qwen3-32b",
           "error_classification": null,
-          "error": null
+          "error": null,
+          "attention_tier": "high",
+          "theme": "macro",
+          "attention_reason": "High-signal macro headline based on title/summary keywords.",
+          "must_keep": true
         },
         {
           "source_article_id": "4365270",
@@ -265,7 +275,11 @@
           "analysis_method": "full_text",
           "model_used": "qwen/qwen3-32b",
           "error_classification": null,
-          "error": null
+          "error": null,
+          "attention_tier": "high",
+          "theme": "macro",
+          "attention_reason": "High-signal macro headline based on title/summary keywords.",
+          "must_keep": true
         },
         {
           "source_article_id": "4365263",
@@ -313,7 +327,11 @@
           "analysis_method": "full_text",
           "model_used": "qwen/qwen3-32b",
           "error_classification": null,
-          "error": null
+          "error": null,
+          "attention_tier": "high",
+          "theme": "geopolitics",
+          "attention_reason": "High-signal geopolitics headline based on title/summary keywords.",
+          "must_keep": true
         },
         {
           "source_article_id": "4365259",
@@ -368,7 +386,11 @@
           "analysis_method": "full_text",
           "model_used": "llama-3.1-8b-instant",
           "error_classification": null,
-          "error": null
+          "error": null,
+          "attention_tier": "medium",
+          "theme": "general",
+          "attention_reason": "Default medium attention because the story is relevant but not an obvious top-priority market mover.",
+          "must_keep": false
         },
         {
           "source_article_id": "4365257",
@@ -400,9 +422,15 @@
           "analysis_method": "full_text",
           "model_used": "llama-3.1-8b-instant",
           "error_classification": null,
-          "error": null
+          "error": null,
+          "attention_tier": "medium",
+          "theme": "general",
+          "attention_reason": "Default medium attention because the story is relevant but not an obvious top-priority market mover.",
+          "must_keep": false
         }
       ],
+      "subgroups": [],
+      "analysis_profile": "standard",
       "model_used": "meta-llama/llama-4-scout-17b-16e-instruct",
       "sub_batch_count": 9,
       "diagnostics": {
@@ -493,7 +521,11 @@
           "analysis_method": "full_text",
           "model_used": "llama-3.1-8b-instant",
           "error_classification": null,
-          "error": null
+          "error": null,
+          "attention_tier": "light",
+          "theme": "general",
+          "attention_reason": "Lighter treatment because this story sits in the 時事脈搏 section without strong market-moving signals.",
+          "must_keep": false
         },
         {
           "source_article_id": "4365293",
@@ -532,7 +564,11 @@
           "analysis_method": "full_text",
           "model_used": "llama-3.1-8b-instant",
           "error_classification": null,
-          "error": null
+          "error": null,
+          "attention_tier": "light",
+          "theme": "general",
+          "attention_reason": "Lighter treatment because this story sits in the 時事脈搏 section without strong market-moving signals.",
+          "must_keep": false
         },
         {
           "source_article_id": "4365292",
@@ -571,7 +607,11 @@
           "analysis_method": "full_text",
           "model_used": "llama-3.1-8b-instant",
           "error_classification": null,
-          "error": null
+          "error": null,
+          "attention_tier": "high",
+          "theme": "geopolitics",
+          "attention_reason": "High-signal geopolitics headline based on title/summary keywords.",
+          "must_keep": true
         },
         {
           "source_article_id": "4365291",
@@ -610,7 +650,11 @@
           "analysis_method": "full_text",
           "model_used": "llama-3.1-8b-instant",
           "error_classification": null,
-          "error": null
+          "error": null,
+          "attention_tier": "light",
+          "theme": "general",
+          "attention_reason": "Lighter treatment because this story sits in the 時事脈搏 section without strong market-moving signals.",
+          "must_keep": false
         },
         {
           "source_article_id": "4365290",
@@ -645,7 +689,11 @@
           "analysis_method": "full_text",
           "model_used": "llama-3.1-8b-instant",
           "error_classification": null,
-          "error": null
+          "error": null,
+          "attention_tier": "light",
+          "theme": "general",
+          "attention_reason": "Lighter treatment because this story sits in the 時事脈搏 section without strong market-moving signals.",
+          "must_keep": false
         },
         {
           "source_article_id": "4365289",
@@ -685,7 +733,11 @@
           "analysis_method": "full_text",
           "model_used": "qwen/qwen3-32b",
           "error_classification": null,
-          "error": null
+          "error": null,
+          "attention_tier": "light",
+          "theme": "general",
+          "attention_reason": "Lighter treatment because this story sits in the 時事脈搏 section without strong market-moving signals.",
+          "must_keep": false
         },
         {
           "source_article_id": "4365288",
@@ -724,7 +776,11 @@
           "analysis_method": "truncated_text",
           "model_used": "llama-3.1-8b-instant",
           "error_classification": null,
-          "error": null
+          "error": null,
+          "attention_tier": "light",
+          "theme": "general",
+          "attention_reason": "Lighter treatment because this story sits in the 時事脈搏 section without strong market-moving signals.",
+          "must_keep": false
         },
         {
           "source_article_id": "4365287",
@@ -763,7 +819,11 @@
           "analysis_method": "truncated_text",
           "model_used": "llama-3.1-8b-instant",
           "error_classification": null,
-          "error": null
+          "error": null,
+          "attention_tier": "light",
+          "theme": "general",
+          "attention_reason": "Lighter treatment because this story sits in the 時事脈搏 section without strong market-moving signals.",
+          "must_keep": false
         },
         {
           "source_article_id": "4365286",
@@ -797,7 +857,11 @@
           "analysis_method": "truncated_text",
           "model_used": "llama-3.1-8b-instant",
           "error_classification": null,
-          "error": null
+          "error": null,
+          "attention_tier": "light",
+          "theme": "general",
+          "attention_reason": "Lighter treatment because this story sits in the 時事脈搏 section without strong market-moving signals.",
+          "must_keep": false
         },
         {
           "source_article_id": "4365285",
@@ -840,7 +904,11 @@
           "analysis_method": "truncated_text",
           "model_used": "llama-3.1-8b-instant",
           "error_classification": null,
-          "error": null
+          "error": null,
+          "attention_tier": "light",
+          "theme": "general",
+          "attention_reason": "Lighter treatment because this story sits in the 時事脈搏 section without strong market-moving signals.",
+          "must_keep": false
         },
         {
           "source_article_id": "4365284",
@@ -879,7 +947,11 @@
           "analysis_method": "truncated_text",
           "model_used": "llama-3.1-8b-instant",
           "error_classification": null,
-          "error": null
+          "error": null,
+          "attention_tier": "light",
+          "theme": "general",
+          "attention_reason": "Lighter treatment because this story sits in the 時事脈搏 section without strong market-moving signals.",
+          "must_keep": false
         },
         {
           "source_article_id": "4365280",
@@ -922,7 +994,11 @@
           "analysis_method": "truncated_text",
           "model_used": "llama-3.1-8b-instant",
           "error_classification": null,
-          "error": null
+          "error": null,
+          "attention_tier": "light",
+          "theme": "general",
+          "attention_reason": "Lighter treatment because this story sits in the 時事脈搏 section without strong market-moving signals.",
+          "must_keep": false
         },
         {
           "source_article_id": "4365283",
@@ -962,7 +1038,11 @@
           "analysis_method": "truncated_text",
           "model_used": "llama-3.1-8b-instant",
           "error_classification": null,
-          "error": null
+          "error": null,
+          "attention_tier": "light",
+          "theme": "general",
+          "attention_reason": "Lighter treatment because this story sits in the 時事脈搏 section without strong market-moving signals.",
+          "must_keep": false
         },
         {
           "source_article_id": "4365282",
@@ -997,7 +1077,11 @@
           "analysis_method": "truncated_text",
           "model_used": "llama-3.1-8b-instant",
           "error_classification": null,
-          "error": null
+          "error": null,
+          "attention_tier": "light",
+          "theme": "general",
+          "attention_reason": "Lighter treatment because this story sits in the 時事脈搏 section without strong market-moving signals.",
+          "must_keep": false
         },
         {
           "source_article_id": "4365281",
@@ -1032,7 +1116,11 @@
           "analysis_method": "truncated_text",
           "model_used": "llama-3.1-8b-instant",
           "error_classification": null,
-          "error": null
+          "error": null,
+          "attention_tier": "light",
+          "theme": "general",
+          "attention_reason": "Lighter treatment because this story sits in the 時事脈搏 section without strong market-moving signals.",
+          "must_keep": false
         },
         {
           "source_article_id": "4365278",
@@ -1067,7 +1155,11 @@
           "analysis_method": "truncated_text",
           "model_used": "llama-3.1-8b-instant",
           "error_classification": null,
-          "error": null
+          "error": null,
+          "attention_tier": "light",
+          "theme": "general",
+          "attention_reason": "Lighter treatment because this story sits in the 時事脈搏 section without strong market-moving signals.",
+          "must_keep": false
         },
         {
           "source_article_id": "4365279",
@@ -1102,7 +1194,11 @@
           "analysis_method": "truncated_text",
           "model_used": "llama-3.1-8b-instant",
           "error_classification": null,
-          "error": null
+          "error": null,
+          "attention_tier": "light",
+          "theme": "general",
+          "attention_reason": "Lighter treatment because this story sits in the 時事脈搏 section without strong market-moving signals.",
+          "must_keep": false
         },
         {
           "source_article_id": "4365275",
@@ -1133,7 +1229,11 @@
           "analysis_method": "truncated_text",
           "model_used": "llama-3.1-8b-instant",
           "error_classification": null,
-          "error": null
+          "error": null,
+          "attention_tier": "light",
+          "theme": "general",
+          "attention_reason": "Lighter treatment because this story sits in the 時事脈搏 section without strong market-moving signals.",
+          "must_keep": false
         },
         {
           "source_article_id": "4365277",
@@ -1168,7 +1268,11 @@
           "analysis_method": "truncated_text",
           "model_used": "llama-3.1-8b-instant",
           "error_classification": null,
-          "error": null
+          "error": null,
+          "attention_tier": "light",
+          "theme": "general",
+          "attention_reason": "Lighter treatment because this story sits in the 時事脈搏 section without strong market-moving signals.",
+          "must_keep": false
         },
         {
           "source_article_id": "4365276",
@@ -1203,7 +1307,11 @@
           "analysis_method": "truncated_text",
           "model_used": "llama-3.1-8b-instant",
           "error_classification": null,
-          "error": null
+          "error": null,
+          "attention_tier": "light",
+          "theme": "general",
+          "attention_reason": "Lighter treatment because this story sits in the 時事脈搏 section without strong market-moving signals.",
+          "must_keep": false
         },
         {
           "source_article_id": "4365274",
@@ -1243,7 +1351,11 @@
           "analysis_method": "truncated_text",
           "model_used": "llama-3.1-8b-instant",
           "error_classification": null,
-          "error": null
+          "error": null,
+          "attention_tier": "light",
+          "theme": "general",
+          "attention_reason": "Lighter treatment because this story sits in the 時事脈搏 section without strong market-moving signals.",
+          "must_keep": false
         },
         {
           "source_article_id": "4365273",
@@ -1283,7 +1395,11 @@
           "analysis_method": "truncated_text",
           "model_used": "llama-3.1-8b-instant",
           "error_classification": null,
-          "error": null
+          "error": null,
+          "attention_tier": "high",
+          "theme": "geopolitics",
+          "attention_reason": "High-signal geopolitics headline based on title/summary keywords.",
+          "must_keep": true
         },
         {
           "source_article_id": "4365271",
@@ -1322,7 +1438,11 @@
           "analysis_method": "truncated_text",
           "model_used": "llama-3.1-8b-instant",
           "error_classification": null,
-          "error": null
+          "error": null,
+          "attention_tier": "high",
+          "theme": "geopolitics",
+          "attention_reason": "High-signal geopolitics headline based on title/summary keywords.",
+          "must_keep": true
         },
         {
           "source_article_id": "4365268",
@@ -1361,7 +1481,11 @@
           "analysis_method": "truncated_text",
           "model_used": "llama-3.1-8b-instant",
           "error_classification": null,
-          "error": null
+          "error": null,
+          "attention_tier": "light",
+          "theme": "general",
+          "attention_reason": "Lighter treatment because this story sits in the 時事脈搏 section without strong market-moving signals.",
+          "must_keep": false
         },
         {
           "source_article_id": "4365267",
@@ -1400,7 +1524,11 @@
           "analysis_method": "truncated_text",
           "model_used": "llama-3.1-8b-instant",
           "error_classification": null,
-          "error": null
+          "error": null,
+          "attention_tier": "light",
+          "theme": "general",
+          "attention_reason": "Lighter treatment because this story sits in the 時事脈搏 section without strong market-moving signals.",
+          "must_keep": false
         },
         {
           "source_article_id": "4365266",
@@ -1439,7 +1567,11 @@
           "analysis_method": "truncated_text",
           "model_used": "llama-3.1-8b-instant",
           "error_classification": null,
-          "error": null
+          "error": null,
+          "attention_tier": "light",
+          "theme": "general",
+          "attention_reason": "Lighter treatment because this story sits in the 時事脈搏 section without strong market-moving signals.",
+          "must_keep": false
         },
         {
           "source_article_id": "4365265",
@@ -1482,7 +1614,11 @@
           "analysis_method": "truncated_text",
           "model_used": "llama-3.1-8b-instant",
           "error_classification": null,
-          "error": null
+          "error": null,
+          "attention_tier": "high",
+          "theme": "geopolitics",
+          "attention_reason": "High-signal geopolitics headline based on title/summary keywords.",
+          "must_keep": true
         },
         {
           "source_article_id": "4365265",
@@ -1525,7 +1661,11 @@
           "analysis_method": "truncated_text",
           "model_used": "llama-3.1-8b-instant",
           "error_classification": null,
-          "error": null
+          "error": null,
+          "attention_tier": "high",
+          "theme": "geopolitics",
+          "attention_reason": "High-signal geopolitics headline based on title/summary keywords.",
+          "must_keep": true
         },
         {
           "source_article_id": "4365264",
@@ -1564,7 +1704,11 @@
           "analysis_method": "truncated_text",
           "model_used": "llama-3.1-8b-instant",
           "error_classification": null,
-          "error": null
+          "error": null,
+          "attention_tier": "high",
+          "theme": "macro",
+          "attention_reason": "High-signal macro headline based on title/summary keywords.",
+          "must_keep": true
         },
         {
           "source_article_id": "4365262",
@@ -1603,7 +1747,11 @@
           "analysis_method": "truncated_text",
           "model_used": "llama-3.1-8b-instant",
           "error_classification": null,
-          "error": null
+          "error": null,
+          "attention_tier": "high",
+          "theme": "macro",
+          "attention_reason": "High-signal macro headline based on title/summary keywords.",
+          "must_keep": true
         },
         {
           "source_article_id": "4365261",
@@ -1642,7 +1790,11 @@
           "analysis_method": "full_text",
           "model_used": "meta-llama/llama-4-scout-17b-16e-instruct",
           "error_classification": null,
-          "error": null
+          "error": null,
+          "attention_tier": "light",
+          "theme": "general",
+          "attention_reason": "Lighter treatment because this story sits in the 時事脈搏 section without strong market-moving signals.",
+          "must_keep": false
         },
         {
           "source_article_id": "4365258",
@@ -1681,9 +1833,15 @@
           "analysis_method": "truncated_text",
           "model_used": "llama-3.1-8b-instant",
           "error_classification": null,
-          "error": null
+          "error": null,
+          "attention_tier": "high",
+          "theme": "geopolitics",
+          "attention_reason": "High-signal geopolitics headline based on title/summary keywords.",
+          "must_keep": true
         }
       ],
+      "subgroups": [],
+      "analysis_profile": "light",
       "model_used": "meta-llama/llama-4-scout-17b-16e-instruct",
       "sub_batch_count": 10,
       "diagnostics": {
