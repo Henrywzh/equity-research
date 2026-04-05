@@ -131,6 +131,7 @@ def _success_report() -> dict[str, object]:
                 ],
             },
         ],
+        "unresolved_articles": [],
         "output_path": "/tmp/hkej-news-analysis.json",
     }
 
@@ -196,6 +197,24 @@ class NotifierTests(unittest.TestCase):
             }
         ]
         report["totals"]["failed_article_analyses"] = 1
+        report["unresolved_articles"] = [
+            {
+                "category": "國際財經",
+                "title": "Bank contingency update",
+                "canonical_url": "https://example.com/bank",
+                "source_article_id": "bank-1",
+                "attention_tier": "high",
+                "theme": "macro",
+                "must_keep": True,
+                "error_classification": "incomplete_model_output",
+                "error": "Model response omitted this article from the category batch.",
+                "model_used": "qwen/qwen3-32b",
+                "delayed_retry_attempted": True,
+                "delayed_retry_model_chain": ["llama-3.1-8b-instant", "openai/gpt-oss-20b"],
+                "delayed_retry_final_model": "openai/gpt-oss-20b",
+                "published_at": "2026-04-04T07:05:00+00:00",
+            }
+        ]
 
         with patch.dict(
             os.environ,
@@ -214,6 +233,19 @@ class NotifierTests(unittest.TestCase):
         self.assertIn("Sent daily macro Gmail summary", message)
         email_payload = message_from_string(_FakeSMTP.sent_messages[0]["payload"])
         self.assertIn("[PARTIAL]", email_payload["Subject"])
+        rendered = message_from_string(_FakeSMTP.sent_messages[0]["payload"])
+        decoded_parts = []
+        for part in rendered.walk():
+            if part.get_content_maintype() == "multipart":
+                continue
+            payload = part.get_payload(decode=True)
+            if payload is None:
+                continue
+            decoded_parts.append(payload.decode(part.get_content_charset() or "utf-8"))
+        rendered_text = "\n".join(decoded_parts)
+        self.assertIn("Unresolved articles", rendered_text)
+        self.assertIn("Bank contingency update", rendered_text)
+        self.assertIn("delayed retry failed", rendered_text.lower())
 
     def test_send_analysis_summary_email_skips_empty_categories(self) -> None:
         report = _success_report()

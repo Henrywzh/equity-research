@@ -21,11 +21,14 @@ from .storage import Storage
 LOGGER = logging.getLogger(__name__)
 
 GROQ_CHAT_COMPLETIONS_URL = "https://api.groq.com/openai/v1/chat/completions"
+OPENAI_CHAT_COMPLETIONS_URL = "https://api.openai.com/v1/chat/completions"
 REPORT_FILE_NAME = "hkej-news-analysis.json"
 REPORT_SCHEMA_VERSION = 4
 DEFAULT_PROVIDER = "groq"
 PRIMARY_MODEL_ID = "meta-llama/llama-4-scout-17b-16e-instruct"
 FALLBACK_MODEL_IDS = ["qwen/qwen3-32b", "llama-3.1-8b-instant"]
+DELAYED_RETRY_FINAL_MODEL_ID = "openai/gpt-oss-20b"
+DELAYED_RETRY_WAIT_SECONDS = 60.0
 DEFAULT_OUTPUT_TOKENS = 1200
 DEFAULT_INPUT_BUDGET_TOKENS = 4500
 DEFAULT_SYNTHESIS_INPUT_BUDGET_TOKENS = 2400
@@ -148,6 +151,8 @@ class ModelConfig:
     model_id: str
     provider: str = DEFAULT_PROVIDER
     max_completion_tokens: int = DEFAULT_OUTPUT_TOKENS
+    api_url: str | None = None
+    api_key_env: str | None = None
 
 
 @dataclass(slots=True)
@@ -176,6 +181,13 @@ class RuntimeDiagnostics:
     json_repair_retry_count: int = 0
     batch_count: int = 0
     failed_batch_count: int = 0
+    delayed_retry_candidate_count: int = 0
+    delayed_retry_attempted_count: int = 0
+    delayed_retry_recovered_count: int = 0
+    delayed_retry_failed_count: int = 0
+    high_medium_unresolved_count: int = 0
+    light_unresolved_count: int = 0
+    delayed_retry_skipped_final_model_count: int = 0
 
     def as_dict(self) -> dict[str, Any]:
         return {
@@ -187,6 +199,13 @@ class RuntimeDiagnostics:
             "json_repair_retry_count": self.json_repair_retry_count,
             "batch_count": self.batch_count,
             "failed_batch_count": self.failed_batch_count,
+            "delayed_retry_candidate_count": self.delayed_retry_candidate_count,
+            "delayed_retry_attempted_count": self.delayed_retry_attempted_count,
+            "delayed_retry_recovered_count": self.delayed_retry_recovered_count,
+            "delayed_retry_failed_count": self.delayed_retry_failed_count,
+            "high_medium_unresolved_count": self.high_medium_unresolved_count,
+            "light_unresolved_count": self.light_unresolved_count,
+            "delayed_retry_skipped_final_model_count": self.delayed_retry_skipped_final_model_count,
         }
 
 
@@ -296,12 +315,14 @@ class AnalysisRuntime:
     session: requests.Session
     governor: RateLimitGovernor
     model_chain: list[ModelConfig]
+    delayed_retry_final_model: ModelConfig | None = None
     current_model_index: int = 0
     model_switches: list[dict[str, Any]] = field(default_factory=list)
     last_attempted_model: str | None = None
     diagnostics: RuntimeDiagnostics = field(default_factory=RuntimeDiagnostics)
     category_diagnostics: dict[str, CategoryDiagnostics] = field(default_factory=dict)
     category_budgets: dict[str, CategoryBudgetState] = field(default_factory=dict)
+    provider_sessions: dict[str, requests.Session] = field(default_factory=dict)
 
     @property
     def primary_model(self) -> ModelConfig:
@@ -314,6 +335,22 @@ class AnalysisRuntime:
     @property
     def current_model(self) -> ModelConfig:
         return self.model_chain[self.current_model_index]
+
+    def get_session_for_model(self, model: ModelConfig) -> requests.Session:
+        if model.provider == DEFAULT_PROVIDER:
+            return self.session
+        session = self.provider_sessions.get(model.provider)
+        if session is not None:
+            return session
+        session = _build_provider_session(_load_model_api_key(model))
+        self.provider_sessions[model.provider] = session
+        return session
+
+    def close_sessions(self) -> None:
+        self.session.close()
+        for session in self.provider_sessions.values():
+            session.close()
+        self.provider_sessions.clear()
 
     def get_model_config(self, model_id: str) -> ModelConfig:
         for model in self.model_chain:
@@ -519,6 +556,12 @@ def _graph_initialize(state: AnalysisGraphState) -> AnalysisGraphState:
             session=_build_groq_session(load_groq_api_key()),
             governor=RateLimitGovernor(),
             model_chain=[ModelConfig(PRIMARY_MODEL_ID), *(ModelConfig(model_id) for model_id in FALLBACK_MODEL_IDS)],
+            delayed_retry_final_model=ModelConfig(
+                DELAYED_RETRY_FINAL_MODEL_ID,
+                provider="openai",
+                api_url=OPENAI_CHAT_COMPLETIONS_URL,
+                api_key_env="OPENAI_API_KEY",
+            ),
         )
     state["today_plan"] = today_plan
     state["previous_retry_plan"] = previous_retry_plan
@@ -577,7 +620,7 @@ def _graph_retry_previous_day(state: AnalysisGraphState) -> AnalysisGraphState:
                 state["updated_previous_report"] = updated_previous_report
     finally:
         if runtime is not None:
-            runtime.session.close()
+            runtime.close_sessions()
     return state
 
 
@@ -621,6 +664,10 @@ def load_groq_api_key() -> str:
 
 
 def _build_groq_session(api_key: str) -> requests.Session:
+    return _build_provider_session(api_key)
+
+
+def _build_provider_session(api_key: str) -> requests.Session:
     session = requests.Session()
     session.headers.update(
         {
@@ -629,6 +676,26 @@ def _build_groq_session(api_key: str) -> requests.Session:
         }
     )
     return session
+
+
+def _load_model_api_key(model: ModelConfig) -> str:
+    if model.provider == DEFAULT_PROVIDER:
+        return load_groq_api_key()
+
+    env_name = model.api_key_env or "OPENAI_API_KEY"
+    env_value = os.environ.get(env_name)
+    if env_value:
+        return env_value
+
+    for config_path in _candidate_config_paths():
+        if not config_path.exists():
+            continue
+        parsed = _parse_simple_env_file(config_path)
+        value = parsed.get(env_name)
+        if value:
+            return value
+
+    raise RuntimeError(f"{env_name} is not set for provider {model.provider}.")
 
 
 def select_content_for_analysis(content_text: str) -> dict[str, Any]:
@@ -1246,6 +1313,7 @@ def _finalize_report(
     incremental: dict[str, int],
 ) -> dict[str, Any]:
     all_articles = [article for category in category_reports for article in category["articles"]]
+    unresolved_articles = _collect_unresolved_articles(category_reports)
     successful_article_analyses = sum(1 for article in all_articles if not article.get("error"))
     failed_article_analyses = len(all_articles) - successful_article_analyses
     full_text_count = sum(1 for article in all_articles if not article.get("content_truncated"))
@@ -1255,6 +1323,13 @@ def _finalize_report(
     failed_categories = sum(1 for category in category_reports if category["status"] == "failed")
     errors = _collect_report_errors(category_reports)
     status = "success" if not errors else "partial"
+    if runtime is not None:
+        runtime.diagnostics.high_medium_unresolved_count = sum(
+            1 for article in unresolved_articles if str(article.get("attention_tier") or "medium") in {"high", "medium"}
+        )
+        runtime.diagnostics.light_unresolved_count = sum(
+            1 for article in unresolved_articles if str(article.get("attention_tier") or "") == "light"
+        )
 
     return {
         "report_schema_version": REPORT_SCHEMA_VERSION,
@@ -1274,6 +1349,7 @@ def _finalize_report(
         },
         "diagnostics": runtime.diagnostics.as_dict() if runtime is not None else RuntimeDiagnostics().as_dict(),
         "incremental": incremental,
+        "unresolved_articles": unresolved_articles,
         "totals": {
             "article_count": len(all_articles),
             "successful_article_analyses": successful_article_analyses,
@@ -1312,6 +1388,41 @@ def _collect_report_errors(category_reports: list[dict[str, Any]]) -> list[dict[
                 }
             )
     return errors
+
+
+def _collect_unresolved_articles(category_reports: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    unresolved: list[dict[str, Any]] = []
+    for category in category_reports:
+        category_name = category.get("category")
+        for article in category.get("articles") or []:
+            if not article.get("error"):
+                continue
+            unresolved.append(
+                {
+                    "category": category_name,
+                    "title": article.get("title"),
+                    "canonical_url": article.get("canonical_url"),
+                    "source_article_id": article.get("source_article_id"),
+                    "attention_tier": article.get("attention_tier"),
+                    "theme": article.get("theme"),
+                    "must_keep": article.get("must_keep"),
+                    "error_classification": article.get("error_classification"),
+                    "error": article.get("error"),
+                    "model_used": article.get("model_used"),
+                    "delayed_retry_attempted": bool(article.get("delayed_retry_attempted")),
+                    "delayed_retry_model_chain": list(article.get("delayed_retry_model_chain") or []),
+                    "delayed_retry_final_model": article.get("delayed_retry_final_model"),
+                    "published_at": article.get("published_at"),
+                }
+            )
+    unresolved.sort(
+        key=lambda item: (
+            ATTENTION_TIER_RANK.get(str(item.get("attention_tier") or "medium"), ATTENTION_TIER_RANK["medium"]),
+            str(item.get("category") or ""),
+            str(item.get("published_at") or ""),
+        )
+    )
+    return unresolved
 
 
 def _category_error_classification(category: dict[str, Any]) -> str:
@@ -1394,6 +1505,9 @@ def _analyze_category(
         article_errors.extend(batch_errors)
         sub_batch_count += batch_count
     article_results = _order_results_like_input(prepared_articles, article_results)
+    article_results, delayed_retry_count = _run_delayed_retry_pass(runtime, category_name, prepared_articles, article_results)
+    sub_batch_count += delayed_retry_count
+    article_errors = _article_errors_from_results(article_results)
     successful_articles = [article for article in article_results if not article.get("error")]
     category_errors = list(article_errors)
     key_developments: list[str] = []
@@ -1466,6 +1580,180 @@ def _analyze_category(
         },
         category_errors,
     )
+
+
+def _run_delayed_retry_pass(
+    runtime: AnalysisRuntime,
+    category_name: str,
+    prepared_articles: list[dict[str, Any]],
+    article_results: list[dict[str, Any]],
+) -> tuple[list[dict[str, Any]], int]:
+    result_by_key = _article_result_by_key(article_results)
+    prepared_by_key = {
+        _article_key(article.get("source_article_id"), article.get("canonical_url")): article
+        for article in prepared_articles
+    }
+    candidates = [
+        result
+        for result in article_results
+        if result.get("error") and str(result.get("attention_tier") or "medium") in {"high", "medium"}
+    ]
+    runtime.diagnostics.delayed_retry_candidate_count += len(candidates)
+    if not candidates:
+        return article_results, 0
+
+    LOGGER.info(
+        "Waiting %.1f seconds before delayed retry for %s unresolved high/medium article(s) in %s.",
+        DELAYED_RETRY_WAIT_SECONDS,
+        len(candidates),
+        category_name,
+    )
+    time.sleep(DELAYED_RETRY_WAIT_SECONDS)
+
+    batch_count = 0
+    for candidate in candidates:
+        key = _article_key(candidate.get("source_article_id"), candidate.get("canonical_url"))
+        prepared_article = prepared_by_key.get(key)
+        if prepared_article is None:
+            continue
+        runtime.diagnostics.delayed_retry_attempted_count += 1
+        retry_result, retry_count = _retry_unresolved_article_with_delay(runtime, category_name, prepared_article, candidate)
+        batch_count += retry_count
+        result_by_key[key] = retry_result
+        if retry_result.get("error"):
+            runtime.diagnostics.delayed_retry_failed_count += 1
+        else:
+            runtime.diagnostics.delayed_retry_recovered_count += 1
+
+    merged_results = [
+        result_by_key[_article_key(article.get("source_article_id"), article.get("canonical_url"))]
+        for article in article_results
+    ]
+    return merged_results, batch_count
+
+
+def _retry_unresolved_article_with_delay(
+    runtime: AnalysisRuntime,
+    category_name: str,
+    prepared_article: dict[str, Any],
+    current_result: dict[str, Any],
+) -> tuple[dict[str, Any], int]:
+    model_chain = _delayed_retry_model_sequence(runtime, str(current_result.get("model_used") or ""))
+    attempted_chain: list[str] = []
+    final_model = DELAYED_RETRY_FINAL_MODEL_ID
+
+    for model in model_chain:
+        attempted_chain.append(model.model_id)
+        try:
+            retry_result = _attempt_single_article_with_model(runtime, category_name, prepared_article, model, current_result)
+            retry_result["delayed_retry_attempted"] = True
+            retry_result["delayed_retry_model_chain"] = list(attempted_chain)
+            retry_result["delayed_retry_final_model"] = final_model
+            current_result = retry_result
+            if not retry_result.get("error"):
+                return retry_result, 1
+        except Exception as exc:
+            if model.provider == "openai" and "OPENAI_API_KEY" in str(exc):
+                runtime.diagnostics.delayed_retry_skipped_final_model_count += 1
+                attempted_chain[-1] = f"{model.model_id} (skipped missing OPENAI_API_KEY)"
+                break
+            failed = _build_failed_article_result(
+                article=prepared_article,
+                error_message=str(exc),
+                model_used=model.model_id,
+                error_classification=_classify_exception(exc),
+            )
+            failed["delayed_retry_attempted"] = True
+            failed["delayed_retry_model_chain"] = list(attempted_chain)
+            failed["delayed_retry_final_model"] = final_model
+            current_result = failed
+
+    current_result = dict(current_result)
+    current_result["delayed_retry_attempted"] = True
+    current_result["delayed_retry_model_chain"] = list(attempted_chain)
+    current_result["delayed_retry_final_model"] = final_model
+    return current_result, 0
+
+
+def _delayed_retry_model_sequence(runtime: AnalysisRuntime, current_model_used: str) -> list[ModelConfig]:
+    sequence: list[ModelConfig] = []
+    seen: set[str] = set()
+    found_current = False
+    for model in runtime.model_chain:
+        if model.model_id == current_model_used:
+            found_current = True
+            continue
+        if not found_current:
+            continue
+        if model.model_id == DELAYED_RETRY_FINAL_MODEL_ID:
+            continue
+        if model.model_id not in seen:
+            sequence.append(model)
+            seen.add(model.model_id)
+    final_model = runtime.delayed_retry_final_model
+    if final_model is not None and final_model.model_id not in seen:
+        sequence.append(final_model)
+    return sequence
+
+
+def _attempt_single_article_with_model(
+    runtime: AnalysisRuntime,
+    category_name: str,
+    prepared_article: dict[str, Any],
+    model: ModelConfig,
+    current_result: dict[str, Any],
+) -> dict[str, Any]:
+    working_article = _clone_prepared_article(prepared_article)
+    budget_state = runtime.get_category_budget(category_name)
+    profile = _section_profile(category_name)
+    effective_budget = _effective_batch_budget(profile, budget_state, [working_article])
+    _shrink_batch_to_budget(
+        category_name,
+        [working_article],
+        input_budget_tokens=effective_budget["input_budget_tokens"],
+        request_byte_budget=effective_budget["request_byte_budget"],
+        model_id=model.model_id,
+    )
+    estimated_input_tokens = _estimate_batch_request_tokens(category_name, [working_article])
+    payload, model_used = _invoke_article_batch(
+        runtime,
+        category_name,
+        [working_article],
+        estimated_input_tokens,
+        batch_label="delayed",
+        content_shrunk=bool(working_article.get("content_truncated")),
+        model_override=model,
+    )
+    merged_results, missing_articles = _merge_batch_article_results([working_article], payload, model_used)
+    if missing_articles:
+        result = _build_failed_article_result(
+            article=working_article,
+            error_message="Model response omitted this article from the delayed retry batch.",
+            model_used=model_used,
+            error_classification="incomplete_model_output",
+        )
+        result["delayed_retry_attempted"] = True
+        result["delayed_retry_model_chain"] = [model.model_id]
+        result["delayed_retry_final_model"] = DELAYED_RETRY_FINAL_MODEL_ID
+        return result
+    recovered = merged_results[0]
+    recovered["delayed_retry_attempted"] = True
+    recovered["delayed_retry_model_chain"] = [model.model_id]
+    recovered["delayed_retry_final_model"] = DELAYED_RETRY_FINAL_MODEL_ID
+    return recovered
+
+
+def _article_errors_from_results(article_results: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    return [
+        {
+            "type": "article",
+            "target": article.get("canonical_url"),
+            "message": article.get("error"),
+            "classification": article.get("error_classification") or "unexpected_error",
+        }
+        for article in article_results
+        if article.get("error")
+    ]
 
 
 def _process_batch_recursive(
@@ -1913,6 +2201,8 @@ def _chat_completion(
     response: requests.Response | None = None
     for attempt in range(DEFAULT_CHAT_RETRIES):
         model = model_override or runtime.current_model
+        api_url = model.api_url or GROQ_CHAT_COMPLETIONS_URL
+        session = runtime.get_session_for_model(model)
         runtime.last_attempted_model = model.model_id
         attempt_context = BatchContext(
             category_name=context.category_name,
@@ -1947,8 +2237,8 @@ def _chat_completion(
                 attempt_context.batch_label,
                 model.model_id,
             )
-        response = runtime.session.post(
-            GROQ_CHAT_COMPLETIONS_URL,
+        response = session.post(
+            api_url,
             json={
                 "model": model.model_id,
                 "messages": messages,
@@ -2912,6 +3202,9 @@ def _merge_batch_article_results(
                 "attention_reason": article.get("attention_reason"),
                 "must_keep": article.get("must_keep"),
                 "model_used": model_used,
+                "delayed_retry_attempted": False,
+                "delayed_retry_model_chain": [],
+                "delayed_retry_final_model": None,
                 "error_classification": None,
                 "error": None,
             }
@@ -2967,6 +3260,9 @@ def _build_failed_article_result(
         "attention_reason": article.get("attention_reason"),
         "must_keep": article.get("must_keep"),
         "model_used": model_used,
+        "delayed_retry_attempted": False,
+        "delayed_retry_model_chain": [],
+        "delayed_retry_final_model": None,
         "error_classification": error_classification,
         "error": error_message,
     }
@@ -3042,6 +3338,7 @@ def _build_empty_report(target_date: str, *, incremental: dict[str, int] | None 
             "failed_categories": 0,
         },
         "categories": [],
+        "unresolved_articles": [],
         "errors": [],
     }
 

@@ -10,7 +10,9 @@ import requests
 
 import daily_macro.analysis as analysis_module
 from daily_macro.analysis import (
+    AnalysisRuntime,
     DEFAULT_INPUT_BUDGET_TOKENS,
+    ModelConfig,
     REPORT_SCHEMA_VERSION,
     RateLimitGovernor,
     run_analysis,
@@ -197,6 +199,136 @@ class AnalysisTests(unittest.TestCase):
         self.assertEqual(merged[0]["attention_tier"], "high")
         self.assertEqual(len(missing), 1)
         self.assertEqual(missing[0]["source_article_id"], "1002")
+
+    def test_delayed_retry_recovers_high_attention_article_with_final_model(self) -> None:
+        prepared_article = analysis_module._prepare_single_article(
+            {
+                "source_article_id": "9001",
+                "title": "聯儲局暗示利率路徑仍偏緊",
+                "canonical_url": "https://example.com/9001",
+                "published_at": "2026-04-04T08:00:00+08:00",
+                "article_section": "國際財經",
+                "summary_snippet": "聯儲局與利率前景仍是市場焦點",
+                "content_text": "macro " * 200,
+            }
+        )
+        current_result = analysis_module._build_failed_article_result(
+            article=prepared_article,
+            error_message="Model response omitted this article from the category batch.",
+            model_used="qwen/qwen3-32b",
+            error_classification="incomplete_model_output",
+        )
+        groq_session = _FakeGroqSession(
+            [
+                _FakeResponse(
+                    200,
+                    payload={"choices": [{"message": {"content": json.dumps({"articles": []}, ensure_ascii=False)}}]},
+                )
+            ]
+        )
+        openai_session = _FakeGroqSession(
+            [
+                _FakeResponse(
+                    200,
+                    payload={
+                        "choices": [
+                            {
+                                "message": {
+                                    "content": json.dumps(
+                                        {
+                                            "articles": [
+                                                {
+                                                    "source_article_id": "9001",
+                                                    "canonical_url": "https://example.com/9001",
+                                                    "novelty_score": 8,
+                                                    "relevance_score": 9,
+                                                    "urgency_score": 8,
+                                                    "named_entities": [{"name": "聯儲局", "type": "institution"}],
+                                                    "key_points": ["Rates remain restrictive."],
+                                                }
+                                            ]
+                                        },
+                                        ensure_ascii=False,
+                                    )
+                                }
+                            }
+                        ]
+                    },
+                )
+            ]
+        )
+        runtime = AnalysisRuntime(
+            session=groq_session,
+            governor=RateLimitGovernor(sleep_fn=lambda seconds: None),
+            model_chain=[
+                ModelConfig("meta-llama/llama-4-scout-17b-16e-instruct"),
+                ModelConfig("qwen/qwen3-32b"),
+                ModelConfig("llama-3.1-8b-instant"),
+            ],
+            delayed_retry_final_model=ModelConfig(
+                "openai/gpt-oss-20b",
+                provider="openai",
+                api_url="https://api.openai.com/v1/chat/completions",
+                api_key_env="OPENAI_API_KEY",
+            ),
+            provider_sessions={"openai": openai_session},
+        )
+
+        with patch("daily_macro.analysis.time.sleep", lambda seconds: None):
+            updated_results, retry_batches = analysis_module._run_delayed_retry_pass(
+                runtime,
+                "國際財經",
+                [prepared_article],
+                [current_result],
+            )
+
+        self.assertEqual(retry_batches, 1)
+        self.assertEqual(updated_results[0]["error"], None)
+        self.assertTrue(updated_results[0]["delayed_retry_attempted"])
+        self.assertEqual(
+            updated_results[0]["delayed_retry_model_chain"],
+            ["llama-3.1-8b-instant", "openai/gpt-oss-20b"],
+        )
+        self.assertEqual(updated_results[0]["model_used"], "openai/gpt-oss-20b")
+
+    def test_delayed_retry_skips_light_attention_articles(self) -> None:
+        prepared_article = analysis_module._prepare_single_article(
+            {
+                "source_article_id": "9002",
+                "title": "一般社區消息",
+                "canonical_url": "https://example.com/9002",
+                "published_at": "2026-04-04T08:00:00+08:00",
+                "article_section": "時事脈搏",
+                "summary_snippet": "本地一般消息",
+                "content_text": "pulse " * 100,
+            }
+        )
+        current_result = analysis_module._build_failed_article_result(
+            article=prepared_article,
+            error_message="Model response omitted this article from the category batch.",
+            model_used="qwen/qwen3-32b",
+            error_classification="incomplete_model_output",
+        )
+        runtime = AnalysisRuntime(
+            session=_FakeGroqSession([]),
+            governor=RateLimitGovernor(sleep_fn=lambda seconds: None),
+            model_chain=[
+                ModelConfig("meta-llama/llama-4-scout-17b-16e-instruct"),
+                ModelConfig("qwen/qwen3-32b"),
+                ModelConfig("llama-3.1-8b-instant"),
+            ],
+        )
+
+        with patch("daily_macro.analysis.time.sleep", side_effect=AssertionError("light articles should not trigger delayed sleep")):
+            updated_results, retry_batches = analysis_module._run_delayed_retry_pass(
+                runtime,
+                "時事脈搏",
+                [prepared_article],
+                [current_result],
+            )
+
+        self.assertEqual(retry_batches, 0)
+        self.assertFalse(updated_results[0]["delayed_retry_attempted"])
 
     def test_rate_limit_governor_waits_for_reset(self) -> None:
         slept: list[float] = []

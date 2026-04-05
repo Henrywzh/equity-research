@@ -223,6 +223,12 @@ def _build_plain_body(summary: dict[str, Any]) -> str:
         lines.extend(f"- {note}" for note in notes)
         lines.append("")
 
+    unresolved_lines = _build_plain_unresolved_lines(summary)
+    if unresolved_lines:
+        lines.append("Unresolved articles:")
+        lines.extend(unresolved_lines)
+        lines.append("")
+
     for category in summary.get("categories") or []:
         lines.append(f"{category.get('category') or 'Uncategorized'} ({category.get('article_count') or 0})")
         for item in (category.get("key_developments") or [])[:5]:
@@ -277,6 +283,8 @@ def _build_html_body(summary: dict[str, Any]) -> str:
             + "</ul></div>"
         )
 
+    unresolved_html = _build_html_unresolved_section(summary)
+
     return f"""
     <html>
       <body style="margin:0;padding:24px;background:#f3f4f6;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;">
@@ -294,6 +302,7 @@ def _build_html_body(summary: dict[str, Any]) -> str:
             Fallback models: {_escape_html(_fallback_model_labels(summary))}
           </p>
           {notes_html}
+          {unresolved_html}
           {"".join(category_blocks)}
         </div>
       </body>
@@ -447,10 +456,71 @@ def _build_run_notes(summary: dict[str, Any]) -> list[str]:
     error_classes = sorted({str(item.get("classification") or "unclassified") for item in summary.get("errors") or []})
     if error_classes:
         notes.append("Failure classifications present: " + ", ".join(error_classes))
+    delayed_retry_skips = int(diagnostics.get("delayed_retry_skipped_final_model_count") or 0)
+    if delayed_retry_skips > 0:
+        notes.append(
+            f"The final delayed-retry fallback model was skipped {delayed_retry_skips} time(s) because OPENAI_API_KEY was unavailable."
+        )
     output_path = summary.get("output_path")
     if output_path:
         notes.append(f"Stored analysis report: {output_path}")
     return notes
+
+
+def _build_plain_unresolved_lines(summary: dict[str, Any]) -> list[str]:
+    unresolved = list(summary.get("unresolved_articles") or [])
+    lines: list[str] = []
+    for item in unresolved:
+        attention = _attention_badge(item)
+        category = str(item.get("category") or "Uncategorized")
+        title = str(item.get("title") or "Untitled")
+        url = str(item.get("canonical_url") or "").strip()
+        reason = str(item.get("error_classification") or "unclassified")
+        message = str(item.get("error") or "").strip()
+        retry_note = ""
+        if item.get("delayed_retry_attempted"):
+            retry_note = " | delayed retry failed"
+        base = f"- {attention}[{category}] {title}"
+        if url:
+            base += f": {url}"
+        details = f" ({reason}"
+        if message:
+            details += f"; {message}"
+        details += f"{retry_note})"
+        lines.append(base + details)
+    return lines
+
+
+def _build_html_unresolved_section(summary: dict[str, Any]) -> str:
+    unresolved = list(summary.get("unresolved_articles") or [])
+    if not unresolved:
+        return ""
+    items = []
+    for item in unresolved:
+        category = _escape_html(str(item.get("category") or "Uncategorized"))
+        title = _escape_html(str(item.get("title") or "Untitled"))
+        url = str(item.get("canonical_url") or "").strip()
+        reason = _escape_html(str(item.get("error_classification") or "unclassified"))
+        message = _escape_html(str(item.get("error") or ""))
+        retry_note = ""
+        if item.get("delayed_retry_attempted"):
+            retry_note = " <span style='color:#b91c1c;font-weight:600;'>Delayed retry failed</span>"
+        label = _attention_badge_html(item)
+        body = f"{label}<strong>[{category}]</strong> "
+        if url:
+            body += f"<a href=\"{_escape_html(url)}\" style=\"color:#2563eb;text-decoration:none;\">{title}</a>"
+        else:
+            body += title
+        body += f"<div style='color:#6b7280;margin-top:2px;font-size:13px;'>{reason}"
+        if message:
+            body += f" | {message}"
+        body += f"{retry_note}</div>"
+        items.append(f"<li style='margin-bottom:10px;'>{body}</li>")
+    return (
+        "<div style='margin:0 0 20px;padding:16px;border:1px solid #fecaca;border-radius:12px;background:#fff7f7;'>"
+        "<div style='font-size:16px;font-weight:700;color:#991b1b;margin-bottom:8px;'>Unresolved articles</div>"
+        "<ul style='margin:0;padding-left:18px;line-height:1.6;'>" + "".join(items) + "</ul></div>"
+    )
 
 
 def _model_label(summary: dict[str, Any], key: str) -> str:
