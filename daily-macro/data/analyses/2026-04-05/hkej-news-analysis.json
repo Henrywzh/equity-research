@@ -1,7 +1,7 @@
 {
   "report_schema_version": 4,
   "report_date": "2026-04-05",
-  "generated_at": "2026-04-05T07:56:47.901353+00:00",
+  "generated_at": "2026-04-05T10:37:14.108239+00:00",
   "source_site": "hkej",
   "status": "partial",
   "model": {
@@ -19,26 +19,51 @@
   },
   "diagnostics": {
     "rate_limit_wait_count": 1,
-    "rate_limit_wait_seconds_total": 44.373,
+    "rate_limit_wait_seconds_total": 46.226,
     "fallback_switch_count": 0,
     "pre_send_split_count": 2,
     "response_413_split_count": 0,
     "json_repair_retry_count": 0,
-    "batch_count": 26,
-    "failed_batch_count": 0
+    "batch_count": 20,
+    "failed_batch_count": 0,
+    "delayed_retry_candidate_count": 1,
+    "delayed_retry_attempted_count": 1,
+    "delayed_retry_recovered_count": 1,
+    "delayed_retry_failed_count": 0,
+    "high_medium_unresolved_count": 0,
+    "light_unresolved_count": 1,
+    "delayed_retry_skipped_final_model_count": 0
   },
   "incremental": {
-    "reused_successful_articles": 0,
-    "new_articles_analyzed": 17,
+    "reused_successful_articles": 15,
+    "new_articles_analyzed": 2,
     "retried_previous_day_articles": 0,
     "previous_day_retry_successes": 0
   },
+  "unresolved_articles": [
+    {
+      "category": "時事脈搏",
+      "title": "甯漢豪:轄下多項研發獲獎 逐步推展至業界及私人工程",
+      "canonical_url": "https://www.hkej.com/instantnews/current/article/4365305/%E7%94%AF%E6%BC%A2%E8%B1%AA%3A%E8%BD%84%E4%B8%8B%E5%A4%9A%E9%A0%85%E7%A0%94%E7%99%BC%E7%8D%B2%E7%8D%8E+%E9%80%90%E6%AD%A5%E6%8E%A8%E5%B1%95%E8%87%B3%E6%A5%AD%E7%95%8C%E5%8F%8A%E7%A7%81%E4%BA%BA%E5%B7%A5%E7%A8%8B",
+      "source_article_id": "4365305",
+      "attention_tier": "light",
+      "theme": "general",
+      "must_keep": false,
+      "error_classification": "incomplete_model_output",
+      "error": "Model response omitted this article from the category batch.",
+      "model_used": "qwen/qwen3-32b",
+      "delayed_retry_attempted": false,
+      "delayed_retry_model_chain": [],
+      "delayed_retry_final_model": null,
+      "published_at": "2026-04-05T12:48:00+08:00"
+    }
+  ],
   "totals": {
     "article_count": 17,
-    "successful_article_analyses": 15,
-    "failed_article_analyses": 2,
-    "full_text_article_count": 16,
-    "truncated_article_count": 1,
+    "successful_article_analyses": 16,
+    "failed_article_analyses": 1,
+    "full_text_article_count": 17,
+    "truncated_article_count": 0,
     "successful_categories": 3,
     "partial_categories": 1,
     "failed_categories": 0
@@ -188,7 +213,7 @@
       "model_used": "meta-llama/llama-4-scout-17b-16e-instruct",
       "sub_batch_count": 2,
       "diagnostics": {
-        "sub_batch_count": 1,
+        "sub_batch_count": 2,
         "split_reasons": [],
         "models_attempted": [
           "meta-llama/llama-4-scout-17b-16e-instruct"
@@ -392,7 +417,7 @@
       "model_used": "meta-llama/llama-4-scout-17b-16e-instruct",
       "sub_batch_count": 2,
       "diagnostics": {
-        "sub_batch_count": 1,
+        "sub_batch_count": 2,
         "split_reasons": [],
         "models_attempted": [
           "meta-llama/llama-4-scout-17b-16e-instruct"
@@ -752,7 +777,7 @@
       "model_used": "meta-llama/llama-4-scout-17b-16e-instruct",
       "sub_batch_count": 2,
       "diagnostics": {
-        "sub_batch_count": 1,
+        "sub_batch_count": 2,
         "split_reasons": [],
         "models_attempted": [
           "meta-llama/llama-4-scout-17b-16e-instruct"
@@ -769,9 +794,9 @@
       "article_count": 12,
       "status": "partial",
       "key_developments": [
-        "香港天文台發出黃雨警告訊號，未來一兩小時香港料雨勢較大及有狂風雷暴",
-        "伊朗核電站附近遇襲，IAEA稱無輻射上升通報",
-        "美軍成功營救伊朗失蹤美軍機師，特朗普稱搜救行動非常英勇"
+        "天文台發出黃雨警告訊號",
+        "香港未來一兩小時料雨勢較大及有狂風雷暴",
+        "中國留學生學歷造假被韓方勒令出境"
       ],
       "named_entities": [
         {
@@ -783,12 +808,8 @@
           "type": "country"
         },
         {
-          "name": "伊朗",
+          "name": "中國",
           "type": "country"
-        },
-        {
-          "name": "特朗普",
-          "type": "person"
         }
       ],
       "articles": [
@@ -831,11 +852,31 @@
           "canonical_url": "https://www.hkej.com/instantnews/current/article/4365307/%E7%BE%8E%E9%80%AE%E6%8D%95%E4%BC%8A%E6%9C%97%E5%B7%B2%E6%95%85%E5%B0%87%E9%A0%98%E8%98%87%E8%90%8A%E9%A6%AC%E5%B0%BC%E4%BE%84%E5%A5%B3+%E8%98%87%E8%90%8A%E9%A6%AC%E5%B0%BC%E5%A5%B3%E5%85%92%E5%90%A6%E8%AA%8D",
           "published_at": "2026-04-05T13:38:00+08:00",
           "section": "時事脈搏",
-          "novelty_score": null,
-          "relevance_score": null,
-          "urgency_score": null,
-          "named_entities": [],
-          "key_points": [],
+          "novelty_score": 8,
+          "relevance_score": 9,
+          "urgency_score": 8,
+          "named_entities": [
+            {
+              "name": "Hamideh Soleimani Afshar",
+              "type": "person"
+            },
+            {
+              "name": "Suleimani",
+              "type": "person"
+            },
+            {
+              "name": "Iran",
+              "type": "country"
+            },
+            {
+              "name": "United States",
+              "type": "country"
+            }
+          ],
+          "key_points": [
+            "US authorities arrested Hamideh Soleimani Afshar, the niece of Iranian Revolutionary Guard Corps commander Qasem Soleimani, and her daughter.",
+            "Soleimani's daughters deny any family members are in US custody."
+          ],
           "content_truncated": false,
           "original_content_length_chars": 256,
           "analyzed_content_length_chars": 256,
@@ -847,9 +888,14 @@
           "theme": "geopolitics",
           "attention_reason": "High-signal geopolitics headline based on title/summary keywords.",
           "must_keep": true,
-          "model_used": "qwen/qwen3-32b",
-          "error_classification": "incomplete_model_output",
-          "error": "Model response omitted this article from the category batch."
+          "model_used": "llama-3.1-8b-instant",
+          "delayed_retry_attempted": true,
+          "delayed_retry_model_chain": [
+            "llama-3.1-8b-instant"
+          ],
+          "delayed_retry_final_model": "openai/gpt-oss-20b",
+          "error_classification": null,
+          "error": null
         },
         {
           "source_article_id": "4365308",
@@ -942,18 +988,21 @@
           "urgency_score": null,
           "named_entities": [],
           "key_points": [],
-          "content_truncated": true,
+          "content_truncated": false,
           "original_content_length_chars": 870,
-          "analyzed_content_length_chars": 470,
+          "analyzed_content_length_chars": 870,
           "original_content_token_estimate": 218,
-          "analyzed_content_token_estimate": 118,
-          "truncation_reason": "Category batch request exceeded the working request budget; article content was shortened to fit.",
-          "analysis_method": "truncated_text",
+          "analyzed_content_token_estimate": 218,
+          "truncation_reason": null,
+          "analysis_method": "full_text",
           "attention_tier": "light",
           "theme": "general",
           "attention_reason": "Lighter treatment because this story sits in the 時事脈搏 section without strong market-moving signals.",
           "must_keep": false,
           "model_used": "qwen/qwen3-32b",
+          "delayed_retry_attempted": false,
+          "delayed_retry_model_chain": [],
+          "delayed_retry_final_model": null,
           "error_classification": "incomplete_model_output",
           "error": "Model response omitted this article from the category batch."
         },
@@ -1246,22 +1295,18 @@
       ],
       "subgroups": [
         {
-          "title": "天氣相關新聞",
-          "theme_rationale": "與天氣相關的新聞報導",
-          "article_count": 3,
+          "title": "Weather Updates",
+          "theme_rationale": "Articles related to weather forecasts and warnings",
+          "article_count": 2,
           "key_developments": [
-            "香港天文台發出黃雨警告訊號",
-            "未來一兩小時香港料雨勢較大及有狂風雷暴",
-            "本港廣泛地區短期料大雨"
+            "天文台發出黃雨警告訊號",
+            "香港未來一兩小時料雨勢較大及有狂風雷暴",
+            "天文台發出特別天氣提示"
           ],
           "named_entities": [
             {
               "name": "天文台",
               "type": "institution"
-            },
-            {
-              "name": "香港",
-              "type": "country"
             }
           ],
           "articles": [
@@ -1331,76 +1376,89 @@
               "model_used": "meta-llama/llama-4-scout-17b-16e-instruct",
               "error_classification": null,
               "error": null
-            },
-            {
-              "source_article_id": "4365302",
-              "title": "天氣丨本港廣泛地區短期料大雨",
-              "canonical_url": "https://www.hkej.com/instantnews/current/article/4365302/%E5%A4%A9%E6%B0%A3%E4%B8%A8%E6%9C%AC%E6%B8%AF%E5%BB%A3%E6%B3%9B%E5%9C%B0%E5%8D%80%E7%9F%AD%E6%9C%9F%E6%96%99%E5%A4%A7%E9%9B%A8",
-              "published_at": "2026-04-05T11:23:00+08:00",
-              "section": "時事脈搏",
-              "novelty_score": 6,
-              "relevance_score": 2,
-              "urgency_score": 8,
-              "named_entities": [
-                {
-                  "name": "天文台",
-                  "type": "institution"
-                },
-                {
-                  "name": "香港",
-                  "type": "country"
-                }
-              ],
-              "key_points": [
-                "本港廣泛地區短期料大雨",
-                "天文台發出特別天氣提示"
-              ],
-              "content_truncated": false,
-              "original_content_length_chars": 125,
-              "analyzed_content_length_chars": 125,
-              "original_content_token_estimate": 32,
-              "analyzed_content_token_estimate": 32,
-              "truncation_reason": null,
-              "analysis_method": "full_text",
-              "attention_tier": "light",
-              "theme": "general",
-              "attention_reason": "Lighter treatment because this story sits in the 時事脈搏 section without strong market-moving signals.",
-              "must_keep": false,
-              "model_used": "meta-llama/llama-4-scout-17b-16e-instruct",
-              "error_classification": null,
-              "error": null
             }
           ],
           "model_used": "meta-llama/llama-4-scout-17b-16e-instruct"
         },
         {
-          "title": "國際事件",
-          "theme_rationale": "國際事件相關新聞報導",
+          "title": "Geopolitical Tensions",
+          "theme_rationale": "Articles related to international conflicts and diplomatic issues",
           "article_count": 2,
           "key_developments": [
-            "美軍成功營救伊朗失蹤美軍機師",
-            "特朗普稱搜救行動非常英勇",
-            "中國留學生學歷造假被勒令出境"
+            "US authorities arrested Hamideh Soleimani Afshar, the niece of Iranian Revolutionary Guard Corps commander Qasem Soleimani, and her daughter.",
+            "Soleimani's daughters deny any family members are in US custody.",
+            "美軍成功營救伊朗失蹤美軍機師"
           ],
           "named_entities": [
             {
-              "name": "伊朗",
-              "type": "country"
-            },
-            {
-              "name": "特朗普",
+              "name": "Hamideh Soleimani Afshar",
               "type": "person"
             },
             {
-              "name": "美國",
+              "name": "Suleimani",
+              "type": "person"
+            },
+            {
+              "name": "Iran",
               "type": "country"
             },
             {
-              "name": "F-15",
-              "type": "asset"
+              "name": "United States",
+              "type": "country"
             }
           ],
           "articles": [
+            {
+              "source_article_id": "4365307",
+              "title": "美逮捕伊朗已故將領蘇萊馬尼侄女 蘇萊馬尼女兒否認",
+              "canonical_url": "https://www.hkej.com/instantnews/current/article/4365307/%E7%BE%8E%E9%80%AE%E6%8D%95%E4%BC%8A%E6%9C%97%E5%B7%B2%E6%95%85%E5%B0%87%E9%A0%98%E8%98%87%E8%90%8A%E9%A6%AC%E5%B0%BC%E4%BE%84%E5%A5%B3+%E8%98%87%E8%90%8A%E9%A6%AC%E5%B0%BC%E5%A5%B3%E5%85%92%E5%90%A6%E8%AA%8D",
+              "published_at": "2026-04-05T13:38:00+08:00",
+              "section": "時事脈搏",
+              "novelty_score": 8,
+              "relevance_score": 9,
+              "urgency_score": 8,
+              "named_entities": [
+                {
+                  "name": "Hamideh Soleimani Afshar",
+                  "type": "person"
+                },
+                {
+                  "name": "Suleimani",
+                  "type": "person"
+                },
+                {
+                  "name": "Iran",
+                  "type": "country"
+                },
+                {
+                  "name": "United States",
+                  "type": "country"
+                }
+              ],
+              "key_points": [
+                "US authorities arrested Hamideh Soleimani Afshar, the niece of Iranian Revolutionary Guard Corps commander Qasem Soleimani, and her daughter.",
+                "Soleimani's daughters deny any family members are in US custody."
+              ],
+              "content_truncated": false,
+              "original_content_length_chars": 256,
+              "analyzed_content_length_chars": 256,
+              "original_content_token_estimate": 64,
+              "analyzed_content_token_estimate": 64,
+              "truncation_reason": null,
+              "analysis_method": "full_text",
+              "attention_tier": "high",
+              "theme": "geopolitics",
+              "attention_reason": "High-signal geopolitics headline based on title/summary keywords.",
+              "must_keep": true,
+              "model_used": "llama-3.1-8b-instant",
+              "delayed_retry_attempted": true,
+              "delayed_retry_model_chain": [
+                "llama-3.1-8b-instant"
+              ],
+              "delayed_retry_final_model": "openai/gpt-oss-20b",
+              "error_classification": null,
+              "error": null
+            },
             {
               "source_article_id": "4365306",
               "title": "伊朗戰爭丨特朗普:已營救失蹤第二名美軍機師",
@@ -1446,7 +1504,34 @@
               "model_used": "meta-llama/llama-4-scout-17b-16e-instruct",
               "error_classification": null,
               "error": null
+            }
+          ],
+          "model_used": "meta-llama/llama-4-scout-17b-16e-instruct"
+        },
+        {
+          "title": "General News",
+          "theme_rationale": "Articles related to general news and social issues",
+          "article_count": 1,
+          "key_developments": [
+            "中國留學生學歷造假",
+            "被韓方勒令出境",
+            "涉偽造學歷"
+          ],
+          "named_entities": [
+            {
+              "name": "中國",
+              "type": "country"
             },
+            {
+              "name": "南韓",
+              "type": "country"
+            },
+            {
+              "name": "湖南大學",
+              "type": "institution"
+            }
+          ],
+          "articles": [
             {
               "source_article_id": "4365299",
               "title": "偽造學歷丨5中國留學生被韓勒令出境 指舉措不當提訴訟",
@@ -1493,29 +1578,132 @@
           "model_used": "meta-llama/llama-4-scout-17b-16e-instruct"
         },
         {
-          "title": "地緣政治局勢",
-          "theme_rationale": "國際關係與衝突相關新聞",
-          "article_count": 3,
+          "title": "Weather and General News",
+          "theme_rationale": "Articles about weather forecasts and general news events",
+          "article_count": 2,
           "key_developments": [
-            "伊朗核電站附近遇襲，IAEA稱無輻射上升通報",
-            "特朗普促伊朗開放海峽，伊朗拒絕美國威脅",
-            "美國針對伊朗軍事行動將動用大部分隱型JASSM-ER巡航導彈庫存"
+            "本港廣泛地區短期料大雨",
+            "天文台發出特別天氣提示",
+            "楊何蓓茵清明節到浩園拜祭殉職公務員"
           ],
           "named_entities": [
             {
-              "name": "伊朗",
+              "name": "天文台",
+              "type": "institution"
+            },
+            {
+              "name": "香港",
               "type": "country"
             },
+            {
+              "name": "楊何蓓茵",
+              "type": "person"
+            },
+            {
+              "name": "何偉豪",
+              "type": "person"
+            }
+          ],
+          "articles": [
+            {
+              "source_article_id": "4365302",
+              "title": "天氣丨本港廣泛地區短期料大雨",
+              "canonical_url": "https://www.hkej.com/instantnews/current/article/4365302/%E5%A4%A9%E6%B0%A3%E4%B8%A8%E6%9C%AC%E6%B8%AF%E5%BB%A3%E6%B3%9B%E5%9C%B0%E5%8D%80%E7%9F%AD%E6%9C%9F%E6%96%99%E5%A4%A7%E9%9B%A8",
+              "published_at": "2026-04-05T11:23:00+08:00",
+              "section": "時事脈搏",
+              "novelty_score": 6,
+              "relevance_score": 2,
+              "urgency_score": 8,
+              "named_entities": [
+                {
+                  "name": "天文台",
+                  "type": "institution"
+                },
+                {
+                  "name": "香港",
+                  "type": "country"
+                }
+              ],
+              "key_points": [
+                "本港廣泛地區短期料大雨",
+                "天文台發出特別天氣提示"
+              ],
+              "content_truncated": false,
+              "original_content_length_chars": 125,
+              "analyzed_content_length_chars": 125,
+              "original_content_token_estimate": 32,
+              "analyzed_content_token_estimate": 32,
+              "truncation_reason": null,
+              "analysis_method": "full_text",
+              "attention_tier": "light",
+              "theme": "general",
+              "attention_reason": "Lighter treatment because this story sits in the 時事脈搏 section without strong market-moving signals.",
+              "must_keep": false,
+              "model_used": "meta-llama/llama-4-scout-17b-16e-instruct",
+              "error_classification": null,
+              "error": null
+            },
+            {
+              "source_article_id": "4365301",
+              "title": "清明節丨楊何蓓茵到浩園拜祭何偉豪等殉職公務員",
+              "canonical_url": "https://www.hkej.com/instantnews/current/article/4365301/%E6%B8%85%E6%98%8E%E7%AF%80%E4%B8%A8%E6%A5%8A%E4%BD%95%E8%93%93%E8%8C%B5%E5%88%B0%E6%B5%A9%E5%9C%92%E6%8B%9C%E7%A5%AD%E4%BD%95%E5%81%89%E8%B1%AA%E7%AD%89%E6%AE%89%E8%81%B7%E5%85%AC%E5%8B%99%E5%93%A1",
+              "published_at": "2026-04-05T11:21:00+08:00",
+              "section": "時事脈搏",
+              "novelty_score": 2,
+              "relevance_score": 3,
+              "urgency_score": 1,
+              "named_entities": [
+                {
+                  "name": "楊何蓓茵",
+                  "type": "person"
+                },
+                {
+                  "name": "何偉豪",
+                  "type": "person"
+                },
+                {
+                  "name": "公務員事務局",
+                  "type": "institution"
+                }
+              ],
+              "key_points": [
+                "楊何蓓茵清明節到浩園拜祭殉職公務員",
+                "悼念何偉豪等因公殉職者"
+              ],
+              "content_truncated": false,
+              "original_content_length_chars": 192,
+              "analyzed_content_length_chars": 192,
+              "original_content_token_estimate": 48,
+              "analyzed_content_token_estimate": 48,
+              "truncation_reason": null,
+              "analysis_method": "full_text",
+              "attention_tier": "light",
+              "theme": "general",
+              "attention_reason": "Lighter treatment because this story sits in the 時事脈搏 section without strong market-moving signals.",
+              "must_keep": false,
+              "model_used": "meta-llama/llama-4-scout-17b-16e-instruct",
+              "error_classification": null,
+              "error": null
+            }
+          ],
+          "model_used": "meta-llama/llama-4-scout-17b-16e-instruct"
+        },
+        {
+          "title": "Geopolitical Events",
+          "theme_rationale": "Article about geopolitical tensions and incidents",
+          "article_count": 1,
+          "key_developments": [
+            "伊朗核電站附近遇襲",
+            "IAEA稱無輻射上升通報",
+            "中東局勢升溫"
+          ],
+          "named_entities": [
             {
               "name": "IAEA",
               "type": "organization"
             },
             {
-              "name": "特朗普",
-              "type": "person"
-            },
-            {
-              "name": "美國",
+              "name": "伊朗",
               "type": "country"
             }
           ],
@@ -1561,7 +1749,38 @@
               "model_used": "meta-llama/llama-4-scout-17b-16e-instruct",
               "error_classification": null,
               "error": null
+            }
+          ],
+          "model_used": "meta-llama/llama-4-scout-17b-16e-instruct"
+        },
+        {
+          "title": "地緣政治局勢",
+          "theme_rationale": "國際關係與衝突相關新聞",
+          "article_count": 2,
+          "key_developments": [
+            "特朗普要求伊朗開放海峽，伊朗拒絕美國威脅",
+            "美國據報部署大部分遠程導彈針對伊朗軍事行動",
+            "伊朗與美國之間的緊張局勢升級"
+          ],
+          "named_entities": [
+            {
+              "name": "特朗普",
+              "type": "person"
             },
+            {
+              "name": "伊朗",
+              "type": "country"
+            },
+            {
+              "name": "美國",
+              "type": "country"
+            },
+            {
+              "name": "JASSM-ER",
+              "type": "asset"
+            }
+          ],
+          "articles": [
             {
               "source_article_id": "4365296",
               "title": "中東戰爭丨特朗普再發最後通牒促開放海峽 伊朗拒絕",
@@ -1650,75 +1869,24 @@
           "model_used": "meta-llama/llama-4-scout-17b-16e-instruct"
         },
         {
-          "title": "社會與天氣動態",
-          "theme_rationale": "社會事件與天氣相關新聞",
-          "article_count": 2,
+          "title": "天氣與災害",
+          "theme_rationale": "與自然災害或天氣相關的新聞",
+          "article_count": 1,
           "key_developments": [
-            "楊何蓓茵清明節到浩園拜祭殉職公務員",
             "香港未來一兩小時有大雨和狂風雷暴",
-            "悼念何偉豪等因公殉職者"
+            "天文台發出特別天氣提示"
           ],
           "named_entities": [
             {
-              "name": "楊何蓓茵",
-              "type": "person"
-            },
-            {
-              "name": "何偉豪",
-              "type": "person"
-            },
-            {
-              "name": "公務員事務局",
-              "type": "institution"
-            },
-            {
               "name": "香港",
               "type": "country"
+            },
+            {
+              "name": "珠江口",
+              "type": "other"
             }
           ],
           "articles": [
-            {
-              "source_article_id": "4365301",
-              "title": "清明節丨楊何蓓茵到浩園拜祭何偉豪等殉職公務員",
-              "canonical_url": "https://www.hkej.com/instantnews/current/article/4365301/%E6%B8%85%E6%98%8E%E7%AF%80%E4%B8%A8%E6%A5%8A%E4%BD%95%E8%93%93%E8%8C%B5%E5%88%B0%E6%B5%A9%E5%9C%92%E6%8B%9C%E7%A5%AD%E4%BD%95%E5%81%89%E8%B1%AA%E7%AD%89%E6%AE%89%E8%81%B7%E5%85%AC%E5%8B%99%E5%93%A1",
-              "published_at": "2026-04-05T11:21:00+08:00",
-              "section": "時事脈搏",
-              "novelty_score": 2,
-              "relevance_score": 3,
-              "urgency_score": 1,
-              "named_entities": [
-                {
-                  "name": "楊何蓓茵",
-                  "type": "person"
-                },
-                {
-                  "name": "何偉豪",
-                  "type": "person"
-                },
-                {
-                  "name": "公務員事務局",
-                  "type": "institution"
-                }
-              ],
-              "key_points": [
-                "楊何蓓茵清明節到浩園拜祭殉職公務員",
-                "悼念何偉豪等因公殉職者"
-              ],
-              "content_truncated": false,
-              "original_content_length_chars": 192,
-              "analyzed_content_length_chars": 192,
-              "original_content_token_estimate": 48,
-              "analyzed_content_token_estimate": 48,
-              "truncation_reason": null,
-              "analysis_method": "full_text",
-              "attention_tier": "light",
-              "theme": "general",
-              "attention_reason": "Lighter treatment because this story sits in the 時事脈搏 section without strong market-moving signals.",
-              "must_keep": false,
-              "model_used": "meta-llama/llama-4-scout-17b-16e-instruct",
-              "error_classification": null,
-              "error": null
-            },
             {
               "source_article_id": "4365297",
               "title": "天氣丨未來一兩小時部分地區雨勢較大及有幾陣狂風雷暴",
@@ -1763,31 +1931,24 @@
       ],
       "analysis_profile": "light",
       "model_used": "meta-llama/llama-4-scout-17b-16e-instruct",
-      "sub_batch_count": 18,
+      "sub_batch_count": 16,
       "diagnostics": {
-        "sub_batch_count": 13,
-        "split_reasons": [
-          "pre_send_budget"
-        ],
+        "sub_batch_count": 16,
+        "split_reasons": [],
         "models_attempted": [
           "meta-llama/llama-4-scout-17b-16e-instruct",
-          "qwen/qwen3-32b"
+          "qwen/qwen3-32b",
+          "llama-3.1-8b-instant"
         ],
-        "estimated_input_tokens_max": 1352,
-        "serialized_request_bytes_max": 7089,
+        "estimated_input_tokens_max": 758,
+        "serialized_request_bytes_max": 5045,
         "rate_limit_waits": 1,
-        "partial_article_count": 2
+        "partial_article_count": 1
       },
       "error": null
     }
   ],
   "errors": [
-    {
-      "type": "article",
-      "target": "https://www.hkej.com/instantnews/current/article/4365307/%E7%BE%8E%E9%80%AE%E6%8D%95%E4%BC%8A%E6%9C%97%E5%B7%B2%E6%95%85%E5%B0%87%E9%A0%98%E8%98%87%E8%90%8A%E9%A6%AC%E5%B0%BC%E4%BE%84%E5%A5%B3+%E8%98%87%E8%90%8A%E9%A6%AC%E5%B0%BC%E5%A5%B3%E5%85%92%E5%90%A6%E8%AA%8D",
-      "message": "Model response omitted this article from the category batch.",
-      "classification": "incomplete_model_output"
-    },
     {
       "type": "article",
       "target": "https://www.hkej.com/instantnews/current/article/4365305/%E7%94%AF%E6%BC%A2%E8%B1%AA%3A%E8%BD%84%E4%B8%8B%E5%A4%9A%E9%A0%85%E7%A0%94%E7%99%BC%E7%8D%B2%E7%8D%8E+%E9%80%90%E6%AD%A5%E6%8E%A8%E5%B1%95%E8%87%B3%E6%A5%AD%E7%95%8C%E5%8F%8A%E7%A7%81%E4%BA%BA%E5%B7%A5%E7%A8%8B",
