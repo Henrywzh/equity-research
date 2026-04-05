@@ -146,7 +146,7 @@ def main(argv: list[str] | None = None) -> int:
             print(json.dumps(result, ensure_ascii=False, indent=2))
         else:
             _print_local_test_result(result)
-        return 0 if result["analysis"]["status"] != "failed" else 1
+        return 0 if result["scrape"]["status"] == "success" and result["analysis"]["status"] != "failed" else 1
 
     if args.command == "notify":
         sent, message = send_analysis_summary_email(load_analysis_result(args.result_path))
@@ -248,6 +248,23 @@ def run_local_test(
     send_email: bool = True,
 ) -> dict[str, object]:
     scrape_result = run_scrape(data_dir=data_dir, db_path=db_path)
+    if scrape_result.get("status") != "success":
+        return {
+            "scrape": scrape_result,
+            "analysis": {
+                "report_date": date_string,
+                "status": "skipped",
+                "output_path": None,
+                "article_count": 0,
+                "category_count": 0,
+                "cached": False,
+            },
+            "notify": {
+                "attempted": False,
+                "sent": False,
+                "message": "Skipped analysis and Gmail because scrape did not complete successfully.",
+            },
+        }
     analysis_result = run_analysis(
         date_string=date_string,
         data_dir=data_dir,

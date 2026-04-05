@@ -286,6 +286,33 @@ class CliTests(unittest.TestCase):
         self.assertFalse(payload["notify"]["sent"])
         mock_notify.assert_not_called()
 
+    def test_local_test_exits_non_zero_and_skips_followups_when_scrape_is_partial(self) -> None:
+        with patch(
+            "daily_macro.cli.run_scrape",
+            return_value={
+                "run_id": 1,
+                "status": "partial_success",
+                "article_count": 4,
+                "placement_count": 10,
+                "errors": ["https://example.com/a: timeout"],
+            },
+        ), patch(
+            "daily_macro.cli.run_analysis",
+        ) as mock_analyze, patch(
+            "daily_macro.cli.send_analysis_summary_email",
+        ) as mock_notify:
+            buffer = io.StringIO()
+            with redirect_stdout(buffer):
+                exit_code = main(["local-test", "--json"])
+
+        self.assertEqual(exit_code, 1)
+        payload = json.loads(buffer.getvalue())
+        self.assertEqual(payload["scrape"]["status"], "partial_success")
+        self.assertEqual(payload["analysis"]["status"], "skipped")
+        self.assertFalse(payload["notify"]["attempted"])
+        mock_analyze.assert_not_called()
+        mock_notify.assert_not_called()
+
     def test_query_date_json_output(self) -> None:
         with patch(
             "daily_macro.cli.run_query_command",
