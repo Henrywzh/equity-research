@@ -34,6 +34,14 @@ A scheduled YouTube intake, transcript archiving, Groq-based video analysis, and
 
 See [youtube-intake/README.md](/Users/henrywzh/Desktop/Quant/equity-research/youtube-intake/README.md) for commands, local config setup, and GitHub Actions email delivery details.
 
+### `daily-market/`
+
+A daily macro market price snapshot and bilingual (EN/ZH) summary pipeline. Fetches prices for a configurable watchlist of indices, commodities, FX pairs, and crypto via yfinance, stores OHLCV snapshots in SQLite, and emails a formatted summary twice daily via Gmail.
+
+Runs at 06:59 HKT (morning brief, recaps US/EU close) and 18:00 HKT (evening brief, recaps Asia close).
+
+See [daily-market/README.md](daily-market/README.md) for commands, watchlist config, and data layout.
+
 ### Shared or supporting files
 
 - `models.py`: model registry / shared model-selection utilities used by some experiments
@@ -44,6 +52,7 @@ See [youtube-intake/README.md](/Users/henrywzh/Desktop/Quant/equity-research/you
 ```text
 equity-research/
 ├── daily-macro/              # Daily news scraping and structured storage
+├── daily-market/             # Daily market price snapshots and bilingual Gmail summaries
 ├── marine-traffic-monitor/   # Maritime monitoring and alerting workflow
 ├── youtube-intake/           # YouTube channel intake and Gmail delivery
 ├── not_in_use/               # Archived or inactive experiments
@@ -55,9 +64,9 @@ equity-research/
 
 Start from the subproject you want to work on:
 
-- For daily news scraping and structured storage, go to [daily-macro/README.md](/Users/henrywzh/Desktop/Quant/equity-research/daily-macro/README.md)
-- For the maritime monitor, go to [marine-traffic-monitor/PROJECT_README.md](/Users/henrywzh/Desktop/Quant/equity-research/marine-traffic-monitor/PROJECT_README.md)
-- For scheduled YouTube channel intake and Gmail summaries, go to [youtube-intake/README.md](/Users/henrywzh/Desktop/Quant/equity-research/youtube-intake/README.md)
-- For scheduled YouTube channel intake, Groq analysis, and Gmail delivery, go to [youtube-intake/README.md](/Users/henrywzh/Desktop/Quant/equity-research/youtube-intake/README.md)
+- For daily news scraping and structured storage, go to [daily-macro/README.md](daily-macro/README.md)
+- For daily market price snapshots and Gmail summaries, go to [daily-market/README.md](daily-market/README.md)
+- For the maritime monitor, go to [marine-traffic-monitor/PROJECT_README.md](marine-traffic-monitor/PROJECT_README.md)
+- For scheduled YouTube channel intake, Groq analysis, and Gmail delivery, go to [youtube-intake/README.md](youtube-intake/README.md)
 
 This root README is intentionally broad. Project-specific setup, commands, and operational details live inside each subfolder’s own documentation.
