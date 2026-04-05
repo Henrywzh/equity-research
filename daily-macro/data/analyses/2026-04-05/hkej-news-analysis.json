@@ -1,7 +1,7 @@
 {
   "report_schema_version": 4,
   "report_date": "2026-04-05",
-  "generated_at": "2026-04-05T10:37:14.108239+00:00",
+  "generated_at": "2026-04-05T21:03:21.172333+00:00",
   "source_site": "hkej",
   "status": "partial",
   "model": {
@@ -14,29 +14,29 @@
   },
   "model_switches": [],
   "input": {
-    "article_count": 17,
+    "article_count": 26,
     "category_count": 4
   },
   "diagnostics": {
-    "rate_limit_wait_count": 1,
-    "rate_limit_wait_seconds_total": 46.226,
+    "rate_limit_wait_count": 2,
+    "rate_limit_wait_seconds_total": 101.016,
     "fallback_switch_count": 0,
-    "pre_send_split_count": 2,
+    "pre_send_split_count": 6,
     "response_413_split_count": 0,
     "json_repair_retry_count": 0,
-    "batch_count": 20,
+    "batch_count": 39,
     "failed_batch_count": 0,
-    "delayed_retry_candidate_count": 1,
-    "delayed_retry_attempted_count": 1,
-    "delayed_retry_recovered_count": 1,
+    "delayed_retry_candidate_count": 0,
+    "delayed_retry_attempted_count": 0,
+    "delayed_retry_recovered_count": 0,
     "delayed_retry_failed_count": 0,
     "high_medium_unresolved_count": 0,
     "light_unresolved_count": 1,
     "delayed_retry_skipped_final_model_count": 0
   },
   "incremental": {
-    "reused_successful_articles": 15,
-    "new_articles_analyzed": 2,
+    "reused_successful_articles": 16,
+    "new_articles_analyzed": 10,
     "retried_previous_day_articles": 0,
     "previous_day_retry_successes": 0
   },
@@ -59,11 +59,11 @@
     }
   ],
   "totals": {
-    "article_count": 17,
-    "successful_article_analyses": 16,
+    "article_count": 26,
+    "successful_article_analyses": 25,
     "failed_article_analyses": 1,
-    "full_text_article_count": 17,
-    "truncated_article_count": 0,
+    "full_text_article_count": 21,
+    "truncated_article_count": 5,
     "successful_categories": 3,
     "partial_categories": 1,
     "failed_categories": 0
@@ -227,16 +227,16 @@
     },
     {
       "category": "中國財經",
-      "article_count": 1,
+      "article_count": 2,
       "status": "success",
       "key_developments": [
-        "DeepSeek V4 將搭載華為晶片運行",
-        "中國科技巨頭向華為訂購數十萬片晶片",
-        "V4 預計未來幾周發布"
+        "鴻海3月營收創新高達8037億元新台幣，按月增長34.9%，按年上升45.57%",
+        "華為晶片搭載於DeepSeek V4，運行效能受矚目",
+        "中國科技巨頭向華為訂購數十萬片晶片"
       ],
       "named_entities": [
         {
-          "name": "DeepSeek",
+          "name": "鴻海",
           "type": "company"
         },
         {
@@ -244,23 +244,57 @@
           "type": "company"
         },
         {
-          "name": "阿里巴巴",
+          "name": "DeepSeek",
           "type": "company"
         },
         {
-          "name": "字節跳動",
-          "type": "company"
-        },
-        {
-          "name": "騰訊",
-          "type": "company"
-        },
-        {
-          "name": "寒武紀科技",
-          "type": "company"
+          "name": "台灣",
+          "type": "country"
         }
       ],
       "articles": [
+        {
+          "source_article_id": "4365313",
+          "title": "鴻海3月營收升46% 創新高",
+          "canonical_url": "https://www.hkej.com/instantnews/china/article/4365313/%E9%B4%BB%E6%B5%B73%E6%9C%88%E7%87%9F%E6%94%B6%E5%8D%8746%25+%E5%89%B5%E6%96%B0%E9%AB%98",
+          "published_at": "2026-04-05T16:45:00+08:00",
+          "section": "中國財經",
+          "novelty_score": 6,
+          "relevance_score": 9,
+          "urgency_score": 8,
+          "named_entities": [
+            {
+              "name": "鴻海",
+              "type": "company"
+            },
+            {
+              "name": "台灣",
+              "type": "country"
+            }
+          ],
+          "key_points": [
+            "鴻海3月營收8037億元新台幣，按月增長34.9%，按年上升45.57%",
+            "首季營收2.13萬億元，按季減少18.18%，按年增加29.68%",
+            "第二季營運展望預計呈現季增、年增"
+          ],
+          "content_truncated": false,
+          "original_content_length_chars": 215,
+          "analyzed_content_length_chars": 215,
+          "original_content_token_estimate": 54,
+          "analyzed_content_token_estimate": 54,
+          "truncation_reason": null,
+          "analysis_method": "full_text",
+          "attention_tier": "high",
+          "theme": "macro",
+          "attention_reason": "High-signal macro headline based on title/summary keywords.",
+          "must_keep": true,
+          "model_used": "meta-llama/llama-4-scout-17b-16e-instruct",
+          "delayed_retry_attempted": false,
+          "delayed_retry_model_chain": [],
+          "delayed_retry_final_model": null,
+          "error_classification": null,
+          "error": null
+        },
         {
           "source_article_id": "4365303",
           "title": "AI丨DeepSeek V4據報搭載華為晶片運行",
@@ -321,15 +355,15 @@
         {
           "title": "中國財經 overview",
           "theme_rationale": "Single subgroup because the category size did not require thematic splitting.",
-          "article_count": 1,
+          "article_count": 2,
           "key_developments": [
-            "DeepSeek V4 將搭載華為晶片運行",
-            "中國科技巨頭向華為訂購數十萬片晶片",
-            "V4 預計未來幾周發布"
+            "鴻海3月營收創新高達8037億元新台幣，按月增長34.9%，按年上升45.57%",
+            "華為晶片搭載於DeepSeek V4，運行效能受矚目",
+            "中國科技巨頭向華為訂購數十萬片晶片"
           ],
           "named_entities": [
             {
-              "name": "DeepSeek",
+              "name": "鴻海",
               "type": "company"
             },
             {
@@ -337,23 +371,57 @@
               "type": "company"
             },
             {
-              "name": "阿里巴巴",
+              "name": "DeepSeek",
               "type": "company"
             },
             {
-              "name": "字節跳動",
-              "type": "company"
-            },
-            {
-              "name": "騰訊",
-              "type": "company"
-            },
-            {
-              "name": "寒武紀科技",
-              "type": "company"
+              "name": "台灣",
+              "type": "country"
             }
           ],
           "articles": [
+            {
+              "source_article_id": "4365313",
+              "title": "鴻海3月營收升46% 創新高",
+              "canonical_url": "https://www.hkej.com/instantnews/china/article/4365313/%E9%B4%BB%E6%B5%B73%E6%9C%88%E7%87%9F%E6%94%B6%E5%8D%8746%25+%E5%89%B5%E6%96%B0%E9%AB%98",
+              "published_at": "2026-04-05T16:45:00+08:00",
+              "section": "中國財經",
+              "novelty_score": 6,
+              "relevance_score": 9,
+              "urgency_score": 8,
+              "named_entities": [
+                {
+                  "name": "鴻海",
+                  "type": "company"
+                },
+                {
+                  "name": "台灣",
+                  "type": "country"
+                }
+              ],
+              "key_points": [
+                "鴻海3月營收8037億元新台幣，按月增長34.9%，按年上升45.57%",
+                "首季營收2.13萬億元，按季減少18.18%，按年增加29.68%",
+                "第二季營運展望預計呈現季增、年增"
+              ],
+              "content_truncated": false,
+              "original_content_length_chars": 215,
+              "analyzed_content_length_chars": 215,
+              "original_content_token_estimate": 54,
+              "analyzed_content_token_estimate": 54,
+              "truncation_reason": null,
+              "analysis_method": "full_text",
+              "attention_tier": "high",
+              "theme": "macro",
+              "attention_reason": "High-signal macro headline based on title/summary keywords.",
+              "must_keep": true,
+              "model_used": "meta-llama/llama-4-scout-17b-16e-instruct",
+              "delayed_retry_attempted": false,
+              "delayed_retry_model_chain": [],
+              "delayed_retry_final_model": null,
+              "error_classification": null,
+              "error": null
+            },
             {
               "source_article_id": "4365303",
               "title": "AI丨DeepSeek V4據報搭載華為晶片運行",
@@ -415,15 +483,15 @@
       ],
       "analysis_profile": "standard",
       "model_used": "meta-llama/llama-4-scout-17b-16e-instruct",
-      "sub_batch_count": 2,
+      "sub_batch_count": 3,
       "diagnostics": {
-        "sub_batch_count": 2,
+        "sub_batch_count": 3,
         "split_reasons": [],
         "models_attempted": [
           "meta-llama/llama-4-scout-17b-16e-instruct"
         ],
-        "estimated_input_tokens_max": 617,
-        "serialized_request_bytes_max": 3409,
+        "estimated_input_tokens_max": 559,
+        "serialized_request_bytes_max": 2847,
         "rate_limit_waits": 0,
         "partial_article_count": 0
       },
@@ -431,28 +499,26 @@
     },
     {
       "category": "國際財經",
-      "article_count": 3,
+      "article_count": 5,
       "status": "success",
       "key_developments": [
-        "Anthropic獲英國邀擴大投資，英國政府擬提供方案包括擴增辦公室規模",
-        "三星家族月內繳清遺產稅，李健熙遺留資產約26萬億韓圜",
-        "IEA警告若霍爾木茲海峽續關閉，4月原油及成品油損失將翻倍"
+        "伊朗軍方表示伊拉克不受霍爾木茲海峽航運限制約束",
+        "IEA警告若霍爾木茲海峽續關閉，4月原油及成品油損失將翻倍",
+        "LG新能源起訴富豪汽車韓國公司申請專利禁令",
+        "Anthropic獲英國邀擴大投資",
+        "三星家族月內繳清遺產稅"
       ],
       "named_entities": [
         {
-          "name": "Anthropic",
-          "type": "company"
-        },
-        {
-          "name": "英國",
+          "name": "伊朗",
           "type": "country"
         },
         {
-          "name": "三星",
-          "type": "company"
+          "name": "伊拉克",
+          "type": "country"
         },
         {
-          "name": "李氏家族",
+          "name": "霍爾木茲海峽",
           "type": "other"
         },
         {
@@ -460,11 +526,119 @@
           "type": "institution"
         },
         {
-          "name": "霍爾木茲海峽",
-          "type": "other"
+          "name": "美國",
+          "type": "country"
+        },
+        {
+          "name": "LG新能源",
+          "type": "company"
         }
       ],
       "articles": [
+        {
+          "source_article_id": "4365319",
+          "title": "LG新能源起訴富豪汽車韓國公司侵權 劍指中國電池商",
+          "canonical_url": "https://www.hkej.com/instantnews/international/article/4365319/LG%E6%96%B0%E8%83%BD%E6%BA%90%E8%B5%B7%E8%A8%B4%E5%AF%8C%E8%B1%AA%E6%B1%BD%E8%BB%8A%E9%9F%93%E5%9C%8B%E5%85%AC%E5%8F%B8%E4%BE%B5%E6%AC%8A+%E5%8A%8D%E6%8C%87%E4%B8%AD%E5%9C%8B%E9%9B%BB%E6%B1%A0%E5%95%86",
+          "published_at": "2026-04-05T19:00:00+08:00",
+          "section": "國際財經",
+          "novelty_score": 6,
+          "relevance_score": 8,
+          "urgency_score": 5,
+          "named_entities": [
+            {
+              "name": "LG新能源",
+              "type": "company"
+            },
+            {
+              "name": "富豪汽車",
+              "type": "company"
+            },
+            {
+              "name": "韓國",
+              "type": "country"
+            },
+            {
+              "name": "欣旺達",
+              "type": "company"
+            },
+            {
+              "name": "日產汽車",
+              "type": "company"
+            }
+          ],
+          "key_points": [
+            "LG新能源起訴富豪汽車韓國公司申請專利禁令",
+            "涉及中國電池製造商欣旺達的方形三元鋰電池",
+            "業界認為LG新能源實際上為施壓欣旺達而申請專利禁令"
+          ],
+          "content_truncated": false,
+          "original_content_length_chars": 326,
+          "analyzed_content_length_chars": 326,
+          "original_content_token_estimate": 82,
+          "analyzed_content_token_estimate": 82,
+          "truncation_reason": null,
+          "analysis_method": "full_text",
+          "attention_tier": "medium",
+          "theme": "general",
+          "attention_reason": "Default medium attention because the story is relevant but not an obvious top-priority market mover.",
+          "must_keep": false,
+          "model_used": "meta-llama/llama-4-scout-17b-16e-instruct",
+          "delayed_retry_attempted": false,
+          "delayed_retry_model_chain": [],
+          "delayed_retry_final_model": null,
+          "error_classification": null,
+          "error": null
+        },
+        {
+          "source_article_id": "4365314",
+          "title": "伊朗局勢丨伊拉克船隻獲准使用霍爾木茲海峽",
+          "canonical_url": "https://www.hkej.com/instantnews/international/article/4365314/%E4%BC%8A%E6%9C%97%E5%B1%80%E5%8B%A2%E4%B8%A8%E4%BC%8A%E6%8B%89%E5%85%8B%E8%88%B9%E9%9A%BB%E7%8D%B2%E5%87%86%E4%BD%BF%E7%94%A8%E9%9C%8D%E7%88%BE%E6%9C%A8%E8%8C%B2%E6%B5%B7%E5%B3%BD",
+          "published_at": "2026-04-05T17:09:00+08:00",
+          "section": "國際財經",
+          "novelty_score": 6,
+          "relevance_score": 8,
+          "urgency_score": 7,
+          "named_entities": [
+            {
+              "name": "伊朗",
+              "type": "country"
+            },
+            {
+              "name": "伊拉克",
+              "type": "country"
+            },
+            {
+              "name": "霍爾木茲海峽",
+              "type": "other"
+            },
+            {
+              "name": "美國",
+              "type": "country"
+            }
+          ],
+          "key_points": [
+            "伊朗軍方表示伊拉克不受霍爾木茲海峽航運限制約束",
+            "有望釋放每天多達300萬桶伊拉克石油供應",
+            "法國貨櫃船和日本油輪成功通行霍爾木茲海峽"
+          ],
+          "content_truncated": false,
+          "original_content_length_chars": 159,
+          "analyzed_content_length_chars": 159,
+          "original_content_token_estimate": 40,
+          "analyzed_content_token_estimate": 40,
+          "truncation_reason": null,
+          "analysis_method": "full_text",
+          "attention_tier": "high",
+          "theme": "geopolitics",
+          "attention_reason": "High-signal geopolitics headline based on title/summary keywords.",
+          "must_keep": true,
+          "model_used": "meta-llama/llama-4-scout-17b-16e-instruct",
+          "delayed_retry_attempted": false,
+          "delayed_retry_model_chain": [],
+          "delayed_retry_final_model": null,
+          "error_classification": null,
+          "error": null
+        },
         {
           "source_article_id": "4365311",
           "title": "AI丨Anthropic據報獲英國力邀擴大投資",
@@ -601,15 +775,151 @@
       ],
       "subgroups": [
         {
-          "title": "國際財經 overview",
-          "theme_rationale": "Single subgroup because the category size did not require thematic splitting.",
-          "article_count": 3,
+          "title": "地緣政治",
+          "theme_rationale": "與地緣政治相關的新聞",
+          "article_count": 2,
           "key_developments": [
-            "Anthropic獲英國邀擴大投資，英國政府擬提供方案包括擴增辦公室規模",
-            "三星家族月內繳清遺產稅，李健熙遺留資產約26萬億韓圜",
-            "IEA警告若霍爾木茲海峽續關閉，4月原油及成品油損失將翻倍"
+            "伊朗軍方表示伊拉克不受霍爾木茲海峽航運限制約束",
+            "IEA警告若霍爾木茲海峽續關閉，4月原油及成品油損失將翻倍",
+            "有望釋放每天多達300萬桶伊拉克石油供應"
           ],
           "named_entities": [
+            {
+              "name": "伊朗",
+              "type": "country"
+            },
+            {
+              "name": "伊拉克",
+              "type": "country"
+            },
+            {
+              "name": "霍爾木茲海峽",
+              "type": "other"
+            },
+            {
+              "name": "IEA",
+              "type": "institution"
+            },
+            {
+              "name": "美國",
+              "type": "country"
+            }
+          ],
+          "articles": [
+            {
+              "source_article_id": "4365314",
+              "title": "伊朗局勢丨伊拉克船隻獲准使用霍爾木茲海峽",
+              "canonical_url": "https://www.hkej.com/instantnews/international/article/4365314/%E4%BC%8A%E6%9C%97%E5%B1%80%E5%8B%A2%E4%B8%A8%E4%BC%8A%E6%8B%89%E5%85%8B%E8%88%B9%E9%9A%BB%E7%8D%B2%E5%87%86%E4%BD%BF%E7%94%A8%E9%9C%8D%E7%88%BE%E6%9C%A8%E8%8C%B2%E6%B5%B7%E5%B3%BD",
+              "published_at": "2026-04-05T17:09:00+08:00",
+              "section": "國際財經",
+              "novelty_score": 6,
+              "relevance_score": 8,
+              "urgency_score": 7,
+              "named_entities": [
+                {
+                  "name": "伊朗",
+                  "type": "country"
+                },
+                {
+                  "name": "伊拉克",
+                  "type": "country"
+                },
+                {
+                  "name": "霍爾木茲海峽",
+                  "type": "other"
+                },
+                {
+                  "name": "美國",
+                  "type": "country"
+                }
+              ],
+              "key_points": [
+                "伊朗軍方表示伊拉克不受霍爾木茲海峽航運限制約束",
+                "有望釋放每天多達300萬桶伊拉克石油供應",
+                "法國貨櫃船和日本油輪成功通行霍爾木茲海峽"
+              ],
+              "content_truncated": false,
+              "original_content_length_chars": 159,
+              "analyzed_content_length_chars": 159,
+              "original_content_token_estimate": 40,
+              "analyzed_content_token_estimate": 40,
+              "truncation_reason": null,
+              "analysis_method": "full_text",
+              "attention_tier": "high",
+              "theme": "geopolitics",
+              "attention_reason": "High-signal geopolitics headline based on title/summary keywords.",
+              "must_keep": true,
+              "model_used": "meta-llama/llama-4-scout-17b-16e-instruct",
+              "delayed_retry_attempted": false,
+              "delayed_retry_model_chain": [],
+              "delayed_retry_final_model": null,
+              "error_classification": null,
+              "error": null
+            },
+            {
+              "source_article_id": "4365304",
+              "title": "能源危機丨IEA:若霍爾木茲海峽續關閉 4月原油及成品油損失將翻倍",
+              "canonical_url": "https://www.hkej.com/instantnews/international/article/4365304/%E8%83%BD%E6%BA%90%E5%8D%B1%E6%A9%9F%E4%B8%A8IEA%3A%E8%8B%A5%E9%9C%8D%E7%88%BE%E6%9C%A8%E8%8C%B2%E6%B5%B7%E5%B3%BD%E7%BA%8C%E9%97%9C%E9%96%89+4%E6%9C%88%E5%8E%9F%E6%B2%B9%E5%8F%8A%E6%88%90%E5%93%81%E6%B2%B9%E6%90%8D%E5%A4%B1%E5%B0%87%E7%BF%BB%E5%80%8D",
+              "published_at": "2026-04-05T12:27:00+08:00",
+              "section": "國際財經",
+              "novelty_score": 7,
+              "relevance_score": 9,
+              "urgency_score": 8,
+              "named_entities": [
+                {
+                  "name": "IEA",
+                  "type": "institution"
+                },
+                {
+                  "name": "霍爾木茲海峽",
+                  "type": "other"
+                },
+                {
+                  "name": "比羅爾",
+                  "type": "person"
+                }
+              ],
+              "key_points": [
+                "IEA警告若霍爾木茲海峽續關閉",
+                "4月原油及成品油損失將翻倍",
+                "各國應抑制囤積石油和燃料的衝動"
+              ],
+              "content_truncated": false,
+              "original_content_length_chars": 381,
+              "analyzed_content_length_chars": 381,
+              "original_content_token_estimate": 96,
+              "analyzed_content_token_estimate": 96,
+              "truncation_reason": null,
+              "analysis_method": "full_text",
+              "attention_tier": "medium",
+              "theme": "general",
+              "attention_reason": "Default medium attention because the story is relevant but not an obvious top-priority market mover.",
+              "must_keep": false,
+              "model_used": "meta-llama/llama-4-scout-17b-16e-instruct",
+              "error_classification": null,
+              "error": null
+            }
+          ],
+          "model_used": "meta-llama/llama-4-scout-17b-16e-instruct"
+        },
+        {
+          "title": "企業動態",
+          "theme_rationale": "與企業相關的新聞",
+          "article_count": 3,
+          "key_developments": [
+            "LG新能源起訴富豪汽車韓國公司申請專利禁令",
+            "Anthropic獲英國邀擴大投資",
+            "三星家族月內繳清遺產稅"
+          ],
+          "named_entities": [
+            {
+              "name": "LG新能源",
+              "type": "company"
+            },
+            {
+              "name": "富豪汽車",
+              "type": "company"
+            },
             {
               "name": "Anthropic",
               "type": "company"
@@ -625,17 +935,63 @@
             {
               "name": "李氏家族",
               "type": "other"
-            },
-            {
-              "name": "IEA",
-              "type": "institution"
-            },
-            {
-              "name": "霍爾木茲海峽",
-              "type": "other"
             }
           ],
           "articles": [
+            {
+              "source_article_id": "4365319",
+              "title": "LG新能源起訴富豪汽車韓國公司侵權 劍指中國電池商",
+              "canonical_url": "https://www.hkej.com/instantnews/international/article/4365319/LG%E6%96%B0%E8%83%BD%E6%BA%90%E8%B5%B7%E8%A8%B4%E5%AF%8C%E8%B1%AA%E6%B1%BD%E8%BB%8A%E9%9F%93%E5%9C%8B%E5%85%AC%E5%8F%B8%E4%BE%B5%E6%AC%8A+%E5%8A%8D%E6%8C%87%E4%B8%AD%E5%9C%8B%E9%9B%BB%E6%B1%A0%E5%95%86",
+              "published_at": "2026-04-05T19:00:00+08:00",
+              "section": "國際財經",
+              "novelty_score": 6,
+              "relevance_score": 8,
+              "urgency_score": 5,
+              "named_entities": [
+                {
+                  "name": "LG新能源",
+                  "type": "company"
+                },
+                {
+                  "name": "富豪汽車",
+                  "type": "company"
+                },
+                {
+                  "name": "韓國",
+                  "type": "country"
+                },
+                {
+                  "name": "欣旺達",
+                  "type": "company"
+                },
+                {
+                  "name": "日產汽車",
+                  "type": "company"
+                }
+              ],
+              "key_points": [
+                "LG新能源起訴富豪汽車韓國公司申請專利禁令",
+                "涉及中國電池製造商欣旺達的方形三元鋰電池",
+                "業界認為LG新能源實際上為施壓欣旺達而申請專利禁令"
+              ],
+              "content_truncated": false,
+              "original_content_length_chars": 326,
+              "analyzed_content_length_chars": 326,
+              "original_content_token_estimate": 82,
+              "analyzed_content_token_estimate": 82,
+              "truncation_reason": null,
+              "analysis_method": "full_text",
+              "attention_tier": "medium",
+              "theme": "general",
+              "attention_reason": "Default medium attention because the story is relevant but not an obvious top-priority market mover.",
+              "must_keep": false,
+              "model_used": "meta-llama/llama-4-scout-17b-16e-instruct",
+              "delayed_retry_attempted": false,
+              "delayed_retry_model_chain": [],
+              "delayed_retry_final_model": null,
+              "error_classification": null,
+              "error": null
+            },
             {
               "source_article_id": "4365311",
               "title": "AI丨Anthropic據報獲英國力邀擴大投資",
@@ -725,49 +1081,6 @@
               "model_used": "meta-llama/llama-4-scout-17b-16e-instruct",
               "error_classification": null,
               "error": null
-            },
-            {
-              "source_article_id": "4365304",
-              "title": "能源危機丨IEA:若霍爾木茲海峽續關閉 4月原油及成品油損失將翻倍",
-              "canonical_url": "https://www.hkej.com/instantnews/international/article/4365304/%E8%83%BD%E6%BA%90%E5%8D%B1%E6%A9%9F%E4%B8%A8IEA%3A%E8%8B%A5%E9%9C%8D%E7%88%BE%E6%9C%A8%E8%8C%B2%E6%B5%B7%E5%B3%BD%E7%BA%8C%E9%97%9C%E9%96%89+4%E6%9C%88%E5%8E%9F%E6%B2%B9%E5%8F%8A%E6%88%90%E5%93%81%E6%B2%B9%E6%90%8D%E5%A4%B1%E5%B0%87%E7%BF%BB%E5%80%8D",
-              "published_at": "2026-04-05T12:27:00+08:00",
-              "section": "國際財經",
-              "novelty_score": 7,
-              "relevance_score": 9,
-              "urgency_score": 8,
-              "named_entities": [
-                {
-                  "name": "IEA",
-                  "type": "institution"
-                },
-                {
-                  "name": "霍爾木茲海峽",
-                  "type": "other"
-                },
-                {
-                  "name": "比羅爾",
-                  "type": "person"
-                }
-              ],
-              "key_points": [
-                "IEA警告若霍爾木茲海峽續關閉",
-                "4月原油及成品油損失將翻倍",
-                "各國應抑制囤積石油和燃料的衝動"
-              ],
-              "content_truncated": false,
-              "original_content_length_chars": 381,
-              "analyzed_content_length_chars": 381,
-              "original_content_token_estimate": 96,
-              "analyzed_content_token_estimate": 96,
-              "truncation_reason": null,
-              "analysis_method": "full_text",
-              "attention_tier": "medium",
-              "theme": "general",
-              "attention_reason": "Default medium attention because the story is relevant but not an obvious top-priority market mover.",
-              "must_keep": false,
-              "model_used": "meta-llama/llama-4-scout-17b-16e-instruct",
-              "error_classification": null,
-              "error": null
             }
           ],
           "model_used": "meta-llama/llama-4-scout-17b-16e-instruct"
@@ -775,15 +1088,15 @@
       ],
       "analysis_profile": "standard",
       "model_used": "meta-llama/llama-4-scout-17b-16e-instruct",
-      "sub_batch_count": 2,
+      "sub_batch_count": 6,
       "diagnostics": {
-        "sub_batch_count": 2,
+        "sub_batch_count": 6,
         "split_reasons": [],
         "models_attempted": [
           "meta-llama/llama-4-scout-17b-16e-instruct"
         ],
-        "estimated_input_tokens_max": 1105,
-        "serialized_request_bytes_max": 6646,
+        "estimated_input_tokens_max": 622,
+        "serialized_request_bytes_max": 3335,
         "rate_limit_waits": 0,
         "partial_article_count": 0
       },
@@ -791,28 +1104,294 @@
     },
     {
       "category": "時事脈搏",
-      "article_count": 12,
+      "article_count": 18,
       "status": "partial",
       "key_developments": [
-        "天文台發出黃雨警告訊號",
-        "香港未來一兩小時料雨勢較大及有狂風雷暴",
-        "中國留學生學歷造假被韓方勒令出境"
+        "伊朗與巴基斯坦外長討論地區局勢及雙邊關係",
+        "瀋陽市發生隨機斬人案，致6死10傷",
+        "葡萄牙議長訪華"
       ],
       "named_entities": [
         {
-          "name": "天文台",
-          "type": "institution"
-        },
-        {
-          "name": "香港",
+          "name": "伊朗",
           "type": "country"
         },
         {
-          "name": "中國",
+          "name": "巴基斯坦",
+          "type": "country"
+        },
+        {
+          "name": "瀋陽",
+          "type": "other"
+        },
+        {
+          "name": "葡萄牙",
           "type": "country"
         }
       ],
       "articles": [
+        {
+          "source_article_id": "4365320",
+          "title": "傳瀋陽發生隨機斬人案 釀多人死傷",
+          "canonical_url": "https://www.hkej.com/instantnews/current/article/4365320/%E5%82%B3%E7%80%8B%E9%99%BD%E7%99%BC%E7%94%9F%E9%9A%A8%E6%A9%9F%E6%96%AC%E4%BA%BA%E6%A1%88+%E9%87%80%E5%A4%9A%E4%BA%BA%E6%AD%BB%E5%82%B7",
+          "published_at": "2026-04-05T18:51:00+08:00",
+          "section": "時事脈搏",
+          "novelty_score": 8,
+          "relevance_score": 5,
+          "urgency_score": 7,
+          "named_entities": [
+            {
+              "name": "瀋陽",
+              "type": "other"
+            },
+            {
+              "name": "遼寧省",
+              "type": "country"
+            },
+            {
+              "name": "南京街第三小學",
+              "type": "institution"
+            },
+            {
+              "name": "隨機斬人案",
+              "type": "other"
+            }
+          ],
+          "key_points": [
+            "瀋陽市南五馬路附近發生隨機持刀傷人事件，致6死10傷",
+            "涉事男子作案後跳樓自殺，現場無官方通報"
+          ],
+          "content_truncated": false,
+          "original_content_length_chars": 185,
+          "analyzed_content_length_chars": 185,
+          "original_content_token_estimate": 47,
+          "analyzed_content_token_estimate": 47,
+          "truncation_reason": null,
+          "analysis_method": "full_text",
+          "attention_tier": "light",
+          "theme": "general",
+          "attention_reason": "Lighter treatment because this story sits in the 時事脈搏 section without strong market-moving signals.",
+          "must_keep": false,
+          "model_used": "qwen/qwen3-32b",
+          "delayed_retry_attempted": false,
+          "delayed_retry_model_chain": [],
+          "delayed_retry_final_model": null,
+          "error_classification": null,
+          "error": null
+        },
+        {
+          "source_article_id": "4365318",
+          "title": "中東局勢丨伊朗與巴基斯坦外長通電話 討論地區局勢",
+          "canonical_url": "https://www.hkej.com/instantnews/current/article/4365318/%E4%B8%AD%E6%9D%B1%E5%B1%80%E5%8B%A2%E4%B8%A8%E4%BC%8A%E6%9C%97%E8%88%87%E5%B7%B4%E5%9F%BA%E6%96%AF%E5%9D%A6%E5%A4%96%E9%95%B7%E9%80%9A%E9%9B%BB%E8%A9%B1+%E8%A8%8E%E8%AB%96%E5%9C%B0%E5%8D%80%E5%B1%80%E5%8B%A2",
+          "published_at": "2026-04-05T18:32:00+08:00",
+          "section": "時事脈搏",
+          "novelty_score": 7,
+          "relevance_score": 8,
+          "urgency_score": 8,
+          "named_entities": [
+            {
+              "name": "伊朗",
+              "type": "country"
+            },
+            {
+              "name": "巴基斯坦",
+              "type": "country"
+            },
+            {
+              "name": "阿巴斯·阿拉格齊",
+              "type": "person"
+            },
+            {
+              "name": "伊沙克·達爾",
+              "type": "person"
+            }
+          ],
+          "key_points": [
+            "伊朗與巴基斯坦外長討論地區局勢及雙邊關係",
+            "伊朗譴責美國與以色列對伊襲擊，呼籲國際社會回應"
+          ],
+          "content_truncated": false,
+          "original_content_length_chars": 228,
+          "analyzed_content_length_chars": 228,
+          "original_content_token_estimate": 57,
+          "analyzed_content_token_estimate": 57,
+          "truncation_reason": null,
+          "analysis_method": "full_text",
+          "attention_tier": "high",
+          "theme": "geopolitics",
+          "attention_reason": "High-signal geopolitics headline based on title/summary keywords.",
+          "must_keep": true,
+          "model_used": "qwen/qwen3-32b",
+          "delayed_retry_attempted": false,
+          "delayed_retry_model_chain": [],
+          "delayed_retry_final_model": null,
+          "error_classification": null,
+          "error": null
+        },
+        {
+          "source_article_id": "4365317",
+          "title": "復活清明長假丨截至下午4時 逾36萬人次港人出境",
+          "canonical_url": "https://www.hkej.com/instantnews/current/article/4365317/%E5%BE%A9%E6%B4%BB%E6%B8%85%E6%98%8E%E9%95%B7%E5%81%87%E4%B8%A8%E6%88%AA%E8%87%B3%E4%B8%8B%E5%8D%884%E6%99%82+%E9%80%BE36%E8%90%AC%E4%BA%BA%E6%AC%A1%E6%B8%AF%E4%BA%BA%E5%87%BA%E5%A2%83",
+          "published_at": "2026-04-05T18:09:00+08:00",
+          "section": "時事脈搏",
+          "novelty_score": 4,
+          "relevance_score": 5,
+          "urgency_score": 3,
+          "named_entities": [
+            {
+              "name": "Hong Kong",
+              "type": "country"
+            },
+            {
+              "name": "Easter",
+              "type": "other"
+            },
+            {
+              "name": "Qingming Festival",
+              "type": "other"
+            }
+          ],
+          "key_points": [
+            "Over 360,000 Hong Kong residents traveled abroad during the Easter and Qingming holidays.",
+            "Total entry/exit reached 689,000 by 4 PM, with 425,000 departures."
+          ],
+          "content_truncated": true,
+          "original_content_length_chars": 96,
+          "analyzed_content_length_chars": 0,
+          "original_content_token_estimate": 24,
+          "analyzed_content_token_estimate": 0,
+          "truncation_reason": "Category batch request exceeded the working request budget; article content was shortened to fit.",
+          "analysis_method": "truncated_text",
+          "attention_tier": "light",
+          "theme": "general",
+          "attention_reason": "Lighter treatment because this story sits in the 時事脈搏 section without strong market-moving signals.",
+          "must_keep": false,
+          "model_used": "qwen/qwen3-32b",
+          "delayed_retry_attempted": false,
+          "delayed_retry_model_chain": [],
+          "delayed_retry_final_model": null,
+          "error_classification": null,
+          "error": null
+        },
+        {
+          "source_article_id": "4365316",
+          "title": "天氣丨黃色暴雨警告訊號取消",
+          "canonical_url": "https://www.hkej.com/instantnews/current/article/4365316/%E5%A4%A9%E6%B0%A3%E4%B8%A8%E9%BB%83%E8%89%B2%E6%9A%B4%E9%9B%A8%E8%AD%A6%E5%91%8A%E8%A8%8A%E8%99%9F%E5%8F%96%E6%B6%88",
+          "published_at": "2026-04-05T17:42:00+08:00",
+          "section": "時事脈搏",
+          "novelty_score": 3,
+          "relevance_score": 1,
+          "urgency_score": 1,
+          "named_entities": [],
+          "key_points": [
+            "黃色暴雨警告訊號取消"
+          ],
+          "content_truncated": true,
+          "original_content_length_chars": 22,
+          "analyzed_content_length_chars": 0,
+          "original_content_token_estimate": 6,
+          "analyzed_content_token_estimate": 0,
+          "truncation_reason": "Category batch request exceeded the working request budget; article content was shortened to fit.",
+          "analysis_method": "truncated_text",
+          "attention_tier": "light",
+          "theme": "general",
+          "attention_reason": "Lighter treatment because this story sits in the 時事脈搏 section without strong market-moving signals.",
+          "must_keep": false,
+          "model_used": "meta-llama/llama-4-scout-17b-16e-instruct",
+          "delayed_retry_attempted": false,
+          "delayed_retry_model_chain": [],
+          "delayed_retry_final_model": null,
+          "error_classification": null,
+          "error": null
+        },
+        {
+          "source_article_id": "4365315",
+          "title": "葡萄牙議長本月7日起率團訪華",
+          "canonical_url": "https://www.hkej.com/instantnews/current/article/4365315/%E8%91%A1%E8%90%84%E7%89%99%E8%AD%B0%E9%95%B7%E6%9C%AC%E6%9C%887%E6%97%A5%E8%B5%B7%E7%8E%87%E5%9C%98%E8%A8%AA%E8%8F%AF",
+          "published_at": "2026-04-05T17:19:00+08:00",
+          "section": "時事脈搏",
+          "novelty_score": 4,
+          "relevance_score": 3,
+          "urgency_score": 2,
+          "named_entities": [
+            {
+              "name": "葡萄牙",
+              "type": "country"
+            },
+            {
+              "name": "布蘭科",
+              "type": "person"
+            },
+            {
+              "name": "趙樂際",
+              "type": "person"
+            },
+            {
+              "name": "中國",
+              "type": "country"
+            }
+          ],
+          "key_points": [
+            "葡萄牙議長訪華"
+          ],
+          "content_truncated": true,
+          "original_content_length_chars": 46,
+          "analyzed_content_length_chars": 0,
+          "original_content_token_estimate": 12,
+          "analyzed_content_token_estimate": 0,
+          "truncation_reason": "Category batch request exceeded the working request budget; article content was shortened to fit.",
+          "analysis_method": "truncated_text",
+          "attention_tier": "light",
+          "theme": "general",
+          "attention_reason": "Lighter treatment because this story sits in the 時事脈搏 section without strong market-moving signals.",
+          "must_keep": false,
+          "model_used": "meta-llama/llama-4-scout-17b-16e-instruct",
+          "delayed_retry_attempted": false,
+          "delayed_retry_model_chain": [],
+          "delayed_retry_final_model": null,
+          "error_classification": null,
+          "error": null
+        },
+        {
+          "source_article_id": "4365312",
+          "title": "羅淑佩:考慮微調啟德體育園績效指標",
+          "canonical_url": "https://www.hkej.com/instantnews/current/article/4365312/%E7%BE%85%E6%B7%91%E4%BD%A9%3A%E8%80%83%E6%85%AE%E5%BE%AE%E8%AA%BF%E5%95%9F%E5%BE%B7%E9%AB%94%E8%82%B2%E5%9C%92%E7%B8%BE%E6%95%88%E6%8C%87%E6%A8%99",
+          "published_at": "2026-04-05T16:31:00+08:00",
+          "section": "時事脈搏",
+          "novelty_score": 3,
+          "relevance_score": 2,
+          "urgency_score": 2,
+          "named_entities": [
+            {
+              "name": "羅淑佩",
+              "type": "person"
+            },
+            {
+              "name": "啟德體育園",
+              "type": "institution"
+            }
+          ],
+          "key_points": [
+            "啟德體育園績效指標或微調"
+          ],
+          "content_truncated": true,
+          "original_content_length_chars": 383,
+          "analyzed_content_length_chars": 0,
+          "original_content_token_estimate": 96,
+          "analyzed_content_token_estimate": 0,
+          "truncation_reason": "Category batch request exceeded the working request budget; article content was shortened to fit.",
+          "analysis_method": "truncated_text",
+          "attention_tier": "light",
+          "theme": "general",
+          "attention_reason": "Lighter treatment because this story sits in the 時事脈搏 section without strong market-moving signals.",
+          "must_keep": false,
+          "model_used": "meta-llama/llama-4-scout-17b-16e-instruct",
+          "delayed_retry_attempted": false,
+          "delayed_retry_model_chain": [],
+          "delayed_retry_final_model": null,
+          "error_classification": null,
+          "error": null
+        },
         {
           "source_article_id": "4365309",
           "title": "天氣丨天文台發出黃雨警告訊號",
@@ -988,13 +1567,13 @@
           "urgency_score": null,
           "named_entities": [],
           "key_points": [],
-          "content_truncated": false,
+          "content_truncated": true,
           "original_content_length_chars": 870,
-          "analyzed_content_length_chars": 870,
+          "analyzed_content_length_chars": 470,
           "original_content_token_estimate": 218,
-          "analyzed_content_token_estimate": 218,
-          "truncation_reason": null,
-          "analysis_method": "full_text",
+          "analyzed_content_token_estimate": 118,
+          "truncation_reason": "Category batch request exceeded the working request budget; article content was shortened to fit.",
+          "analysis_method": "truncated_text",
           "attention_tier": "light",
           "theme": "general",
           "attention_reason": "Lighter treatment because this story sits in the 時事脈搏 section without strong market-moving signals.",
@@ -1295,85 +1874,78 @@
       ],
       "subgroups": [
         {
-          "title": "Weather Updates",
-          "theme_rationale": "Articles related to weather forecasts and warnings",
-          "article_count": 2,
+          "title": "國際局勢",
+          "theme_rationale": "與國際事件相關的報道",
+          "article_count": 1,
           "key_developments": [
-            "天文台發出黃雨警告訊號",
-            "香港未來一兩小時料雨勢較大及有狂風雷暴",
-            "天文台發出特別天氣提示"
+            "伊朗與巴基斯坦外長討論地區局勢及雙邊關係",
+            "伊朗譴責美國與以色列對伊襲擊，呼籲國際社會回應"
           ],
           "named_entities": [
             {
-              "name": "天文台",
-              "type": "institution"
+              "name": "伊朗",
+              "type": "country"
+            },
+            {
+              "name": "巴基斯坦",
+              "type": "country"
+            },
+            {
+              "name": "阿巴斯·阿拉格齊",
+              "type": "person"
+            },
+            {
+              "name": "伊沙克·達爾",
+              "type": "person"
             }
           ],
           "articles": [
             {
-              "source_article_id": "4365309",
-              "title": "天氣丨天文台發出黃雨警告訊號",
-              "canonical_url": "https://www.hkej.com/instantnews/current/article/4365309/%E5%A4%A9%E6%B0%A3%E4%B8%A8%E5%A4%A9%E6%96%87%E5%8F%B0%E7%99%BC%E5%87%BA%E9%BB%83%E9%9B%A8%E8%AD%A6%E5%91%8A%E8%A8%8A%E8%99%9F",
-              "published_at": "2026-04-05T14:10:00+08:00",
+              "source_article_id": "4365318",
+              "title": "中東局勢丨伊朗與巴基斯坦外長通電話 討論地區局勢",
+              "canonical_url": "https://www.hkej.com/instantnews/current/article/4365318/%E4%B8%AD%E6%9D%B1%E5%B1%80%E5%8B%A2%E4%B8%A8%E4%BC%8A%E6%9C%97%E8%88%87%E5%B7%B4%E5%9F%BA%E6%96%AF%E5%9D%A6%E5%A4%96%E9%95%B7%E9%80%9A%E9%9B%BB%E8%A9%B1+%E8%A8%8E%E8%AB%96%E5%9C%B0%E5%8D%80%E5%B1%80%E5%8B%A2",
+              "published_at": "2026-04-05T18:32:00+08:00",
               "section": "時事脈搏",
-              "novelty_score": 2,
-              "relevance_score": 1,
-              "urgency_score": 3,
+              "novelty_score": 7,
+              "relevance_score": 8,
+              "urgency_score": 8,
               "named_entities": [
                 {
-                  "name": "天文台",
-                  "type": "institution"
+                  "name": "伊朗",
+                  "type": "country"
+                },
+                {
+                  "name": "巴基斯坦",
+                  "type": "country"
+                },
+                {
+                  "name": "阿巴斯·阿拉格齊",
+                  "type": "person"
+                },
+                {
+                  "name": "伊沙克·達爾",
+                  "type": "person"
                 }
               ],
               "key_points": [
-                "香港發出黃雨警告"
+                "伊朗與巴基斯坦外長討論地區局勢及雙邊關係",
+                "伊朗譴責美國與以色列對伊襲擊，呼籲國際社會回應"
               ],
               "content_truncated": false,
-              "original_content_length_chars": 21,
-              "analyzed_content_length_chars": 21,
-              "original_content_token_estimate": 6,
-              "analyzed_content_token_estimate": 6,
+              "original_content_length_chars": 228,
+              "analyzed_content_length_chars": 228,
+              "original_content_token_estimate": 57,
+              "analyzed_content_token_estimate": 57,
               "truncation_reason": null,
               "analysis_method": "full_text",
-              "attention_tier": "light",
-              "theme": "general",
-              "attention_reason": "Lighter treatment because this story sits in the 時事脈搏 section without strong market-moving signals.",
-              "must_keep": false,
-              "model_used": "meta-llama/llama-4-scout-17b-16e-instruct",
-              "error_classification": null,
-              "error": null
-            },
-            {
-              "source_article_id": "4365308",
-              "title": "天氣丨本港未來一兩小時料雨勢較大及有狂風雷暴",
-              "canonical_url": "https://www.hkej.com/instantnews/current/article/4365308/%E5%A4%A9%E6%B0%A3%E4%B8%A8%E6%9C%AC%E6%B8%AF%E6%9C%AA%E4%BE%86%E4%B8%80%E5%85%A9%E5%B0%8F%E6%99%82%E6%96%99%E9%9B%A8%E5%8B%A2%E8%BC%83%E5%A4%A7%E5%8F%8A%E6%9C%89%E7%8B%82%E9%A2%A8%E9%9B%B7%E6%9A%B4",
-              "published_at": "2026-04-05T13:26:00+08:00",
-              "section": "時事脈搏",
-              "novelty_score": 4,
-              "relevance_score": 2,
-              "urgency_score": 6,
-              "named_entities": [
-                {
-                  "name": "天文台",
-                  "type": "institution"
-                }
-              ],
-              "key_points": [
-                "香港未來一兩小時有大雨和狂風雷暴",
-                "天文台發出特別天氣提示"
-              ],
-              "content_truncated": false,
-              "original_content_length_chars": 69,
-              "analyzed_content_length_chars": 69,
-              "original_content_token_estimate": 18,
-              "analyzed_content_token_estimate": 18,
-              "truncation_reason": null,
-              "analysis_method": "full_text",
-              "attention_tier": "light",
-              "theme": "general",
-              "attention_reason": "Lighter treatment because this story sits in the 時事脈搏 section without strong market-moving signals.",
-              "must_keep": false,
-              "model_used": "meta-llama/llama-4-scout-17b-16e-instruct",
+              "attention_tier": "high",
+              "theme": "geopolitics",
+              "attention_reason": "High-signal geopolitics headline based on title/summary keywords.",
+              "must_keep": true,
+              "model_used": "qwen/qwen3-32b",
+              "delayed_retry_attempted": false,
+              "delayed_retry_model_chain": [],
+              "delayed_retry_final_model": null,
               "error_classification": null,
               "error": null
             }
@@ -1381,33 +1953,233 @@
           "model_used": "meta-llama/llama-4-scout-17b-16e-instruct"
         },
         {
-          "title": "Geopolitical Tensions",
-          "theme_rationale": "Articles related to international conflicts and diplomatic issues",
-          "article_count": 2,
+          "title": "社會動態",
+          "theme_rationale": "與社會事件相關的報道",
+          "article_count": 3,
           "key_developments": [
-            "US authorities arrested Hamideh Soleimani Afshar, the niece of Iranian Revolutionary Guard Corps commander Qasem Soleimani, and her daughter.",
-            "Soleimani's daughters deny any family members are in US custody.",
-            "美軍成功營救伊朗失蹤美軍機師"
+            "瀋陽市發生隨機斬人案，致6死10傷",
+            "逾36萬港人次出境旅遊",
+            "黃色暴雨警告訊號取消"
           ],
           "named_entities": [
             {
-              "name": "Hamideh Soleimani Afshar",
-              "type": "person"
+              "name": "瀋陽",
+              "type": "other"
             },
             {
-              "name": "Suleimani",
-              "type": "person"
-            },
-            {
-              "name": "Iran",
+              "name": "Hong Kong",
               "type": "country"
             },
             {
-              "name": "United States",
+              "name": "遼寧省",
               "type": "country"
             }
           ],
           "articles": [
+            {
+              "source_article_id": "4365320",
+              "title": "傳瀋陽發生隨機斬人案 釀多人死傷",
+              "canonical_url": "https://www.hkej.com/instantnews/current/article/4365320/%E5%82%B3%E7%80%8B%E9%99%BD%E7%99%BC%E7%94%9F%E9%9A%A8%E6%A9%9F%E6%96%AC%E4%BA%BA%E6%A1%88+%E9%87%80%E5%A4%9A%E4%BA%BA%E6%AD%BB%E5%82%B7",
+              "published_at": "2026-04-05T18:51:00+08:00",
+              "section": "時事脈搏",
+              "novelty_score": 8,
+              "relevance_score": 5,
+              "urgency_score": 7,
+              "named_entities": [
+                {
+                  "name": "瀋陽",
+                  "type": "other"
+                },
+                {
+                  "name": "遼寧省",
+                  "type": "country"
+                },
+                {
+                  "name": "南京街第三小學",
+                  "type": "institution"
+                },
+                {
+                  "name": "隨機斬人案",
+                  "type": "other"
+                }
+              ],
+              "key_points": [
+                "瀋陽市南五馬路附近發生隨機持刀傷人事件，致6死10傷",
+                "涉事男子作案後跳樓自殺，現場無官方通報"
+              ],
+              "content_truncated": false,
+              "original_content_length_chars": 185,
+              "analyzed_content_length_chars": 185,
+              "original_content_token_estimate": 47,
+              "analyzed_content_token_estimate": 47,
+              "truncation_reason": null,
+              "analysis_method": "full_text",
+              "attention_tier": "light",
+              "theme": "general",
+              "attention_reason": "Lighter treatment because this story sits in the 時事脈搏 section without strong market-moving signals.",
+              "must_keep": false,
+              "model_used": "qwen/qwen3-32b",
+              "delayed_retry_attempted": false,
+              "delayed_retry_model_chain": [],
+              "delayed_retry_final_model": null,
+              "error_classification": null,
+              "error": null
+            },
+            {
+              "source_article_id": "4365317",
+              "title": "復活清明長假丨截至下午4時 逾36萬人次港人出境",
+              "canonical_url": "https://www.hkej.com/instantnews/current/article/4365317/%E5%BE%A9%E6%B4%BB%E6%B8%85%E6%98%8E%E9%95%B7%E5%81%87%E4%B8%A8%E6%88%AA%E8%87%B3%E4%B8%8B%E5%8D%884%E6%99%82+%E9%80%BE36%E8%90%AC%E4%BA%BA%E6%AC%A1%E6%B8%AF%E4%BA%BA%E5%87%BA%E5%A2%83",
+              "published_at": "2026-04-05T18:09:00+08:00",
+              "section": "時事脈搏",
+              "novelty_score": 4,
+              "relevance_score": 5,
+              "urgency_score": 3,
+              "named_entities": [
+                {
+                  "name": "Hong Kong",
+                  "type": "country"
+                },
+                {
+                  "name": "Easter",
+                  "type": "other"
+                },
+                {
+                  "name": "Qingming Festival",
+                  "type": "other"
+                }
+              ],
+              "key_points": [
+                "Over 360,000 Hong Kong residents traveled abroad during the Easter and Qingming holidays.",
+                "Total entry/exit reached 689,000 by 4 PM, with 425,000 departures."
+              ],
+              "content_truncated": true,
+              "original_content_length_chars": 96,
+              "analyzed_content_length_chars": 0,
+              "original_content_token_estimate": 24,
+              "analyzed_content_token_estimate": 0,
+              "truncation_reason": "Category batch request exceeded the working request budget; article content was shortened to fit.",
+              "analysis_method": "truncated_text",
+              "attention_tier": "light",
+              "theme": "general",
+              "attention_reason": "Lighter treatment because this story sits in the 時事脈搏 section without strong market-moving signals.",
+              "must_keep": false,
+              "model_used": "qwen/qwen3-32b",
+              "delayed_retry_attempted": false,
+              "delayed_retry_model_chain": [],
+              "delayed_retry_final_model": null,
+              "error_classification": null,
+              "error": null
+            },
+            {
+              "source_article_id": "4365316",
+              "title": "天氣丨黃色暴雨警告訊號取消",
+              "canonical_url": "https://www.hkej.com/instantnews/current/article/4365316/%E5%A4%A9%E6%B0%A3%E4%B8%A8%E9%BB%83%E8%89%B2%E6%9A%B4%E9%9B%A8%E8%AD%A6%E5%91%8A%E8%A8%8A%E8%99%9F%E5%8F%96%E6%B6%88",
+              "published_at": "2026-04-05T17:42:00+08:00",
+              "section": "時事脈搏",
+              "novelty_score": 3,
+              "relevance_score": 1,
+              "urgency_score": 1,
+              "named_entities": [],
+              "key_points": [
+                "黃色暴雨警告訊號取消"
+              ],
+              "content_truncated": true,
+              "original_content_length_chars": 22,
+              "analyzed_content_length_chars": 0,
+              "original_content_token_estimate": 6,
+              "analyzed_content_token_estimate": 0,
+              "truncation_reason": "Category batch request exceeded the working request budget; article content was shortened to fit.",
+              "analysis_method": "truncated_text",
+              "attention_tier": "light",
+              "theme": "general",
+              "attention_reason": "Lighter treatment because this story sits in the 時事脈搏 section without strong market-moving signals.",
+              "must_keep": false,
+              "model_used": "meta-llama/llama-4-scout-17b-16e-instruct",
+              "delayed_retry_attempted": false,
+              "delayed_retry_model_chain": [],
+              "delayed_retry_final_model": null,
+              "error_classification": null,
+              "error": null
+            }
+          ],
+          "model_used": "meta-llama/llama-4-scout-17b-16e-instruct"
+        },
+        {
+          "title": "國際時事",
+          "theme_rationale": "涉及國家間互動與國際事件",
+          "article_count": 2,
+          "key_developments": [
+            "葡萄牙議長訪華",
+            "美逮捕伊朗已故將領蘇萊馬尼侄女",
+            "蘇萊馬尼女兒否認家人被美國拘留"
+          ],
+          "named_entities": [
+            {
+              "name": "葡萄牙",
+              "type": "country"
+            },
+            {
+              "name": "布蘭科",
+              "type": "person"
+            },
+            {
+              "name": "趙樂際",
+              "type": "person"
+            },
+            {
+              "name": "中國",
+              "type": "country"
+            }
+          ],
+          "articles": [
+            {
+              "source_article_id": "4365315",
+              "title": "葡萄牙議長本月7日起率團訪華",
+              "canonical_url": "https://www.hkej.com/instantnews/current/article/4365315/%E8%91%A1%E8%90%84%E7%89%99%E8%AD%B0%E9%95%B7%E6%9C%AC%E6%9C%887%E6%97%A5%E8%B5%B7%E7%8E%87%E5%9C%98%E8%A8%AA%E8%8F%AF",
+              "published_at": "2026-04-05T17:19:00+08:00",
+              "section": "時事脈搏",
+              "novelty_score": 4,
+              "relevance_score": 3,
+              "urgency_score": 2,
+              "named_entities": [
+                {
+                  "name": "葡萄牙",
+                  "type": "country"
+                },
+                {
+                  "name": "布蘭科",
+                  "type": "person"
+                },
+                {
+                  "name": "趙樂際",
+                  "type": "person"
+                },
+                {
+                  "name": "中國",
+                  "type": "country"
+                }
+              ],
+              "key_points": [
+                "葡萄牙議長訪華"
+              ],
+              "content_truncated": true,
+              "original_content_length_chars": 46,
+              "analyzed_content_length_chars": 0,
+              "original_content_token_estimate": 12,
+              "analyzed_content_token_estimate": 0,
+              "truncation_reason": "Category batch request exceeded the working request budget; article content was shortened to fit.",
+              "analysis_method": "truncated_text",
+              "attention_tier": "light",
+              "theme": "general",
+              "attention_reason": "Lighter treatment because this story sits in the 時事脈搏 section without strong market-moving signals.",
+              "must_keep": false,
+              "model_used": "meta-llama/llama-4-scout-17b-16e-instruct",
+              "delayed_retry_attempted": false,
+              "delayed_retry_model_chain": [],
+              "delayed_retry_final_model": null,
+              "error_classification": null,
+              "error": null
+            },
             {
               "source_article_id": "4365307",
               "title": "美逮捕伊朗已故將領蘇萊馬尼侄女 蘇萊馬尼女兒否認",
@@ -1458,7 +2230,233 @@
               "delayed_retry_final_model": "openai/gpt-oss-20b",
               "error_classification": null,
               "error": null
+            }
+          ],
+          "model_used": "meta-llama/llama-4-scout-17b-16e-instruct"
+        },
+        {
+          "title": "本地事務",
+          "theme_rationale": "關注本地議題與事件",
+          "article_count": 2,
+          "key_developments": [
+            "羅淑佩考慮微調啟德體育園績效指標",
+            "天文台發出黃雨警告訊號",
+            "啟德體育園績效指標或微調"
+          ],
+          "named_entities": [
+            {
+              "name": "羅淑佩",
+              "type": "person"
             },
+            {
+              "name": "啟德體育園",
+              "type": "institution"
+            },
+            {
+              "name": "天文台",
+              "type": "institution"
+            }
+          ],
+          "articles": [
+            {
+              "source_article_id": "4365312",
+              "title": "羅淑佩:考慮微調啟德體育園績效指標",
+              "canonical_url": "https://www.hkej.com/instantnews/current/article/4365312/%E7%BE%85%E6%B7%91%E4%BD%A9%3A%E8%80%83%E6%85%AE%E5%BE%AE%E8%AA%BF%E5%95%9F%E5%BE%B7%E9%AB%94%E8%82%B2%E5%9C%92%E7%B8%BE%E6%95%88%E6%8C%87%E6%A8%99",
+              "published_at": "2026-04-05T16:31:00+08:00",
+              "section": "時事脈搏",
+              "novelty_score": 3,
+              "relevance_score": 2,
+              "urgency_score": 2,
+              "named_entities": [
+                {
+                  "name": "羅淑佩",
+                  "type": "person"
+                },
+                {
+                  "name": "啟德體育園",
+                  "type": "institution"
+                }
+              ],
+              "key_points": [
+                "啟德體育園績效指標或微調"
+              ],
+              "content_truncated": true,
+              "original_content_length_chars": 383,
+              "analyzed_content_length_chars": 0,
+              "original_content_token_estimate": 96,
+              "analyzed_content_token_estimate": 0,
+              "truncation_reason": "Category batch request exceeded the working request budget; article content was shortened to fit.",
+              "analysis_method": "truncated_text",
+              "attention_tier": "light",
+              "theme": "general",
+              "attention_reason": "Lighter treatment because this story sits in the 時事脈搏 section without strong market-moving signals.",
+              "must_keep": false,
+              "model_used": "meta-llama/llama-4-scout-17b-16e-instruct",
+              "delayed_retry_attempted": false,
+              "delayed_retry_model_chain": [],
+              "delayed_retry_final_model": null,
+              "error_classification": null,
+              "error": null
+            },
+            {
+              "source_article_id": "4365309",
+              "title": "天氣丨天文台發出黃雨警告訊號",
+              "canonical_url": "https://www.hkej.com/instantnews/current/article/4365309/%E5%A4%A9%E6%B0%A3%E4%B8%A8%E5%A4%A9%E6%96%87%E5%8F%B0%E7%99%BC%E5%87%BA%E9%BB%83%E9%9B%A8%E8%AD%A6%E5%91%8A%E8%A8%8A%E8%99%9F",
+              "published_at": "2026-04-05T14:10:00+08:00",
+              "section": "時事脈搏",
+              "novelty_score": 2,
+              "relevance_score": 1,
+              "urgency_score": 3,
+              "named_entities": [
+                {
+                  "name": "天文台",
+                  "type": "institution"
+                }
+              ],
+              "key_points": [
+                "香港發出黃雨警告"
+              ],
+              "content_truncated": false,
+              "original_content_length_chars": 21,
+              "analyzed_content_length_chars": 21,
+              "original_content_token_estimate": 6,
+              "analyzed_content_token_estimate": 6,
+              "truncation_reason": null,
+              "analysis_method": "full_text",
+              "attention_tier": "light",
+              "theme": "general",
+              "attention_reason": "Lighter treatment because this story sits in the 時事脈搏 section without strong market-moving signals.",
+              "must_keep": false,
+              "model_used": "meta-llama/llama-4-scout-17b-16e-instruct",
+              "error_classification": null,
+              "error": null
+            }
+          ],
+          "model_used": "meta-llama/llama-4-scout-17b-16e-instruct"
+        },
+        {
+          "title": "Weather Updates",
+          "theme_rationale": "Articles related to weather forecasts and updates.",
+          "article_count": 2,
+          "key_developments": [
+            "香港未來一兩小時有大雨和狂風雷暴",
+            "天文台發出特別天氣提示",
+            "本港廣泛地區短期料大雨"
+          ],
+          "named_entities": [
+            {
+              "name": "天文台",
+              "type": "institution"
+            },
+            {
+              "name": "香港",
+              "type": "country"
+            }
+          ],
+          "articles": [
+            {
+              "source_article_id": "4365308",
+              "title": "天氣丨本港未來一兩小時料雨勢較大及有狂風雷暴",
+              "canonical_url": "https://www.hkej.com/instantnews/current/article/4365308/%E5%A4%A9%E6%B0%A3%E4%B8%A8%E6%9C%AC%E6%B8%AF%E6%9C%AA%E4%BE%86%E4%B8%80%E5%85%A9%E5%B0%8F%E6%99%82%E6%96%99%E9%9B%A8%E5%8B%A2%E8%BC%83%E5%A4%A7%E5%8F%8A%E6%9C%89%E7%8B%82%E9%A2%A8%E9%9B%B7%E6%9A%B4",
+              "published_at": "2026-04-05T13:26:00+08:00",
+              "section": "時事脈搏",
+              "novelty_score": 4,
+              "relevance_score": 2,
+              "urgency_score": 6,
+              "named_entities": [
+                {
+                  "name": "天文台",
+                  "type": "institution"
+                }
+              ],
+              "key_points": [
+                "香港未來一兩小時有大雨和狂風雷暴",
+                "天文台發出特別天氣提示"
+              ],
+              "content_truncated": false,
+              "original_content_length_chars": 69,
+              "analyzed_content_length_chars": 69,
+              "original_content_token_estimate": 18,
+              "analyzed_content_token_estimate": 18,
+              "truncation_reason": null,
+              "analysis_method": "full_text",
+              "attention_tier": "light",
+              "theme": "general",
+              "attention_reason": "Lighter treatment because this story sits in the 時事脈搏 section without strong market-moving signals.",
+              "must_keep": false,
+              "model_used": "meta-llama/llama-4-scout-17b-16e-instruct",
+              "error_classification": null,
+              "error": null
+            },
+            {
+              "source_article_id": "4365302",
+              "title": "天氣丨本港廣泛地區短期料大雨",
+              "canonical_url": "https://www.hkej.com/instantnews/current/article/4365302/%E5%A4%A9%E6%B0%A3%E4%B8%A8%E6%9C%AC%E6%B8%AF%E5%BB%A3%E6%B3%9B%E5%9C%B0%E5%8D%80%E7%9F%AD%E6%9C%9F%E6%96%99%E5%A4%A7%E9%9B%A8",
+              "published_at": "2026-04-05T11:23:00+08:00",
+              "section": "時事脈搏",
+              "novelty_score": 6,
+              "relevance_score": 2,
+              "urgency_score": 8,
+              "named_entities": [
+                {
+                  "name": "天文台",
+                  "type": "institution"
+                },
+                {
+                  "name": "香港",
+                  "type": "country"
+                }
+              ],
+              "key_points": [
+                "本港廣泛地區短期料大雨",
+                "天文台發出特別天氣提示"
+              ],
+              "content_truncated": false,
+              "original_content_length_chars": 125,
+              "analyzed_content_length_chars": 125,
+              "original_content_token_estimate": 32,
+              "analyzed_content_token_estimate": 32,
+              "truncation_reason": null,
+              "analysis_method": "full_text",
+              "attention_tier": "light",
+              "theme": "general",
+              "attention_reason": "Lighter treatment because this story sits in the 時事脈搏 section without strong market-moving signals.",
+              "must_keep": false,
+              "model_used": "meta-llama/llama-4-scout-17b-16e-instruct",
+              "error_classification": null,
+              "error": null
+            }
+          ],
+          "model_used": "meta-llama/llama-4-scout-17b-16e-instruct"
+        },
+        {
+          "title": "Geopolitics and International News",
+          "theme_rationale": "Articles related to international conflicts, politics, and diplomacy.",
+          "article_count": 1,
+          "key_developments": [
+            "美軍成功營救伊朗失蹤美軍機師",
+            "特朗普稱搜救行動非常英勇",
+            "伊朗戰爭中美軍展開營救行動"
+          ],
+          "named_entities": [
+            {
+              "name": "伊朗",
+              "type": "country"
+            },
+            {
+              "name": "特朗普",
+              "type": "person"
+            },
+            {
+              "name": "美國",
+              "type": "country"
+            },
+            {
+              "name": "F-15",
+              "type": "asset"
+            }
+          ],
+          "articles": [
             {
               "source_article_id": "4365306",
               "title": "伊朗戰爭丨特朗普:已營救失蹤第二名美軍機師",
@@ -1510,7 +2508,7 @@
         },
         {
           "title": "General News",
-          "theme_rationale": "Articles related to general news and social issues",
+          "theme_rationale": "Articles related to general news, including education and social issues.",
           "article_count": 1,
           "key_developments": [
             "中國留學生學歷造假",
@@ -1578,132 +2576,29 @@
           "model_used": "meta-llama/llama-4-scout-17b-16e-instruct"
         },
         {
-          "title": "Weather and General News",
-          "theme_rationale": "Articles about weather forecasts and general news events",
-          "article_count": 2,
+          "title": "地緣政治局勢",
+          "theme_rationale": "國際關係與衝突相關新聞",
+          "article_count": 3,
           "key_developments": [
-            "本港廣泛地區短期料大雨",
-            "天文台發出特別天氣提示",
-            "楊何蓓茵清明節到浩園拜祭殉職公務員"
+            "伊朗核電站附近遇襲，IAEA稱無輻射上升通報",
+            "特朗普促伊朗開放海峽，伊朗拒絕美國威脅",
+            "美國針對伊朗軍事行動將動用大部分隱型JASSM-ER巡航導彈庫存"
           ],
           "named_entities": [
             {
-              "name": "天文台",
-              "type": "institution"
-            },
-            {
-              "name": "香港",
+              "name": "伊朗",
               "type": "country"
             },
-            {
-              "name": "楊何蓓茵",
-              "type": "person"
-            },
-            {
-              "name": "何偉豪",
-              "type": "person"
-            }
-          ],
-          "articles": [
-            {
-              "source_article_id": "4365302",
-              "title": "天氣丨本港廣泛地區短期料大雨",
-              "canonical_url": "https://www.hkej.com/instantnews/current/article/4365302/%E5%A4%A9%E6%B0%A3%E4%B8%A8%E6%9C%AC%E6%B8%AF%E5%BB%A3%E6%B3%9B%E5%9C%B0%E5%8D%80%E7%9F%AD%E6%9C%9F%E6%96%99%E5%A4%A7%E9%9B%A8",
-              "published_at": "2026-04-05T11:23:00+08:00",
-              "section": "時事脈搏",
-              "novelty_score": 6,
-              "relevance_score": 2,
-              "urgency_score": 8,
-              "named_entities": [
-                {
-                  "name": "天文台",
-                  "type": "institution"
-                },
-                {
-                  "name": "香港",
-                  "type": "country"
-                }
-              ],
-              "key_points": [
-                "本港廣泛地區短期料大雨",
-                "天文台發出特別天氣提示"
-              ],
-              "content_truncated": false,
-              "original_content_length_chars": 125,
-              "analyzed_content_length_chars": 125,
-              "original_content_token_estimate": 32,
-              "analyzed_content_token_estimate": 32,
-              "truncation_reason": null,
-              "analysis_method": "full_text",
-              "attention_tier": "light",
-              "theme": "general",
-              "attention_reason": "Lighter treatment because this story sits in the 時事脈搏 section without strong market-moving signals.",
-              "must_keep": false,
-              "model_used": "meta-llama/llama-4-scout-17b-16e-instruct",
-              "error_classification": null,
-              "error": null
-            },
-            {
-              "source_article_id": "4365301",
-              "title": "清明節丨楊何蓓茵到浩園拜祭何偉豪等殉職公務員",
-              "canonical_url": "https://www.hkej.com/instantnews/current/article/4365301/%E6%B8%85%E6%98%8E%E7%AF%80%E4%B8%A8%E6%A5%8A%E4%BD%95%E8%93%93%E8%8C%B5%E5%88%B0%E6%B5%A9%E5%9C%92%E6%8B%9C%E7%A5%AD%E4%BD%95%E5%81%89%E8%B1%AA%E7%AD%89%E6%AE%89%E8%81%B7%E5%85%AC%E5%8B%99%E5%93%A1",
-              "published_at": "2026-04-05T11:21:00+08:00",
-              "section": "時事脈搏",
-              "novelty_score": 2,
-              "relevance_score": 3,
-              "urgency_score": 1,
-              "named_entities": [
-                {
-                  "name": "楊何蓓茵",
-                  "type": "person"
-                },
-                {
-                  "name": "何偉豪",
-                  "type": "person"
-                },
-                {
-                  "name": "公務員事務局",
-                  "type": "institution"
-                }
-              ],
-              "key_points": [
-                "楊何蓓茵清明節到浩園拜祭殉職公務員",
-                "悼念何偉豪等因公殉職者"
-              ],
-              "content_truncated": false,
-              "original_content_length_chars": 192,
-              "analyzed_content_length_chars": 192,
-              "original_content_token_estimate": 48,
-              "analyzed_content_token_estimate": 48,
-              "truncation_reason": null,
-              "analysis_method": "full_text",
-              "attention_tier": "light",
-              "theme": "general",
-              "attention_reason": "Lighter treatment because this story sits in the 時事脈搏 section without strong market-moving signals.",
-              "must_keep": false,
-              "model_used": "meta-llama/llama-4-scout-17b-16e-instruct",
-              "error_classification": null,
-              "error": null
-            }
-          ],
-          "model_used": "meta-llama/llama-4-scout-17b-16e-instruct"
-        },
-        {
-          "title": "Geopolitical Events",
-          "theme_rationale": "Article about geopolitical tensions and incidents",
-          "article_count": 1,
-          "key_developments": [
-            "伊朗核電站附近遇襲",
-            "IAEA稱無輻射上升通報",
-            "中東局勢升溫"
-          ],
-          "named_entities": [
             {
               "name": "IAEA",
               "type": "organization"
             },
             {
-              "name": "伊朗",
+              "name": "特朗普",
+              "type": "person"
+            },
+            {
+              "name": "美國",
               "type": "country"
             }
           ],
@@ -1749,38 +2644,7 @@
               "model_used": "meta-llama/llama-4-scout-17b-16e-instruct",
               "error_classification": null,
               "error": null
-            }
-          ],
-          "model_used": "meta-llama/llama-4-scout-17b-16e-instruct"
-        },
-        {
-          "title": "地緣政治局勢",
-          "theme_rationale": "國際關係與衝突相關新聞",
-          "article_count": 2,
-          "key_developments": [
-            "特朗普要求伊朗開放海峽，伊朗拒絕美國威脅",
-            "美國據報部署大部分遠程導彈針對伊朗軍事行動",
-            "伊朗與美國之間的緊張局勢升級"
-          ],
-          "named_entities": [
-            {
-              "name": "特朗普",
-              "type": "person"
             },
-            {
-              "name": "伊朗",
-              "type": "country"
-            },
-            {
-              "name": "美國",
-              "type": "country"
-            },
-            {
-              "name": "JASSM-ER",
-              "type": "asset"
-            }
-          ],
-          "articles": [
             {
               "source_article_id": "4365296",
               "title": "中東戰爭丨特朗普再發最後通牒促開放海峽 伊朗拒絕",
@@ -1869,24 +2733,75 @@
           "model_used": "meta-llama/llama-4-scout-17b-16e-instruct"
         },
         {
-          "title": "天氣與災害",
-          "theme_rationale": "與自然災害或天氣相關的新聞",
-          "article_count": 1,
+          "title": "社會與天氣動態",
+          "theme_rationale": "社會事件與天氣相關新聞",
+          "article_count": 2,
           "key_developments": [
+            "楊何蓓茵清明節到浩園拜祭殉職公務員",
             "香港未來一兩小時有大雨和狂風雷暴",
-            "天文台發出特別天氣提示"
+            "悼念何偉豪等因公殉職者"
           ],
           "named_entities": [
             {
-              "name": "香港",
-              "type": "country"
+              "name": "楊何蓓茵",
+              "type": "person"
             },
             {
-              "name": "珠江口",
-              "type": "other"
+              "name": "何偉豪",
+              "type": "person"
+            },
+            {
+              "name": "公務員事務局",
+              "type": "institution"
+            },
+            {
+              "name": "香港",
+              "type": "country"
             }
           ],
           "articles": [
+            {
+              "source_article_id": "4365301",
+              "title": "清明節丨楊何蓓茵到浩園拜祭何偉豪等殉職公務員",
+              "canonical_url": "https://www.hkej.com/instantnews/current/article/4365301/%E6%B8%85%E6%98%8E%E7%AF%80%E4%B8%A8%E6%A5%8A%E4%BD%95%E8%93%93%E8%8C%B5%E5%88%B0%E6%B5%A9%E5%9C%92%E6%8B%9C%E7%A5%AD%E4%BD%95%E5%81%89%E8%B1%AA%E7%AD%89%E6%AE%89%E8%81%B7%E5%85%AC%E5%8B%99%E5%93%A1",
+              "published_at": "2026-04-05T11:21:00+08:00",
+              "section": "時事脈搏",
+              "novelty_score": 2,
+              "relevance_score": 3,
+              "urgency_score": 1,
+              "named_entities": [
+                {
+                  "name": "楊何蓓茵",
+                  "type": "person"
+                },
+                {
+                  "name": "何偉豪",
+                  "type": "person"
+                },
+                {
+                  "name": "公務員事務局",
+                  "type": "institution"
+                }
+              ],
+              "key_points": [
+                "楊何蓓茵清明節到浩園拜祭殉職公務員",
+                "悼念何偉豪等因公殉職者"
+              ],
+              "content_truncated": false,
+              "original_content_length_chars": 192,
+              "analyzed_content_length_chars": 192,
+              "original_content_token_estimate": 48,
+              "analyzed_content_token_estimate": 48,
+              "truncation_reason": null,
+              "analysis_method": "full_text",
+              "attention_tier": "light",
+              "theme": "general",
+              "attention_reason": "Lighter treatment because this story sits in the 時事脈搏 section without strong market-moving signals.",
+              "must_keep": false,
+              "model_used": "meta-llama/llama-4-scout-17b-16e-instruct",
+              "error_classification": null,
+              "error": null
+            },
             {
               "source_article_id": "4365297",
               "title": "天氣丨未來一兩小時部分地區雨勢較大及有幾陣狂風雷暴",
@@ -1931,18 +2846,19 @@
       ],
       "analysis_profile": "light",
       "model_used": "meta-llama/llama-4-scout-17b-16e-instruct",
-      "sub_batch_count": 16,
+      "sub_batch_count": 24,
       "diagnostics": {
-        "sub_batch_count": 16,
-        "split_reasons": [],
+        "sub_batch_count": 24,
+        "split_reasons": [
+          "pre_send_budget"
+        ],
         "models_attempted": [
           "meta-llama/llama-4-scout-17b-16e-instruct",
-          "qwen/qwen3-32b",
-          "llama-3.1-8b-instant"
+          "qwen/qwen3-32b"
         ],
-        "estimated_input_tokens_max": 758,
-        "serialized_request_bytes_max": 5045,
-        "rate_limit_waits": 1,
+        "estimated_input_tokens_max": 1119,
+        "serialized_request_bytes_max": 5118,
+        "rate_limit_waits": 2,
         "partial_article_count": 1
       },
       "error": null
