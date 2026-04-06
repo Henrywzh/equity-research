@@ -222,6 +222,35 @@ class GroqAnalystClient:
     def model_id(self) -> str:
         return self.active_model
 
+    def _get_video_language_instruction(self, archive: dict[str, Any]) -> str:
+        """Resolve the content language from the archive and return an LLM instruction."""
+        lang_code = archive.get("transcript_language")
+        if not lang_code:
+            return (
+                "Generate the summary and all descriptive fields in the same language "
+                "as the video title and description. Keep JSON keys in English."
+            )
+        _LANG_NAMES: dict[str, str] = {
+            "en": "English",
+            "zh": "Chinese",
+            "zh-hans": "Simplified Chinese",
+            "zh-hant": "Traditional Chinese",
+            "ja": "Japanese",
+            "ko": "Korean",
+            "de": "German",
+            "fr": "French",
+            "es": "Spanish",
+            "it": "Italian",
+            "pt": "Portuguese",
+            "ru": "Russian",
+        }
+        name = _LANG_NAMES.get(lang_code.lower(), lang_code)
+        return (
+            f"IMPORTANT: Generate all text/descriptive JSON values "
+            f"(executive_summary, signals, findings, etc.) in {name}, "
+            f"matching the content language. Keep JSON keys in English."
+        )
+
     def analyze_video(self, archive: dict[str, Any]) -> dict[str, Any]:
         source_basis = _resolve_source_basis(archive)
         profile = get_profile((archive.get("channel") or {}).get("profile"))
@@ -331,12 +360,32 @@ class GroqAnalystClient:
             },
         }
 
+        # Language logic for synthesis:
+        # If all videos in this run share the same non-English transcript language, 
+        # instruct the synthesizer to output in that language as well.
+        _SYNTH_LANG_NAMES: dict[str, str] = {
+            "zh": "Chinese", "ja": "Japanese", "ko": "Korean",
+            "de": "German", "fr": "French", "es": "Spanish",
+            "it": "Italian", "pt": "Portuguese", "ru": "Russian",
+        }
+        video_languages = {
+            (a.get("transcript_language") or "en").lower().split("-")[0]
+            for a in video_analyses
+        }
+        if len(video_languages) == 1 and "en" not in video_languages:
+            target_lang = list(video_languages)[0]
+            lang_name = _SYNTH_LANG_NAMES.get(target_lang, target_lang)
+            language_instruction = f"All content in this run is in {lang_name}. Generate the report and summaries in {lang_name}."
+        else:
+            language_instruction = "Generate the synthesis in English."
+
         call_result = self._chat_json(
             system_prompt=(
                 "You are a finance research synthesizer. Combine the per-video analyses into a single run-level "
                 "summary. Return JSON only. Highlight what matters most for a market watcher. "
                 "Identify crowded trades (tickers or themes mentioned by 2+ sources in the same direction). "
-                "Flag contrarian views that disagree with the majority consensus."
+                "Flag contrarian views that disagree with the majority consensus. "
+                + language_instruction
             ),
             user_payload=user_payload,
         )
@@ -366,6 +415,7 @@ class GroqAnalystClient:
             "task": "video_analysis",
             "requirements": {
                 "focus": list(profile.build_full_schema().keys()),
+                "language_policy": self._get_video_language_instruction(archive),
                 "timestamp_policy": (
                     "Only include key_timestamps when transcript segments are present. "
                     "Use direct evidence from transcript cues."
@@ -419,9 +469,10 @@ class GroqAnalystClient:
             chunk_outputs: list[dict[str, Any]] = []
             total_attempts = 0
             try:
+                lang_instruction = self._get_video_language_instruction(archive)
                 for index, chunk in enumerate(chunks, start=1):
                     call_result = self._chat_json(
-                        system_prompt=profile.chunk_system_prompt,
+                        system_prompt=f"{profile.chunk_system_prompt} {lang_instruction}",
                         user_payload={
                             "task": "video_chunk_analysis",
                             "chunk_index": index,
@@ -436,6 +487,7 @@ class GroqAnalystClient:
                                 "analysis_input_basis": source_basis,
                             },
                             "chunk": {"segments": chunk},
+                            "requirements": {"language_policy": lang_instruction},
                             "output_schema": chunk_schema,
                         },
                     )
@@ -443,7 +495,7 @@ class GroqAnalystClient:
                     chunk_outputs.append(call_result.payload)
 
                 final_result = self._chat_json(
-                    system_prompt=profile.consolidation_system_prompt,
+                    system_prompt=f"{profile.consolidation_system_prompt} {lang_instruction}",
                     user_payload={
                         "task": "video_chunk_consolidation",
                         "video": {
@@ -456,6 +508,7 @@ class GroqAnalystClient:
                             "analysis_input_basis": source_basis,
                         },
                         "chunk_analyses": chunk_outputs,
+                        "requirements": {"language_policy": lang_instruction},
                         "output_schema": profile.build_full_schema(),
                     },
                 )
@@ -824,6 +877,7 @@ def _normalize_video_analysis(raw: dict[str, Any], archive: dict[str, Any], *, p
         "published_at": archive.get("published_at"),
         "source_kind": archive.get("source_kind"),
         "transcript_status": archive.get("transcript_status"),
+        "transcript_language": archive.get("transcript_language"),
         "source_basis": source_basis,
         "profile": resolved_profile.name,
         "synthesis_section": resolved_profile.synthesis_section,
