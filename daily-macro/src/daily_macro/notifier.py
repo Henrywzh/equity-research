@@ -223,6 +223,12 @@ def _build_plain_body(summary: dict[str, Any]) -> str:
         lines.extend(f"- {note}" for note in notes)
         lines.append("")
 
+    market_lines = _build_plain_market_lines(summary)
+    if market_lines:
+        lines.append("Market snapshot:")
+        lines.extend(market_lines)
+        lines.append("")
+
     unresolved_lines = _build_plain_unresolved_lines(summary)
     if unresolved_lines:
         lines.append("Unresolved articles:")
@@ -284,6 +290,7 @@ def _build_html_body(summary: dict[str, Any]) -> str:
         )
 
     unresolved_html = _build_html_unresolved_section(summary)
+    market_html = _build_html_market_section(summary)
 
     return f"""
     <html>
@@ -302,6 +309,7 @@ def _build_html_body(summary: dict[str, Any]) -> str:
             Fallback models: {_escape_html(_fallback_model_labels(summary))}
           </p>
           {notes_html}
+          {market_html}
           {unresolved_html}
           {"".join(category_blocks)}
         </div>
@@ -520,6 +528,59 @@ def _build_html_unresolved_section(summary: dict[str, Any]) -> str:
         "<div style='margin:0 0 20px;padding:16px;border:1px solid #fecaca;border-radius:12px;background:#fff7f7;'>"
         "<div style='font-size:16px;font-weight:700;color:#991b1b;margin-bottom:8px;'>Unresolved articles</div>"
         "<ul style='margin:0;padding-left:18px;line-height:1.6;'>" + "".join(items) + "</ul></div>"
+    )
+
+
+def _build_plain_market_lines(summary: dict[str, Any]) -> list[str]:
+    items = list(summary.get("market_context") or [])
+    lines: list[str] = []
+    for item in items:
+        ticker = item.get("ticker", "?")
+        price = item.get("price")
+        pct = item.get("pct_change")
+        if price is None:
+            continue
+        pct_str = f" ({pct:+.2f}%)" if pct is not None else ""
+        lines.append(f"- {ticker}: {price:.2f}{pct_str}")
+    return lines
+
+
+def _build_html_market_section(summary: dict[str, Any]) -> str:
+    items = list(summary.get("market_context") or [])
+    if not items:
+        return ""
+    rows = []
+    for item in items:
+        ticker = _escape_html(str(item.get("ticker", "?")))
+        price = item.get("price")
+        pct = item.get("pct_change")
+        if price is None:
+            continue
+        price_str = f"{price:.2f}"
+        if pct is not None:
+            color = "#059669" if pct >= 0 else "#dc2626"
+            pct_str = f"<span style='color:{color};font-weight:600;'>{pct:+.2f}%</span>"
+        else:
+            pct_str = "<span style='color:#6b7280;'>N/A</span>"
+        rows.append(
+            f"<tr><td style='padding:4px 12px 4px 0;'>{ticker}</td>"
+            f"<td style='padding:4px 12px 4px 0;text-align:right;'>{price_str}</td>"
+            f"<td style='padding:4px 0;text-align:right;'>{pct_str}</td></tr>"
+        )
+    table = (
+        "<table style='width:100%;border-collapse:collapse;color:#374151;font-size:14px;'>"
+        "<tr style='border-bottom:1px solid #e5e7eb;'>"
+        "<th style='text-align:left;padding:4px 12px 4px 0;font-weight:600;'>Ticker</th>"
+        "<th style='text-align:right;padding:4px 12px 4px 0;font-weight:600;'>Price</th>"
+        "<th style='text-align:right;padding:4px 0;font-weight:600;'>Change</th></tr>"
+        + "".join(rows)
+        + "</table>"
+    )
+    return (
+        "<div style='margin:0 0 20px;padding:16px;border:1px solid #e5e7eb;border-radius:12px;background:#f9fafb;'>"
+        "<div style='font-size:16px;font-weight:700;color:#111827;margin-bottom:10px;'>Market Snapshot</div>"
+        + table
+        + "</div>"
     )
 
 

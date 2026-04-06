@@ -23,7 +23,7 @@ LOGGER = logging.getLogger(__name__)
 GROQ_CHAT_COMPLETIONS_URL = "https://api.groq.com/openai/v1/chat/completions"
 OPENAI_CHAT_COMPLETIONS_URL = "https://api.openai.com/v1/chat/completions"
 REPORT_FILE_NAME = "hkej-news-analysis.json"
-REPORT_SCHEMA_VERSION = 4
+REPORT_SCHEMA_VERSION = 5
 DEFAULT_PROVIDER = "groq"
 PRIMARY_MODEL_ID = "meta-llama/llama-4-scout-17b-16e-instruct"
 FALLBACK_MODEL_IDS = ["qwen/qwen3-32b", "llama-3.1-8b-instant"]
@@ -65,10 +65,10 @@ FAILURE_CLASSIFICATIONS = {
     "http_error",
     "unexpected_error",
 }
-LIGHT_ANALYSIS_SECTIONS = {"時事脈搏", "地產新聞"}
+LIGHT_ANALYSIS_SECTIONS = {"地產新聞"}
 ATTENTION_TIERS = ("high", "medium", "light")
 ATTENTION_TIER_RANK = {"high": 0, "medium": 1, "light": 2}
-ROUTER_LLM_MIN_ARTICLES = 5
+ROUTER_LLM_MIN_ARTICLES = 1
 HIGH_ATTENTION_THEME_KEYWORDS = {
     "stocks": ("業績", "盈喜", "盈警", "回購", "配股", "供股", "新股", "上市", "股份", "股價", "股東", "盈利", "profit", "earnings", "guidance", "buyback", "placement", "ipo", "shares"),
     "macro": ("聯儲", "聯儲局", "人行", "央行", "利率", "通脹", "經濟", "衰退", "增長", "國債", "收益率", "匯率", "美元", "人民幣", "油價", "gdp", "inflation", "rates", "yield", "fx", "oil", "economy"),
@@ -97,7 +97,7 @@ class SectionProfile:
 STANDARD_SECTION_PROFILE = SectionProfile(
     name="standard",
     article_key_points_limit=4,
-    article_key_points_instruction="2 to 4 concise strings",
+    article_key_points_instruction="2 to 4 strings — each must include at least one specific detail such as a figure, percentage, named actor, date, cause, or consequence; do not restate the article title",
     entity_limit=6,
     category_bullet_limit=5,
     subgroup_bullet_limit=4,
@@ -113,7 +113,7 @@ STANDARD_SECTION_PROFILE = SectionProfile(
 LIGHT_SECTION_PROFILE = SectionProfile(
     name="light",
     article_key_points_limit=2,
-    article_key_points_instruction="1 to 2 concise strings",
+    article_key_points_instruction="1 to 2 strings — each must include a specific detail such as a figure, named actor, cause, or consequence; do not restate the article title",
     entity_limit=4,
     category_bullet_limit=3,
     subgroup_bullet_limit=3,
@@ -143,6 +143,8 @@ class AnalysisGraphState(TypedDict):
     previous_day_retry_successes: int
     updated_previous_report: NotRequired[dict[str, Any] | None]
     incremental: dict[str, int]
+    market_context_string: str
+    market_snapshots: list[dict[str, Any]]
     report: dict[str, Any]
 
 
@@ -323,6 +325,7 @@ class AnalysisRuntime:
     category_diagnostics: dict[str, CategoryDiagnostics] = field(default_factory=dict)
     category_budgets: dict[str, CategoryBudgetState] = field(default_factory=dict)
     provider_sessions: dict[str, requests.Session] = field(default_factory=dict)
+    market_context_string: str = ""
 
     @property
     def primary_model(self) -> ModelConfig:
@@ -515,6 +518,8 @@ def run_analysis(
         "category_reports": [],
         "previous_day_retry_successes": 0,
         "incremental": {},
+        "market_context_string": "",
+        "market_snapshots": [],
         "report": {},
     }
     final_state = graph.invoke(state)
@@ -534,12 +539,14 @@ def run_analysis(
 def _build_analysis_graph():
     graph = StateGraph(AnalysisGraphState)
     graph.add_node("initialize", _graph_initialize)
+    graph.add_node("fetch_market_data", _graph_fetch_market_data)
     graph.add_node("route_attention", _graph_route_attention)
     graph.add_node("analyze_today", _graph_analyze_today)
     graph.add_node("retry_previous_day", _graph_retry_previous_day)
     graph.add_node("finalize", _graph_finalize)
     graph.add_edge(START, "initialize")
-    graph.add_edge("initialize", "route_attention")
+    graph.add_edge("initialize", "fetch_market_data")
+    graph.add_edge("fetch_market_data", "route_attention")
     graph.add_edge("route_attention", "analyze_today")
     graph.add_edge("analyze_today", "retry_previous_day")
     graph.add_edge("retry_previous_day", "finalize")
@@ -572,6 +579,22 @@ def _graph_initialize(state: AnalysisGraphState) -> AnalysisGraphState:
         "retried_previous_day_articles": previous_retry_plan["retried_previous_day_articles"],
         "previous_day_retry_successes": 0,
     }
+    return state
+
+
+def _graph_fetch_market_data(state: AnalysisGraphState) -> AnalysisGraphState:
+    from .market import build_market_context_string, fetch_market_snapshot_for_date
+
+    snapshots = fetch_market_snapshot_for_date(state["target_date"])
+    state["market_context_string"] = build_market_context_string(snapshots)
+    state["market_snapshots"] = snapshots
+    if state["runtime"] is not None:
+        state["runtime"].market_context_string = state["market_context_string"]
+    LOGGER.info(
+        "Loaded market snapshot with %d ticker(s) for %s.",
+        len(snapshots),
+        state["target_date"],
+    )
     return state
 
 
@@ -639,6 +662,7 @@ def _graph_finalize(state: AnalysisGraphState) -> AnalysisGraphState:
         category_reports=state["category_reports"],
         runtime=state["runtime"],
         incremental=state["incremental"],
+        market_snapshots=state.get("market_snapshots"),
     )
     _write_report(state["report_path"], report)
     state["report"] = report
@@ -1311,6 +1335,7 @@ def _finalize_report(
     category_reports: list[dict[str, Any]],
     runtime: AnalysisRuntime | None,
     incremental: dict[str, int],
+    market_snapshots: list[dict[str, Any]] | None = None,
 ) -> dict[str, Any]:
     all_articles = [article for category in category_reports for article in category["articles"]]
     unresolved_articles = _collect_unresolved_articles(category_reports)
@@ -1360,6 +1385,7 @@ def _finalize_report(
             "partial_categories": partial_categories,
             "failed_categories": failed_categories,
         },
+        "market_context": _build_market_context_for_report(market_snapshots or []),
         "categories": category_reports,
         "errors": errors,
     }
@@ -2120,7 +2146,7 @@ def _invoke_article_batch(
     content_shrunk: bool,
     model_override: ModelConfig | None = None,
 ) -> tuple[dict[str, Any], str]:
-    messages = _build_article_batch_messages(category_name, batch_articles)
+    messages = _build_article_batch_messages(category_name, batch_articles, market_context=runtime.market_context_string)
     active_model = model_override or runtime.current_model
     context = BatchContext(
         category_name=category_name,
@@ -2320,7 +2346,7 @@ def _chat_completion(
     raise RuntimeError("Groq request retries exhausted.")
 
 
-def _build_article_batch_messages(category_name: str, batch_articles: list[dict[str, Any]]) -> list[dict[str, Any]]:
+def _build_article_batch_messages(category_name: str, batch_articles: list[dict[str, Any]], market_context: str = "") -> list[dict[str, Any]]:
     profile = _section_profile(category_name)
     batch_tier = _batch_attention_tier(batch_articles)
     return [
@@ -2358,6 +2384,7 @@ def _build_article_batch_messages(category_name: str, batch_articles: list[dict[
                         "Match article results by source_article_id when available and also include canonical_url.",
                         "Do not include category-level summary in this response.",
                         "If an article is tagged as light attention, keep key points especially concise.",
+                        "If market_context data is provided, reference specific price movements and percentage changes in your key_points when relevant to the article.",
                     ],
                     "scoring_rubric": {
                         "novelty_score": "How new or non-repetitive this development is within the current news flow.",
@@ -2382,6 +2409,7 @@ def _build_article_batch_messages(category_name: str, batch_articles: list[dict[
                         }
                         for article in batch_articles
                     ],
+                    "market_context": market_context,
                 },
                 ensure_ascii=False,
             ),
@@ -2463,16 +2491,19 @@ def _build_category_outputs(
             "named_entities": only_group["named_entities"],
         }, model_used, total_batches, subgroup_reports
 
-    category_payload, category_model, category_batches = _synthesize_summary_items(
-        runtime,
-        category_name,
-        subgroup_summary_items,
-        batch_label_prefix="summary",
-        bullet_limit=profile.category_bullet_limit,
-        scope_kind="category",
-        scope_title=category_name,
-    )
-    return category_payload, category_model, total_batches + category_batches, subgroup_reports
+    seen_entity_names: set[str] = set()
+    merged_entities: list[dict[str, str]] = []
+    for sg in subgroup_reports:
+        for entity in (sg.get("named_entities") or []):
+            name = entity.get("name") or ""
+            if name and name not in seen_entity_names:
+                seen_entity_names.add(name)
+                merged_entities.append(entity)
+    category_payload = {
+        "key_developments": [],
+        "named_entities": merged_entities[: profile.entity_limit],
+    }
+    return category_payload, model_used, total_batches, subgroup_reports
 
 
 def _assign_article_subgroups(
@@ -2695,6 +2726,7 @@ def _invoke_synthesis_batch(
         bullet_limit=bullet_limit,
         scope_kind=scope_kind,
         scope_title=scope_title,
+        market_context=runtime.market_context_string,
     )
     estimated_input_tokens = _estimate_messages_tokens(messages)
     context = BatchContext(
@@ -2716,6 +2748,7 @@ def _build_synthesis_messages(
     bullet_limit: int,
     scope_kind: str,
     scope_title: str,
+    market_context: str = "",
 ) -> list[dict[str, Any]]:
     return [
         {
@@ -2731,14 +2764,18 @@ def _build_synthesis_messages(
                 {
                     "task": f"Synthesize one {scope_kind} from already-analyzed article results.",
                     "required_schema": {
-                        "key_developments": [f"2 to {bullet_limit} concise developments"],
+                        "key_developments": [f"2 to {bullet_limit} developments — each must contain a specific detail such as a figure, causal link, named company, or concrete outcome; avoid abstract statements"],
                         "named_entities": [
                             {"name": "entity name", "type": "person|company|country|institution|index|organization|asset|other"}
                         ],
                     },
+                    "rules": [
+                        "If market_context data is provided, incorporate specific price movements into developments where relevant.",
+                    ],
                     "category": category_name,
                     "scope_title": scope_title,
                     "inputs": synthesis_items,
+                    "market_context": market_context,
                 },
                 ensure_ascii=False,
             ),
@@ -3337,6 +3374,7 @@ def _build_empty_report(target_date: str, *, incremental: dict[str, int] | None 
             "partial_categories": 0,
             "failed_categories": 0,
         },
+        "market_context": [],
         "categories": [],
         "unresolved_articles": [],
         "errors": [],
@@ -3592,6 +3630,12 @@ def _article_group_key(article: dict[str, Any]) -> str:
     if source_article_id:
         return source_article_id
     return str(article.get("canonical_url") or "").strip()
+
+
+def _build_market_context_for_report(snapshots: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    from .market import build_market_context_for_report
+
+    return build_market_context_for_report(snapshots)
 
 
 def _section_profile(category_name: str) -> SectionProfile:
