@@ -3,9 +3,10 @@ from __future__ import annotations
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import TYPE_CHECKING
+import re
 
 from .config import get_config_path, get_data_dir, get_state_path
-from .models import ArchivedItemSummary, ChannelState, TranscriptPayload, VideoMetadata
+from .models import ArchivedItemSummary, ChannelState, ChannelTarget, TranscriptPayload, VideoMetadata
 from .storage import load_channel_targets, load_state, save_state, write_archive
 
 if TYPE_CHECKING:
@@ -69,6 +70,15 @@ def run_sync(
 
             videos = [_load_video_metadata(client, candidate) for candidate in candidates_to_resolve]
             selected = _select_videos_to_archive(videos, state)
+
+            if channel.title_filter:
+                before_count = len(selected)
+                selected = [v for v in selected if _matches_title_filter(v, channel)]
+                skipped = before_count - len(selected)
+                if skipped:
+                    note = f"{channel.slug}: skipped {skipped} video(s) not matching title_filter '{channel.title_filter}'."
+                    result["notes"].append(note)
+                    summary["run_notes"].append(note)
 
             if not selected:
                 result["noop"] = True
@@ -248,6 +258,12 @@ def _parse_iso_timestamp(value: str | None) -> int | None:
         return int(datetime.fromisoformat(value).timestamp())
     except ValueError:
         return None
+
+
+def _matches_title_filter(video: VideoMetadata, channel: ChannelTarget) -> bool:
+    if channel.title_filter is None:
+        return True
+    return bool(re.search(channel.title_filter, video.title or ""))
 
 
 def _build_new_item_summary(

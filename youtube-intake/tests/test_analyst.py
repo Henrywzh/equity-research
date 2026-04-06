@@ -72,9 +72,11 @@ class PartialFailureClient:
             "source_kind": archive["source_kind"],
             "transcript_status": archive["transcript_status"],
             "source_basis": archive["analysis_input_basis"],
+            "profile": archive.get("channel", {}).get("profile", "macroeconomics"),
+            "synthesis_section": "🏦 Institutional Research",
             "executive_summary": "Recovered first video summary.",
-            "notable_claims": ["Claim."],
-            "notable_opinions": ["Opinion."],
+            "tickers_mentioned": [],
+            "profile_data": {},
             "key_timestamps": [],
             "topic_tags": [{"tag": "macro", "score": 80}],
             "confidence": 0.7,
@@ -99,6 +101,8 @@ class PartialFailureClient:
                 "agreements": [],
                 "disagreements": [],
                 "top_claims_worth_watching": [],
+                "crowded_trades": [],
+                "contrarian_flags": [],
                 "run_notes": [],
             },
             "summary_analysis_model": PRIMARY_ANALYSIS_MODEL_ID,
@@ -144,7 +148,7 @@ class AnalystTests(unittest.TestCase):
         transport = FakeTransport(
             responses=[
                 FakeResponse(status_code=429, headers={"retry-after": "3"}),
-                _success_response({"executive_summary": "ok", "notable_claims": [], "notable_opinions": [], "key_timestamps": [], "topic_tags": [], "confidence": 0.7}),
+                _success_response({"executive_summary": "ok", "tickers_mentioned": [], "key_timestamps": [], "topic_tags": [], "confidence": 0.7}),
             ]
         )
         client = GroqAnalystClient(
@@ -168,8 +172,8 @@ class AnalystTests(unittest.TestCase):
                 FakeResponse(status_code=503),
                 FakeResponse(status_code=503),
                 FakeResponse(status_code=503),
-                _success_response({"executive_summary": "fallback ok", "notable_claims": [], "notable_opinions": [], "key_timestamps": [], "topic_tags": [], "confidence": 0.7}),
-                _success_response({"executive_summary": "second ok", "notable_claims": [], "notable_opinions": [], "key_timestamps": [], "topic_tags": [], "confidence": 0.7}),
+                _success_response({"executive_summary": "fallback ok", "tickers_mentioned": [], "key_timestamps": [], "topic_tags": [], "confidence": 0.7}),
+                _success_response({"executive_summary": "second ok", "tickers_mentioned": [], "key_timestamps": [], "topic_tags": [], "confidence": 0.7}),
             ]
         )
         client = GroqAnalystClient(
@@ -196,8 +200,7 @@ class AnalystTests(unittest.TestCase):
                 _success_response(
                     {
                         "executive_summary": "chunk one",
-                        "notable_claims": ["Claim 1"],
-                        "notable_opinions": ["Opinion 1"],
+                        "tickers_mentioned": ["SPX"],
                         "key_timestamps": [{"timestamp": "00:00:10", "label": "Point", "snippet": "s1", "why_it_matters": "w1"}],
                         "topic_tags": [{"tag": "macro", "score": 70}],
                     }
@@ -205,8 +208,7 @@ class AnalystTests(unittest.TestCase):
                 _success_response(
                     {
                         "executive_summary": "chunk two",
-                        "notable_claims": ["Claim 2"],
-                        "notable_opinions": ["Opinion 2"],
+                        "tickers_mentioned": ["QQQ"],
                         "key_timestamps": [{"timestamp": "00:05:00", "label": "Point", "snippet": "s2", "why_it_matters": "w2"}],
                         "topic_tags": [{"tag": "earnings", "score": 72}],
                     }
@@ -214,8 +216,7 @@ class AnalystTests(unittest.TestCase):
                 _success_response(
                     {
                         "executive_summary": "final",
-                        "notable_claims": ["Final claim"],
-                        "notable_opinions": ["Final opinion"],
+                        "tickers_mentioned": ["SPX", "QQQ"],
                         "key_timestamps": [{"timestamp": "00:05:00", "label": "Final", "snippet": "sf", "why_it_matters": "wf"}],
                         "topic_tags": [{"tag": "macro", "score": 85}],
                         "confidence": 0.76,
@@ -498,8 +499,8 @@ class AnalystTests(unittest.TestCase):
                 _success_response(
                     {
                         "executive_summary": "Video summary.",
-                        "notable_claims": ["Claim."],
-                        "notable_opinions": ["Opinion."],
+                        "tickers_mentioned": ["SPX"],
+                        "macro_developments": ["Fed held rates steady."],
                         "key_timestamps": [{"timestamp": "00:01:23", "label": "Key turn", "snippet": "Snippet", "why_it_matters": "Why"}],
                         "topic_tags": [{"tag": "macro", "score": 90}],
                         "confidence": 0.8,
@@ -513,6 +514,8 @@ class AnalystTests(unittest.TestCase):
                         "agreements": ["Agreement"],
                         "disagreements": [],
                         "top_claims_worth_watching": ["Claim to watch"],
+                        "crowded_trades": [],
+                        "contrarian_flags": [],
                     }
                 ),
             ]
@@ -593,6 +596,7 @@ def _archive_payload(
     transcript_segments: list[dict[str, object]] | None = None,
     transcript_source: str | None = None,
     error: str | None = None,
+    profile: str = "macroeconomics",
 ) -> dict:
     normalized_segments: list[dict[str, object]] = []
     if transcript_segments is not None:
@@ -613,6 +617,7 @@ def _archive_payload(
             "handle": f"@{channel_slug}",
             "channel_id": f"{channel_slug}-id",
             "channel_name": channel_name,
+            "profile": profile,
         },
         "video": {
             "video_id": video_id,

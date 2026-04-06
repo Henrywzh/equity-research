@@ -12,6 +12,7 @@ from typing import Any, Callable
 import requests
 
 from .config import get_data_dir
+from .profiles import AnalysisProfile, get_profile
 from .runtime_env import load_local_config, read_env
 from .storage import load_json_document, write_json_document
 
@@ -223,9 +224,10 @@ class GroqAnalystClient:
 
     def analyze_video(self, archive: dict[str, Any]) -> dict[str, Any]:
         source_basis = _resolve_source_basis(archive)
+        profile = get_profile((archive.get("channel") or {}).get("profile"))
         if source_basis == "metadata_only":
-            raw_result, call_meta = self._analyze_video_single_pass(archive, source_basis=source_basis)
-            normalized = _normalize_video_analysis(raw_result, archive)
+            raw_result, call_meta = self._analyze_video_single_pass(archive, source_basis=source_basis, profile=profile)
+            normalized = _normalize_video_analysis(raw_result, archive, profile=profile)
             normalized.update(
                 {
                     "analysis_model": call_meta.model_id,
@@ -249,9 +251,10 @@ class GroqAnalystClient:
                         source_basis=source_basis,
                         transcript_segments=transcript_segments,
                         current_limits=current_limits,
+                        profile=profile,
                     )
                     total_attempts += chunk_attempts
-                    normalized = _normalize_video_analysis(raw_result, archive)
+                    normalized = _normalize_video_analysis(raw_result, archive, profile=profile)
                     normalized.update(
                         {
                             "analysis_model": final_meta.model_id,
@@ -261,9 +264,9 @@ class GroqAnalystClient:
                     )
                     return normalized
 
-                raw_result, call_meta = self._analyze_video_single_pass(archive, source_basis=source_basis)
+                raw_result, call_meta = self._analyze_video_single_pass(archive, source_basis=source_basis, profile=profile)
                 total_attempts += call_meta.attempts
-                normalized = _normalize_video_analysis(raw_result, archive)
+                normalized = _normalize_video_analysis(raw_result, archive, profile=profile)
                 normalized.update(
                     {
                         "analysis_model": call_meta.model_id,
@@ -287,8 +290,8 @@ class GroqAnalystClient:
                 {
                     "title": analysis["title"],
                     "executive_summary": analysis["executive_summary"],
-                    "notable_claims": analysis["notable_claims"],
-                    "notable_opinions": analysis["notable_opinions"],
+                    "profile": analysis.get("profile", "macroeconomics"),
+                    "tickers_mentioned": analysis.get("tickers_mentioned", []),
                     "topic_tags": analysis["topic_tags"],
                     "confidence": analysis["confidence"],
                 }
@@ -304,9 +307,10 @@ class GroqAnalystClient:
                     "channel_name": item["channel_name"],
                     "title": item["title"],
                     "source_kind": item["source_kind"],
+                    "profile": item.get("profile", "macroeconomics"),
                     "executive_summary": item["executive_summary"],
-                    "notable_claims": item["notable_claims"],
-                    "notable_opinions": item["notable_opinions"],
+                    "tickers_mentioned": item.get("tickers_mentioned", []),
+                    "profile_data": item.get("profile_data", {}),
                     "topic_tags": item["topic_tags"],
                     "confidence": item["confidence"],
                     "analysis_model": item.get("analysis_model"),
@@ -322,13 +326,17 @@ class GroqAnalystClient:
                 "agreements": ["string"],
                 "disagreements": ["string"],
                 "top_claims_worth_watching": ["string"],
+                "crowded_trades": ["string"],
+                "contrarian_flags": ["string"],
             },
         }
 
         call_result = self._chat_json(
             system_prompt=(
                 "You are a finance research synthesizer. Combine the per-video analyses into a single run-level "
-                "summary. Return JSON only. Highlight what matters most for a market watcher."
+                "summary. Return JSON only. Highlight what matters most for a market watcher. "
+                "Identify crowded trades (tickers or themes mentioned by 2+ sources in the same direction). "
+                "Flag contrarian views that disagree with the majority consensus."
             ),
             user_payload=user_payload,
         )
@@ -342,7 +350,13 @@ class GroqAnalystClient:
         normalized["summary_analysis_attempts"] = call_result.attempts
         return normalized
 
-    def _analyze_video_single_pass(self, archive: dict[str, Any], *, source_basis: str) -> tuple[dict[str, Any], CallResult]:
+    def _analyze_video_single_pass(
+        self,
+        archive: dict[str, Any],
+        *,
+        source_basis: str,
+        profile: AnalysisProfile,
+    ) -> tuple[dict[str, Any], CallResult]:
         transcript_available = source_basis == "transcript"
         transcript_payload = {
             "segments": archive.get("transcript_segments") or [],
@@ -351,19 +365,11 @@ class GroqAnalystClient:
         user_payload = {
             "task": "video_analysis",
             "requirements": {
-                "focus": [
-                    "executive_summary",
-                    "notable_claims",
-                    "notable_opinions",
-                    "key_timestamps",
-                    "topic_tags",
-                    "confidence",
-                ],
+                "focus": list(profile.build_full_schema().keys()),
                 "timestamp_policy": (
                     "Only include key_timestamps when transcript segments are present. "
                     "Use direct evidence from transcript cues."
                 ),
-                "opinion_policy": "Distinguish factual claims from the creator's opinions or interpretations.",
                 "metadata_only_policy": (
                     "If there is no transcript, analyze title and description only, lower confidence, "
                     "and return an empty key_timestamps list."
@@ -379,28 +385,10 @@ class GroqAnalystClient:
                 "analysis_input_basis": source_basis,
                 "transcript": transcript_payload if transcript_available else None,
             },
-            "output_schema": {
-                "executive_summary": "string",
-                "notable_claims": ["string"],
-                "notable_opinions": ["string"],
-                "key_timestamps": [
-                    {
-                        "timestamp": "HH:MM:SS",
-                        "label": "string",
-                        "snippet": "string",
-                        "why_it_matters": "string",
-                    }
-                ],
-                "topic_tags": [{"tag": "string", "score": "0-100 integer"}],
-                "confidence": "0-1 float",
-            },
+            "output_schema": profile.build_full_schema(),
         }
         call_result = self._chat_json(
-            system_prompt=(
-                "You are a finance-video analyst. Read the provided YouTube transcript or metadata and "
-                "return JSON only. Be precise, avoid invented details, and keep claims tied to what the "
-                "speaker actually said."
-            ),
+            system_prompt=profile.system_prompt,
             user_payload=user_payload,
         )
         return call_result.payload, call_result
@@ -412,8 +400,11 @@ class GroqAnalystClient:
         source_basis: str,
         transcript_segments: list[dict[str, Any]],
         current_limits: ModelLimits,
+        profile: AnalysisProfile,
     ) -> tuple[dict[str, Any], int, CallResult]:
         chunk_token_limit = current_limits.chunk_input_tokens
+        chunk_schema = dict(profile.build_full_schema())
+        chunk_schema.pop("confidence", None)
         while True:
             chunks = _chunk_transcript_segments(
                 transcript_segments,
@@ -430,10 +421,7 @@ class GroqAnalystClient:
             try:
                 for index, chunk in enumerate(chunks, start=1):
                     call_result = self._chat_json(
-                        system_prompt=(
-                            "You are a finance-video analyst. Review this chronological transcript chunk and return JSON only. "
-                            "Keep claims and opinions grounded in the chunk."
-                        ),
+                        system_prompt=profile.chunk_system_prompt,
                         user_payload={
                             "task": "video_chunk_analysis",
                             "chunk_index": index,
@@ -448,30 +436,14 @@ class GroqAnalystClient:
                                 "analysis_input_basis": source_basis,
                             },
                             "chunk": {"segments": chunk},
-                            "output_schema": {
-                                "executive_summary": "string",
-                                "notable_claims": ["string"],
-                                "notable_opinions": ["string"],
-                                "key_timestamps": [
-                                    {
-                                        "timestamp": "HH:MM:SS",
-                                        "label": "string",
-                                        "snippet": "string",
-                                        "why_it_matters": "string",
-                                    }
-                                ],
-                                "topic_tags": [{"tag": "string", "score": "0-100 integer"}],
-                            },
+                            "output_schema": chunk_schema,
                         },
                     )
                     total_attempts += call_result.attempts
                     chunk_outputs.append(call_result.payload)
 
                 final_result = self._chat_json(
-                    system_prompt=(
-                        "You are a finance-video analyst consolidating chunk-level findings into one video analysis. "
-                        "Return JSON only and keep the final claims/opinions evidence-based."
-                    ),
+                    system_prompt=profile.consolidation_system_prompt,
                     user_payload={
                         "task": "video_chunk_consolidation",
                         "video": {
@@ -484,21 +456,7 @@ class GroqAnalystClient:
                             "analysis_input_basis": source_basis,
                         },
                         "chunk_analyses": chunk_outputs,
-                        "output_schema": {
-                            "executive_summary": "string",
-                            "notable_claims": ["string"],
-                            "notable_opinions": ["string"],
-                            "key_timestamps": [
-                                {
-                                    "timestamp": "HH:MM:SS",
-                                    "label": "string",
-                                    "snippet": "string",
-                                    "why_it_matters": "string",
-                                }
-                            ],
-                            "topic_tags": [{"tag": "string", "score": "0-100 integer"}],
-                            "confidence": "0-1 float",
-                        },
+                        "output_schema": profile.build_full_schema(),
                     },
                 )
                 total_attempts += final_result.attempts
@@ -828,7 +786,7 @@ def _update_run_result_with_analysis_paths(
     write_json_document(result_path, updated)
 
 
-def _normalize_video_analysis(raw: dict[str, Any], archive: dict[str, Any]) -> dict[str, Any]:
+def _normalize_video_analysis(raw: dict[str, Any], archive: dict[str, Any], *, profile: AnalysisProfile | None = None) -> dict[str, Any]:
     channel = archive.get("channel") or {}
     video = archive.get("video") or {}
     source_basis = _resolve_source_basis(archive)
@@ -846,6 +804,17 @@ def _normalize_video_analysis(raw: dict[str, Any], archive: dict[str, Any]) -> d
             "Dropped model-provided key timestamps because they could not be validated against the transcript timeline."
         )
 
+    resolved_profile = profile or get_profile(channel.get("profile"))
+    profile_data: dict[str, Any] = {}
+    for field_name in resolved_profile.extra_fields:
+        value = raw.get(field_name)
+        if isinstance(value, list):
+            profile_data[field_name] = _normalize_string_list(value, limit=6)
+        elif isinstance(value, str):
+            profile_data[field_name] = _normalize_text(value, fallback="")
+        elif value is not None:
+            profile_data[field_name] = value
+
     return {
         "video_id": str(video.get("video_id") or ""),
         "channel_slug": str(channel.get("slug") or ""),
@@ -856,12 +825,14 @@ def _normalize_video_analysis(raw: dict[str, Any], archive: dict[str, Any]) -> d
         "source_kind": archive.get("source_kind"),
         "transcript_status": archive.get("transcript_status"),
         "source_basis": source_basis,
+        "profile": resolved_profile.name,
+        "synthesis_section": resolved_profile.synthesis_section,
         "executive_summary": _normalize_text(
             raw.get("executive_summary") or raw.get("summary"),
             fallback=(archive.get("description") or "No summary generated."),
         ),
-        "notable_claims": _normalize_string_list(raw.get("notable_claims"), limit=4),
-        "notable_opinions": _normalize_string_list(raw.get("notable_opinions"), limit=4),
+        "tickers_mentioned": _normalize_string_list(raw.get("tickers_mentioned"), limit=10),
+        "profile_data": profile_data,
         "key_timestamps": key_timestamps,
         "topic_tags": _normalize_topic_tags(raw.get("topic_tags")),
         "confidence": confidence,
@@ -923,6 +894,8 @@ def _normalize_run_synthesis(
             "agreements": _normalize_string_list(raw.get("agreements"), limit=4),
             "disagreements": _normalize_string_list(raw.get("disagreements"), limit=4),
             "top_claims_worth_watching": _normalize_string_list(raw.get("top_claims_worth_watching"), limit=5),
+            "crowded_trades": _normalize_string_list(raw.get("crowded_trades"), limit=5),
+            "contrarian_flags": _normalize_string_list(raw.get("contrarian_flags"), limit=4),
             "run_notes": list(run_errors),
         },
     }

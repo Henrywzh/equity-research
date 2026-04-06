@@ -12,6 +12,8 @@ class ChannelTarget:
     videos_url: str
     streams_url: str
     enabled: bool = True
+    profile: str = "macroeconomics"
+    title_filter: str | None = None
 
 
 @dataclass(slots=True)

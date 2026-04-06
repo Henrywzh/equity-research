@@ -19,6 +19,8 @@ def load_channel_targets(config_path: str | Path) -> list[ChannelTarget]:
                 videos_url=item["videos_url"],
                 streams_url=item["streams_url"],
                 enabled=bool(item.get("enabled", True)),
+                profile=str(item.get("profile", "macroeconomics")),
+                title_filter=item.get("title_filter"),
             )
         )
     return channels
@@ -69,6 +71,7 @@ def write_archive(
             "handle": channel.handle,
             "channel_id": channel.channel_id,
             "channel_name": video.channel_name,
+            "profile": channel.profile,
         },
         "video": {
             "video_id": video.video_id,
