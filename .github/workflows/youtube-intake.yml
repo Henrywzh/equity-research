@@ -32,6 +32,12 @@ jobs:
           cache: "pip"
           cache-dependency-path: youtube-intake/pyproject.toml
 
+      - name: Install system dependencies (ffmpeg + deno)
+        run: |
+          sudo apt-get update -qq && sudo apt-get install -y -qq ffmpeg
+          curl -fsSL https://deno.land/install.sh | sh
+          echo "$HOME/.deno/bin" >> "$GITHUB_PATH"
+
       - name: Install package
         run: |
           python -m pip install --upgrade pip
