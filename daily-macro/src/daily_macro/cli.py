@@ -51,6 +51,7 @@ def build_parser() -> argparse.ArgumentParser:
 
     notify_parser = subparsers.add_parser("notify", help="Send a Gmail summary for a prior analysis result.")
     notify_parser.add_argument("--result-path", required=True, help="Path to the JSON analysis result.")
+    notify_parser.add_argument("--preview", action="store_true", help="Print the HTML summary to stdout instead of sending email.")
 
     subparsers.add_parser("test-email", help="Send a Gmail connectivity test email.")
 
@@ -149,7 +150,12 @@ def main(argv: list[str] | None = None) -> int:
         return 0 if result["scrape"]["status"] == "success" and result["analysis"]["status"] != "failed" else 1
 
     if args.command == "notify":
-        sent, message = send_analysis_summary_email(load_analysis_result(args.result_path))
+        result_data = load_analysis_result(args.result_path)
+        if args.preview:
+            from .notifier import _build_html_body
+            print(_build_html_body(result_data))
+            return 0
+        sent, message = send_analysis_summary_email(result_data)
         print(json.dumps({"sent": sent, "message": message}, ensure_ascii=False, indent=2))
         return 0
 

@@ -9,6 +9,8 @@ from typing import Any
 
 from .config import get_project_root
 
+ATTENTION_TIER_RANK = {"high": 0, "medium": 1, "light": 2}
+
 GMAIL_SENDER_ENV = "DAILY_MACRO_GMAIL_SENDER"
 GMAIL_APP_PASSWORD_ENV = "DAILY_MACRO_GMAIL_APP_PASSWORD"
 GMAIL_RECIPIENT_ENV = "DAILY_MACRO_GMAIL_RECIPIENT"
@@ -439,17 +441,60 @@ def _build_html_subgroups(category: dict[str, Any], category_name: str = "") -> 
 def _build_html_articles(articles: list[dict[str, Any]]) -> str:
     if not articles:
         return ""
+    
+    # Sort: High/Medium/Light, then Newest Date
+    sorted_articles = sorted(
+        articles,
+        key=lambda a: (
+            ATTENTION_TIER_RANK.get(str(a.get("attention_tier") or "medium").lower(), 1),
+            -(_to_epoch(a.get("published_at")) or 0)
+        )
+    )
+
     items = []
-    for article in articles:
+    
+    if len(sorted_articles) < 5:
+        top_n = sorted_articles
+        remaining = []
+    else:
+        high_articles = [a for a in sorted_articles if str(a.get("attention_tier") or "").lower() == "high"]
+        if len(high_articles) >= 3:
+            top_n = high_articles
+            remaining = [a for a in sorted_articles if str(a.get("attention_tier") or "").lower() != "high"]
+        else:
+            top_n = sorted_articles[:3]
+            remaining = sorted_articles[3:]
+
+    def _render_item(article):
         title = _escape_html(str(article.get("title") or "Untitled"))
         url = str(article.get("canonical_url") or "").strip()
+        pub_at = (article.get("published_at") or "").replace("T", " ")
+        date_str = f" <span style='color:#6b7280;font-size:12px;'>({pub_at[:16]})</span>" if pub_at else ""
         unresolved = " <strong style='color:#b91c1c;'>[UNRESOLVED]</strong>" if article.get("error") else ""
         attention = _attention_badge_html(article)
         if url:
-            items.append(f"<li>{attention}<a href=\"{_escape_html(url)}\" style=\"color:#2563eb;text-decoration:none;\">{title}</a>{unresolved}</li>")
-        else:
-            items.append(f"<li>{attention}{title}{unresolved}</li>")
-    return "<div style='margin-top:10px;'><div style='font-weight:600;color:#111827;margin-bottom:6px;'>Articles</div><ul style='margin:0;padding-left:18px;line-height:1.7;'>" + "".join(items) + "</ul></div>"
+            return f"<li style='margin-bottom:4px;'>{attention}<a href=\"{_escape_html(url)}\" style=\"color:#2563eb;text-decoration:none;\">{title}</a>{date_str}{unresolved}</li>"
+        return f"<li style='margin-bottom:4px;'>{attention}{title}{date_str}{unresolved}</li>"
+
+    for article in top_n:
+        items.append(_render_item(article))
+
+    articles_list = "<ul style='margin:0;padding-left:18px;line-height:1.7;'>" + "".join(items)
+    
+    if remaining:
+        folded_items = "".join([_render_item(a) for a in remaining])
+        articles_list += (
+            f"<li style='list-style:none;margin-top:4px;'>"
+            f"<details style='margin-left:-18px;'>"
+            f"<summary style='color:#6b7280;font-size:12px;cursor:pointer;padding-left:18px;list-style:disclosure-closed;'>"
+            f"Show {len(remaining)} more news..."
+            f"</summary>"
+            f"<ul style='margin:4px 0 0;padding-left:18px;list-style:inherit;'>{folded_items}</ul>"
+            f"</details></li>"
+        )
+    
+    articles_list += "</ul>"
+    return f"<div style='margin-top:10px;'><div style='font-weight:600;color:#111827;margin-bottom:6px;'>Articles</div>{articles_list}</div>"
 
 
 def _attention_badge(article: dict[str, Any]) -> str:
@@ -599,6 +644,7 @@ def _build_html_market_section(summary: dict[str, Any]) -> str:
         if price is None:
             continue
         price_str = f"{price:.2f}"
+        date_str = _escape_html(str(item.get("data_timestamp", "")[:10]))
         if pct is not None:
             color = "#059669" if pct >= 0 else "#dc2626"
             pct_str = f"<span style='color:{color};font-weight:600;'>{pct:+.2f}%</span>"
@@ -607,14 +653,16 @@ def _build_html_market_section(summary: dict[str, Any]) -> str:
         rows.append(
             f"<tr><td style='padding:4px 12px 4px 0;'>{ticker}</td>"
             f"<td style='padding:4px 12px 4px 0;text-align:right;'>{price_str}</td>"
-            f"<td style='padding:4px 0;text-align:right;'>{pct_str}</td></tr>"
+            f"<td style='padding:4px 12px 4px 0;text-align:right;'>{pct_str}</td>"
+            f"<td style='padding:4px 0;text-align:right;color:#6b7280;font-size:12px;'>{date_str}</td></tr>"
         )
     table = (
         "<table style='width:100%;border-collapse:collapse;color:#374151;font-size:14px;'>"
         "<tr style='border-bottom:1px solid #e5e7eb;'>"
         "<th style='text-align:left;padding:4px 12px 4px 0;font-weight:600;'>Ticker</th>"
         "<th style='text-align:right;padding:4px 12px 4px 0;font-weight:600;'>Price</th>"
-        "<th style='text-align:right;padding:4px 0;font-weight:600;'>Change</th></tr>"
+        "<th style='text-align:right;padding:4px 12px 4px 0;font-weight:600;'>Change</th>"
+        "<th style='text-align:right;padding:4px 0;font-weight:600;'>Date</th></tr>"
         + "".join(rows)
         + "</table>"
     )
@@ -736,8 +784,8 @@ def _build_html_property_table(developments: list[str]) -> str:
 
     return (
         f"<details style='margin-top:10px;border:1px solid #f3f4f6;border-radius:8px;padding:8px;'>"
-        f"<summary style='font-size:14px;font-weight:600;color:#374151;cursor:pointer;list-style:none;'>"
-        f"Property Market Transactions ({len(developments)} units) <span style='float:right;color:#6b7280;'>▼</span>"
+        f"<summary style='font-size:14px;font-weight:600;color:#374151;cursor:pointer;'>"
+        f"Property Market Transactions ({len(developments)} units)"
         f"</summary>"
         f"<div style='margin-top:8px;overflow-x:hidden;'>"
         f"<table style='width:100%;border-collapse:collapse;font-size:13px;line-height:1.4;'>"
@@ -782,3 +830,12 @@ def _escape_html(value: str) -> str:
         .replace('"', "&quot;")
         .replace("'", "&#39;")
     )
+def _to_epoch(date_str: str | None) -> int | None:
+    if not date_str:
+        return None
+    try:
+        from datetime import datetime
+        # Handles 2026-04-07 15:33:21 or similar
+        return int(datetime.strptime(date_str[:19], "%Y-%m-%d %H:%M:%S").timestamp())
+    except Exception:
+        return None

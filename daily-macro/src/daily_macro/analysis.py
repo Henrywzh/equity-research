@@ -46,15 +46,15 @@ MIN_SYNTHESIS_INPUT_BUDGET_TOKENS = 800
 CATEGORY_SHRINK_STEP_CHARS = 400
 CATEGORY_MIN_CONTENT_CHARS = 0
 CATEGORY_ORDER = [
-    "港股直擊",
-    "香港財經",
-    "地產新聞",
-    "中國財經",
     "國際財經",
     "時事脈搏",
+    "香港財經",
+    "港股直擊",
+    "中國財經",
     "即巿股評",
     "重要通告",
     "港交所通告",
+    "地產新聞",
 ]
 ENTITY_TYPES = {"person", "company", "country", "institution", "index", "organization", "asset", "other"}
 FAILURE_CLASSIFICATIONS = {
@@ -663,12 +663,27 @@ def _graph_summarize_top_alerts(state: AnalysisGraphState) -> AnalysisGraphState
         cat_name = category.get("category") or "Unknown"
         for subgroup in category.get("subgroups") or []:
             subgroup_title = subgroup.get("title") or "Overview"
+            
+            # Extract relevant articles' titles and times for this subgroup
+            subgroup_articles = subgroup.get("articles") or []
+            article_refs: list[str] = []
+            for art in subgroup_articles:
+                title = str(art.get("title") or "Untitled")
+                pub_at = str(art.get("published_at") or "")
+                time_str = pub_at[11:16] if len(pub_at) >= 16 else pub_at
+                if time_str:
+                    article_refs.append(f"({title} | {time_str})")
+                else:
+                    article_refs.append(f"({title})")
+            
+            joined_refs = " ".join(article_refs)
+            
             for dev in subgroup.get("key_developments") or []:
                 all_developments.append(
                     {
                         "category": cat_name,
                         "subgroup": subgroup_title,
-                        "text": dev,
+                        "text": f"{dev} {joined_refs}".strip(),
                     }
                 )
 
@@ -1570,11 +1585,36 @@ def _analyze_category(
     article_results: list[dict[str, Any]] = []
     article_errors: list[dict[str, Any]] = []
     sub_batch_count = 0
+    
+    # Analyze non-light articles in batches
     for index, batch in enumerate(planned_batches, start=1):
+        if not batch:
+            continue
         batch_results, batch_errors, batch_count = _process_batch_recursive(runtime, category_name, batch, str(index))
         article_results.extend(batch_results)
         article_errors.extend(batch_errors)
         sub_batch_count += batch_count
+        
+    # Handle bypassed light articles
+    for article in prepared_articles:
+        if str(article.get("attention_tier") or "").lower() == "light":
+            article_results.append({
+                "source_article_id": article.get("source_article_id"),
+                "canonical_url": article.get("canonical_url"),
+                "title": article.get("title"),
+                "section": article.get("section"),
+                "published_at": article.get("published_at"),
+                "attention_tier": "light",
+                "novelty_score": 5,
+                "relevance_score": 5,
+                "urgency_score": 5,
+                "named_entities": [],
+                "key_points": [],
+                "content_truncated": article.get("content_truncated"),
+                "analysis_method": "bypassed",
+                "model_used": "direct",
+            })
+
     article_results = _order_results_like_input(prepared_articles, article_results)
     article_results, delayed_retry_count = _run_delayed_retry_pass(runtime, category_name, prepared_articles, article_results)
     sub_batch_count += delayed_retry_count
@@ -1612,7 +1652,7 @@ def _analyze_category(
                     "classification": _classify_exception(exc),
                 }
             )
-    else:
+    elif prepared_articles:
         category_status = "failed"
         category_error_message = "No successful article analyses available for synthesis."
         category_errors.append(
@@ -1623,6 +1663,10 @@ def _analyze_category(
                 "classification": "incomplete_model_output",
             }
         )
+    else:
+        # Graceful handling for exactly 0 articles case
+        category_status = "success"
+
 
     if category_status == "success" and article_errors:
         category_status = "partial"
@@ -2880,6 +2924,10 @@ def _plan_category_batches(
     current: list[dict[str, Any]] = []
 
     for article in prepared_articles:
+        # Bypassing LLM analysis for light news
+        if str(article.get("attention_tier") or "").lower() == "light":
+            continue
+
         if current and _batch_attention_tier(current) != _batch_attention_tier([article]):
             planned.append(current)
             current = [article]
@@ -3395,8 +3443,15 @@ def _build_failed_article_result(
 
 def _group_source_articles(articles: list[dict[str, Any]]) -> list[tuple[str, list[dict[str, Any]]]]:
     grouped: dict[str, list[dict[str, Any]]] = defaultdict(list)
+    # Ensure ordered categories exist even if empty
+    for category in CATEGORY_ORDER:
+        grouped[category] = []
+        
     for article in articles:
-        grouped[(article.get("article_section") or "未分類")].append(article)
+        section_name = article.get("article_section") or "未分類"
+        if section_name in {"二手市場", "新盤情報"}:
+            section_name = "地產新聞"
+        grouped[section_name].append(article)
 
     fixed_order = {name: index for index, name in enumerate(CATEGORY_ORDER)}
     ordered_categories = sorted(grouped, key=lambda category: (fixed_order.get(category, len(CATEGORY_ORDER)), category))
@@ -3744,7 +3799,8 @@ def _generate_top_alerts(
         "1. Pick EXACTLY 3 developments. If fewer than 3 are significant, pick the best available.\n"
         "2. Ensure each alert includes specific data (prices, % changes, specific figures) referenced in the news.\n"
         "3. Do not invent causal links; only cite the facts and their significance.\n"
-        "4. Your output must be a valid JSON object with a single key 'top_alerts' containing a list of strings."
+        "4. Your output must be a valid JSON object with a single key 'top_alerts' containing a list of strings. "
+        "Each string must end with the exact source article title and time in parentheses, e.g., (阿提密斯2號繞月任務 | 15:33)."
     )
 
     user_payload = {

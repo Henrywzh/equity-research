@@ -103,7 +103,7 @@ def fetch_market_snapshot_for_date(target_date: str) -> list[dict[str, Any]]:
                    GROUP BY ticker
                ) latest ON ps.ticker = latest.ticker
                        AND ps.fetched_at = latest.max_fetched
-               ORDER BY ps.asset_class, ps.ticker""",
+               ORDER BY ps.asset_class, ps.data_timestamp DESC, ps.ticker""",
             (target_date,),
         ).fetchall()
         if rows:
@@ -115,7 +115,7 @@ def fetch_market_snapshot_for_date(target_date: str) -> list[dict[str, Any]]:
                    FROM price_snapshots GROUP BY ticker
                ) latest ON ps.ticker = latest.ticker
                        AND ps.fetched_at = latest.max_fetched
-               ORDER BY ps.asset_class, ps.ticker""",
+               ORDER BY ps.asset_class, ps.data_timestamp DESC, ps.ticker""",
         ).fetchall()
         return [dict(r) for r in rows]
     except Exception:
