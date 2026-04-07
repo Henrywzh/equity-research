@@ -65,7 +65,7 @@ FAILURE_CLASSIFICATIONS = {
     "http_error",
     "unexpected_error",
 }
-LIGHT_ANALYSIS_SECTIONS = {"地產新聞"}
+LIGHT_ANALYSIS_SECTIONS = {"時事脈搏", "地產新聞"}
 ATTENTION_TIERS = ("high", "medium", "light")
 ATTENTION_TIER_RANK = {"high": 0, "medium": 1, "light": 2}
 ROUTER_LLM_MIN_ARTICLES = 1
