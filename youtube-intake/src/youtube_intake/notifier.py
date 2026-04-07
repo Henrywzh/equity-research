@@ -411,12 +411,15 @@ def _build_video_card(item: dict[str, Any]) -> str:
     {_escape_html(item.get("channel_name") or item.get("channel_slug") or "Unknown Channel")}
   </div>
   <div style="margin-top:6px;font-size:22px;font-weight:700;line-height:1.3;">
-    <a href="{_escape_html(item.get("webpage_url") or "#")}" style="color:#111827;text-decoration:none;">{_escape_html(item.get("title") or "Untitled")}</a>
+    <a href="{_escape_html(item.get("webpage_url") or "#")}" style="color:#1d4ed8;text-decoration:underline;">{_escape_html(item.get("title") or "Untitled")}</a>
   </div>
   <div style="margin-top:10px;font-size:13px;color:#4b5563;">
     Published: {_escape_html(item.get("published_at") or "Unknown")}<br />
     Type: {_escape_html(item.get("source_kind") or "unknown")}<br />
     Confidence: {_escape_html(item.get("confidence") or "unknown")}
+  </div>
+  <div style="margin-top:10px;">
+    <a href="{_escape_html(item.get("webpage_url") or "#")}" style="display:inline-block;padding:8px 16px;background:#1d4ed8;color:#ffffff;font-size:13px;font-weight:700;text-decoration:none;border-radius:6px;">Watch Video ▶</a>
   </div>
   <div style="margin-top:12px;font-size:14px;color:#111827;line-height:1.7;">
     {_escape_html(item.get("executive_summary") or "No takeaway available.")}
