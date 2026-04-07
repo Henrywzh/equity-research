@@ -1,0 +1,23 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "truthsocial-monitor"
+version = "0.1.0"
+description = "TruthSocial @realDonaldTrump post monitor with SQLite storage and Gmail alerts."
+readme = "README.md"
+requires-python = ">=3.11"
+dependencies = [
+  "truthbrush>=0.1.0",
+  "requests>=2.31.0",
+]
+
+[project.scripts]
+truthsocial-monitor = "truthsocial_monitor.cli:main"
+
+[tool.setuptools]
+package-dir = {"" = "src"}
+
+[tool.setuptools.packages.find]
+where = ["src"]
