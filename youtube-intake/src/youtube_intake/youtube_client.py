@@ -18,8 +18,20 @@ from yt_dlp.utils import DownloadError
 from .config import DEFAULT_RECENT_LIMIT, DEFAULT_REQUEST_TIMEOUT, PREFERRED_TRANSCRIPT_LANGUAGES
 from .models import ChannelTarget, FlatPlaylistEntry, TranscriptPayload, TranscriptSegment, VideoMetadata
 from .runtime_env import load_local_config, read_env
+from .storage import load_json_document
 
 
+DEFAULT_USER_AGENT = (
+    "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) "
+    "AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
+)
+DEFAULT_HTTP_HEADERS = {
+    "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7",
+    "Accept-Language": "en-US,en;q=0.9",
+    "Sec-Ch-Ua": '"Not_A Brand";v="8", "Chromium";v="120", "Google Chrome";v="120"',
+    "Sec-Ch-Ua-Mobile": "?0",
+    "Sec-Ch-Ua-Platform": '"macOS"',
+}
 GROQ_API_KEY_ENV = "GROQ_API_KEY"
 YT_COOKIES_ENV = "YOUTUBE_INTAKE_YT_COOKIES"
 GROQ_AUDIO_TRANSCRIPTIONS_URL = "https://api.groq.com/openai/v1/audio/transcriptions"
@@ -234,6 +246,8 @@ class YoutubeClient:
                 "no_warnings": True,
                 "noplaylist": True,
                 "ignoreerrors": False,
+                "user_agent": DEFAULT_USER_AGENT,
+                "http_headers": DEFAULT_HTTP_HEADERS,
                 "format": (
                     format_id
                     or "worstaudio[ext=m4a]/worstaudio[ext=webm]/worstaudio/"
@@ -377,6 +391,8 @@ class YoutubeClient:
             "skip_download": True,
             "noplaylist": True,
             "ignoreerrors": False,
+            "user_agent": DEFAULT_USER_AGENT,
+            "http_headers": DEFAULT_HTTP_HEADERS,
         }
         if cookiefile is not None:
             options["cookiefile"] = str(cookiefile)

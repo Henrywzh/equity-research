@@ -418,9 +418,6 @@ def _build_video_card(item: dict[str, Any]) -> str:
     Type: {_escape_html(item.get("source_kind") or "unknown")}<br />
     Confidence: {_escape_html(item.get("confidence") or "unknown")}
   </div>
-  <div style="margin-top:10px;">
-    <a href="{_escape_html(item.get("webpage_url") or "#")}" style="display:inline-block;padding:8px 16px;background:#1d4ed8;color:#ffffff;font-size:13px;font-weight:700;text-decoration:none;border-radius:6px;">Watch Video ▶</a>
-  </div>
   <div style="margin-top:12px;font-size:14px;color:#111827;line-height:1.7;">
     {_escape_html(item.get("executive_summary") or "No takeaway available.")}
   </div>
