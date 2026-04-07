@@ -1,9 +1,9 @@
 {
   "report_schema_version": 5,
   "report_date": "2026-04-06",
-  "generated_at": "2026-04-06T21:10:39.592308+00:00",
+  "generated_at": "2026-04-07T08:19:59.419886+00:00",
   "source_site": "hkej",
-  "status": "partial",
+  "status": "success",
   "model": {
     "provider": "groq",
     "primary_model": "meta-llama/llama-4-scout-17b-16e-instruct",
@@ -18,157 +18,40 @@
     "category_count": 5
   },
   "diagnostics": {
-    "rate_limit_wait_count": 0,
-    "rate_limit_wait_seconds_total": 0.0,
+    "rate_limit_wait_count": 2,
+    "rate_limit_wait_seconds_total": 116.943,
     "fallback_switch_count": 0,
-    "pre_send_split_count": 3,
+    "pre_send_split_count": 8,
     "response_413_split_count": 0,
     "json_repair_retry_count": 0,
-    "batch_count": 39,
+    "batch_count": 78,
     "failed_batch_count": 0,
     "delayed_retry_candidate_count": 2,
     "delayed_retry_attempted_count": 2,
-    "delayed_retry_recovered_count": 1,
-    "delayed_retry_failed_count": 1,
-    "high_medium_unresolved_count": 1,
+    "delayed_retry_recovered_count": 2,
+    "delayed_retry_failed_count": 0,
+    "high_medium_unresolved_count": 0,
     "light_unresolved_count": 0,
-    "delayed_retry_skipped_final_model_count": 1
+    "delayed_retry_skipped_final_model_count": 0
   },
   "incremental": {
-    "reused_successful_articles": 16,
-    "new_articles_analyzed": 8,
-    "retried_previous_day_articles": 0,
-    "previous_day_retry_successes": 0
+    "reused_successful_articles": 0,
+    "new_articles_analyzed": 0,
+    "retried_previous_day_articles": 1,
+    "previous_day_retry_successes": 1
   },
-  "unresolved_articles": [
-    {
-      "category": "國際財經",
-      "title": "日央行維持樂觀經濟評估 中東衝突恐造成衝擊",
-      "canonical_url": "https://www.hkej.com/instantnews/international/article/4365404/%E6%97%A5%E5%A4%AE%E8%A1%8C%E7%B6%AD%E6%8C%81%E6%A8%82%E8%A7%80%E7%B6%93%E6%BF%9F%E8%A9%95%E4%BC%B0+%E4%B8%AD%E6%9D%B1%E8%A1%9D%E7%AA%81%E6%81%90%E9%80%A0%E6%88%90%E8%A1%9D%E6%93%8A",
-      "source_article_id": "4365404",
-      "attention_tier": "medium",
-      "theme": "macro",
-      "must_keep": true,
-      "error_classification": "incomplete_model_output",
-      "error": "Model response omitted this article from the delayed retry batch.",
-      "model_used": "llama-3.1-8b-instant",
-      "delayed_retry_attempted": true,
-      "delayed_retry_model_chain": [
-        "llama-3.1-8b-instant",
-        "openai/gpt-oss-20b (skipped missing OPENAI_API_KEY)"
-      ],
-      "delayed_retry_final_model": "openai/gpt-oss-20b",
-      "published_at": "2026-04-06T17:57:00+08:00"
-    }
-  ],
+  "unresolved_articles": [],
   "totals": {
     "article_count": 24,
-    "successful_article_analyses": 23,
-    "failed_article_analyses": 1,
+    "successful_article_analyses": 24,
+    "failed_article_analyses": 0,
     "full_text_article_count": 24,
     "truncated_article_count": 0,
-    "successful_categories": 4,
-    "partial_categories": 1,
+    "successful_categories": 5,
+    "partial_categories": 0,
     "failed_categories": 0
   },
-  "market_context": [
-    {
-      "ticker": "CL=F",
-      "asset_class": "commodity",
-      "price": 109.94999694824219,
-      "prev_close": 111.54000091552734,
-      "pct_change": -1.4255011244704174,
-      "data_timestamp": "2026-04-06"
-    },
-    {
-      "ticker": "GC=F",
-      "asset_class": "commodity",
-      "price": 4719.2001953125,
-      "prev_close": 4651.5,
-      "pct_change": 1.4554486791895087,
-      "data_timestamp": "2026-04-06"
-    },
-    {
-      "ticker": "BTC-USD",
-      "asset_class": "crypto",
-      "price": 69755.96875,
-      "prev_close": 68981.8984375,
-      "pct_change": 1.1221354152804806,
-      "data_timestamp": "2026-04-06"
-    },
-    {
-      "ticker": "DX-Y.NYB",
-      "asset_class": "fx",
-      "price": 99.91200256347656,
-      "prev_close": 100.02999877929688,
-      "pct_change": -0.11796082901156055,
-      "data_timestamp": "2026-04-06"
-    },
-    {
-      "ticker": "GBPHKD=X",
-      "asset_class": "fx",
-      "price": 10.336020469665527,
-      "prev_close": 10.367500305175781,
-      "pct_change": -0.3036395908716606,
-      "data_timestamp": "2026-04-06"
-    },
-    {
-      "ticker": "GBPHKD=X",
-      "asset_class": "fx",
-      "price": 10.378820419311523,
-      "prev_close": 10.367500305175781,
-      "pct_change": 0.10918846204509713,
-      "data_timestamp": "2026-04-06"
-    },
-    {
-      "ticker": "USDCNH=X",
-      "asset_class": "fx",
-      "price": 6.8856000900268555,
-      "prev_close": 6.880899906158447,
-      "pct_change": 0.0683076913268497,
-      "data_timestamp": "2026-04-06"
-    },
-    {
-      "ticker": "USDCNH=X",
-      "asset_class": "fx",
-      "price": 6.876780033111572,
-      "prev_close": 6.880899906158447,
-      "pct_change": -0.05987404413756533,
-      "data_timestamp": "2026-04-06"
-    },
-    {
-      "ticker": "USDJPY=X",
-      "asset_class": "fx",
-      "price": 159.77099609375,
-      "prev_close": 159.49099731445312,
-      "pct_change": 0.17555773304547606,
-      "data_timestamp": "2026-04-06"
-    },
-    {
-      "ticker": "USDJPY=X",
-      "asset_class": "fx",
-      "price": 159.46099853515625,
-      "prev_close": 159.49099731445312,
-      "pct_change": -0.018809073742092966,
-      "data_timestamp": "2026-04-06"
-    },
-    {
-      "ticker": "^KS11",
-      "asset_class": "index",
-      "price": 5450.330078125,
-      "prev_close": 5377.2998046875,
-      "pct_change": 1.3581216612441442,
-      "data_timestamp": "2026-04-06"
-    },
-    {
-      "ticker": "^N225",
-      "asset_class": "index",
-      "price": 53413.6796875,
-      "prev_close": 53123.48828125,
-      "pct_change": 0.54625819131765,
-      "data_timestamp": "2026-04-06"
-    }
-  ],
+  "market_context": [],
   "categories": [
     {
       "category": "香港財經",
@@ -632,7 +515,7 @@
     {
       "category": "國際財經",
       "article_count": 6,
-      "status": "partial",
+      "status": "success",
       "key_developments": [],
       "named_entities": [
         {
@@ -721,11 +604,28 @@
           "canonical_url": "https://www.hkej.com/instantnews/international/article/4365404/%E6%97%A5%E5%A4%AE%E8%A1%8C%E7%B6%AD%E6%8C%81%E6%A8%82%E8%A7%80%E7%B6%93%E6%BF%9F%E8%A9%95%E4%BC%B0+%E4%B8%AD%E6%9D%B1%E8%A1%9D%E7%AA%81%E6%81%90%E9%80%A0%E6%88%90%E8%A1%9D%E6%93%8A",
           "published_at": "2026-04-06T17:57:00+08:00",
           "section": "國際財經",
-          "novelty_score": null,
-          "relevance_score": null,
-          "urgency_score": null,
-          "named_entities": [],
-          "key_points": [],
+          "novelty_score": 6,
+          "relevance_score": 8,
+          "urgency_score": 7,
+          "named_entities": [
+            {
+              "name": "日本央行",
+              "type": "institution"
+            },
+            {
+              "name": "中東",
+              "type": "other"
+            },
+            {
+              "name": "日圓",
+              "type": "other"
+            }
+          ],
+          "key_points": [
+            "日本央行維持對9個地區經濟的樂觀評估，消費保持堅挺，得益於入境旅遊和薪資上漲。",
+            "中東衝突可能導致油價飆升和供應中斷，衝擊經濟，企業擔憂價格上漲損害利潤和消費。",
+            "市場押注4月加息可能性約70%，但中東衝突令日央行加息計劃更複雜。"
+          ],
           "content_truncated": false,
           "original_content_length_chars": 408,
           "analyzed_content_length_chars": 408,
@@ -733,19 +633,16 @@
           "analyzed_content_token_estimate": 102,
           "truncation_reason": null,
           "analysis_method": "full_text",
-          "attention_tier": "medium",
+          "attention_tier": "high",
           "theme": "macro",
-          "attention_reason": "Article discusses Japan's central bank maintaining an optimistic economic outlook amidst Middle East conflicts.",
+          "attention_reason": "High-signal macro headline based on title/summary keywords.",
           "must_keep": true,
-          "model_used": "llama-3.1-8b-instant",
-          "delayed_retry_attempted": true,
-          "delayed_retry_model_chain": [
-            "llama-3.1-8b-instant",
-            "openai/gpt-oss-20b (skipped missing OPENAI_API_KEY)"
-          ],
-          "delayed_retry_final_model": "openai/gpt-oss-20b",
-          "error_classification": "incomplete_model_output",
-          "error": "Model response omitted this article from the delayed retry batch."
+          "model_used": "meta-llama/llama-4-scout-17b-16e-instruct",
+          "delayed_retry_attempted": false,
+          "delayed_retry_model_chain": [],
+          "delayed_retry_final_model": null,
+          "error_classification": null,
+          "error": null
         },
         {
           "source_article_id": "4365401",
@@ -941,14 +838,14 @@
       ],
       "subgroups": [
         {
-          "title": "能源市場動態",
-          "theme_rationale": "與能源市場相關的新聞，包括油價走勢和生產調整。",
+          "title": "原油市場動態",
+          "theme_rationale": "關注原油價格、產量調整等相關新聞",
           "article_count": 2,
           "key_developments": [
             "沙特阿拉伯將其面向亞洲銷售的主要原油品級價格上調至紀錄高位，阿拉伯輕質原油價格上調至較基準每桶升水19.5美元。",
             "美國和以色列針對伊朗的戰爭攪亂全球能源市場，布油已上漲逾50%，美國、歐洲和亞洲的燃料價格大幅飆升。",
             "OPEC+原則同意5月原油產量配額提高至每日20.6萬桶，與4月增產幅度相同，但受美以與伊朗戰爭影響，主要成員國實際增產能力受限。",
-            "原油期貨(CL=F)當日下跌1.43%，反映投資者對OPEC+增產協議實際影響的懷疑。"
+            "市場反映顯示原油期貨(CL=F)當日下跌1.43%，反映投資者對OPEC+增產協議實際影響的懷疑。"
           ],
           "named_entities": [
             {
@@ -1093,14 +990,14 @@
           "model_used": "meta-llama/llama-4-scout-17b-16e-instruct"
         },
         {
-          "title": "股市動態",
-          "theme_rationale": "與股市相關的新聞，包括亞股走勢和個別公司動態。",
-          "article_count": 3,
+          "title": "亞洲股市表現",
+          "theme_rationale": "報導亞洲股市走勢、經濟評估等相關新聞",
+          "article_count": 2,
           "key_developments": [
             "日經平均指數收報53413點，升290點或0.55%。",
             "南韓首爾綜合指數收報5450點，升73點或1.36%。",
-            "蘋果首款摺疊式iPhone已在試產，富士康已開始試產。",
-            "OpenAI CEO冀第四季掛牌，CFO指今年不具備條件。"
+            "日本央行維持對9個地區經濟的樂觀評估，消費保持堅挺，得益於入境旅遊和薪資上漲。",
+            "市場押注4月加息可能性約70%，但中東衝突令日央行加息計劃更複雜。"
           ],
           "named_entities": [
             {
@@ -1112,16 +1009,12 @@
               "type": "index"
             },
             {
-              "name": "蘋果",
-              "type": "company"
+              "name": "日本央行",
+              "type": "institution"
             },
             {
-              "name": "富士康",
-              "type": "company"
-            },
-            {
-              "name": "OpenAI",
-              "type": "company"
+              "name": "中東",
+              "type": "other"
             }
           ],
           "articles": [
@@ -1167,6 +1060,92 @@
               "error_classification": null,
               "error": null
             },
+            {
+              "source_article_id": "4365404",
+              "title": "日央行維持樂觀經濟評估 中東衝突恐造成衝擊",
+              "canonical_url": "https://www.hkej.com/instantnews/international/article/4365404/%E6%97%A5%E5%A4%AE%E8%A1%8C%E7%B6%AD%E6%8C%81%E6%A8%82%E8%A7%80%E7%B6%93%E6%BF%9F%E8%A9%95%E4%BC%B0+%E4%B8%AD%E6%9D%B1%E8%A1%9D%E7%AA%81%E6%81%90%E9%80%A0%E6%88%90%E8%A1%9D%E6%93%8A",
+              "published_at": "2026-04-06T17:57:00+08:00",
+              "section": "國際財經",
+              "novelty_score": 6,
+              "relevance_score": 8,
+              "urgency_score": 7,
+              "named_entities": [
+                {
+                  "name": "日本央行",
+                  "type": "institution"
+                },
+                {
+                  "name": "中東",
+                  "type": "other"
+                },
+                {
+                  "name": "日圓",
+                  "type": "other"
+                }
+              ],
+              "key_points": [
+                "日本央行維持對9個地區經濟的樂觀評估，消費保持堅挺，得益於入境旅遊和薪資上漲。",
+                "中東衝突可能導致油價飆升和供應中斷，衝擊經濟，企業擔憂價格上漲損害利潤和消費。",
+                "市場押注4月加息可能性約70%，但中東衝突令日央行加息計劃更複雜。"
+              ],
+              "content_truncated": false,
+              "original_content_length_chars": 408,
+              "analyzed_content_length_chars": 408,
+              "original_content_token_estimate": 102,
+              "analyzed_content_token_estimate": 102,
+              "truncation_reason": null,
+              "analysis_method": "full_text",
+              "attention_tier": "high",
+              "theme": "macro",
+              "attention_reason": "High-signal macro headline based on title/summary keywords.",
+              "must_keep": true,
+              "model_used": "meta-llama/llama-4-scout-17b-16e-instruct",
+              "delayed_retry_attempted": false,
+              "delayed_retry_model_chain": [],
+              "delayed_retry_final_model": null,
+              "error_classification": null,
+              "error": null
+            }
+          ],
+          "model_used": "meta-llama/llama-4-scout-17b-16e-instruct"
+        },
+        {
+          "title": "科技股動態",
+          "theme_rationale": "關注科技公司股票相關新聞",
+          "article_count": 2,
+          "key_developments": [
+            "蘋果首款摺疊式iPhone已在試產，富士康已開始試產。",
+            "OpenAI CEO冀第四季掛牌，CFO指今年不具備條件。",
+            "OpenAI將在未來5年內投入6000億美元。",
+            "公司獲得總計1220億美元投資承諾。"
+          ],
+          "named_entities": [
+            {
+              "name": "蘋果",
+              "type": "company"
+            },
+            {
+              "name": "富士康",
+              "type": "company"
+            },
+            {
+              "name": "iPhone",
+              "type": "asset"
+            },
+            {
+              "name": "OpenAI",
+              "type": "company"
+            },
+            {
+              "name": "阿爾特曼",
+              "type": "person"
+            },
+            {
+              "name": "弗萊爾",
+              "type": "person"
+            }
+          ],
+          "articles": [
             {
               "source_article_id": "4365401",
               "title": "iPhone丨傳蘋果首款iPhone摺機試產",
@@ -1264,19 +1243,21 @@
       ],
       "analysis_profile": "standard",
       "model_used": "meta-llama/llama-4-scout-17b-16e-instruct",
-      "sub_batch_count": 7,
+      "sub_batch_count": 6,
       "diagnostics": {
-        "sub_batch_count": 7,
-        "split_reasons": [],
+        "sub_batch_count": 6,
+        "split_reasons": [
+          "pre_send_budget"
+        ],
         "models_attempted": [
           "meta-llama/llama-4-scout-17b-16e-instruct",
           "qwen/qwen3-32b",
           "llama-3.1-8b-instant"
         ],
-        "estimated_input_tokens_max": 702,
-        "serialized_request_bytes_max": 4359,
+        "estimated_input_tokens_max": 1402,
+        "serialized_request_bytes_max": 8501,
         "rate_limit_waits": 0,
-        "partial_article_count": 1
+        "partial_article_count": 0
       },
       "error": null
     },
@@ -3078,7 +3059,7 @@
       "model_used": "meta-llama/llama-4-scout-17b-16e-instruct",
       "sub_batch_count": 2,
       "diagnostics": {
-        "sub_batch_count": 1,
+        "sub_batch_count": 2,
         "split_reasons": [],
         "models_attempted": [
           "meta-llama/llama-4-scout-17b-16e-instruct"
@@ -3091,12 +3072,5 @@
       "error": null
     }
   ],
-  "errors": [
-    {
-      "type": "article",
-      "target": "https://www.hkej.com/instantnews/international/article/4365404/%E6%97%A5%E5%A4%AE%E8%A1%8C%E7%B6%AD%E6%8C%81%E6%A8%82%E8%A7%80%E7%B6%93%E6%BF%9F%E8%A9%95%E4%BC%B0+%E4%B8%AD%E6%9D%B1%E8%A1%9D%E7%AA%81%E6%81%90%E9%80%A0%E6%88%90%E8%A1%9D%E6%93%8A",
-      "message": "Model response omitted this article from the delayed retry batch.",
-      "classification": "incomplete_model_output"
-    }
-  ]
+  "errors": []
 }
