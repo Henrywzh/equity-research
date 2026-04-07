@@ -229,6 +229,13 @@ def _build_plain_body(summary: dict[str, Any]) -> str:
         lines.extend(market_lines)
         lines.append("")
 
+    executive_summary = summary.get("executive_summary") or []
+    if executive_summary:
+        lines.append("EXECUTIVE SUMMARY (TOP ALERTS):")
+        for alert in executive_summary:
+            lines.append(f"!!! {alert}")
+        lines.append("")
+
     unresolved_lines = _build_plain_unresolved_lines(summary)
     if unresolved_lines:
         lines.append("Unresolved articles:")
@@ -254,24 +261,38 @@ def _build_plain_body(summary: dict[str, Any]) -> str:
 def _build_html_body(summary: dict[str, Any]) -> str:
     category_blocks = []
     for category in summary.get("categories") or []:
-        items = "".join(
-            f"<li>{_escape_html(str(item))}</li>"
-            for item in (category.get("key_developments") or [])[:5]
-        )
+        category_name = str(category.get("category") or "")
+        category_articles = category.get("articles") or []
+        is_property = category_name in {"二手市場", "新盤情報"}
+        is_light_only = _is_light_only(category_articles) and not is_property
+        
+        items_html = ""
+        if not is_light_only:
+            developments = category.get("key_developments") or []
+            if is_property and developments:
+                items_html = _build_html_property_table(developments)
+            elif developments:
+                bullets = "".join(
+                    f"<li>{_escape_html(str(item))}</li>"
+                    for item in developments[:5]
+                )
+                items_html = f"<ul style='margin:0;padding-left:18px;color:#374151;line-height:1.6;'>{bullets}</ul>"
+
         entities = category.get("named_entities") or []
         entities_html = ""
-        if entities:
+        if entities and not is_light_only:
             labels = ", ".join(_escape_html(str(entity.get("name") or "")) for entity in entities[:8] if entity.get("name"))
             entities_html = f"<p style='margin:10px 0 0;color:#4b5563;'><strong>Named entities:</strong> {labels}</p>"
-        subgroup_html = _build_html_subgroups(category)
+        
+        subgroup_html = _build_html_subgroups(category, category_name)
         category_blocks.append(
             f"""
-            <div style="margin:0 0 18px;padding:16px;border:1px solid #e5e7eb;border-radius:12px;background:#ffffff;">
-              <div style="font-size:18px;font-weight:700;color:#111827;margin-bottom:8px;">
-                {_escape_html(str(category.get("category") or "Uncategorized"))}
-                <span style="font-size:13px;font-weight:500;color:#6b7280;">({int(category.get("article_count") or 0)} article(s))</span>
+            <div style="margin:0 0 16px;padding:12px;border:1px solid #e5e7eb;border-radius:12px;background:#ffffff;">
+              <div style="font-size:17px;font-weight:700;color:#111827;margin-bottom:6px;">
+                {_escape_html(category_name or "Uncategorized")}
+                <span style="font-size:12px;font-weight:500;color:#6b7280;">({int(category.get("article_count") or 0)} article(s))</span>
               </div>
-              <ul style="margin:0;padding-left:18px;color:#374151;line-height:1.6;">{items}</ul>
+              {items_html}
               {entities_html}
               {subgroup_html}
             </div>
@@ -291,15 +312,18 @@ def _build_html_body(summary: dict[str, Any]) -> str:
 
     unresolved_html = _build_html_unresolved_section(summary)
     market_html = _build_html_market_section(summary)
+    executive_summary_html = _build_html_executive_summary(summary)
 
     return f"""
     <html>
       <body style="margin:0;padding:24px;background:#f3f4f6;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;">
         <div style="max-width:760px;margin:0 auto;background:#ffffff;border-radius:16px;padding:28px 28px 16px;border:1px solid #e5e7eb;">
           <div style="font-size:30px;font-weight:800;color:#111827;">Daily Macro Analyst</div>
-          <p style="margin:8px 0 0;color:#4b5563;">
+          <p style="margin:8px 0 20px;color:#4b5563;">
             Report date: {_escape_html(str(summary.get("report_date") or "Unknown"))}
           </p>
+          {executive_summary_html}
+          {notes_html}
           <p style="margin:6px 0 0;color:#4b5563;">
             Articles: {int((summary.get("totals") or {}).get("article_count") or 0)} |
             Categories: {int((summary.get("input") or {}).get("category_count") or 0)}
@@ -320,23 +344,28 @@ def _build_html_body(summary: dict[str, Any]) -> str:
 
 def _build_plain_subgroup_lines(category: dict[str, Any]) -> list[str]:
     subgroups = list(category.get("subgroups") or [])
+    category_name = str(category.get("category") or "")
     if not subgroups:
         return _build_plain_article_lines(category.get("articles") or [])
 
     lines: list[str] = []
     for subgroup in subgroups:
+        subgroup_articles = subgroup.get("articles") or []
+        is_light_only = _is_light_only(subgroup_articles)
+        
         lines.append(f"Subgroup: {subgroup.get('title') or 'Overview'}")
-        rationale = str(subgroup.get("theme_rationale") or "").strip()
-        if rationale:
-            lines.append(f"  Theme: {rationale}")
-        for item in (subgroup.get("key_developments") or [])[:4]:
-            lines.append(f"  - {item}")
-        entities = subgroup.get("named_entities") or []
-        if entities:
-            labels = ", ".join(entity["name"] for entity in entities[:6] if entity.get("name"))
-            if labels:
-                lines.append(f"  Named entities: {labels}")
-        lines.extend(f"  - {line}" for line in _build_plain_article_lines(subgroup.get("articles") or []))
+        if not is_light_only:
+            rationale = str(subgroup.get("theme_rationale") or "").strip()
+            if rationale:
+                lines.append(f"  Theme: {rationale}")
+            for item in (subgroup.get("key_developments") or [])[:4]:
+                lines.append(f"  - {item}")
+            entities = subgroup.get("named_entities") or []
+            if entities:
+                labels = ", ".join(entity["name"] for entity in entities[:6] if entity.get("name"))
+                if labels:
+                    lines.append(f"  Named entities: {labels}")
+        lines.extend(f"  - {line}" for line in _build_plain_article_lines(subgroup_articles))
     return lines
 
 
@@ -354,38 +383,51 @@ def _build_plain_article_lines(articles: list[dict[str, Any]]) -> list[str]:
     return lines
 
 
-def _build_html_subgroups(category: dict[str, Any]) -> str:
+def _build_html_subgroups(category: dict[str, Any], category_name: str = "") -> str:
     subgroups = list(category.get("subgroups") or [])
     if not subgroups:
         articles_html = _build_html_articles(category.get("articles") or [])
         return f"<div style='margin-top:14px;'>{articles_html}</div>" if articles_html else ""
 
     blocks = []
+    is_property = category_name in {"二手市場", "新盤情報"}
+    
     for subgroup in subgroups:
-        bullets = "".join(
-            f"<li>{_escape_html(str(item))}</li>"
-            for item in (subgroup.get("key_developments") or [])[:4]
-        )
-        rationale = str(subgroup.get("theme_rationale") or "").strip()
-        rationale_html = (
-            f"<p style='margin:6px 0 8px;color:#6b7280;'><strong>Theme:</strong> {_escape_html(rationale)}</p>"
-            if rationale
-            else ""
-        )
-        entities = subgroup.get("named_entities") or []
-        entity_labels = ", ".join(_escape_html(str(entity.get("name") or "")) for entity in entities[:6] if entity.get("name"))
-        entities_html = (
-            f"<p style='margin:8px 0 0;color:#4b5563;'><strong>Named entities:</strong> {entity_labels}</p>"
-            if entity_labels
-            else ""
-        )
-        article_links = _build_html_articles(subgroup.get("articles") or [])
+        subgroup_articles = subgroup.get("articles") or []
+        is_light_only = _is_light_only(subgroup_articles) and not is_property
+        
+        items_html = ""
+        if not is_light_only:
+            developments = subgroup.get("key_developments") or []
+            if is_property and developments:
+                items_html = _build_html_property_table(developments)
+            elif developments:
+                bullets = "".join(
+                    f"<li>{_escape_html(str(item))}</li>"
+                    for item in developments[:4]
+                )
+                items_html = f"<ul style='margin:0;padding-left:18px;color:#374151;line-height:1.6;'>{bullets}</ul>"
+
+        rationale_html = ""
+        if not is_light_only:
+            rationale = str(subgroup.get("theme_rationale") or "").strip()
+            if rationale:
+                rationale_html = f"<p style='margin:6px 0 8px;color:#6b7280;'><strong>Theme:</strong> {_escape_html(rationale)}</p>"
+
+        entities_html = ""
+        if not is_light_only:
+            entities = subgroup.get("named_entities") or []
+            entity_labels = ", ".join(_escape_html(str(entity.get("name") or "")) for entity in entities[:6] if entity.get("name"))
+            if entity_labels:
+                entities_html = f"<p style='margin:8px 0 0;color:#4b5563;'><strong>Named entities:</strong> {entity_labels}</p>"
+
+        article_links = _build_html_articles(subgroup_articles)
         blocks.append(
             f"""
             <div style="margin-top:16px;padding-top:14px;border-top:1px solid #f3f4f6;">
               <div style="font-size:15px;font-weight:700;color:#111827;">{_escape_html(str(subgroup.get("title") or "Overview"))}</div>
               {rationale_html}
-              <ul style="margin:0;padding-left:18px;color:#374151;line-height:1.6;">{bullets}</ul>
+              {items_html}
               {entities_html}
               {article_links}
             </div>
@@ -656,6 +698,80 @@ def _read_env(name: str) -> str:
     import os
 
     return str(os.environ.get(name) or "")
+
+
+def _is_light_only(articles: list[dict[str, Any]]) -> bool:
+    if not articles:
+        return False
+    return all(str(a.get("attention_tier") or "").strip().lower() == "light" for a in articles)
+
+
+def _build_html_property_table(developments: list[str]) -> str:
+    import re
+
+    rows = []
+    # Heuristic extraction
+    for text in developments:
+        # Try to split by common Chinese indicators for price/action
+        parts = re.split(r"([以以])", text, 1)
+        if len(parts) == 3:
+            project = parts[0].strip()
+            details = parts[1] + parts[2].strip()
+        else:
+            # Try splitting by "獲利" or "易手" or "成交"
+            parts = re.split(r"(獲利|易手|成交|招標售出)", text, 1)
+            if len(parts) == 3:
+                project = parts[0].strip()
+                details = parts[1] + parts[2].strip()
+            else:
+                project = text
+                details = ""
+        
+        rows.append(
+            f"<tr>"
+            f"<td style='padding:6px 12px 6px 0;border-bottom:1px solid #f3f4f6;font-weight:500;'>{_escape_html(project)}</td>"
+            f"<td style='padding:6px 0;border-bottom:1px solid #f3f4f6;color:#6b7280;'>{_escape_html(details)}</td>"
+            f"</tr>"
+        )
+
+    return (
+        f"<details style='margin-top:10px;border:1px solid #f3f4f6;border-radius:8px;padding:8px;'>"
+        f"<summary style='font-size:14px;font-weight:600;color:#374151;cursor:pointer;list-style:none;'>"
+        f"Property Market Transactions ({len(developments)} units) <span style='float:right;color:#6b7280;'>▼</span>"
+        f"</summary>"
+        f"<div style='margin-top:8px;overflow-x:hidden;'>"
+        f"<table style='width:100%;border-collapse:collapse;font-size:13px;line-height:1.4;'>"
+        f"<tr style='background:#f9fafb;'>"
+        f"<th style='text-align:left;padding:4px 12px 4px 0;border-bottom:2px solid #e5e7eb;color:#4b5563;'>Project/Unit</th>"
+        f"<th style='text-align:left;padding:4px 0;border-bottom:2px solid #e5e7eb;color:#4b5563;'>Transaction</th>"
+        f"</tr>"
+        + "".join(rows)
+        + "</table></div></details>"
+    )
+
+
+def _build_html_executive_summary(summary: dict[str, Any]) -> str:
+    alerts = summary.get("executive_summary") or []
+    if not alerts:
+        return ""
+    
+    items = "".join(
+        f"<div style='margin-bottom:12px;padding:12px;border-left:4px solid #ef4444;background:#fff5f5;border-radius:0 8px 8px 0;'>"
+        f"<div style='font-weight:700;color:#991b1b;font-size:14px;margin-bottom:4px;'>TOP ALERT</div>"
+        f"<div style='color:#111827;line-height:1.5;'>{_escape_html(alert)}</div>"
+        f"</div>"
+        for alert in alerts
+    )
+    
+    return (
+        "<div style='margin-bottom:24px;'>"
+        "<div style='font-size:18px;font-weight:700;color:#111827;margin-bottom:12px;display:flex;align-items:center;'>"
+        "<span style='background:#ef4444;color:white;padding:2px 8px;border-radius:4px;font-size:12px;margin-right:8px;'>CIO BRIEFING</span>"
+        "Executive Summary"
+        "</div>"
+        + items
+        + "</div>"
+    )
 
 
 def _escape_html(value: str) -> str:

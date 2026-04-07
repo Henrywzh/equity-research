@@ -23,7 +23,7 @@ LOGGER = logging.getLogger(__name__)
 GROQ_CHAT_COMPLETIONS_URL = "https://api.groq.com/openai/v1/chat/completions"
 OPENAI_CHAT_COMPLETIONS_URL = "https://api.openai.com/v1/chat/completions"
 REPORT_FILE_NAME = "hkej-news-analysis.json"
-REPORT_SCHEMA_VERSION = 5
+REPORT_SCHEMA_VERSION = 6
 DEFAULT_PROVIDER = "groq"
 PRIMARY_MODEL_ID = "meta-llama/llama-4-scout-17b-16e-instruct"
 FALLBACK_MODEL_IDS = ["qwen/qwen3-32b", "llama-3.1-8b-instant"]
@@ -98,7 +98,7 @@ STANDARD_SECTION_PROFILE = SectionProfile(
     name="standard",
     article_key_points_limit=4,
     article_key_points_instruction="2 to 4 strings — each must include at least one specific detail such as a figure, percentage, named actor, date, cause, or consequence; do not restate the article title",
-    entity_limit=6,
+    entity_limit=5,
     category_bullet_limit=5,
     subgroup_bullet_limit=4,
     article_input_budget_tokens=DEFAULT_INPUT_BUDGET_TOKENS,
@@ -106,7 +106,7 @@ STANDARD_SECTION_PROFILE = SectionProfile(
     synthesis_input_budget_tokens=DEFAULT_SYNTHESIS_INPUT_BUDGET_TOKENS,
     synthesis_request_byte_budget=DEFAULT_SYNTHESIS_REQUEST_BYTE_BUDGET,
     subgroup_threshold=5,
-    subgroup_target_size=3,
+    subgroup_target_size=6,
     salvage_max_depth=3,
 )
 
@@ -122,7 +122,7 @@ LIGHT_SECTION_PROFILE = SectionProfile(
     synthesis_input_budget_tokens=1600,
     synthesis_request_byte_budget=5600,
     subgroup_threshold=7,
-    subgroup_target_size=4,
+    subgroup_target_size=8,
     salvage_max_depth=2,
 )
 
@@ -144,7 +144,9 @@ class AnalysisGraphState(TypedDict):
     updated_previous_report: NotRequired[dict[str, Any] | None]
     incremental: dict[str, int]
     market_context_string: str
+    market_context_string: str
     market_snapshots: list[dict[str, Any]]
+    top_alerts: list[str]
     report: dict[str, Any]
 
 
@@ -520,6 +522,7 @@ def run_analysis(
         "incremental": {},
         "market_context_string": "",
         "market_snapshots": [],
+        "top_alerts": [],
         "report": {},
     }
     final_state = graph.invoke(state)
@@ -543,13 +546,15 @@ def _build_analysis_graph():
     graph.add_node("route_attention", _graph_route_attention)
     graph.add_node("analyze_today", _graph_analyze_today)
     graph.add_node("retry_previous_day", _graph_retry_previous_day)
+    graph.add_node("summarize_top_alerts", _graph_summarize_top_alerts)
     graph.add_node("finalize", _graph_finalize)
     graph.add_edge(START, "initialize")
     graph.add_edge("initialize", "fetch_market_data")
     graph.add_edge("fetch_market_data", "route_attention")
     graph.add_edge("route_attention", "analyze_today")
     graph.add_edge("analyze_today", "retry_previous_day")
-    graph.add_edge("retry_previous_day", "finalize")
+    graph.add_edge("retry_previous_day", "summarize_top_alerts")
+    graph.add_edge("summarize_top_alerts", "finalize")
     graph.add_edge("finalize", END)
     return graph.compile()
 
@@ -647,6 +652,43 @@ def _graph_retry_previous_day(state: AnalysisGraphState) -> AnalysisGraphState:
     return state
 
 
+def _graph_summarize_top_alerts(state: AnalysisGraphState) -> AnalysisGraphState:
+    runtime = state["runtime"]
+    if runtime is None or not state["category_reports"]:
+        return state
+
+    # Collect all key developments and their metadata
+    all_developments: list[dict[str, Any]] = []
+    for category in state["category_reports"]:
+        cat_name = category.get("category") or "Unknown"
+        for subgroup in category.get("subgroups") or []:
+            subgroup_title = subgroup.get("title") or "Overview"
+            for dev in subgroup.get("key_developments") or []:
+                all_developments.append(
+                    {
+                        "category": cat_name,
+                        "subgroup": subgroup_title,
+                        "text": dev,
+                    }
+                )
+
+    if not all_developments:
+        return state
+
+    try:
+        top_alerts = _generate_top_alerts(
+            runtime=runtime,
+            developments=all_developments,
+            market_context=state["market_context_string"],
+        )
+        state["top_alerts"] = top_alerts
+        LOGGER.info("Successfully generated %d top-level alerts.", len(top_alerts))
+    except Exception as e:
+        LOGGER.warning("Failed to generate top alerts: %s", e)
+
+    return state
+
+
 def _graph_finalize(state: AnalysisGraphState) -> AnalysisGraphState:
     if not state["articles"]:
         report = _build_empty_report(state["target_date"], incremental=state["incremental"])
@@ -660,6 +702,7 @@ def _graph_finalize(state: AnalysisGraphState) -> AnalysisGraphState:
         source_site=state["source_site"],
         input_article_count=len(state["articles"]),
         category_reports=state["category_reports"],
+        top_alerts=state.get("top_alerts") or [],
         runtime=state["runtime"],
         incremental=state["incremental"],
         market_snapshots=state.get("market_snapshots"),
@@ -1333,6 +1376,7 @@ def _finalize_report(
     source_site: str,
     input_article_count: int,
     category_reports: list[dict[str, Any]],
+    top_alerts: list[str],
     runtime: AnalysisRuntime | None,
     incremental: dict[str, int],
     market_snapshots: list[dict[str, Any]] | None = None,
@@ -1362,6 +1406,7 @@ def _finalize_report(
         "generated_at": datetime.now().astimezone().isoformat(),
         "source_site": source_site,
         "status": status,
+        "executive_summary": top_alerts,
         "model": {
             "provider": DEFAULT_PROVIDER,
             "primary_model": PRIMARY_MODEL_ID,
@@ -2445,6 +2490,7 @@ def _build_category_outputs(
         return summary_payload, summary_model, summary_batches, [subgroup]
 
     subgroup_specs = _assign_article_subgroups(runtime, category_name, successful_articles)
+    subgroup_specs = _consolidate_subgroups(subgroup_specs)
     subgroup_reports: list[dict[str, Any]] = []
     subgroup_summary_items: list[dict[str, Any]] = []
     total_batches = 0
@@ -2809,7 +2855,7 @@ def _build_grouping_messages(category_name: str, grouping_items: list[dict[str, 
                     },
                     "rules": [
                         "Every input article must appear in exactly one subgroup.",
-                        "Prefer fewer, coherent groups over many tiny groups.",
+                        "Avoid many tiny subgroups; focus on 2-3 broad thematic clusters.",
                         f"Target around {profile.subgroup_target_size} article(s) per subgroup when possible.",
                         "Use the provided theme and attention tier as hints when forming subgroups.",
                     ],
@@ -3038,8 +3084,50 @@ def _normalize_grouping_payload(
                 "articles": subgroup_articles,
             }
         )
+
     missing_articles = [article for key, article in article_lookup.items() if key not in assigned_keys]
     return normalized, missing_articles
+
+
+def _consolidate_subgroups(
+    subgroups: list[dict[str, Any]],
+    target_count: int = 3,
+    min_articles: int = 3
+) -> list[dict[str, Any]]:
+    """Merges smaller subgroups into larger ones if fragmentations are too high."""
+    if len(subgroups) <= target_count:
+        return subgroups
+        
+    to_keep = []
+    to_merge = []
+    for sg in subgroups:
+        if len(sg.get("articles") or []) < min_articles:
+            to_merge.append(sg)
+        else:
+            to_keep.append(sg)
+            
+    if not to_merge:
+        return subgroups
+        
+    if not to_keep:
+        # All were small, just return them as one big group
+        merged_articles = []
+        for sg in to_merge:
+            merged_articles.extend(sg["articles"])
+        return [{
+            "title": "Combined Market Overview",
+            "theme_rationale": "Consolidated smaller themes for brevity.",
+            "articles": merged_articles
+        }]
+        
+    # Merge small ones into the largest existing subgroup or the first one
+    to_keep.sort(key=lambda x: len(x["articles"]), reverse=True)
+    target_sg = to_keep[0]
+    for sg in to_merge:
+        target_sg["articles"].extend(sg["articles"])
+    
+    target_sg["title"] += " & Other News"
+    return to_keep
 
 
 def _fallback_subgroups(category_name: str, successful_articles: list[dict[str, Any]]) -> list[dict[str, Any]]:
@@ -3640,3 +3728,54 @@ def _build_market_context_for_report(snapshots: list[dict[str, Any]]) -> list[di
 
 def _section_profile(category_name: str) -> SectionProfile:
     return LIGHT_SECTION_PROFILE if category_name in LIGHT_ANALYSIS_SECTIONS else STANDARD_SECTION_PROFILE
+def _generate_top_alerts(
+    runtime: AnalysisRuntime,
+    developments: list[dict[str, Any]],
+    market_context: str = "",
+) -> list[str]:
+    """Uses LLM to pick exactly 3 most critical macro-moving developments."""
+    import json
+
+    system_prompt = (
+        "You are a Chief Investment Officer. Your task is to pick the 3 most critical news developments "
+        "from the following list for a morning briefing. Your goal is high 'Alpha' — prioritize events "
+        "that have the greatest macro impact, structural significance, or immediate market urgency.\n\n"
+        "Guidelines:\n"
+        "1. Pick EXACTLY 3 developments. If fewer than 3 are significant, pick the best available.\n"
+        "2. Ensure each alert includes specific data (prices, % changes, specific figures) referenced in the news.\n"
+        "3. Do not invent causal links; only cite the facts and their significance.\n"
+        "4. Your output must be a valid JSON object with a single key 'top_alerts' containing a list of strings."
+    )
+
+    user_payload = {
+        "market_context": market_context,
+        "developments": developments,
+    }
+
+    try:
+        model = runtime.primary_model
+        api_url = model.api_url or GROQ_CHAT_COMPLETIONS_URL
+        session = runtime.get_session_for_model(model)
+        
+        response = session.post(
+            api_url,
+            json={
+                "model": model.model_id,
+                "messages": [
+                    {"role": "system", "content": system_prompt},
+                    {"role": "user", "content": json.dumps(user_payload, ensure_ascii=False)},
+                ],
+                "response_format": {"type": "json_object"},
+                "temperature": 0.1,
+            },
+            timeout=30,
+        )
+        response.raise_for_status()
+        data = response.json()
+        content = data["choices"][0]["message"]["content"]
+        parsed = json.loads(content)
+        return list(parsed.get("top_alerts") or [])[:3]
+    except Exception as e:
+        LOGGER.warning("Alert generation LLM call failed: %s", e)
+        # Simple fallback: pick first 3 from input if LLM fails
+        return [d["text"] for d in developments[:3]]

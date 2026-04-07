@@ -96,7 +96,13 @@ def fetch_market_snapshot_for_date(target_date: str) -> list[dict[str, Any]]:
     try:
         rows = conn.execute(
             """SELECT ps.* FROM price_snapshots ps
-               WHERE ps.data_timestamp = ?
+               INNER JOIN (
+                   SELECT ticker, MAX(fetched_at) AS max_fetched
+                   FROM price_snapshots
+                   WHERE data_timestamp = ?
+                   GROUP BY ticker
+               ) latest ON ps.ticker = latest.ticker
+                       AND ps.fetched_at = latest.max_fetched
                ORDER BY ps.asset_class, ps.ticker""",
             (target_date,),
         ).fetchall()
