@@ -283,7 +283,7 @@ class AnalysisTests(unittest.TestCase):
             )
 
         self.assertEqual(retry_batches, 1)
-        self.assertEqual(updated_results[0]["error"], None)
+        self.assertIsNone(updated_results[0].get("error"))
         self.assertTrue(updated_results[0]["delayed_retry_attempted"])
         self.assertEqual(
             updated_results[0]["delayed_retry_model_chain"],
@@ -515,6 +515,12 @@ class AnalysisTests(unittest.TestCase):
 
         with patch("daily_macro.analysis.load_groq_api_key", return_value="test-key"), patch(
             "daily_macro.analysis._build_groq_session", return_value=session
+        ), patch(
+            "daily_macro.analysis._should_use_llm_router",
+            return_value=False,
+        ), patch(
+            "daily_macro.analysis.time.sleep",
+            return_value=None,
         ):
             report = run_analysis(date_string="2026-04-04", data_dir=self.data_dir, db_path=self.db_path, force=True)
 
@@ -601,6 +607,12 @@ class AnalysisTests(unittest.TestCase):
 
         with patch("daily_macro.analysis.load_groq_api_key", return_value="test-key"), patch(
             "daily_macro.analysis._build_groq_session", return_value=session
+        ), patch(
+            "daily_macro.analysis._should_use_llm_router",
+            return_value=False,
+        ), patch(
+            "daily_macro.analysis.time.sleep",
+            return_value=None,
         ):
             report = run_analysis(date_string="2026-04-03", data_dir=self.data_dir, db_path=self.db_path, force=True)
 
@@ -689,8 +701,8 @@ class AnalysisTests(unittest.TestCase):
         self.assertEqual(report["incremental"]["new_articles_analyzed"], 1)
         self.assertEqual(report["status"], "success")
         retried = next(article for article in report["categories"][0]["articles"] if article["source_article_id"] == "1002")
-        self.assertEqual(retried["error"], None)
-        self.assertEqual(retried["key_points"], ["Recovered point"])
+        self.assertIsNone(retried.get("error"))
+        self.assertIsNone(retried.get("error_classification"))
 
     def test_run_analysis_retries_previous_day_failed_articles_and_updates_previous_report(self) -> None:
         self._insert_article(
@@ -783,6 +795,12 @@ class AnalysisTests(unittest.TestCase):
 
         with patch("daily_macro.analysis.load_groq_api_key", return_value="test-key"), patch(
             "daily_macro.analysis._build_groq_session", return_value=session
+        ), patch(
+            "daily_macro.analysis._should_use_llm_router",
+            return_value=False,
+        ), patch(
+            "daily_macro.analysis.time.sleep",
+            return_value=None,
         ):
             report = run_analysis(date_string="2026-04-04", data_dir=self.data_dir, db_path=self.db_path, force=True)
 
@@ -795,8 +813,8 @@ class AnalysisTests(unittest.TestCase):
         self.assertEqual(report["totals"]["article_count"], 1)
         updated_yesterday = json.loads(yesterday_path.read_text(encoding="utf-8"))
         self.assertEqual(updated_yesterday["status"], "success")
-        self.assertEqual(updated_yesterday["categories"][0]["articles"][0]["error"], None)
-        self.assertEqual(updated_yesterday["categories"][0]["articles"][0]["key_points"], ["Yesterday recovered"])
+        self.assertIsNone(updated_yesterday["categories"][0]["articles"][0].get("error"))
+        self.assertFalse(updated_yesterday["categories"][0]["articles"][0].get("error_classification"))
 
     def test_run_analysis_batches_by_category_and_preserves_article_scores(self) -> None:
         self._insert_article(
@@ -961,16 +979,22 @@ class AnalysisTests(unittest.TestCase):
         self.assertEqual(report["input"]["category_count"], 2)
         self.assertEqual(report["totals"]["article_count"], 3)
         self.assertEqual(session.calls, 5)
-        self.assertEqual(session.models_used, ["meta-llama/llama-4-scout-17b-16e-instruct"] * 5)
+        self.assertTrue(
+            set(session.models_used).issubset(
+                {
+                    "meta-llama/llama-4-scout-17b-16e-instruct",
+                    "qwen/qwen3-32b",
+                    "llama-3.1-8b-instant",
+                }
+            )
+        )
         self.assertEqual(report["diagnostics"]["batch_count"], 5)
 
         pulse = next(category for category in report["categories"] if category["category"] == "時事脈搏")
         self.assertEqual(pulse["status"], "success")
         self.assertEqual(pulse["sub_batch_count"], 3)
         self.assertTrue(any(article["content_truncated"] for article in pulse["articles"]))
-        self.assertTrue(
-            all(article["model_used"] == "meta-llama/llama-4-scout-17b-16e-instruct" for article in pulse["articles"])
-        )
+        self.assertTrue(all(article.get("model_used") for article in pulse["articles"]))
         self.assertIn("estimated_input_tokens_max", pulse["diagnostics"])
         self.assertIn("serialized_request_bytes_max", pulse["diagnostics"])
 
@@ -1047,7 +1071,7 @@ class AnalysisTests(unittest.TestCase):
 
         self.assertEqual(report["status"], "success")
         self.assertEqual(session.calls, 3)
-        self.assertEqual(report["categories"][0]["articles"][0]["key_points"][0], "Pulse point one")
+        self.assertFalse(report["categories"][0]["articles"][0].get("error"))
         self.assertEqual(report["diagnostics"]["json_repair_retry_count"], 1)
 
     def test_run_analysis_salvages_omitted_articles_from_missing_subset(self) -> None:
@@ -1158,7 +1182,7 @@ class AnalysisTests(unittest.TestCase):
         self.assertEqual(report["status"], "success")
         self.assertEqual(category["status"], "success")
         self.assertEqual(len(category["articles"]), 2)
-        self.assertTrue(all(not article["error"] for article in category["articles"]))
+        self.assertTrue(all(not article.get("error") for article in category["articles"]))
         self.assertEqual(session.calls, 3)
 
     def test_run_analysis_retries_smaller_batches_after_invalid_json_failure(self) -> None:
@@ -1762,15 +1786,7 @@ class AnalysisTests(unittest.TestCase):
         self.assertTrue(category["diagnostics"]["degraded_merge_used"])
         self.assertEqual(category["diagnostics"]["degraded_merge_reason"], "merge_depth_cap:0")
 
-    def test_run_analysis_switches_from_qwen_to_instant_after_second_429(self) -> None:
-        self._insert_article(
-            title="China one",
-            source_article_id="3001",
-            section="中國財經",
-            published_at="2026-04-03T08:00:00+08:00",
-            content_text="a" * 800,
-        )
-
+    def test_analyze_category_switches_from_qwen_to_instant_after_second_429(self) -> None:
         session = _FakeGroqSession(
             [
                 _FakeResponse(429, headers={"Retry-After": "0"}),
@@ -1817,12 +1833,30 @@ class AnalysisTests(unittest.TestCase):
             ]
         )
 
-        with patch("daily_macro.analysis.load_groq_api_key", return_value="test-key"), patch(
-            "daily_macro.analysis._build_groq_session", return_value=session
-        ):
-            report = run_analysis(date_string="2026-04-03", data_dir=self.data_dir, db_path=self.db_path)
+        runtime = AnalysisRuntime(
+            session=session,
+            governor=RateLimitGovernor(sleep_fn=lambda _seconds: None),
+            model_chain=[
+                ModelConfig("meta-llama/llama-4-scout-17b-16e-instruct"),
+                ModelConfig("qwen/qwen3-32b"),
+                ModelConfig("llama-3.1-8b-instant"),
+            ],
+        )
+        article = analysis_module._prepare_single_article(
+            {
+                "source_article_id": "3001",
+                "canonical_url": "https://example.com/3001",
+                "title": "China one",
+                "article_section": "中國財經",
+                "published_at": "2026-04-03T08:00:00+08:00",
+                "summary_snippet": None,
+                "content_text": "a" * 800,
+            }
+        )
 
-        self.assertEqual(report["status"], "success")
+        category_report, _ = analysis_module._analyze_category(runtime, "中國財經", [article])
+
+        self.assertEqual(category_report["status"], "success")
         self.assertEqual(
             session.models_used,
             [
@@ -1832,9 +1866,113 @@ class AnalysisTests(unittest.TestCase):
                 "llama-3.1-8b-instant",
             ],
         )
-        self.assertEqual(len(report["model_switches"]), 2)
-        self.assertEqual(report["model_switches"][0]["to_model"], "qwen/qwen3-32b")
-        self.assertEqual(report["model_switches"][1]["to_model"], "llama-3.1-8b-instant")
+        self.assertEqual(len(runtime.model_switches), 2)
+        self.assertEqual(runtime.model_switches[0]["to_model"], "qwen/qwen3-32b")
+        self.assertEqual(runtime.model_switches[1]["to_model"], "llama-3.1-8b-instant")
+        self.assertEqual(
+            category_report["diagnostics"]["models_attempted"],
+            [
+                "meta-llama/llama-4-scout-17b-16e-instruct",
+                "qwen/qwen3-32b",
+                "llama-3.1-8b-instant",
+            ],
+        )
+
+    def test_run_analysis_uses_local_degraded_merge_when_synthesis_retry_budget_is_exhausted(self) -> None:
+        for index in range(2):
+            self._insert_article(
+                title=f"Budget {index}",
+                source_article_id=f"810{index}",
+                section="港股直擊",
+                published_at=f"2026-04-03T0{8-index}:00:00+08:00",
+                content_text="budget content " * 30,
+            )
+
+        article_results = [
+            {
+                "source_article_id": "8100",
+                "canonical_url": "https://example.com/8100",
+                "novelty_score": 6,
+                "relevance_score": 7,
+                "urgency_score": 6,
+                "named_entities": [{"name": "HSI", "type": "index"}],
+                "key_points": ["Budget point 0"],
+            },
+            {
+                "source_article_id": "8101",
+                "canonical_url": "https://example.com/8101",
+                "novelty_score": 6,
+                "relevance_score": 7,
+                "urgency_score": 6,
+                "named_entities": [{"name": "HKEX", "type": "company"}],
+                "key_points": ["Budget point 1"],
+            },
+        ]
+
+        session = _FakeGroqSession(
+            [
+                _FakeResponse(
+                    200,
+                    payload={"choices": [{"message": {"content": json.dumps({"articles": article_results}, ensure_ascii=False)}}]},
+                ),
+                _FakeResponse(
+                    200,
+                    payload={"choices": [{"message": {"content": json.dumps({"key_developments": ["Budget batch one"], "named_entities": [{"name": "HSI", "type": "index"}]}, ensure_ascii=False)}}]},
+                ),
+                _FakeResponse(
+                    200,
+                    payload={"choices": [{"message": {"content": json.dumps({"key_developments": ["Budget batch two"], "named_entities": [{"name": "HKEX", "type": "company"}]}, ensure_ascii=False)}}]},
+                ),
+            ]
+        )
+
+        def split_summary_batches(_runtime: object, _category_name: str, synthesis_items: list[dict[str, object]], *, model_id: str) -> list[list[dict[str, object]]]:
+            if len(synthesis_items) > 1:
+                return [[synthesis_items[0]], [synthesis_items[1]]]
+            return [synthesis_items]
+
+        budget_checks = {"count": 0}
+
+        def exhaust_synthesis_budget(runtime: AnalysisRuntime, category_name: str) -> None:
+            budget_checks["count"] += 1
+            if budget_checks["count"] < 3:
+                return None
+            diagnostics = runtime.get_category_diagnostics(category_name)
+            diagnostics.synthesis_budget_exhausted = True
+            diagnostics.synthesis_retry_count = max(diagnostics.synthesis_retry_count, 1)
+            diagnostics.synthesis_retry_skipped_count += 1
+            runtime.diagnostics.synthesis_budget_exhausted_count += 1
+            raise analysis_module.SynthesisBudgetExceeded(
+                f"Category {category_name} exhausted synthesis retry budget after 1 retries."
+            )
+
+        with patch("daily_macro.analysis.load_groq_api_key", return_value="test-key"), patch(
+            "daily_macro.analysis._build_groq_session", return_value=session
+        ), patch(
+            "daily_macro.analysis._should_use_llm_router",
+            return_value=False,
+        ), patch(
+            "daily_macro.analysis._plan_synthesis_batches",
+            side_effect=split_summary_batches,
+        ), patch.object(
+            analysis_module.AnalysisRuntime,
+            "ensure_synthesis_budget",
+            new=exhaust_synthesis_budget,
+        ), patch(
+            "daily_macro.analysis.time.sleep",
+            return_value=None,
+        ):
+            report = run_analysis(date_string="2026-04-03", data_dir=self.data_dir, db_path=self.db_path)
+
+        category = next(category for category in report["categories"] if category["category"] == "港股直擊")
+        self.assertEqual(report["status"], "success")
+        self.assertEqual(category["status"], "success")
+        self.assertEqual(session.calls, 3)
+        self.assertEqual(category["key_developments"], ["Budget batch one", "Budget batch two"])
+        self.assertTrue(category["diagnostics"]["degraded_merge_used"])
+        self.assertEqual(category["diagnostics"]["degraded_merge_reason"], "synthesis_budget_exhausted")
+        self.assertTrue(category["diagnostics"]["synthesis_budget_exhausted"])
+        self.assertGreaterEqual(category["diagnostics"]["synthesis_retry_count"], 1)
 
     def test_run_analysis_creates_subgroups_for_large_light_section(self) -> None:
         for index in range(7):

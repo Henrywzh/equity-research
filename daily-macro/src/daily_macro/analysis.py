@@ -1367,6 +1367,7 @@ def _retry_previous_report(
         source_site=DEFAULT_SOURCE_SITE,
         input_article_count=int((existing_report.get("input") or {}).get("article_count") or len(db_articles)),
         category_reports=category_reports,
+        top_alerts=list(existing_report.get("executive_summary") or []),
         runtime=runtime,
         incremental={
             "reused_successful_articles": 0,

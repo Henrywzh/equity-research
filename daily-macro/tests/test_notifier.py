@@ -70,6 +70,8 @@ def _success_report() -> dict[str, object]:
             "json_repair_retry_count": 0,
             "batch_count": 3,
             "failed_batch_count": 0,
+            "synthesis_budget_exhausted_count": 0,
+            "degraded_merge_count": 0,
         },
         "totals": {
             "article_count": 3,
@@ -106,6 +108,23 @@ def _success_report() -> dict[str, object]:
                         ],
                     }
                 ],
+                "diagnostics": {
+                    "sub_batch_count": 2,
+                    "split_reasons": [],
+                    "models_attempted": ["qwen/qwen3-32b"],
+                    "estimated_input_tokens_max": 1800,
+                    "serialized_request_bytes_max": 7200,
+                    "rate_limit_waits": 0,
+                    "partial_article_count": 0,
+                    "synthesis_wait_seconds_total": 0.0,
+                    "synthesis_retry_count": 0,
+                    "synthesis_retry_skipped_count": 0,
+                    "synthesis_budget_exhausted": False,
+                    "degraded_merge_used": False,
+                    "degraded_merge_reason": "",
+                    "synthesis_merge_depth_max": 0,
+                    "model_switches": [],
+                },
             },
             {
                 "category": "時事脈搏",
@@ -130,6 +149,23 @@ def _success_report() -> dict[str, object]:
                         ],
                     }
                 ],
+                "diagnostics": {
+                    "sub_batch_count": 1,
+                    "split_reasons": [],
+                    "models_attempted": ["qwen/qwen3-32b"],
+                    "estimated_input_tokens_max": 900,
+                    "serialized_request_bytes_max": 3500,
+                    "rate_limit_waits": 0,
+                    "partial_article_count": 0,
+                    "synthesis_wait_seconds_total": 0.0,
+                    "synthesis_retry_count": 0,
+                    "synthesis_retry_skipped_count": 0,
+                    "synthesis_budget_exhausted": False,
+                    "degraded_merge_used": False,
+                    "degraded_merge_reason": "",
+                    "synthesis_merge_depth_max": 0,
+                    "model_switches": [],
+                },
             },
         ],
         "unresolved_articles": [],
@@ -247,6 +283,46 @@ class NotifierTests(unittest.TestCase):
         self.assertIn("Unresolved articles", rendered_text)
         self.assertIn("Bank contingency update", rendered_text)
         self.assertIn("delayed retry failed", rendered_text.lower())
+
+    def test_send_analysis_summary_email_accepts_degraded_synthesis_diagnostics(self) -> None:
+        report = _success_report()
+        report["status"] = "partial"
+        report["diagnostics"]["synthesis_budget_exhausted_count"] = 1
+        report["diagnostics"]["degraded_merge_count"] = 1
+        report["categories"][0]["diagnostics"]["degraded_merge_used"] = True
+        report["categories"][0]["diagnostics"]["degraded_merge_reason"] = "synthesis_budget_exhausted"
+        report["categories"][0]["diagnostics"]["synthesis_wait_seconds_total"] = 126.0
+        report["categories"][0]["diagnostics"]["synthesis_retry_count"] = 2
+        report["categories"][0]["diagnostics"]["synthesis_retry_skipped_count"] = 1
+        report["categories"][0]["diagnostics"]["synthesis_budget_exhausted"] = True
+
+        with patch.dict(
+            os.environ,
+            {
+                "DAILY_MACRO_GMAIL_SENDER": "sender@example.com",
+                "DAILY_MACRO_GMAIL_APP_PASSWORD": "app-password",
+                "DAILY_MACRO_GMAIL_RECIPIENT": "recipient@example.com",
+            },
+            clear=False,
+        ), patch("daily_macro.notifier._load_local_config", return_value={}), patch(
+            "daily_macro.notifier.smtplib.SMTP_SSL", _FakeSMTP
+        ):
+            sent, message = send_analysis_summary_email(report)
+
+        self.assertTrue(sent)
+        self.assertIn("Sent daily macro Gmail summary", message)
+        rendered = message_from_string(_FakeSMTP.sent_messages[0]["payload"])
+        decoded_parts = []
+        for part in rendered.walk():
+            if part.get_content_maintype() == "multipart":
+                continue
+            payload = part.get_payload(decode=True)
+            if payload is None:
+                continue
+            decoded_parts.append(payload.decode(part.get_content_charset() or "utf-8"))
+        rendered_text = "\n".join(decoded_parts)
+        self.assertIn("Model switch", rendered_text)
+        self.assertIn("International subgroup development", rendered_text)
 
     def test_send_analysis_summary_email_skips_empty_categories(self) -> None:
         report = _success_report()
