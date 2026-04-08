@@ -29,6 +29,9 @@ PRIMARY_MODEL_ID = "meta-llama/llama-4-scout-17b-16e-instruct"
 FALLBACK_MODEL_IDS = ["qwen/qwen3-32b", "llama-3.1-8b-instant"]
 DELAYED_RETRY_FINAL_MODEL_ID = "openai/gpt-oss-20b"
 DELAYED_RETRY_WAIT_SECONDS = 60.0
+MAX_CATEGORY_SYNTHESIS_WAIT_SECONDS = 1800.0
+MAX_CATEGORY_SYNTHESIS_RETRIES = 24
+MAX_SYNTHESIS_MERGE_DEPTH = 3
 DEFAULT_OUTPUT_TOKENS = 1200
 DEFAULT_INPUT_BUDGET_TOKENS = 4500
 DEFAULT_SYNTHESIS_INPUT_BUDGET_TOKENS = 2400
@@ -64,6 +67,7 @@ FAILURE_CLASSIFICATIONS = {
     "incomplete_model_output",
     "http_error",
     "unexpected_error",
+    "synthesis_budget_exhausted",
 }
 LIGHT_ANALYSIS_SECTIONS = {"時事脈搏", "地產新聞"}
 ATTENTION_TIERS = ("high", "medium", "light")
@@ -192,6 +196,8 @@ class RuntimeDiagnostics:
     high_medium_unresolved_count: int = 0
     light_unresolved_count: int = 0
     delayed_retry_skipped_final_model_count: int = 0
+    synthesis_budget_exhausted_count: int = 0
+    degraded_merge_count: int = 0
 
     def as_dict(self) -> dict[str, Any]:
         return {
@@ -210,6 +216,8 @@ class RuntimeDiagnostics:
             "high_medium_unresolved_count": self.high_medium_unresolved_count,
             "light_unresolved_count": self.light_unresolved_count,
             "delayed_retry_skipped_final_model_count": self.delayed_retry_skipped_final_model_count,
+            "synthesis_budget_exhausted_count": self.synthesis_budget_exhausted_count,
+            "degraded_merge_count": self.degraded_merge_count,
         }
 
 
@@ -222,6 +230,14 @@ class CategoryDiagnostics:
     rate_limit_waits: int = 0
     partial_article_count: int = 0
     sub_batch_count: int = 0
+    synthesis_wait_seconds_total: float = 0.0
+    synthesis_retry_count: int = 0
+    synthesis_retry_skipped_count: int = 0
+    synthesis_budget_exhausted: bool = False
+    degraded_merge_used: bool = False
+    degraded_merge_reason: str = ""
+    synthesis_merge_depth_max: int = 0
+    model_switches: list[dict[str, Any]] = field(default_factory=list)
 
     def as_dict(self) -> dict[str, Any]:
         return {
@@ -232,7 +248,19 @@ class CategoryDiagnostics:
             "serialized_request_bytes_max": self.serialized_request_bytes_max,
             "rate_limit_waits": self.rate_limit_waits,
             "partial_article_count": self.partial_article_count,
+            "synthesis_wait_seconds_total": round(self.synthesis_wait_seconds_total, 3),
+            "synthesis_retry_count": self.synthesis_retry_count,
+            "synthesis_retry_skipped_count": self.synthesis_retry_skipped_count,
+            "synthesis_budget_exhausted": self.synthesis_budget_exhausted,
+            "degraded_merge_used": self.degraded_merge_used,
+            "degraded_merge_reason": self.degraded_merge_reason,
+            "synthesis_merge_depth_max": self.synthesis_merge_depth_max,
+            "model_switches": list(self.model_switches),
         }
+
+
+class SynthesisBudgetExceeded(RuntimeError):
+    """Raised when a category has exhausted its allowed synthesis retry/wait budget."""
 
 
 @dataclass(frozen=True, slots=True)
@@ -377,14 +405,13 @@ class AnalysisRuntime:
         if next_model is None:
             return False
         self.diagnostics.fallback_switch_count += 1
-        self.model_switches.append(
-            {
-                "switched_at": datetime.now().astimezone().isoformat(),
-                "from_model": self.current_model.model_id,
-                "to_model": next_model.model_id,
-                "reason": reason,
-            }
-        )
+        switch = {
+            "switched_at": datetime.now().astimezone().isoformat(),
+            "from_model": self.current_model.model_id,
+            "to_model": next_model.model_id,
+            "reason": reason,
+        }
+        self.model_switches.append(switch)
         LOGGER.info(
             "Switching Groq model from %s to %s: %s",
             self.current_model.model_id,
@@ -393,6 +420,9 @@ class AnalysisRuntime:
         )
         self.current_model_index += 1
         return True
+
+    def reset_model_for_category(self) -> None:
+        self.current_model_index = 0
 
     def get_category_diagnostics(self, category_name: str) -> CategoryDiagnostics:
         return self.category_diagnostics.setdefault(category_name, CategoryDiagnostics())
@@ -408,12 +438,53 @@ class AnalysisRuntime:
             )
         return self.category_budgets[category_name]
 
-    def record_wait(self, category_name: str, delay_seconds: float) -> None:
+    def record_wait(self, category_name: str, delay_seconds: float, *, batch_kind: str = "") -> None:
         if delay_seconds <= 0:
             return
         self.diagnostics.rate_limit_wait_count += 1
         self.diagnostics.rate_limit_wait_seconds_total += delay_seconds
-        self.get_category_diagnostics(category_name).rate_limit_waits += 1
+        diagnostics = self.get_category_diagnostics(category_name)
+        diagnostics.rate_limit_waits += 1
+        if batch_kind.startswith("synthesis"):
+            diagnostics.synthesis_wait_seconds_total += delay_seconds
+
+    def record_retry(self, category_name: str, *, batch_kind: str = "") -> None:
+        if batch_kind.startswith("synthesis"):
+            self.get_category_diagnostics(category_name).synthesis_retry_count += 1
+
+    def record_model_switch(self, category_name: str, switch: dict[str, Any]) -> None:
+        self.get_category_diagnostics(category_name).model_switches.append(dict(switch))
+
+    def note_synthesis_merge_depth(self, category_name: str, depth: int) -> None:
+        diagnostics = self.get_category_diagnostics(category_name)
+        diagnostics.synthesis_merge_depth_max = max(diagnostics.synthesis_merge_depth_max, depth)
+
+    def mark_degraded_merge(self, category_name: str, reason: str) -> None:
+        diagnostics = self.get_category_diagnostics(category_name)
+        diagnostics.degraded_merge_used = True
+        diagnostics.degraded_merge_reason = reason
+        self.diagnostics.degraded_merge_count += 1
+
+    def ensure_synthesis_budget(self, category_name: str) -> None:
+        diagnostics = self.get_category_diagnostics(category_name)
+        if diagnostics.synthesis_wait_seconds_total >= MAX_CATEGORY_SYNTHESIS_WAIT_SECONDS:
+            if not diagnostics.synthesis_budget_exhausted:
+                self.diagnostics.synthesis_budget_exhausted_count += 1
+            diagnostics.synthesis_budget_exhausted = True
+            diagnostics.synthesis_retry_skipped_count += 1
+            raise SynthesisBudgetExceeded(
+                f"Category {category_name} exhausted synthesis wait budget after "
+                f"{diagnostics.synthesis_wait_seconds_total:.1f} seconds."
+            )
+        if diagnostics.synthesis_retry_count >= MAX_CATEGORY_SYNTHESIS_RETRIES:
+            if not diagnostics.synthesis_budget_exhausted:
+                self.diagnostics.synthesis_budget_exhausted_count += 1
+            diagnostics.synthesis_budget_exhausted = True
+            diagnostics.synthesis_retry_skipped_count += 1
+            raise SynthesisBudgetExceeded(
+                f"Category {category_name} exhausted synthesis retry budget after "
+                f"{diagnostics.synthesis_retry_count} retries."
+            )
 
     def record_split(self, category_name: str, reason: str) -> None:
         diagnostics = self.get_category_diagnostics(category_name)
@@ -1351,6 +1422,7 @@ def _merge_category_report(
         diagnostics = dict((analyzed_category or {}).get("diagnostics") or diagnostics)
         sub_batch_count = int((analyzed_category or {}).get("sub_batch_count") or sub_batch_count)
         if successful_articles and runtime is not None:
+            runtime.reset_model_for_category()
             try:
                 synthesis_payload, synthesis_model, synthesis_batch_count, subgroup_reports = _build_category_outputs(
                     runtime,
@@ -1586,6 +1658,7 @@ def _analyze_category(
     category_name: str,
     prepared_articles: list[dict[str, Any]],
 ) -> tuple[dict[str, Any], list[dict[str, Any]]]:
+    runtime.reset_model_for_category()
     LOGGER.info("Analyzing category %s with %s article(s).", category_name, len(prepared_articles))
     profile = _section_profile(category_name)
     planned_batches = _plan_category_batches(runtime, category_name, prepared_articles)
@@ -2323,6 +2396,8 @@ def _chat_completion(
     response: requests.Response | None = None
     for attempt in range(DEFAULT_CHAT_RETRIES):
         model = model_override or runtime.current_model
+        if context.batch_kind.startswith("synthesis"):
+            runtime.ensure_synthesis_budget(context.category_name)
         api_url = model.api_url or GROQ_CHAT_COMPLETIONS_URL
         session = runtime.get_session_for_model(model)
         runtime.last_attempted_model = model.model_id
@@ -2349,7 +2424,7 @@ def _chat_completion(
             attempt + 1,
         )
         wait_seconds = runtime.governor.before_request(model.model_id, estimated_input_tokens)
-        runtime.record_wait(context.category_name, wait_seconds)
+        runtime.record_wait(context.category_name, wait_seconds, batch_kind=context.batch_kind)
         if wait_seconds > 0:
             LOGGER.info(
                 "Waiting %.1f seconds before %s for category %s batch=%s on %s.",
@@ -2402,6 +2477,7 @@ def _chat_completion(
                 batch_kind="synthesis" if attempt_context.batch_kind.startswith("synthesis") else "article_batch",
             )
             if runtime.switch_to_next_model(f"Model {model.model_id} returned 429 rate_limit_exceeded."):
+                runtime.record_model_switch(context.category_name, runtime.model_switches[-1])
                 continue
 
         if response.status_code in {429, 500, 502, 503, 504}:
@@ -2417,9 +2493,11 @@ def _chat_completion(
                     "rate_limited",
                     batch_kind="synthesis" if attempt_context.batch_kind.startswith("synthesis") else "article_batch",
                 )
+            runtime.record_retry(attempt_context.category_name, batch_kind=attempt_context.batch_kind)
             if attempt == DEFAULT_CHAT_RETRIES - 1:
                 response.raise_for_status()
             delay_seconds = runtime.governor.apply_backoff(model.model_id, response, attempt)
+            runtime.record_wait(attempt_context.category_name, delay_seconds, batch_kind=attempt_context.batch_kind)
             LOGGER.info(
                 "Retrying category %s batch=%s on %s after HTTP %s in %.1f seconds.",
                 attempt_context.category_name,
@@ -2724,6 +2802,7 @@ def _synthesize_summary_items(
     scope_kind: str,
     scope_title: str,
     model_override: ModelConfig | None = None,
+    merge_depth: int = 0,
 ) -> tuple[dict[str, Any], str, int]:
     active_model = model_override or runtime.current_model
     planned_batches = _plan_synthesis_batches(runtime, category_name, synthesis_items, model_id=active_model.model_id)
@@ -2792,17 +2871,39 @@ def _synthesize_summary_items(
             "named_entities": summary["named_entities"],
         }, model_used, total_batch_count
 
-    merged_payload, merged_model, merged_count = _synthesize_summary_items(
-        runtime,
-        category_name,
-        partial_summaries,
-        batch_label_prefix=f"{batch_label_prefix}m",
-        bullet_limit=bullet_limit,
-        scope_kind=scope_kind,
-        scope_title=scope_title,
-        model_override=model_override,
-    )
-    return merged_payload, merged_model, total_batch_count + merged_count
+    next_merge_depth = merge_depth + 1
+    runtime.note_synthesis_merge_depth(category_name, next_merge_depth)
+    if next_merge_depth > MAX_SYNTHESIS_MERGE_DEPTH:
+        runtime.mark_degraded_merge(category_name, f"merge_depth_cap:{MAX_SYNTHESIS_MERGE_DEPTH}")
+        LOGGER.info(
+            "Using local degraded merge for category %s scope=%s after reaching synthesis merge depth cap %s.",
+            category_name,
+            scope_title,
+            MAX_SYNTHESIS_MERGE_DEPTH,
+        )
+        return _merge_summary_items_locally(partial_summaries, bullet_limit), model_used, total_batch_count
+
+    try:
+        merged_payload, merged_model, merged_count = _synthesize_summary_items(
+            runtime,
+            category_name,
+            partial_summaries,
+            batch_label_prefix=f"{batch_label_prefix}-merge{next_merge_depth}",
+            bullet_limit=bullet_limit,
+            scope_kind=scope_kind,
+            scope_title=scope_title,
+            model_override=model_override,
+            merge_depth=next_merge_depth,
+        )
+        return merged_payload, merged_model, total_batch_count + merged_count
+    except SynthesisBudgetExceeded:
+        runtime.mark_degraded_merge(category_name, "synthesis_budget_exhausted")
+        LOGGER.info(
+            "Using local degraded merge for category %s scope=%s after exhausting synthesis budget.",
+            category_name,
+            scope_title,
+        )
+        return _merge_summary_items_locally(partial_summaries, bullet_limit), model_used, total_batch_count
 
 
 def _invoke_synthesis_batch(
@@ -3104,6 +3205,36 @@ def _summary_to_synthesis_item(payload: dict[str, Any], article_count: int, labe
         "article_count": article_count,
         "key_developments": _normalize_string_list(payload.get("key_developments"), limit=5),
         "named_entities": _normalize_entities(payload.get("named_entities"))[:6],
+    }
+
+
+def _merge_summary_items_locally(summary_items: list[dict[str, Any]], bullet_limit: int) -> dict[str, Any]:
+    key_developments: list[str] = []
+    seen_developments: set[str] = set()
+    seen_entities: set[str] = set()
+    named_entities: list[dict[str, str]] = []
+
+    for item in summary_items:
+        for development in _normalize_string_list(item.get("key_developments"), limit=bullet_limit):
+            normalized = development.strip()
+            if not normalized or normalized in seen_developments:
+                continue
+            seen_developments.add(normalized)
+            key_developments.append(normalized)
+            if len(key_developments) >= bullet_limit:
+                break
+        for entity in _normalize_entities(item.get("named_entities")):
+            name = str(entity.get("name") or "").strip()
+            if not name or name in seen_entities:
+                continue
+            seen_entities.add(name)
+            named_entities.append(entity)
+        if len(key_developments) >= bullet_limit:
+            break
+
+    return {
+        "key_developments": key_developments[:bullet_limit],
+        "named_entities": named_entities[:6],
     }
 
 
@@ -3757,6 +3888,8 @@ def _parse_int(value: str | None) -> int | None:
 
 
 def _classify_exception(exc: Exception) -> str:
+    if isinstance(exc, SynthesisBudgetExceeded):
+        return "synthesis_budget_exhausted"
     if isinstance(exc, ValueError):
         return "invalid_json"
     if isinstance(exc, requests.HTTPError):

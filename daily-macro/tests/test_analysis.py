@@ -945,6 +945,12 @@ class AnalysisTests(unittest.TestCase):
 
         with patch("daily_macro.analysis.load_groq_api_key", return_value="test-key"), patch(
             "daily_macro.analysis._build_groq_session", return_value=session
+        ), patch(
+            "daily_macro.analysis.RateLimitGovernor",
+            side_effect=lambda: RateLimitGovernor(sleep_fn=lambda _seconds: None),
+        ), patch(
+            "daily_macro.analysis.time.sleep",
+            return_value=None,
         ):
             report = run_analysis(date_string="2026-04-03", data_dir=self.data_dir, db_path=self.db_path)
 
@@ -1027,6 +1033,12 @@ class AnalysisTests(unittest.TestCase):
 
         with patch("daily_macro.analysis.load_groq_api_key", return_value="test-key"), patch(
             "daily_macro.analysis._build_groq_session", return_value=session
+        ), patch(
+            "daily_macro.analysis.RateLimitGovernor",
+            side_effect=lambda: RateLimitGovernor(sleep_fn=lambda _seconds: None),
+        ), patch(
+            "daily_macro.analysis.time.sleep",
+            return_value=None,
         ):
             report = run_analysis(date_string="2026-04-03", data_dir=self.data_dir, db_path=self.db_path)
 
@@ -1520,7 +1532,7 @@ class AnalysisTests(unittest.TestCase):
         self.assertEqual(report["diagnostics"]["response_413_split_count"], 1)
         self.assertIn("response_413", category["diagnostics"]["split_reasons"])
 
-    def test_run_analysis_switches_to_next_model_for_rest_of_run_after_primary_429(self) -> None:
+    def test_run_analysis_resets_preferred_model_for_each_category_after_429(self) -> None:
         self._insert_article(
             title="China one",
             source_article_id="3001",
@@ -1539,45 +1551,6 @@ class AnalysisTests(unittest.TestCase):
         session = _FakeGroqSession(
             [
                 _FakeResponse(429, headers={"Retry-After": "0"}),
-                _FakeResponse(
-                    200,
-                    payload={
-                        "choices": [
-                            {
-                                "message": {
-                                    "content": json.dumps(
-                                        {
-                                            "articles": [
-                                                {
-                                                    "source_article_id": "3001",
-                                                    "canonical_url": "https://example.com/3001",
-                                                    "novelty_score": 6,
-                                                    "relevance_score": 8,
-                                                    "urgency_score": 7,
-                                                    "named_entities": [{"name": "小米", "type": "company"}],
-                                                    "key_points": ["China point"],
-                                                }
-                                            ]
-                                        },
-                                        ensure_ascii=False,
-                                    )
-                                }
-                            }
-                        ]
-                    },
-                ),
-                _FakeResponse(
-                    200,
-                    payload={
-                        "choices": [
-                            {
-                                "message": {
-                                    "content": json.dumps({"key_developments": ["China development"], "named_entities": []})
-                                }
-                            }
-                        ]
-                    },
-                ),
                 _FakeResponse(
                     200,
                     payload={
@@ -1617,6 +1590,45 @@ class AnalysisTests(unittest.TestCase):
                         ]
                     },
                 ),
+                _FakeResponse(
+                    200,
+                    payload={
+                        "choices": [
+                            {
+                                "message": {
+                                    "content": json.dumps(
+                                        {
+                                            "articles": [
+                                                {
+                                                    "source_article_id": "3001",
+                                                    "canonical_url": "https://example.com/3001",
+                                                    "novelty_score": 6,
+                                                    "relevance_score": 8,
+                                                    "urgency_score": 7,
+                                                    "named_entities": [{"name": "小米", "type": "company"}],
+                                                    "key_points": ["China point"],
+                                                }
+                                            ]
+                                        },
+                                        ensure_ascii=False,
+                                    )
+                                }
+                            }
+                        ]
+                    },
+                ),
+                _FakeResponse(
+                    200,
+                    payload={
+                        "choices": [
+                            {
+                                "message": {
+                                    "content": json.dumps({"key_developments": ["China development"], "named_entities": []})
+                                }
+                            }
+                        ]
+                    },
+                ),
             ]
         )
 
@@ -1632,14 +1644,91 @@ class AnalysisTests(unittest.TestCase):
                 "meta-llama/llama-4-scout-17b-16e-instruct",
                 "qwen/qwen3-32b",
                 "qwen/qwen3-32b",
-                "qwen/qwen3-32b",
-                "qwen/qwen3-32b",
+                "meta-llama/llama-4-scout-17b-16e-instruct",
+                "meta-llama/llama-4-scout-17b-16e-instruct",
             ],
         )
         self.assertEqual(len(report["model_switches"]), 1)
         self.assertEqual(report["model_switches"][0]["to_model"], "qwen/qwen3-32b")
         self.assertEqual(report["diagnostics"]["fallback_switch_count"], 1)
-        self.assertIn("qwen/qwen3-32b", report["categories"][0]["diagnostics"]["models_attempted"])
+        global_category = next(category for category in report["categories"] if category["category"] == "國際財經")
+        china_category = next(category for category in report["categories"] if category["category"] == "中國財經")
+        self.assertIn("qwen/qwen3-32b", global_category["diagnostics"]["models_attempted"])
+        self.assertEqual(
+            china_category["diagnostics"]["models_attempted"],
+            ["meta-llama/llama-4-scout-17b-16e-instruct"],
+        )
+
+    def test_run_analysis_uses_local_degraded_merge_when_merge_depth_cap_is_hit(self) -> None:
+        for index in range(2):
+            self._insert_article(
+                title=f"Market {index}",
+                source_article_id=f"800{index}",
+                section="港股直擊",
+                published_at=f"2026-04-03T0{8-index}:00:00+08:00",
+                content_text="market content " * 30,
+            )
+
+        article_results = [
+            {
+                "source_article_id": "8000",
+                "canonical_url": "https://example.com/8000",
+                "novelty_score": 6,
+                "relevance_score": 7,
+                "urgency_score": 6,
+                "named_entities": [{"name": "HSI", "type": "index"}],
+                "key_points": ["Market point 0"],
+            },
+            {
+                "source_article_id": "8001",
+                "canonical_url": "https://example.com/8001",
+                "novelty_score": 6,
+                "relevance_score": 7,
+                "urgency_score": 6,
+                "named_entities": [{"name": "Tencent", "type": "company"}],
+                "key_points": ["Market point 1"],
+            },
+        ]
+
+        session = _FakeGroqSession(
+            [
+                _FakeResponse(
+                    200,
+                    payload={"choices": [{"message": {"content": json.dumps({"articles": article_results}, ensure_ascii=False)}}]},
+                ),
+                _FakeResponse(
+                    200,
+                    payload={"choices": [{"message": {"content": json.dumps({"key_developments": ["Batch one development"], "named_entities": [{"name": "HSI", "type": "index"}]}, ensure_ascii=False)}}]},
+                ),
+                _FakeResponse(
+                    200,
+                    payload={"choices": [{"message": {"content": json.dumps({"key_developments": ["Batch two development"], "named_entities": [{"name": "Tencent", "type": "company"}]}, ensure_ascii=False)}}]},
+                ),
+            ]
+        )
+
+        def split_summary_batches(_runtime: object, _category_name: str, synthesis_items: list[dict[str, object]], *, model_id: str) -> list[list[dict[str, object]]]:
+            if len(synthesis_items) > 1:
+                return [[synthesis_items[0]], [synthesis_items[1]]]
+            return [synthesis_items]
+
+        with patch("daily_macro.analysis.load_groq_api_key", return_value="test-key"), patch(
+            "daily_macro.analysis._build_groq_session", return_value=session
+        ), patch(
+            "daily_macro.analysis._plan_synthesis_batches",
+            side_effect=split_summary_batches,
+        ), patch.object(
+            analysis_module,
+            "MAX_SYNTHESIS_MERGE_DEPTH",
+            0,
+        ):
+            report = run_analysis(date_string="2026-04-03", data_dir=self.data_dir, db_path=self.db_path)
+
+        category = next(category for category in report["categories"] if category["category"] == "港股直擊")
+        self.assertEqual(session.calls, 3)
+        self.assertEqual(category["key_developments"], ["Batch one development", "Batch two development"])
+        self.assertTrue(category["diagnostics"]["degraded_merge_used"])
+        self.assertEqual(category["diagnostics"]["degraded_merge_reason"], "merge_depth_cap:0")
 
     def test_run_analysis_switches_from_qwen_to_instant_after_second_429(self) -> None:
         self._insert_article(
