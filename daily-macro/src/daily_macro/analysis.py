@@ -148,10 +148,9 @@ class AnalysisGraphState(TypedDict):
     updated_previous_report: NotRequired[dict[str, Any] | None]
     incremental: dict[str, int]
     market_context_string: str
-    market_context_string: str
-    market_snapshots: list[dict[str, Any]]
     top_alerts: list[str]
     report: dict[str, Any]
+    total_scraped_articles: int
 
 
 @dataclass(frozen=True, slots=True)
@@ -623,6 +622,7 @@ def run_analysis(
     storage = Storage(resolved_db_path)
     try:
         articles = storage.fetch_published_articles_for_date(target_date, source_site=DEFAULT_SOURCE_SITE)
+        total_scraped_articles = len(storage.fetch_articles_by_date(target_date))
         previous_date = (datetime.fromisoformat(target_date).date() - timedelta(days=1)).isoformat()
         previous_report_path = analysis_dir / previous_date / REPORT_FILE_NAME
         previous_report = _load_existing_report(previous_report_path)
@@ -648,11 +648,11 @@ def run_analysis(
         "runtime": None,
         "category_reports": [],
         "previous_day_retry_successes": 0,
-        "incremental": {},
         "market_context_string": "",
         "market_snapshots": [],
         "top_alerts": [],
         "report": {},
+        "total_scraped_articles": total_scraped_articles,
     }
     final_state = graph.invoke(state)
     report = final_state["report"]
@@ -867,6 +867,7 @@ def _graph_finalize(state: AnalysisGraphState) -> AnalysisGraphState:
         top_alerts=state.get("top_alerts") or [],
         runtime=state["runtime"],
         incremental=state["incremental"],
+        total_scraped_count=state.get("total_scraped_articles") or 0,
         market_snapshots=state.get("market_snapshots"),
     )
     _write_report(state["report_path"], report)
@@ -1558,6 +1559,7 @@ def _finalize_report(
     top_alerts: list[str],
     runtime: AnalysisRuntime | None,
     incremental: dict[str, int],
+    total_scraped_count: int,
     market_snapshots: list[dict[str, Any]] | None = None,
 ) -> dict[str, Any]:
     all_articles = [article for category in category_reports for article in category["articles"]]
@@ -1598,6 +1600,11 @@ def _finalize_report(
         },
         "diagnostics": runtime.diagnostics.as_dict() if runtime is not None else RuntimeDiagnostics().as_dict(),
         "incremental": incremental,
+        "daily_stats": {
+            "total_scraped": total_scraped_count,
+            "analyzed": input_article_count,
+            "success_rate": round((input_article_count / max(total_scraped_count, 1)) * 100, 1) if total_scraped_count > 0 else 0,
+        },
         "unresolved_articles": unresolved_articles,
         "totals": {
             "article_count": len(all_articles),
@@ -3596,6 +3603,14 @@ def _merge_batch_article_results(
     for article in batch_articles:
         key = _article_key(article.get("source_article_id"), article.get("canonical_url"))
         match = response_by_key.get(key)
+        
+        # Fallback 1: Match by source_article_id only if URL was tweaked by LLM
+        if match is None and article.get("source_article_id"):
+            for r_key, r_item in response_by_key.items():
+                if r_key[0] == article.get("source_article_id"):
+                    match = r_item
+                    break
+        
         if match is None:
             missing_articles.append(article)
             continue

@@ -231,6 +231,13 @@ def _build_plain_body(summary: dict[str, Any]) -> str:
         lines.extend(market_lines)
         lines.append("")
 
+    daily_stats = summary.get("daily_stats") or {}
+    scraped = daily_stats.get("total_scraped") or 0
+    analyzed = daily_stats.get("analyzed") or 0
+    if scraped:
+        lines.append(f"MARKET COVERAGE: {analyzed} analyzed / {scraped} scraped ({daily_stats.get('success_rate', 0)}% success)")
+        lines.append("")
+
     executive_summary = summary.get("executive_summary") or []
     if executive_summary:
         lines.append("EXECUTIVE SUMMARY (TOP ALERTS):")
@@ -320,6 +327,18 @@ def _build_html_body(summary: dict[str, Any]) -> str:
     market_html = _build_html_market_section(summary)
     executive_summary_html = _build_html_executive_summary(summary)
 
+    daily_stats = summary.get("daily_stats") or {}
+    scraped = daily_stats.get("total_scraped") or 0
+    analyzed = daily_stats.get("analyzed") or 0
+    market_coverage_html = ""
+    if scraped:
+        market_coverage_html = (
+            f"<div style='margin-bottom:16px;font-size:14px;color:#6b7280;'>"
+            f"<b>Market Coverage:</b> {analyzed} analyzed / {scraped} scraped "
+            f"({daily_stats.get('success_rate', 0)}% success)"
+            f"</div>"
+        )
+
     return f"""
     <html>
       <body style="margin:0;padding:24px;background:#f3f4f6;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;">
@@ -328,12 +347,8 @@ def _build_html_body(summary: dict[str, Any]) -> str:
           <p style="margin:8px 0 20px;color:#4b5563;">
             Report date: {_escape_html(str(summary.get("report_date") or "Unknown"))}
           </p>
+          {market_coverage_html}
           {executive_summary_html}
-          {notes_html}
-          <p style="margin:6px 0 0;color:#4b5563;">
-            Articles: {int((summary.get("totals") or {}).get("article_count") or 0)} |
-            Categories: {int((summary.get("input") or {}).get("category_count") or 0)}
-          </p>
           {market_html}
           {unresolved_html}
           {"".join(category_blocks)}
