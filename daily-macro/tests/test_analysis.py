@@ -946,6 +946,9 @@ class AnalysisTests(unittest.TestCase):
         with patch("daily_macro.analysis.load_groq_api_key", return_value="test-key"), patch(
             "daily_macro.analysis._build_groq_session", return_value=session
         ), patch(
+            "daily_macro.analysis._should_use_llm_router",
+            return_value=False,
+        ), patch(
             "daily_macro.analysis.RateLimitGovernor",
             side_effect=lambda: RateLimitGovernor(sleep_fn=lambda _seconds: None),
         ), patch(
@@ -1139,6 +1142,15 @@ class AnalysisTests(unittest.TestCase):
 
         with patch("daily_macro.analysis.load_groq_api_key", return_value="test-key"), patch(
             "daily_macro.analysis._build_groq_session", return_value=session
+        ), patch(
+            "daily_macro.analysis._should_use_llm_router",
+            return_value=False,
+        ), patch(
+            "daily_macro.analysis.RateLimitGovernor",
+            side_effect=lambda: RateLimitGovernor(sleep_fn=lambda _seconds: None),
+        ), patch(
+            "daily_macro.analysis.time.sleep",
+            return_value=None,
         ):
             report = run_analysis(date_string="2026-04-03", data_dir=self.data_dir, db_path=self.db_path)
 
@@ -1532,22 +1544,7 @@ class AnalysisTests(unittest.TestCase):
         self.assertEqual(report["diagnostics"]["response_413_split_count"], 1)
         self.assertIn("response_413", category["diagnostics"]["split_reasons"])
 
-    def test_run_analysis_resets_preferred_model_for_each_category_after_429(self) -> None:
-        self._insert_article(
-            title="China one",
-            source_article_id="3001",
-            section="中國財經",
-            published_at="2026-04-03T08:00:00+08:00",
-            content_text="a" * 800,
-        )
-        self._insert_article(
-            title="Global one",
-            source_article_id="4001",
-            section="國際財經",
-            published_at="2026-04-03T09:00:00+08:00",
-            content_text="b" * 900,
-        )
-
+    def test_analyze_category_resets_preferred_model_for_each_category_after_429(self) -> None:
         session = _FakeGroqSession(
             [
                 _FakeResponse(429, headers={"Retry-After": "0"}),
@@ -1632,12 +1629,43 @@ class AnalysisTests(unittest.TestCase):
             ]
         )
 
-        with patch("daily_macro.analysis.load_groq_api_key", return_value="test-key"), patch(
-            "daily_macro.analysis._build_groq_session", return_value=session
-        ):
-            report = run_analysis(date_string="2026-04-03", data_dir=self.data_dir, db_path=self.db_path)
+        runtime = AnalysisRuntime(
+            session=session,
+            governor=RateLimitGovernor(sleep_fn=lambda _seconds: None),
+            model_chain=[
+                ModelConfig("meta-llama/llama-4-scout-17b-16e-instruct"),
+                ModelConfig("qwen/qwen3-32b"),
+                ModelConfig("llama-3.1-8b-instant"),
+            ],
+        )
+        global_article = analysis_module._prepare_single_article(
+            {
+                "source_article_id": "4001",
+                "canonical_url": "https://example.com/4001",
+                "title": "Global one",
+                "article_section": "國際財經",
+                "published_at": "2026-04-03T09:00:00+08:00",
+                "summary_snippet": None,
+                "content_text": "b" * 900,
+            }
+        )
+        china_article = analysis_module._prepare_single_article(
+            {
+                "source_article_id": "3001",
+                "canonical_url": "https://example.com/3001",
+                "title": "China one",
+                "article_section": "中國財經",
+                "published_at": "2026-04-03T08:00:00+08:00",
+                "summary_snippet": None,
+                "content_text": "a" * 800,
+            }
+        )
 
-        self.assertEqual(report["status"], "success")
+        global_report, _ = analysis_module._analyze_category(runtime, "國際財經", [global_article])
+        china_report, _ = analysis_module._analyze_category(runtime, "中國財經", [china_article])
+
+        self.assertEqual(global_report["status"], "success")
+        self.assertEqual(china_report["status"], "success")
         self.assertEqual(
             session.models_used,
             [
@@ -1648,14 +1676,12 @@ class AnalysisTests(unittest.TestCase):
                 "meta-llama/llama-4-scout-17b-16e-instruct",
             ],
         )
-        self.assertEqual(len(report["model_switches"]), 1)
-        self.assertEqual(report["model_switches"][0]["to_model"], "qwen/qwen3-32b")
-        self.assertEqual(report["diagnostics"]["fallback_switch_count"], 1)
-        global_category = next(category for category in report["categories"] if category["category"] == "國際財經")
-        china_category = next(category for category in report["categories"] if category["category"] == "中國財經")
-        self.assertIn("qwen/qwen3-32b", global_category["diagnostics"]["models_attempted"])
+        self.assertEqual(len(runtime.model_switches), 1)
+        self.assertEqual(runtime.model_switches[0]["to_model"], "qwen/qwen3-32b")
+        self.assertEqual(runtime.diagnostics.fallback_switch_count, 1)
+        self.assertIn("qwen/qwen3-32b", global_report["diagnostics"]["models_attempted"])
         self.assertEqual(
-            china_category["diagnostics"]["models_attempted"],
+            china_report["diagnostics"]["models_attempted"],
             ["meta-llama/llama-4-scout-17b-16e-instruct"],
         )
 
@@ -1715,12 +1741,18 @@ class AnalysisTests(unittest.TestCase):
         with patch("daily_macro.analysis.load_groq_api_key", return_value="test-key"), patch(
             "daily_macro.analysis._build_groq_session", return_value=session
         ), patch(
+            "daily_macro.analysis._should_use_llm_router",
+            return_value=False,
+        ), patch(
             "daily_macro.analysis._plan_synthesis_batches",
             side_effect=split_summary_batches,
         ), patch.object(
             analysis_module,
             "MAX_SYNTHESIS_MERGE_DEPTH",
             0,
+        ), patch(
+            "daily_macro.analysis.time.sleep",
+            return_value=None,
         ):
             report = run_analysis(date_string="2026-04-03", data_dir=self.data_dir, db_path=self.db_path)
 
