@@ -198,12 +198,14 @@ class RuntimeDiagnostics:
     delayed_retry_skipped_final_model_count: int = 0
     synthesis_budget_exhausted_count: int = 0
     degraded_merge_count: int = 0
+    key_rotation_count: int = 0
 
     def as_dict(self) -> dict[str, Any]:
         return {
             "rate_limit_wait_count": self.rate_limit_wait_count,
             "rate_limit_wait_seconds_total": round(self.rate_limit_wait_seconds_total, 3),
             "fallback_switch_count": self.fallback_switch_count,
+            "key_rotation_count": self.key_rotation_count,
             "pre_send_split_count": self.pre_send_split_count,
             "response_413_split_count": self.response_413_split_count,
             "json_repair_retry_count": self.json_repair_retry_count,
@@ -278,37 +280,69 @@ class RateLimitGovernor:
     def __init__(self, *, time_fn=time.monotonic, sleep_fn=time.sleep):
         self._time_fn = time_fn
         self._sleep_fn = sleep_fn
-        self._states: dict[str, ModelRateLimitState] = {}
+        # Keyed by (model_id, key_index) to track rate limits per API key independently.
+        self._states: dict[tuple[str, int], ModelRateLimitState] = {}
+
+    def _state(self, model_id: str, key_index: int) -> ModelRateLimitState:
+        return self._states.setdefault((model_id, key_index), ModelRateLimitState())
+
+    def select_key(
+        self,
+        model_id: str,
+        current_key: int,
+        num_keys: int,
+        estimated_input_tokens: int = 0,
+    ) -> tuple[int, float]:
+        """Return (best_key_index, seconds_slept).
+
+        Picks the key with the most remaining token capacity. If a better key
+        exists, rotates silently (0 sleep). Only sleeps when ALL keys are
+        exhausted, waiting until the soonest-resetting key unlocks.
+        """
+        now = self._time_fn()
+        best_key: int | None = None
+        best_remaining_tokens = -1
+        earliest_reset = float("inf")
+
+        for ki in range(num_keys):
+            state = self._state(model_id, ki)
+            req_ok = (
+                state.remaining_requests is None
+                or state.remaining_requests > RATE_LIMIT_REQUEST_FLOOR
+            )
+            tok_ok = (
+                state.remaining_tokens is None
+                or state.remaining_tokens > estimated_input_tokens + RATE_LIMIT_TOKEN_FLOOR
+            )
+            if req_ok and tok_ok:
+                remaining = state.remaining_tokens if state.remaining_tokens is not None else 9_999_999
+                if best_key is None or remaining > best_remaining_tokens:
+                    best_key = ki
+                    best_remaining_tokens = remaining
+            else:
+                reset_at = max(
+                    state.reset_requests_at or 0.0,
+                    state.reset_tokens_at or 0.0,
+                )
+                if reset_at > now:
+                    earliest_reset = min(earliest_reset, reset_at)
+
+        if best_key is not None:
+            return best_key, 0.0
+
+        # All keys exhausted — sleep until the soonest one resets.
+        sleep_secs = max(0.0, earliest_reset - now) if earliest_reset != float("inf") else 0.0
+        if sleep_secs > 0:
+            self._sleep_fn(sleep_secs)
+        return current_key, sleep_secs
 
     def before_request(self, model_id: str, estimated_input_tokens: int = 0) -> float:
-        state = self._states.setdefault(model_id, ModelRateLimitState())
-        now = self._time_fn()
-        delays: list[float] = []
+        """Backward-compatible single-key check. Uses key_index=0."""
+        _key, waited = self.select_key(model_id, 0, 1, estimated_input_tokens)
+        return waited
 
-        if (
-            state.remaining_requests is not None
-            and state.remaining_requests <= RATE_LIMIT_REQUEST_FLOOR
-            and state.reset_requests_at is not None
-            and state.reset_requests_at > now
-        ):
-            delays.append(state.reset_requests_at - now)
-
-        if (
-            state.remaining_tokens is not None
-            and state.remaining_tokens <= estimated_input_tokens + RATE_LIMIT_TOKEN_FLOOR
-            and state.reset_tokens_at is not None
-            and state.reset_tokens_at > now
-        ):
-            delays.append(state.reset_tokens_at - now)
-
-        if delays:
-            delay_seconds = max(delays)
-            self._sleep_fn(delay_seconds)
-            return delay_seconds
-        return 0.0
-
-    def record_response(self, model_id: str, response: requests.Response) -> None:
-        state = self._states.setdefault(model_id, ModelRateLimitState())
+    def record_response(self, model_id: str, response: requests.Response, key_index: int = 0) -> None:
+        state = self._state(model_id, key_index)
         now = self._time_fn()
         headers = {key.lower(): value for key, value in response.headers.items()}
 
@@ -344,11 +378,13 @@ class RateLimitGovernor:
 
 @dataclass(slots=True)
 class AnalysisRuntime:
-    session: requests.Session
+    groq_api_keys: list[str]
     governor: RateLimitGovernor
     model_chain: list[ModelConfig]
     delayed_retry_final_model: ModelConfig | None = None
     current_model_index: int = 0
+    current_key_index: int = 0
+    groq_sessions: dict[int, requests.Session] = field(default_factory=dict)
     model_switches: list[dict[str, Any]] = field(default_factory=list)
     last_attempted_model: str | None = None
     diagnostics: RuntimeDiagnostics = field(default_factory=RuntimeDiagnostics)
@@ -369,9 +405,15 @@ class AnalysisRuntime:
     def current_model(self) -> ModelConfig:
         return self.model_chain[self.current_model_index]
 
+    def get_groq_session(self, key_index: int | None = None) -> requests.Session:
+        ki = key_index if key_index is not None else self.current_key_index
+        if ki not in self.groq_sessions:
+            self.groq_sessions[ki] = _build_groq_session(self.groq_api_keys[ki])
+        return self.groq_sessions[ki]
+
     def get_session_for_model(self, model: ModelConfig) -> requests.Session:
         if model.provider == DEFAULT_PROVIDER:
-            return self.session
+            return self.get_groq_session(self.current_key_index)
         session = self.provider_sessions.get(model.provider)
         if session is not None:
             return session
@@ -379,8 +421,24 @@ class AnalysisRuntime:
         self.provider_sessions[model.provider] = session
         return session
 
+    def rotate_key(self, reason: str) -> bool:
+        """Rotate to the next API key. Returns False if only one key available."""
+        if len(self.groq_api_keys) <= 1:
+            return False
+        next_idx = (self.current_key_index + 1) % len(self.groq_api_keys)
+        LOGGER.info("Rotating Groq API key %d → %d: %s", self.current_key_index, next_idx, reason)
+        self.current_key_index = next_idx
+        self.diagnostics.key_rotation_count += 1
+        # Clear old sessions to force new authentication
+        for ki in list(self.groq_sessions.keys()):
+            self.groq_sessions[ki].close()
+            del self.groq_sessions[ki]
+        return True
+
     def close_sessions(self) -> None:
-        self.session.close()
+        for session in self.groq_sessions.values():
+            session.close()
+        self.groq_sessions.clear()
         for session in self.provider_sessions.values():
             session.close()
         self.provider_sessions.clear()
@@ -635,8 +693,10 @@ def _graph_initialize(state: AnalysisGraphState) -> AnalysisGraphState:
     previous_retry_plan = _build_previous_retry_plan(state["previous_articles"], state["previous_report"])
     runtime: AnalysisRuntime | None = None
     if today_plan["new_articles_analyzed"] > 0 or previous_retry_plan["retried_previous_day_articles"] > 0:
+        groq_keys = load_groq_api_keys()
+        LOGGER.info("Loaded %d Groq API key(s).", len(groq_keys))
         runtime = AnalysisRuntime(
-            session=_build_groq_session(load_groq_api_key()),
+            groq_api_keys=groq_keys,
             governor=RateLimitGovernor(),
             model_chain=[ModelConfig(PRIMARY_MODEL_ID), *(ModelConfig(model_id) for model_id in FALLBACK_MODEL_IDS)],
             delayed_retry_final_model=ModelConfig(
@@ -728,55 +788,66 @@ def _graph_summarize_top_alerts(state: AnalysisGraphState) -> AnalysisGraphState
     if runtime is None or not state["category_reports"]:
         return state
 
-    # Collect all key developments and their metadata
+    # Collect all key developments and their metadata mapping
     all_developments: list[dict[str, Any]] = []
+    # Map article info by a temporary ID for the LLM to reference
+    article_metadata: dict[str, dict[str, str]] = {}
+    
     for category in state["category_reports"]:
         cat_name = category.get("category") or "Unknown"
         for subgroup in category.get("subgroups") or []:
             subgroup_title = subgroup.get("title") or "Overview"
             
-            # Extract relevant articles' titles, times, and URLs for this subgroup
+            # Index articles in this subgroup for the LLM
             subgroup_articles = subgroup.get("articles") or []
-            article_refs: list[str] = []
+            ref_ids = []
             for art in subgroup_articles:
+                # Use source_article_id as the stabilizer
+                aid = str(art.get("source_article_id") or art.get("canonical_url") or "")
                 title = str(art.get("title") or "Untitled")
                 pub_at = str(art.get("published_at") or "")
-                # Use full YYYY-MM-DD HH:MM if available
-                time_str = pub_at[:16].replace("T", " ") if len(pub_at) >= 16 else pub_at
+                # Default to report date if published_at is missing date part
+                date_str = pub_at[:10] if len(pub_at) >= 10 else state["target_date"]
                 url = str(art.get("canonical_url") or "").strip()
                 
-                if time_str and url:
-                    article_refs.append(f"({title} | {time_str}) {{{url}}}")
-                elif time_str:
-                    article_refs.append(f"({title} | {time_str})")
-                else:
-                    article_refs.append(f"({title})")
-            
-            joined_refs = " ".join(article_refs)
+                if aid:
+                    article_metadata[aid] = {
+                        "title": title,
+                        "date": date_str,
+                        "url": url,
+                    }
+                    ref_ids.append(aid)
             
             for dev in subgroup.get("key_developments") or []:
                 all_developments.append(
                     {
                         "category": cat_name,
                         "subgroup": subgroup_title,
-                        "text": f"{dev} {joined_refs}".strip(),
+                        "text": str(dev),
+                        "ref_ids": ref_ids,
                     }
                 )
-
+    
     if not all_developments:
         return state
 
     try:
         top_alerts = _generate_top_alerts(
             runtime=runtime,
-            developments=all_developments,
             market_context=state["market_context_string"],
+            developments=all_developments,
+            article_metadata=article_metadata,
         )
+        state["executive_summary"] = top_alerts
+        # Legacy key support
         state["top_alerts"] = top_alerts
-        LOGGER.info("Successfully generated %d top-level alerts.", len(top_alerts))
     except Exception as e:
-        LOGGER.warning("Failed to generate top alerts: %s", e)
+        LOGGER.warning("Graph summarize_top_alerts failed: %s", e)
+        state["executive_summary"] = []
+        state["top_alerts"] = []
 
+    if state.get("executive_summary"):
+        LOGGER.info("Successfully generated %d top-level alerts.", len(state["executive_summary"]))
     return state
 
 
@@ -803,22 +874,30 @@ def _graph_finalize(state: AnalysisGraphState) -> AnalysisGraphState:
     return state
 
 
+def load_groq_api_keys() -> list[str]:
+    """Load all Groq API keys from GROQ_API_KEY (comma-separated for multiple keys)."""
+    raw: str | None = os.environ.get("GROQ_API_KEY")
+    if not raw:
+        for config_path in _candidate_config_paths():
+            if not config_path.exists():
+                continue
+            parsed = _parse_simple_env_file(config_path)
+            raw = parsed.get("GROQ_API_KEY")
+            if raw:
+                break
+    if not raw:
+        raise RuntimeError(
+            "GROQ_API_KEY is not set. Export GROQ_API_KEY or add it to the repo-root .config file."
+        )
+    keys = [k.strip() for k in raw.split(",") if k.strip()]
+    if not keys:
+        raise RuntimeError("GROQ_API_KEY contains no valid keys.")
+    return keys
+
+
 def load_groq_api_key() -> str:
-    env_key = os.environ.get("GROQ_API_KEY")
-    if env_key:
-        return env_key
-
-    for config_path in _candidate_config_paths():
-        if not config_path.exists():
-            continue
-        parsed = _parse_simple_env_file(config_path)
-        key = parsed.get("GROQ_API_KEY")
-        if key:
-            return key
-
-    raise RuntimeError(
-        "GROQ_API_KEY is not set. Export GROQ_API_KEY or add it to the repo-root .config file."
-    )
+    """Return the first Groq API key (backward-compat shim)."""
+    return load_groq_api_keys()[0]
 
 
 def _build_groq_session(api_key: str) -> requests.Session:
@@ -2429,16 +2508,34 @@ def _chat_completion(
             attempt_context.content_shrunk,
             attempt + 1,
         )
-        wait_seconds = runtime.governor.before_request(model.model_id, estimated_input_tokens)
+        # Select the API key with the most remaining capacity; rotate silently if a
+        # better key exists, sleep only when all keys are exhausted for this model.
+        best_key, wait_seconds = runtime.governor.select_key(
+            model.model_id,
+            runtime.current_key_index,
+            len(runtime.groq_api_keys),
+            estimated_input_tokens,
+        )
+        if best_key != runtime.current_key_index and model.provider == DEFAULT_PROVIDER:
+            LOGGER.info(
+                "Governor rotating key %d → %d for model %s (more capacity available).",
+                runtime.current_key_index,
+                best_key,
+                model.model_id,
+            )
+            runtime.current_key_index = best_key
+            runtime.diagnostics.key_rotation_count += 1
+            session = runtime.get_session_for_model(model)
         runtime.record_wait(context.category_name, wait_seconds, batch_kind=context.batch_kind)
         if wait_seconds > 0:
             LOGGER.info(
-                "Waiting %.1f seconds before %s for category %s batch=%s on %s.",
+                "Waiting %.1f seconds before %s for category %s batch=%s on %s (key=%d).",
                 wait_seconds,
                 attempt_context.batch_kind,
                 attempt_context.category_name,
                 attempt_context.batch_label,
                 model.model_id,
+                runtime.current_key_index,
             )
         response = session.post(
             api_url,
@@ -2451,7 +2548,7 @@ def _chat_completion(
             },
             timeout=60,
         )
-        runtime.governor.record_response(model.model_id, response)
+        runtime.governor.record_response(model.model_id, response, key_index=runtime.current_key_index)
         LOGGER.debug(
             "Received HTTP %s for %s category=%s batch=%s model=%s.",
             response.status_code,
@@ -2472,17 +2569,25 @@ def _chat_completion(
 
         if response.status_code == 429 and model_override is None:
             LOGGER.info(
-                "Groq returned HTTP 429 for category %s batch=%s on %s.",
+                "Groq returned HTTP 429 for category %s batch=%s on %s (key=%d).",
                 attempt_context.category_name,
                 attempt_context.batch_label,
                 model.model_id,
+                runtime.current_key_index,
             )
             runtime.tighten_category_budget(
                 attempt_context.category_name,
                 "rate_limited",
                 batch_kind="synthesis" if attempt_context.batch_kind.startswith("synthesis") else "article_batch",
             )
-            if runtime.switch_to_next_model(f"Model {model.model_id} returned 429 rate_limit_exceeded."):
+            # Try rotating to another key before switching models.
+            if runtime.rotate_key(f"429 on key {runtime.current_key_index} / model {model.model_id}"):
+                session = runtime.get_session_for_model(model)
+                continue
+            # All keys exhausted for this model — switch model and reset key index.
+            if runtime.switch_to_next_model(f"All keys returned 429 on {model.model_id}."):
+                runtime.current_key_index = 0
+                session = runtime.get_session_for_model(runtime.current_model)
                 runtime.record_model_switch(context.category_name, runtime.model_switches[-1])
                 continue
 
@@ -3931,8 +4036,9 @@ def _section_profile(category_name: str) -> SectionProfile:
     return LIGHT_SECTION_PROFILE if category_name in LIGHT_ANALYSIS_SECTIONS else STANDARD_SECTION_PROFILE
 def _generate_top_alerts(
     runtime: AnalysisRuntime,
+    market_context: str,
     developments: list[dict[str, Any]],
-    market_context: str = "",
+    article_metadata: dict[str, dict[str, str]],
 ) -> list[str]:
     """Uses LLM to pick exactly 3 most critical macro-moving developments."""
     import json
@@ -3975,8 +4081,23 @@ def _generate_top_alerts(
         response.raise_for_status()
         data = response.json()
         content = data["choices"][0]["message"]["content"]
-        parsed = json.loads(content)
-        return list(parsed.get("top_alerts") or [])[:3]
+        parsed = _parse_json_content(content)
+        alerts_data = list(parsed.get("top_alerts") or [])[:3]
+        
+        results: list[str] = []
+        for item in alerts_data:
+            summary_text = str(item.get("summary") or "").strip()
+            ref_id = str(item.get("ref_id") or "").strip()
+            meta = article_metadata.get(ref_id)
+            if meta and summary_text:
+                title = meta["title"]
+                date = meta["date"]
+                url = meta["url"]
+                results.append(f"{summary_text} ({title} | {date}) {{{url}}}")
+            elif summary_text:
+                results.append(summary_text)
+        
+        return results
     except Exception as e:
         LOGGER.warning("Alert generation LLM call failed: %s", e)
         # Simple fallback: pick first 3 from input if LLM fails

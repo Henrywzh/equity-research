@@ -265,7 +265,11 @@ def _build_html_body(summary: dict[str, Any]) -> str:
     for category in summary.get("categories") or []:
         category_name = str(category.get("category") or "")
         category_articles = category.get("articles") or []
-        is_property = category_name in {"二手市場", "新盤情報", "地產新聞"}
+        # Check if all articles are low importance (LIGHT)
+        importance_levels = {str(a.get("attention_tier") or "").lower() for a in category_articles}
+        all_light = importance_levels == {"light"} or not importance_levels
+        
+        is_property = (category_name in {"二手市場", "新盤情報", "地產新聞"}) and not all_light
         is_light_only = _is_light_only(category_articles) and not is_property
         
         items_html = ""
@@ -330,11 +334,6 @@ def _build_html_body(summary: dict[str, Any]) -> str:
             Articles: {int((summary.get("totals") or {}).get("article_count") or 0)} |
             Categories: {int((summary.get("input") or {}).get("category_count") or 0)}
           </p>
-          <p style="margin:6px 0 20px;color:#4b5563;">
-            Primary model: {_escape_html(_model_label(summary, "primary_model"))} |
-            Fallback models: {_escape_html(_fallback_model_labels(summary))}
-          </p>
-          {notes_html}
           {market_html}
           {unresolved_html}
           {"".join(category_blocks)}
@@ -392,7 +391,10 @@ def _build_html_subgroups(category: dict[str, Any], category_name: str = "") -> 
         return f"<div style='margin-top:14px;'>{articles_html}</div>" if articles_html else ""
 
     blocks = []
-    is_property = category_name in {"二手市場", "新盤情報", "地產新聞"}
+    is_property = (category_name in {"二手市場", "新盤情報", "地產新聞"})
+    importance_levels = {str(a.get("attention_tier") or "").lower() for a in subgroups[0].get("articles", [])} if subgroups else set()
+    all_light = importance_levels == {"light"} or not importance_levels
+    is_property = is_property and not all_light
     
     for subgroup in subgroups:
         subgroup_articles = subgroup.get("articles") or []
@@ -465,10 +467,17 @@ def _build_html_articles(articles: list[dict[str, Any]]) -> str:
             top_n = sorted_articles[:3]
             remaining = sorted_articles[3:]
 
-    def _render_item(article):
+    def _render_item(article, compact=False):
         title = _escape_html(str(article.get("title") or "Untitled"))
         url = str(article.get("canonical_url") or "").strip()
         pub_at = (article.get("published_at") or "").replace("T", " ")
+        
+        if compact:
+            # titles only for shadow lists to save space in Gmail
+            if url:
+                return f"<li style='margin-bottom:2px;font-size:13px;color:#4b5563;'><a href=\"{_escape_html(url)}\" style=\"color:#4b5563;text-decoration:none;\">{title}</a></li>"
+            return f"<li style='margin-bottom:2px;font-size:13px;color:#4b5563;'>{title}</li>"
+
         date_str = f" <span style='color:#6b7280;font-size:12px;'>({pub_at[:16]})</span>" if pub_at else ""
         unresolved = " <strong style='color:#b91c1c;'>[UNRESOLVED]</strong>" if article.get("error") else ""
         attention = _attention_badge_html(article)
@@ -482,15 +491,15 @@ def _build_html_articles(articles: list[dict[str, Any]]) -> str:
     articles_list = "<ul style='margin:0;padding-left:18px;line-height:1.7;'>" + "".join(items)
     
     if remaining:
-        folded_items = "".join([_render_item(a) for a in remaining])
+        # Switch from <details> to a 'Shadow List' (Compact headlines) for better Gmail compatibility
+        folded_items = "".join([_render_item(a, compact=True) for a in remaining])
         articles_list += (
-            f"<li style='list-style:none;margin-top:8px;'>"
-            f"<details style='margin-left:-18px;'>"
-            f"<summary style='color:#374151;font-size:12px;cursor:pointer;padding:4px 10px;background:#f3f4f6;border:1px solid #e5e7eb;border-radius:4px;display:inline-block;list-style:disclosure-closed;'>"
-            f"Show {len(remaining)} more news..."
-            f"</summary>"
-            f"<ul style='margin:4px 0 0;padding-left:18px;list-style:inherit;'>{folded_items}</ul>"
-            f"</details></li>"
+            f"<li style='list-style:none;margin-top:12px;padding-top:8px;border-top:1px solid #f3f4f6;'>"
+            f"<div style='color:#6b7280;font-size:12px;font-weight:600;margin-bottom:6px;text-transform:uppercase;letter-spacing:0.025em;'>"
+            f"And {len(remaining)} more headline(s):"
+            f"</div>"
+            f"<ul style='margin:0;padding-left:18px;list-style:circle;'>{folded_items}</ul>"
+            f"</li>"
         )
     
     articles_list += "</ul>"
@@ -551,11 +560,7 @@ def _build_run_notes(summary: dict[str, Any]) -> list[str]:
     error_classes = sorted({str(item.get("classification") or "unclassified") for item in summary.get("errors") or []})
     if error_classes:
         notes.append("Failure classifications present: " + ", ".join(error_classes))
-    delayed_retry_skips = int(diagnostics.get("delayed_retry_skipped_final_model_count") or 0)
-    if delayed_retry_skips > 0:
-        notes.append(
-            f"The final delayed-retry fallback model was skipped {delayed_retry_skips} time(s) because OPENAI_API_KEY was unavailable."
-        )
+    
     output_path = summary.get("output_path")
     if output_path:
         notes.append(f"Stored analysis report: {output_path}")
