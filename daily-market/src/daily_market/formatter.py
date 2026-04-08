@@ -84,7 +84,14 @@ def format_summary(
                 "asset_class": ac,
                 "label_en": _SECTION_LABELS.get(ac, {}).get("en", ac.upper()),
                 "label_zh": _SECTION_LABELS.get(ac, {}).get("zh", ac),
-                "rows": [_snapshot_to_row(s) for s in snaps],
+                "rows": [
+                    _snapshot_to_row(s)
+                    for s in sorted(
+                        snaps,
+                        key=lambda x: str(x.data_timestamp or "0000-00-00"),
+                        reverse=True,
+                    )
+                ],
             }
             for ac, snaps in sections
         ],
@@ -99,6 +106,8 @@ def format_summary(
         "session": session,
         "date": date_str,
         "status": status,
+        "ticker_count": len(snapshots),
+        "success_count": success_count,
     }
 
 
