@@ -1,13 +1,13 @@
 {
   "report_schema_version": 6,
   "report_date": "2026-04-08",
-  "generated_at": "2026-04-08T21:44:36.798577+00:00",
+  "generated_at": "2026-04-08T21:55:02.647168+00:00",
   "source_site": "hkej",
-  "status": "partial",
+  "status": "success",
   "executive_summary": [
-    "美國與伊朗達成兩周的停火協議，投資者情緒亢奮。",
-    "道指早段飆升1324點或2.84%，報47915點。",
-    "比特幣突破7.1萬美元，升至三周新高，報71783美元，升4.61%。"
+    "美國與伊朗達成兩周的停火協議，道指飆升1029點或2.21%，報47613點。",
+    "比特幣突破7.1萬美元，升至三周新高，報71783美元，升4.61%。",
+    "日經平均指數收報56308點，升2878點或5.4%，為3月初以來首次於56000點以上收市。"
   ],
   "model": {
     "provider": "groq",
@@ -26,175 +26,55 @@
     "rate_limit_wait_count": 0,
     "rate_limit_wait_seconds_total": 0.0,
     "fallback_switch_count": 0,
-    "key_rotation_count": 29,
-    "pre_send_split_count": 12,
+    "key_rotation_count": 22,
+    "pre_send_split_count": 13,
     "response_413_split_count": 0,
     "json_repair_retry_count": 0,
-    "batch_count": 57,
+    "batch_count": 35,
     "failed_batch_count": 0,
-    "delayed_retry_candidate_count": 1,
-    "delayed_retry_attempted_count": 1,
+    "delayed_retry_candidate_count": 0,
+    "delayed_retry_attempted_count": 0,
     "delayed_retry_recovered_count": 0,
-    "delayed_retry_failed_count": 1,
-    "high_medium_unresolved_count": 1,
+    "delayed_retry_failed_count": 0,
+    "high_medium_unresolved_count": 0,
     "light_unresolved_count": 0,
-    "delayed_retry_skipped_final_model_count": 1,
+    "delayed_retry_skipped_final_model_count": 0,
     "synthesis_budget_exhausted_count": 0,
     "degraded_merge_count": 0
   },
   "incremental": {
-    "reused_successful_articles": 44,
-    "new_articles_analyzed": 15,
+    "reused_successful_articles": 58,
+    "new_articles_analyzed": 1,
     "retried_previous_day_articles": 0,
     "previous_day_retry_successes": 0
   },
-  "unresolved_articles": [
-    {
-      "category": "時事脈搏",
-      "title": "伊朗局勢丨中俄否決安理會涉霍爾木茲海峽決議",
-      "canonical_url": "https://www.hkej.com/instantnews/current/article/4365700/%E4%BC%8A%E6%9C%97%E5%B1%80%E5%8B%A2%E4%B8%A8%E4%B8%AD%E4%BF%84%E5%90%A6%E6%B1%BA%E5%AE%89%E7%90%86%E6%9C%83%E6%B6%89%E9%9C%8D%E7%88%BE%E6%9C%A8%E8%8C%B2%E6%B5%B7%E5%B3%BD%E6%B1%BA%E8%AD%B0",
-      "source_article_id": "4365700",
-      "attention_tier": "high",
-      "theme": "geopolitics",
-      "must_keep": true,
-      "error_classification": "incomplete_model_output",
-      "error": "Model response omitted this article from the delayed retry batch.",
-      "model_used": "llama-3.1-8b-instant",
-      "delayed_retry_attempted": true,
-      "delayed_retry_model_chain": [
-        "llama-3.1-8b-instant",
-        "openai/gpt-oss-20b (skipped missing OPENAI_API_KEY)"
-      ],
-      "delayed_retry_final_model": "openai/gpt-oss-20b",
-      "published_at": "2026-04-08T00:16:00+08:00"
-    }
-  ],
+  "daily_stats": {
+    "total_scraped": 59,
+    "analyzed": 59,
+    "success_rate": 100.0
+  },
+  "unresolved_articles": [],
   "totals": {
     "article_count": 59,
-    "successful_article_analyses": 58,
-    "failed_article_analyses": 1,
+    "successful_article_analyses": 59,
+    "failed_article_analyses": 0,
     "full_text_article_count": 59,
     "truncated_article_count": 0,
-    "successful_categories": 7,
-    "partial_categories": 1,
+    "successful_categories": 8,
+    "partial_categories": 0,
     "failed_categories": 0
   },
-  "market_context": [
-    {
-      "ticker": "CL=F",
-      "asset_class": "commodity",
-      "price": 94.62999725341797,
-      "prev_close": 112.94999694824219,
-      "pct_change": -16.219566347769902,
-      "data_timestamp": "2026-04-08"
-    },
-    {
-      "ticker": "GC=F",
-      "asset_class": "commodity",
-      "price": 4820.0,
-      "prev_close": 4657.10009765625,
-      "pct_change": 3.4978827795806153,
-      "data_timestamp": "2026-04-08"
-    },
-    {
-      "ticker": "BTC-USD",
-      "asset_class": "crypto",
-      "price": 71491.28125,
-      "prev_close": 71940.703125,
-      "pct_change": -0.6247115408631893,
-      "data_timestamp": "2026-04-08"
-    },
-    {
-      "ticker": "DX-Y.NYB",
-      "asset_class": "fx",
-      "price": 98.84200286865234,
-      "prev_close": 99.63999938964844,
-      "pct_change": -0.8008796927782773,
-      "data_timestamp": "2026-04-08"
-    },
-    {
-      "ticker": "GBPHKD=X",
-      "asset_class": "fx",
-      "price": 10.529290199279785,
-      "prev_close": 10.370880126953125,
-      "pct_change": 1.527450615449353,
-      "data_timestamp": "2026-04-08"
-    },
-    {
-      "ticker": "USDCNH=X",
-      "asset_class": "fx",
-      "price": 6.828060150146484,
-      "prev_close": 6.852749824523926,
-      "pct_change": -0.3602885704229929,
-      "data_timestamp": "2026-04-08"
-    },
-    {
-      "ticker": "USDJPY=X",
-      "asset_class": "fx",
-      "price": 158.45599365234375,
-      "prev_close": 159.68299865722656,
-      "pct_change": -0.7684005280466241,
-      "data_timestamp": "2026-04-08"
-    },
-    {
-      "ticker": "000001.SS",
-      "asset_class": "index",
-      "price": 3994.99755859375,
-      "prev_close": 3890.1650390625,
-      "pct_change": 2.6948090499654955,
-      "data_timestamp": "2026-04-08"
-    },
-    {
-      "ticker": "^FTSE",
-      "asset_class": "index",
-      "price": 10638.5400390625,
-      "prev_close": 10348.7998046875,
-      "pct_change": 2.7997472155540377,
-      "data_timestamp": "2026-04-08"
-    },
-    {
-      "ticker": "^HSI",
-      "asset_class": "index",
-      "price": 25893.01953125,
-      "prev_close": 25116.529296875,
-      "pct_change": 3.0915506883811807,
-      "data_timestamp": "2026-04-08"
-    },
-    {
-      "ticker": "^KS11",
-      "asset_class": "index",
-      "price": 5872.33984375,
-      "prev_close": 5494.77978515625,
-      "pct_change": 6.871250047430494,
-      "data_timestamp": "2026-04-08"
-    },
-    {
-      "ticker": "^N225",
-      "asset_class": "index",
-      "price": 56308.421875,
-      "prev_close": 53429.55859375,
-      "pct_change": 5.3881472297747175,
-      "data_timestamp": "2026-04-08"
-    },
-    {
-      "ticker": "^STOXX50E",
-      "asset_class": "index",
-      "price": 5910.22021484375,
-      "prev_close": 5633.22021484375,
-      "pct_change": 4.917258502873622,
-      "data_timestamp": "2026-04-08"
-    }
-  ],
+  "market_context": [],
   "categories": [
     {
       "category": "國際財經",
       "article_count": 14,
       "status": "success",
       "key_developments": [
-        "美國與伊朗達成兩周的停火協議，投資者情緒亢奮。",
-        "道指早段飆升1324點或2.84%，報47915點。",
+        "美國與伊朗達成兩周的停火協議，道指飆升1029點或2.21%，報47613點。",
         "比特幣突破7.1萬美元，升至三周新高，報71783美元，升4.61%。",
-        "美國能源資訊局（EIA）上調2026年紐約期油價格預測至每桶87.41美元，升幅18.7%。"
+        "日經平均指數收報56308點，升2878點或5.4%，為3月初以來首次於56000點以上收市。",
+        "油價下滑，紐約原油期貨每桶報92.75美元，跌20.2美元或17.88%。"
       ],
       "named_entities": [
         {
@@ -210,12 +90,12 @@
           "type": "asset"
         },
         {
-          "name": "美國能源部",
-          "type": "institution"
+          "name": "日經平均指數",
+          "type": "index"
         },
         {
-          "name": "能源資訊局(EIA)",
-          "type": "institution"
+          "name": "紐約原油期貨",
+          "type": "asset"
         }
       ],
       "articles": [
@@ -942,10 +822,10 @@
           "theme_rationale": "報道股市走勢、股票市場動態和相關經濟數據。",
           "article_count": 14,
           "key_developments": [
-            "美國與伊朗達成兩周的停火協議，投資者情緒亢奮。",
-            "道指早段飆升1324點或2.84%，報47915點。",
+            "美國與伊朗達成兩周的停火協議，道指飆升1029點或2.21%，報47613點。",
             "比特幣突破7.1萬美元，升至三周新高，報71783美元，升4.61%。",
-            "美國能源資訊局（EIA）上調2026年紐約期油價格預測至每桶87.41美元，升幅18.7%。"
+            "日經平均指數收報56308點，升2878點或5.4%，為3月初以來首次於56000點以上收市。",
+            "油價下滑，紐約原油期貨每桶報92.75美元，跌20.2美元或17.88%。"
           ],
           "named_entities": [
             {
@@ -961,12 +841,12 @@
               "type": "asset"
             },
             {
-              "name": "美國能源部",
-              "type": "institution"
+              "name": "日經平均指數",
+              "type": "index"
             },
             {
-              "name": "能源資訊局(EIA)",
-              "type": "institution"
+              "name": "紐約原油期貨",
+              "type": "asset"
             }
           ],
           "articles": [
@@ -1692,15 +1572,13 @@
       ],
       "analysis_profile": "standard",
       "model_used": "meta-llama/llama-4-scout-17b-16e-instruct",
-      "sub_batch_count": 9,
+      "sub_batch_count": 4,
       "diagnostics": {
-        "sub_batch_count": 9,
+        "sub_batch_count": 4,
         "split_reasons": [],
-        "models_attempted": [
-          "meta-llama/llama-4-scout-17b-16e-instruct"
-        ],
-        "estimated_input_tokens_max": 1215,
-        "serialized_request_bytes_max": 6430,
+        "models_attempted": [],
+        "estimated_input_tokens_max": 0,
+        "serialized_request_bytes_max": 0,
         "rate_limit_waits": 0,
         "partial_article_count": 0,
         "synthesis_wait_seconds_total": 0.0,
@@ -1717,24 +1595,24 @@
     {
       "category": "時事脈搏",
       "article_count": 23,
-      "status": "partial",
+      "status": "success",
       "key_developments": [],
       "named_entities": [
         {
-          "name": "伊朗",
-          "type": "country"
+          "name": "特朗普",
+          "type": "person"
         },
         {
-          "name": "郭俊峯",
-          "type": "person"
+          "name": "伊朗",
+          "type": "country"
         },
         {
           "name": "美國",
           "type": "country"
         },
         {
-          "name": "Transport Department",
-          "type": "institution"
+          "name": "Jean Arnault",
+          "type": "person"
         }
       ],
       "articles": [
@@ -2454,11 +2332,31 @@
           "canonical_url": "https://www.hkej.com/instantnews/current/article/4365700/%E4%BC%8A%E6%9C%97%E5%B1%80%E5%8B%A2%E4%B8%A8%E4%B8%AD%E4%BF%84%E5%90%A6%E6%B1%BA%E5%AE%89%E7%90%86%E6%9C%83%E6%B6%89%E9%9C%8D%E7%88%BE%E6%9C%A8%E8%8C%B2%E6%B5%B7%E5%B3%BD%E6%B1%BA%E8%AD%B0",
           "published_at": "2026-04-08T00:16:00+08:00",
           "section": "時事脈搏",
-          "novelty_score": null,
-          "relevance_score": null,
-          "urgency_score": null,
-          "named_entities": [],
-          "key_points": [],
+          "novelty_score": 6,
+          "relevance_score": 8,
+          "urgency_score": 9,
+          "named_entities": [
+            {
+              "name": "伊朗",
+              "type": "country"
+            },
+            {
+              "name": "中俄",
+              "type": "country"
+            },
+            {
+              "name": "聯合國安理會",
+              "type": "organization"
+            },
+            {
+              "name": "美國",
+              "type": "country"
+            }
+          ],
+          "key_points": [
+            "伊朗局勢升級，中俄否決安理會涉霍爾木茲海峽決議草案。",
+            "美國原油價格下跌16.22%至94.63，黃金價格上漲3.50%至4820.00。"
+          ],
           "content_truncated": false,
           "original_content_length_chars": 262,
           "analyzed_content_length_chars": 262,
@@ -2470,39 +2368,40 @@
           "theme": "geopolitics",
           "attention_reason": "High-signal geopolitics headline based on title/summary keywords.",
           "must_keep": true,
-          "model_used": "llama-3.1-8b-instant",
-          "delayed_retry_attempted": true,
-          "delayed_retry_model_chain": [
-            "llama-3.1-8b-instant",
-            "openai/gpt-oss-20b (skipped missing OPENAI_API_KEY)"
-          ],
-          "delayed_retry_final_model": "openai/gpt-oss-20b",
-          "error_classification": "incomplete_model_output",
-          "error": "Model response omitted this article from the delayed retry batch."
+          "model_used": "meta-llama/llama-4-scout-17b-16e-instruct",
+          "delayed_retry_attempted": false,
+          "delayed_retry_model_chain": [],
+          "delayed_retry_final_model": null,
+          "error_classification": null,
+          "error": null
         }
       ],
       "subgroups": [
         {
           "title": "社會動態 & Other News",
           "theme_rationale": "關注社會事件和政策動向",
-          "article_count": 10,
+          "article_count": 11,
           "key_developments": [
-            "美國和伊朗同意有條件停火兩周。",
-            "CL=F原油暴跌16.22%，報94.63美元。",
-            "郭俊峯獲延任入境處處長至明年6月底。"
+            "美國和伊朗同意有條件停火兩周，伊朗同意開放霍爾木茲海峽，布倫特原油價格下跌16.22%至94.63美元/桶",
+            "特朗普威脅對向伊朗提供武器國家徵50%關稅",
+            "聯合國秘書長特使Jean Arnault抵伊朗，推動持久結束戰爭方案"
           ],
           "named_entities": [
+            {
+              "name": "特朗普",
+              "type": "person"
+            },
             {
               "name": "伊朗",
               "type": "country"
             },
             {
-              "name": "郭俊峯",
-              "type": "person"
-            },
-            {
               "name": "美國",
               "type": "country"
+            },
+            {
+              "name": "Jean Arnault",
+              "type": "person"
             }
           ],
           "articles": [
@@ -2569,6 +2468,25 @@
               "title": "全紅嬋受網暴丨 體育總局:已報警追究責任 絕不姑息",
               "section": "時事脈搏",
               "published_at": "2026-04-08T15:00:00+08:00",
+              "attention_tier": "light",
+              "novelty_score": 5,
+              "relevance_score": 5,
+              "urgency_score": 5,
+              "named_entities": [],
+              "key_points": [],
+              "content_truncated": false,
+              "analysis_method": "bypassed",
+              "model_used": "direct",
+              "theme": "general",
+              "attention_reason": "Lighter treatment because this story sits in the 時事脈搏 section without strong market-moving signals.",
+              "must_keep": false
+            },
+            {
+              "source_article_id": "4366033",
+              "canonical_url": "https://www.hkej.com/instantnews/current/article/4366033/%E3%80%8C%E7%8D%B5%E6%88%B6%E5%BA%A7%E3%80%8D%E6%88%90%E5%8A%9F%E7%B9%9E%E6%9C%88+%E9%96%8B%E5%A7%8B%E8%BF%94%E5%9B%9E%E5%9C%B0%E7%90%83",
+              "title": "「獵戶座」成功繞月 開始返回地球",
+              "section": "時事脈搏",
+              "published_at": "2026-04-08T14:16:00+08:00",
               "attention_tier": "light",
               "novelty_score": 5,
               "relevance_score": 5,
@@ -2677,38 +2595,15 @@
               "error": null
             },
             {
-              "source_article_id": "4366033",
-              "canonical_url": "https://www.hkej.com/instantnews/current/article/4366033/%E3%80%8C%E7%8D%B5%E6%88%B6%E5%BA%A7%E3%80%8D%E6%88%90%E5%8A%9F%E7%B9%9E%E6%9C%88+%E9%96%8B%E5%A7%8B%E8%BF%94%E5%9B%9E%E5%9C%B0%E7%90%83",
-              "title": "「獵戶座」成功繞月 開始返回地球",
+              "source_article_id": "4365840",
+              "title": "伊朗局勢丨美伊同意停火兩周 德黑蘭將開放霍爾木茲海峽",
+              "canonical_url": "https://www.hkej.com/instantnews/current/article/4365840/%E4%BC%8A%E6%9C%97%E5%B1%80%E5%8B%A2%E4%B8%A8%E7%BE%8E%E4%BC%8A%E5%90%8C%E6%84%8F%E5%81%9C%E7%81%AB%E5%85%A9%E5%91%A8+%E5%BE%B7%E9%BB%91%E8%98%AD%E5%B0%87%E9%96%8B%E6%94%BE%E9%9C%8D%E7%88%BE%E6%9C%A8%E8%8C%B2%E6%B5%B7%E5%B3%BD",
+              "published_at": "2026-04-08T11:16:00+08:00",
               "section": "時事脈搏",
-              "published_at": "2026-04-08T14:16:00+08:00",
-              "attention_tier": "light",
-              "novelty_score": 5,
-              "relevance_score": 5,
-              "urgency_score": 5,
-              "named_entities": [],
-              "key_points": [],
-              "content_truncated": false,
-              "analysis_method": "bypassed",
-              "model_used": "direct",
-              "theme": "general",
-              "attention_reason": "Lighter treatment because this story sits in the 時事脈搏 section without strong market-moving signals.",
-              "must_keep": false
-            },
-            {
-              "source_article_id": "4365702",
-              "title": "中東戰火丨以襲伊朗鐵路橋樑 美打擊哈爾克島軍事目標",
-              "canonical_url": "https://www.hkej.com/instantnews/current/article/4365702/%E4%B8%AD%E6%9D%B1%E6%88%B0%E7%81%AB%E4%B8%A8%E4%BB%A5%E8%A5%B2%E4%BC%8A%E6%9C%97%E9%90%B5%E8%B7%AF%E6%A9%8B%E6%A8%91+%E7%BE%8E%E6%89%93%E6%93%8A%E5%93%88%E7%88%BE%E5%85%8B%E5%B3%B6%E8%BB%8D%E4%BA%8B%E7%9B%AE%E6%A8%99",
-              "published_at": "2026-04-08T00:55:00+08:00",
-              "section": "時事脈搏",
-              "novelty_score": 7,
+              "novelty_score": 8,
               "relevance_score": 9,
               "urgency_score": 10,
               "named_entities": [
-                {
-                  "name": "以色列",
-                  "type": "country"
-                },
                 {
                   "name": "美國",
                   "type": "country"
@@ -2718,19 +2613,23 @@
                   "type": "country"
                 },
                 {
-                  "name": "內塔尼亞胡",
+                  "name": "巴基斯坦",
+                  "type": "country"
+                },
+                {
+                  "name": "特朗普",
                   "type": "person"
                 }
               ],
               "key_points": [
-                "以色列和美國對伊朗實施轟炸，以色列總理內塔尼亞胡稱以軍空襲了伊朗的多處鐵路和橋樑。",
-                "美國和以色列加緊對伊朗實施轟炸，距離美國總統特朗普設定對伊朗談判的最後期限不到半天。"
+                "美國和伊朗同意有條件停火兩周，取消了美國總統特朗普向伊朗發出的「最後通牒」。",
+                "伊朗同意在接下來的兩周內，經由與伊朗武裝部隊協調，船隻將可安全通過霍爾木茲海峽，布倫特原油價格下跌16.22%至94.63美元/桶。"
               ],
               "content_truncated": false,
-              "original_content_length_chars": 294,
-              "analyzed_content_length_chars": 294,
-              "original_content_token_estimate": 74,
-              "analyzed_content_token_estimate": 74,
+              "original_content_length_chars": 1024,
+              "analyzed_content_length_chars": 1024,
+              "original_content_token_estimate": 256,
+              "analyzed_content_token_estimate": 256,
               "truncation_reason": null,
               "analysis_method": "full_text",
               "attention_tier": "high",
@@ -2745,48 +2644,97 @@
               "error": null
             },
             {
-              "source_article_id": "4365701",
-              "title": "中東戰事丨美國否認正考慮在伊朗使用核武器",
-              "canonical_url": "https://www.hkej.com/instantnews/current/article/4365701/%E4%B8%AD%E6%9D%B1%E6%88%B0%E4%BA%8B%E4%B8%A8%E7%BE%8E%E5%9C%8B%E5%90%A6%E8%AA%8D%E6%AD%A3%E8%80%83%E6%85%AE%E5%9C%A8%E4%BC%8A%E6%9C%97%E4%BD%BF%E7%94%A8%E6%A0%B8%E6%AD%A6%E5%99%A8",
-              "published_at": "2026-04-08T00:39:00+08:00",
+              "source_article_id": "4365713",
+              "title": "伊朗局勢丨巴基斯坦總理倡議美伊暫緩局勢兩周",
+              "canonical_url": "https://www.hkej.com/instantnews/current/article/4365713/%E4%BC%8A%E6%9C%97%E5%B1%80%E5%8B%A2%E4%B8%A8%E5%B7%B4%E5%9F%BA%E6%96%AF%E5%9D%A6%E7%B8%BD%E7%90%86%E5%80%A1%E8%AD%B0%E7%BE%8E%E4%BC%8A%E6%9A%AB%E7%B7%A9%E5%B1%80%E5%8B%A2%E5%85%A9%E5%91%A8",
+              "published_at": "2026-04-08T04:07:00+08:00",
               "section": "時事脈搏",
-              "novelty_score": 9,
-              "relevance_score": 10,
+              "novelty_score": 6,
+              "relevance_score": 8,
               "urgency_score": 9,
               "named_entities": [
                 {
+                  "name": "希赫伯茲",
+                  "type": "person"
+                },
+                {
+                  "name": "特朗普",
+                  "type": "person"
+                },
+                {
+                  "name": "巴基斯坦",
+                  "type": "country"
+                },
+                {
                   "name": "美國",
                   "type": "country"
-                },
-                {
-                  "name": "伊朗",
-                  "type": "country"
-                },
-                {
-                  "name": "白宮",
-                  "type": "institution"
-                },
-                {
-                  "name": "JD Vance",
-                  "type": "person"
                 }
               ],
               "key_points": [
-                "美國白宮否認正考慮在伊朗使用核武器，駁斥此前新聞頻道關於副總統萬斯提及核選項的報導",
-                "特朗普威脅若伊朗未在東岸時間周二晚上8時前重新開放霍爾木茲海峽，將摧毀伊朗基礎設施，市場反映CL=F原油暴跌16.22%，DX-Y.NYB美元指數跌0.80%"
+                "巴基斯坦總理希赫伯茲請求美國總統特朗普將針對伊朗的「最後通牒」押後兩周。",
+                "伊朗與美國緊張關係升溫，巴基斯坦近期在美伊之間充當調解方。"
               ],
               "content_truncated": false,
-              "original_content_length_chars": 366,
-              "analyzed_content_length_chars": 366,
-              "original_content_token_estimate": 92,
-              "analyzed_content_token_estimate": 92,
+              "original_content_length_chars": 216,
+              "analyzed_content_length_chars": 216,
+              "original_content_token_estimate": 54,
+              "analyzed_content_token_estimate": 54,
               "truncation_reason": null,
               "analysis_method": "full_text",
               "attention_tier": "high",
               "theme": "geopolitics",
               "attention_reason": "High-signal geopolitics headline based on title/summary keywords.",
               "must_keep": true,
-              "model_used": "qwen/qwen3-32b",
+              "model_used": "meta-llama/llama-4-scout-17b-16e-instruct",
+              "delayed_retry_attempted": false,
+              "delayed_retry_model_chain": [],
+              "delayed_retry_final_model": null,
+              "error_classification": null,
+              "error": null
+            },
+            {
+              "source_article_id": "4365712",
+              "title": "伊朗戰火丨聯合國人權專員:威脅消滅文明言論令人髮指",
+              "canonical_url": "https://www.hkej.com/instantnews/current/article/4365712/%E4%BC%8A%E6%9C%97%E6%88%B0%E7%81%AB%E4%B8%A8%E8%81%AF%E5%90%88%E5%9C%8B%E4%BA%BA%E6%AC%8A%E5%B0%88%E5%93%A1%3A%E5%A8%81%E8%84%85%E6%B6%88%E6%BB%85%E6%96%87%E6%98%8E%E8%A8%80%E8%AB%96%E4%BB%A4%E4%BA%BA%E9%AB%AE%E6%8C%87",
+              "published_at": "2026-04-08T03:50:00+08:00",
+              "section": "時事脈搏",
+              "novelty_score": 5,
+              "relevance_score": 7,
+              "urgency_score": 8,
+              "named_entities": [
+                {
+                  "name": "特朗普",
+                  "type": "person"
+                },
+                {
+                  "name": "圖爾克",
+                  "type": "person"
+                },
+                {
+                  "name": "聯合國",
+                  "type": "organization"
+                },
+                {
+                  "name": "美國",
+                  "type": "country"
+                }
+              ],
+              "key_points": [
+                "聯合國人權事務高級專員圖爾克譴責特朗普威脅消滅文明的言論。",
+                "特朗普在社交媒體貼文，威脅伊朗稱「今晚，整個文明將消亡，永不復返」。"
+              ],
+              "content_truncated": false,
+              "original_content_length_chars": 240,
+              "analyzed_content_length_chars": 240,
+              "original_content_token_estimate": 60,
+              "analyzed_content_token_estimate": 60,
+              "truncation_reason": null,
+              "analysis_method": "full_text",
+              "attention_tier": "high",
+              "theme": "geopolitics",
+              "attention_reason": "High-signal geopolitics headline based on title/summary keywords.",
+              "must_keep": true,
+              "model_used": "meta-llama/llama-4-scout-17b-16e-instruct",
               "delayed_retry_attempted": false,
               "delayed_retry_model_chain": [],
               "delayed_retry_final_model": null,
@@ -2821,7 +2769,7 @@
           "article_count": 3,
           "key_developments": [
             "The Transport Department is monitoring the bus service for Tuen Mun residents and has proactively contacted the operator of the Ma Wan Ferry.",
-            "The Land and Building Consultative Committee is considering legislation to accelerate the development of the North District.",
+            "The Land and Building Consultative Committee is considering legislation to accelerate the development of the Northside of Hong Kong.",
             "The Hong Kong Polytechnic University hosted a summit attended by global scholars to explore innovation in science and engineering."
           ],
           "named_entities": [
@@ -2904,8 +2852,8 @@
           "model_used": "meta-llama/llama-4-scout-17b-16e-instruct"
         },
         {
-          "title": "Geopolitics",
-          "theme_rationale": "Articles related to international relations and conflicts",
+          "title": "地緣政治局勢",
+          "theme_rationale": "國際關係與衝突相關新聞",
           "article_count": 3,
           "key_developments": [
             "特朗普表示美國可能尋求與伊朗成立「聯合項目」，以保障霍爾木茲海峽的安全。",
@@ -3078,21 +3026,21 @@
           "model_used": "meta-llama/llama-4-scout-17b-16e-instruct"
         },
         {
-          "title": "Domestic Affairs",
-          "theme_rationale": "Articles related to domestic politics and governance",
+          "title": "國內政策與動態",
+          "theme_rationale": "國內政治與政策相關新聞",
           "article_count": 3,
           "key_developments": [
-            "習近平強調加強幹部革命性鍛造，保持軍隊純潔光榮",
             "王毅將於明日訪問北韓兩天",
+            "習近平強調加強幹部革命性鍛造，保持軍隊純潔光榮",
             "張國清在山東調研，推進AI對工業深層次賦能"
           ],
           "named_entities": [
             {
-              "name": "習近平",
+              "name": "王毅",
               "type": "person"
             },
             {
-              "name": "王毅",
+              "name": "習近平",
               "type": "person"
             },
             {
@@ -3105,6 +3053,25 @@
             }
           ],
           "articles": [
+            {
+              "source_article_id": "4367057",
+              "canonical_url": "https://www.hkej.com/instantnews/current/article/4367057/%E5%BC%B5%E5%9C%8B%E6%B8%85%E5%B1%B1%E6%9D%B1%E8%AA%BF%E7%A0%94%3A%E6%8E%A8%E9%80%B2AI%E5%B0%8D%E5%B7%A5%E6%A5%AD%E6%B7%B1%E5%B1%A4%E6%AC%A1%E8%B3%A6%E8%83%BD",
+              "title": "張國清山東調研:推進AI對工業深層次賦能",
+              "section": "時事脈搏",
+              "published_at": "2026-04-08T20:27:00+08:00",
+              "attention_tier": "light",
+              "novelty_score": 5,
+              "relevance_score": 5,
+              "urgency_score": 5,
+              "named_entities": [],
+              "key_points": [],
+              "content_truncated": false,
+              "analysis_method": "bypassed",
+              "model_used": "direct",
+              "theme": "general",
+              "attention_reason": "Lighter treatment because this story sits in the 時事脈搏 section without strong market-moving signals.",
+              "must_keep": false
+            },
             {
               "source_article_id": "4366797",
               "canonical_url": "https://www.hkej.com/instantnews/current/article/4366797/%E7%BF%92%E8%BF%91%E5%B9%B3%3A%E5%8A%A0%E5%BC%B7%E5%B9%B9%E9%83%A8%E9%9D%A9%E5%91%BD%E6%80%A7%E9%8D%9B%E9%80%A0+%E4%BF%9D%E6%8C%81%E8%BB%8D%E9%9A%8A%E7%B4%94%E6%BD%94%E5%85%89%E6%A6%AE",
@@ -3142,39 +3109,24 @@
               "theme": "general",
               "attention_reason": "Lighter treatment because this story sits in the 時事脈搏 section without strong market-moving signals.",
               "must_keep": false
-            },
-            {
-              "source_article_id": "4367057",
-              "canonical_url": "https://www.hkej.com/instantnews/current/article/4367057/%E5%BC%B5%E5%9C%8B%E6%B8%85%E5%B1%B1%E6%9D%B1%E8%AA%BF%E7%A0%94%3A%E6%8E%A8%E9%80%B2AI%E5%B0%8D%E5%B7%A5%E6%A5%AD%E6%B7%B1%E5%B1%A4%E6%AC%A1%E8%B3%A6%E8%83%BD",
-              "title": "張國清山東調研:推進AI對工業深層次賦能",
-              "section": "時事脈搏",
-              "published_at": "2026-04-08T20:27:00+08:00",
-              "attention_tier": "light",
-              "novelty_score": 5,
-              "relevance_score": 5,
-              "urgency_score": 5,
-              "named_entities": [],
-              "key_points": [],
-              "content_truncated": false,
-              "analysis_method": "bypassed",
-              "model_used": "direct",
-              "theme": "general",
-              "attention_reason": "Lighter treatment because this story sits in the 時事脈搏 section without strong market-moving signals.",
-              "must_keep": false
             }
           ],
           "model_used": "meta-llama/llama-4-scout-17b-16e-instruct"
         },
         {
           "title": "地緣政治局勢",
-          "theme_rationale": "關注國際關係與區域衝突的最新發展",
+          "theme_rationale": "國際關係與衝突相關新聞",
           "article_count": 3,
           "key_developments": [
-            "美國和伊朗同意有條件停火兩周，取消了美國總統特朗普向伊朗發出的「最後通牒」。",
-            "伊朗同意在接下來的兩周內，經由與伊朗武裝部隊協調，船隻將可安全通過霍爾木茲海峽，布倫特原油價格下跌16.22%至94.63美元/桶。",
-            "巴基斯坦總理希赫伯茲請求美國總統特朗普將針對伊朗的「最後通牒」押後兩周。"
+            "以色列和美國對伊朗實施轟炸，以色列總理內塔尼亞胡稱以軍空襲了伊朗的多處鐵路和橋樑。",
+            "美國白宮否認正考慮在伊朗使用核武器，駁斥此前新聞頻道關於副總統萬斯提及核選項的報導。",
+            "中俄否決安理會涉霍爾木茲海峽決議草案，美國原油價格下跌16.22%至94.63，黃金價格上漲3.50%至4820.00。"
           ],
           "named_entities": [
+            {
+              "name": "以色列",
+              "type": "country"
+            },
             {
               "name": "美國",
               "type": "country"
@@ -3184,24 +3136,69 @@
               "type": "country"
             },
             {
-              "name": "特朗普",
+              "name": "內塔尼亞胡",
               "type": "person"
-            },
-            {
-              "name": "巴基斯坦",
-              "type": "country"
             }
           ],
           "articles": [
             {
-              "source_article_id": "4365840",
-              "title": "伊朗局勢丨美伊同意停火兩周 德黑蘭將開放霍爾木茲海峽",
-              "canonical_url": "https://www.hkej.com/instantnews/current/article/4365840/%E4%BC%8A%E6%9C%97%E5%B1%80%E5%8B%A2%E4%B8%A8%E7%BE%8E%E4%BC%8A%E5%90%8C%E6%84%8F%E5%81%9C%E7%81%AB%E5%85%A9%E5%91%A8+%E5%BE%B7%E9%BB%91%E8%98%AD%E5%B0%87%E9%96%8B%E6%94%BE%E9%9C%8D%E7%88%BE%E6%9C%A8%E8%8C%B2%E6%B5%B7%E5%B3%BD",
-              "published_at": "2026-04-08T11:16:00+08:00",
+              "source_article_id": "4365702",
+              "title": "中東戰火丨以襲伊朗鐵路橋樑 美打擊哈爾克島軍事目標",
+              "canonical_url": "https://www.hkej.com/instantnews/current/article/4365702/%E4%B8%AD%E6%9D%B1%E6%88%B0%E7%81%AB%E4%B8%A8%E4%BB%A5%E8%A5%B2%E4%BC%8A%E6%9C%97%E9%90%B5%E8%B7%AF%E6%A9%8B%E6%A8%91+%E7%BE%8E%E6%89%93%E6%93%8A%E5%93%88%E7%88%BE%E5%85%8B%E5%B3%B6%E8%BB%8D%E4%BA%8B%E7%9B%AE%E6%A8%99",
+              "published_at": "2026-04-08T00:55:00+08:00",
               "section": "時事脈搏",
-              "novelty_score": 8,
+              "novelty_score": 7,
               "relevance_score": 9,
               "urgency_score": 10,
+              "named_entities": [
+                {
+                  "name": "以色列",
+                  "type": "country"
+                },
+                {
+                  "name": "美國",
+                  "type": "country"
+                },
+                {
+                  "name": "伊朗",
+                  "type": "country"
+                },
+                {
+                  "name": "內塔尼亞胡",
+                  "type": "person"
+                }
+              ],
+              "key_points": [
+                "以色列和美國對伊朗實施轟炸，以色列總理內塔尼亞胡稱以軍空襲了伊朗的多處鐵路和橋樑。",
+                "美國和以色列加緊對伊朗實施轟炸，距離美國總統特朗普設定對伊朗談判的最後期限不到半天。"
+              ],
+              "content_truncated": false,
+              "original_content_length_chars": 294,
+              "analyzed_content_length_chars": 294,
+              "original_content_token_estimate": 74,
+              "analyzed_content_token_estimate": 74,
+              "truncation_reason": null,
+              "analysis_method": "full_text",
+              "attention_tier": "high",
+              "theme": "geopolitics",
+              "attention_reason": "High-signal geopolitics headline based on title/summary keywords.",
+              "must_keep": true,
+              "model_used": "meta-llama/llama-4-scout-17b-16e-instruct",
+              "delayed_retry_attempted": false,
+              "delayed_retry_model_chain": [],
+              "delayed_retry_final_model": null,
+              "error_classification": null,
+              "error": null
+            },
+            {
+              "source_article_id": "4365701",
+              "title": "中東戰事丨美國否認正考慮在伊朗使用核武器",
+              "canonical_url": "https://www.hkej.com/instantnews/current/article/4365701/%E4%B8%AD%E6%9D%B1%E6%88%B0%E4%BA%8B%E4%B8%A8%E7%BE%8E%E5%9C%8B%E5%90%A6%E8%AA%8D%E6%AD%A3%E8%80%83%E6%85%AE%E5%9C%A8%E4%BC%8A%E6%9C%97%E4%BD%BF%E7%94%A8%E6%A0%B8%E6%AD%A6%E5%99%A8",
+              "published_at": "2026-04-08T00:39:00+08:00",
+              "section": "時事脈搏",
+              "novelty_score": 9,
+              "relevance_score": 10,
+              "urgency_score": 9,
               "named_entities": [
                 {
                   "name": "美國",
@@ -3212,30 +3209,30 @@
                   "type": "country"
                 },
                 {
-                  "name": "巴基斯坦",
-                  "type": "country"
+                  "name": "白宮",
+                  "type": "institution"
                 },
                 {
-                  "name": "特朗普",
+                  "name": "JD Vance",
                   "type": "person"
                 }
               ],
               "key_points": [
-                "美國和伊朗同意有條件停火兩周，取消了美國總統特朗普向伊朗發出的「最後通牒」。",
-                "伊朗同意在接下來的兩周內，經由與伊朗武裝部隊協調，船隻將可安全通過霍爾木茲海峽，布倫特原油價格下跌16.22%至94.63美元/桶。"
+                "美國白宮否認正考慮在伊朗使用核武器，駁斥此前新聞頻道關於副總統萬斯提及核選項的報導",
+                "特朗普威脅若伊朗未在東岸時間周二晚上8時前重新開放霍爾木茲海峽，將摧毀伊朗基礎設施，市場反映CL=F原油暴跌16.22%，DX-Y.NYB美元指數跌0.80%"
               ],
               "content_truncated": false,
-              "original_content_length_chars": 1024,
-              "analyzed_content_length_chars": 1024,
-              "original_content_token_estimate": 256,
-              "analyzed_content_token_estimate": 256,
+              "original_content_length_chars": 366,
+              "analyzed_content_length_chars": 366,
+              "original_content_token_estimate": 92,
+              "analyzed_content_token_estimate": 92,
               "truncation_reason": null,
               "analysis_method": "full_text",
               "attention_tier": "high",
               "theme": "geopolitics",
               "attention_reason": "High-signal geopolitics headline based on title/summary keywords.",
               "must_keep": true,
-              "model_used": "meta-llama/llama-4-scout-17b-16e-instruct",
+              "model_used": "qwen/qwen3-32b",
               "delayed_retry_attempted": false,
               "delayed_retry_model_chain": [],
               "delayed_retry_final_model": null,
@@ -3243,74 +3240,25 @@
               "error": null
             },
             {
-              "source_article_id": "4365713",
-              "title": "伊朗局勢丨巴基斯坦總理倡議美伊暫緩局勢兩周",
-              "canonical_url": "https://www.hkej.com/instantnews/current/article/4365713/%E4%BC%8A%E6%9C%97%E5%B1%80%E5%8B%A2%E4%B8%A8%E5%B7%B4%E5%9F%BA%E6%96%AF%E5%9D%A6%E7%B8%BD%E7%90%86%E5%80%A1%E8%AD%B0%E7%BE%8E%E4%BC%8A%E6%9A%AB%E7%B7%A9%E5%B1%80%E5%8B%A2%E5%85%A9%E5%91%A8",
-              "published_at": "2026-04-08T04:07:00+08:00",
+              "source_article_id": "4365700",
+              "title": "伊朗局勢丨中俄否決安理會涉霍爾木茲海峽決議",
+              "canonical_url": "https://www.hkej.com/instantnews/current/article/4365700/%E4%BC%8A%E6%9C%97%E5%B1%80%E5%8B%A2%E4%B8%A8%E4%B8%AD%E4%BF%84%E5%90%A6%E6%B1%BA%E5%AE%89%E7%90%86%E6%9C%83%E6%B6%89%E9%9C%8D%E7%88%BE%E6%9C%A8%E8%8C%B2%E6%B5%B7%E5%B3%BD%E6%B1%BA%E8%AD%B0",
+              "published_at": "2026-04-08T00:16:00+08:00",
               "section": "時事脈搏",
               "novelty_score": 6,
               "relevance_score": 8,
               "urgency_score": 9,
               "named_entities": [
                 {
-                  "name": "希赫伯茲",
-                  "type": "person"
-                },
-                {
-                  "name": "特朗普",
-                  "type": "person"
-                },
-                {
-                  "name": "巴基斯坦",
+                  "name": "伊朗",
                   "type": "country"
                 },
                 {
-                  "name": "美國",
+                  "name": "中俄",
                   "type": "country"
-                }
-              ],
-              "key_points": [
-                "巴基斯坦總理希赫伯茲請求美國總統特朗普將針對伊朗的「最後通牒」押後兩周。",
-                "伊朗與美國緊張關係升溫，巴基斯坦近期在美伊之間充當調解方。"
-              ],
-              "content_truncated": false,
-              "original_content_length_chars": 216,
-              "analyzed_content_length_chars": 216,
-              "original_content_token_estimate": 54,
-              "analyzed_content_token_estimate": 54,
-              "truncation_reason": null,
-              "analysis_method": "full_text",
-              "attention_tier": "high",
-              "theme": "geopolitics",
-              "attention_reason": "High-signal geopolitics headline based on title/summary keywords.",
-              "must_keep": true,
-              "model_used": "meta-llama/llama-4-scout-17b-16e-instruct",
-              "delayed_retry_attempted": false,
-              "delayed_retry_model_chain": [],
-              "delayed_retry_final_model": null,
-              "error_classification": null,
-              "error": null
-            },
-            {
-              "source_article_id": "4365712",
-              "title": "伊朗戰火丨聯合國人權專員:威脅消滅文明言論令人髮指",
-              "canonical_url": "https://www.hkej.com/instantnews/current/article/4365712/%E4%BC%8A%E6%9C%97%E6%88%B0%E7%81%AB%E4%B8%A8%E8%81%AF%E5%90%88%E5%9C%8B%E4%BA%BA%E6%AC%8A%E5%B0%88%E5%93%A1%3A%E5%A8%81%E8%84%85%E6%B6%88%E6%BB%85%E6%96%87%E6%98%8E%E8%A8%80%E8%AB%96%E4%BB%A4%E4%BA%BA%E9%AB%AE%E6%8C%87",
-              "published_at": "2026-04-08T03:50:00+08:00",
-              "section": "時事脈搏",
-              "novelty_score": 5,
-              "relevance_score": 7,
-              "urgency_score": 8,
-              "named_entities": [
-                {
-                  "name": "特朗普",
-                  "type": "person"
                 },
                 {
-                  "name": "圖爾克",
-                  "type": "person"
-                },
-                {
-                  "name": "聯合國",
+                  "name": "聯合國安理會",
                   "type": "organization"
                 },
                 {
@@ -3319,14 +3267,14 @@
                 }
               ],
               "key_points": [
-                "聯合國人權事務高級專員圖爾克譴責特朗普威脅消滅文明的言論。",
-                "特朗普在社交媒體貼文，威脅伊朗稱「今晚，整個文明將消亡，永不復返」。"
+                "伊朗局勢升級，中俄否決安理會涉霍爾木茲海峽決議草案。",
+                "美國原油價格下跌16.22%至94.63，黃金價格上漲3.50%至4820.00。"
               ],
               "content_truncated": false,
-              "original_content_length_chars": 240,
-              "analyzed_content_length_chars": 240,
-              "original_content_token_estimate": 60,
-              "analyzed_content_token_estimate": 60,
+              "original_content_length_chars": 262,
+              "analyzed_content_length_chars": 262,
+              "original_content_token_estimate": 66,
+              "analyzed_content_token_estimate": 66,
               "truncation_reason": null,
               "analysis_method": "full_text",
               "attention_tier": "high",
@@ -3346,19 +3294,17 @@
       ],
       "analysis_profile": "light",
       "model_used": "meta-llama/llama-4-scout-17b-16e-instruct",
-      "sub_batch_count": 11,
+      "sub_batch_count": 10,
       "diagnostics": {
-        "sub_batch_count": 11,
+        "sub_batch_count": 10,
         "split_reasons": [],
         "models_attempted": [
-          "meta-llama/llama-4-scout-17b-16e-instruct",
-          "qwen/qwen3-32b",
-          "llama-3.1-8b-instant"
+          "meta-llama/llama-4-scout-17b-16e-instruct"
         ],
-        "estimated_input_tokens_max": 1406,
-        "serialized_request_bytes_max": 8964,
+        "estimated_input_tokens_max": 673,
+        "serialized_request_bytes_max": 4109,
         "rate_limit_waits": 0,
-        "partial_article_count": 1,
+        "partial_article_count": 0,
         "synthesis_wait_seconds_total": 0.0,
         "synthesis_retry_count": 0,
         "synthesis_retry_skipped_count": 0,
@@ -3381,20 +3327,20 @@
           "type": "company"
         },
         {
-          "name": "香港",
-          "type": "country"
-        },
-        {
           "name": "德勤",
           "type": "company"
         },
         {
-          "name": "MPF",
-          "type": "institution"
+          "name": "香港",
+          "type": "country"
         },
         {
-          "name": "渣打集團",
-          "type": "company"
+          "name": "恒指",
+          "type": "index"
+        },
+        {
+          "name": "MPF",
+          "type": "institution"
         }
       ],
       "articles": [
@@ -3623,14 +3569,14 @@
       ],
       "subgroups": [
         {
-          "title": "股票市場",
-          "theme_rationale": "與股票市場相關的新聞，包括股票基金、IPO等。",
+          "title": "股票市場動態",
+          "theme_rationale": "關注股票市場的最新動態和表現。",
           "article_count": 3,
           "key_developments": [
             "富途證券客戶於平台上進行首次期權交易的人數按月增幅達15.3%。",
-            "港股市場在經歷了一段時期的波動後，迎來快速反彈，恆生指數（^HSI）漲3.09%。",
             "德勤預計2026年香港將有約160隻新股上市融資最少3000億元，穩守全球三甲之列。",
-            "MPF股票基金過去1年平均淨回報16%"
+            "港股市場在經歷了一段時期的波動後，迎來快速反彈，恒指夜期收報25233點，升145點，高水116點。",
+            "今年首季香港有40隻新股上市融資1099億元，按年多1.67倍，融資額激增5.04倍。"
           ],
           "named_entities": [
             {
@@ -3638,16 +3584,16 @@
               "type": "company"
             },
             {
-              "name": "香港",
-              "type": "country"
-            },
-            {
               "name": "德勤",
               "type": "company"
             },
             {
-              "name": "MPF",
-              "type": "institution"
+              "name": "香港",
+              "type": "country"
+            },
+            {
+              "name": "恒指",
+              "type": "index"
             }
           ],
           "articles": [
@@ -3685,48 +3631,6 @@
               "attention_tier": "medium",
               "theme": "stocks",
               "attention_reason": "The article mentions stock market performance and a specific company's data, indicating a moderate level of market relevance.",
-              "must_keep": true,
-              "model_used": "meta-llama/llama-4-scout-17b-16e-instruct",
-              "delayed_retry_attempted": false,
-              "delayed_retry_model_chain": [],
-              "delayed_retry_final_model": null,
-              "error_classification": null,
-              "error": null
-            },
-            {
-              "source_article_id": "4366042",
-              "title": "MPF丨股票基金過去1年平均淨回報16%",
-              "canonical_url": "https://www.hkej.com/instantnews/hongkong/article/4366042/MPF%E4%B8%A8%E8%82%A1%E7%A5%A8%E5%9F%BA%E9%87%91%E9%81%8E%E5%8E%BB1%E5%B9%B4%E5%B9%B3%E5%9D%87%E6%B7%A8%E5%9B%9E%E5%A0%B116%25",
-              "published_at": "2026-04-08T14:25:00+08:00",
-              "section": "香港財經",
-              "novelty_score": 6,
-              "relevance_score": 8,
-              "urgency_score": 5,
-              "named_entities": [
-                {
-                  "name": "MPF",
-                  "type": "institution"
-                },
-                {
-                  "name": "香港財經",
-                  "type": "organization"
-                }
-              ],
-              "key_points": [
-                "MPF股票基金過去1年平均淨回報16%，混合資產基金達12.7%",
-                "自強積金制度實施以來，股票基金和混合資產基金的平均年率化淨回報分別為4.8%和4.4%",
-                "積金局提醒強積金計劃成員，應根據個人的人生階段、財務狀況、風險承受能力等因素，作出合適自己的投資規劃"
-              ],
-              "content_truncated": false,
-              "original_content_length_chars": 345,
-              "analyzed_content_length_chars": 345,
-              "original_content_token_estimate": 87,
-              "analyzed_content_token_estimate": 87,
-              "truncation_reason": null,
-              "analysis_method": "full_text",
-              "attention_tier": "medium",
-              "theme": "general",
-              "attention_reason": "Article discusses MPF stock fund performance",
               "must_keep": true,
               "model_used": "meta-llama/llama-4-scout-17b-16e-instruct",
               "delayed_retry_attempted": false,
@@ -3788,80 +3692,6 @@
               "delayed_retry_final_model": null,
               "error_classification": null,
               "error": null
-            }
-          ],
-          "model_used": "meta-llama/llama-4-scout-17b-16e-instruct"
-        },
-        {
-          "title": "宏觀經濟",
-          "theme_rationale": "與宏觀經濟相關的新聞，包括貨幣融資、經濟數據等。",
-          "article_count": 2,
-          "key_developments": [
-            "近四分之一企業擬增加人民幣融資",
-            "恒指夜期收報25233點，升145點，高水116點",
-            "受訪企業中，23%的收入和25%的成本皆涉及人民幣敞口，但僅得14%的債務以人民幣計價",
-            "香港近期推出多項措施，增強離岸人民幣流動性及便利貿易融資"
-          ],
-          "named_entities": [
-            {
-              "name": "渣打集團",
-              "type": "company"
-            },
-            {
-              "name": "人民幣",
-              "type": "other"
-            },
-            {
-              "name": "恒指",
-              "type": "index"
-            },
-            {
-              "name": "港股",
-              "type": "organization"
-            }
-          ],
-          "articles": [
-            {
-              "source_article_id": "4366032",
-              "title": "報告丨近四分一企業擬增加人民幣融資",
-              "canonical_url": "https://www.hkej.com/instantnews/hongkong/article/4366032/%E5%A0%B1%E5%91%8A%E4%B8%A8%E8%BF%91%E5%9B%9B%E5%88%86%E4%B8%80%E4%BC%81%E6%A5%AD%E6%93%AC%E5%A2%9E%E5%8A%A0%E4%BA%BA%E6%B0%91%E5%B9%A3%E8%9E%8D%E8%B3%87",
-              "published_at": "2026-04-08T13:40:00+08:00",
-              "section": "香港財經",
-              "novelty_score": 5,
-              "relevance_score": 7,
-              "urgency_score": 4,
-              "named_entities": [
-                {
-                  "name": "渣打集團",
-                  "type": "company"
-                },
-                {
-                  "name": "人民幣",
-                  "type": "other"
-                }
-              ],
-              "key_points": [
-                "近四分之一企業擬增加人民幣融資，渣打報告顯示企業在融資和財資管理方面有待進一步增長",
-                "受訪企業中，23%的收入和25%的成本皆涉及人民幣敞口，但僅得14%的債務以人民幣計價",
-                "香港近期推出多項措施，增強離岸人民幣流動性及便利貿易融資"
-              ],
-              "content_truncated": false,
-              "original_content_length_chars": 551,
-              "analyzed_content_length_chars": 551,
-              "original_content_token_estimate": 138,
-              "analyzed_content_token_estimate": 138,
-              "truncation_reason": null,
-              "analysis_method": "full_text",
-              "attention_tier": "medium",
-              "theme": "macro",
-              "attention_reason": "Article discusses RMB financing plans",
-              "must_keep": true,
-              "model_used": "meta-llama/llama-4-scout-17b-16e-instruct",
-              "delayed_retry_attempted": false,
-              "delayed_retry_model_chain": [],
-              "delayed_retry_final_model": null,
-              "error_classification": null,
-              "error": null
             },
             {
               "source_article_id": "4365711",
@@ -3907,19 +3737,133 @@
             }
           ],
           "model_used": "meta-llama/llama-4-scout-17b-16e-instruct"
+        },
+        {
+          "title": "投資與融資",
+          "theme_rationale": "討論投資、融資和財資管理的相關話題。",
+          "article_count": 2,
+          "key_developments": [
+            "MPF股票基金過去1年平均淨回報16%，混合資產基金達12.7%",
+            "近四分之一企業擬增加人民幣融資",
+            "自強積金制度實施以來，股票基金和混合資產基金的平均年率化淨回報分別為4.8%和4.4%",
+            "香港近期推出多項措施，增強離岸人民幣流動性及便利貿易融資"
+          ],
+          "named_entities": [
+            {
+              "name": "MPF",
+              "type": "institution"
+            },
+            {
+              "name": "渣打集團",
+              "type": "company"
+            },
+            {
+              "name": "人民幣",
+              "type": "other"
+            },
+            {
+              "name": "香港財經",
+              "type": "organization"
+            }
+          ],
+          "articles": [
+            {
+              "source_article_id": "4366042",
+              "title": "MPF丨股票基金過去1年平均淨回報16%",
+              "canonical_url": "https://www.hkej.com/instantnews/hongkong/article/4366042/MPF%E4%B8%A8%E8%82%A1%E7%A5%A8%E5%9F%BA%E9%87%91%E9%81%8E%E5%8E%BB1%E5%B9%B4%E5%B9%B3%E5%9D%87%E6%B7%A8%E5%9B%9E%E5%A0%B116%25",
+              "published_at": "2026-04-08T14:25:00+08:00",
+              "section": "香港財經",
+              "novelty_score": 6,
+              "relevance_score": 8,
+              "urgency_score": 5,
+              "named_entities": [
+                {
+                  "name": "MPF",
+                  "type": "institution"
+                },
+                {
+                  "name": "香港財經",
+                  "type": "organization"
+                }
+              ],
+              "key_points": [
+                "MPF股票基金過去1年平均淨回報16%，混合資產基金達12.7%",
+                "自強積金制度實施以來，股票基金和混合資產基金的平均年率化淨回報分別為4.8%和4.4%",
+                "積金局提醒強積金計劃成員，應根據個人的人生階段、財務狀況、風險承受能力等因素，作出合適自己的投資規劃"
+              ],
+              "content_truncated": false,
+              "original_content_length_chars": 345,
+              "analyzed_content_length_chars": 345,
+              "original_content_token_estimate": 87,
+              "analyzed_content_token_estimate": 87,
+              "truncation_reason": null,
+              "analysis_method": "full_text",
+              "attention_tier": "medium",
+              "theme": "general",
+              "attention_reason": "Article discusses MPF stock fund performance",
+              "must_keep": true,
+              "model_used": "meta-llama/llama-4-scout-17b-16e-instruct",
+              "delayed_retry_attempted": false,
+              "delayed_retry_model_chain": [],
+              "delayed_retry_final_model": null,
+              "error_classification": null,
+              "error": null
+            },
+            {
+              "source_article_id": "4366032",
+              "title": "報告丨近四分一企業擬增加人民幣融資",
+              "canonical_url": "https://www.hkej.com/instantnews/hongkong/article/4366032/%E5%A0%B1%E5%91%8A%E4%B8%A8%E8%BF%91%E5%9B%9B%E5%88%86%E4%B8%80%E4%BC%81%E6%A5%AD%E6%93%AC%E5%A2%9E%E5%8A%A0%E4%BA%BA%E6%B0%91%E5%B9%A3%E8%9E%8D%E8%B3%87",
+              "published_at": "2026-04-08T13:40:00+08:00",
+              "section": "香港財經",
+              "novelty_score": 5,
+              "relevance_score": 7,
+              "urgency_score": 4,
+              "named_entities": [
+                {
+                  "name": "渣打集團",
+                  "type": "company"
+                },
+                {
+                  "name": "人民幣",
+                  "type": "other"
+                }
+              ],
+              "key_points": [
+                "近四分之一企業擬增加人民幣融資，渣打報告顯示企業在融資和財資管理方面有待進一步增長",
+                "受訪企業中，23%的收入和25%的成本皆涉及人民幣敞口，但僅得14%的債務以人民幣計價",
+                "香港近期推出多項措施，增強離岸人民幣流動性及便利貿易融資"
+              ],
+              "content_truncated": false,
+              "original_content_length_chars": 551,
+              "analyzed_content_length_chars": 551,
+              "original_content_token_estimate": 138,
+              "analyzed_content_token_estimate": 138,
+              "truncation_reason": null,
+              "analysis_method": "full_text",
+              "attention_tier": "medium",
+              "theme": "macro",
+              "attention_reason": "Article discusses RMB financing plans",
+              "must_keep": true,
+              "model_used": "meta-llama/llama-4-scout-17b-16e-instruct",
+              "delayed_retry_attempted": false,
+              "delayed_retry_model_chain": [],
+              "delayed_retry_final_model": null,
+              "error_classification": null,
+              "error": null
+            }
+          ],
+          "model_used": "meta-llama/llama-4-scout-17b-16e-instruct"
         }
       ],
       "analysis_profile": "standard",
       "model_used": "meta-llama/llama-4-scout-17b-16e-instruct",
-      "sub_batch_count": 4,
+      "sub_batch_count": 2,
       "diagnostics": {
-        "sub_batch_count": 4,
+        "sub_batch_count": 2,
         "split_reasons": [],
-        "models_attempted": [
-          "meta-llama/llama-4-scout-17b-16e-instruct"
-        ],
-        "estimated_input_tokens_max": 679,
-        "serialized_request_bytes_max": 4190,
+        "models_attempted": [],
+        "estimated_input_tokens_max": 0,
+        "serialized_request_bytes_max": 0,
         "rate_limit_waits": 0,
         "partial_article_count": 0,
         "synthesis_wait_seconds_total": 0.0,
@@ -3949,16 +3893,16 @@
           "type": "company"
         },
         {
-          "name": "恒指",
-          "type": "index"
-        },
-        {
           "name": "GLM-5.1",
           "type": "other"
         },
         {
           "name": "Claude Sonnet 4.6",
           "type": "other"
+        },
+        {
+          "name": "恒指",
+          "type": "index"
         }
       ],
       "articles": [
@@ -3976,7 +3920,10 @@
           "key_points": [],
           "content_truncated": false,
           "analysis_method": "bypassed",
-          "model_used": "direct"
+          "model_used": "direct",
+          "theme": "general",
+          "attention_reason": "Default medium attention because the story is relevant but not an obvious top-priority market mover.",
+          "must_keep": false
         },
         {
           "source_article_id": "4367085",
@@ -3992,7 +3939,10 @@
           "key_points": [],
           "content_truncated": false,
           "analysis_method": "bypassed",
-          "model_used": "direct"
+          "model_used": "direct",
+          "theme": "general",
+          "attention_reason": "Default medium attention because the story is relevant but not an obvious top-priority market mover.",
+          "must_keep": false
         },
         {
           "source_article_id": "4366073",
@@ -4112,16 +4062,16 @@
               "type": "company"
             },
             {
-              "name": "恒指",
-              "type": "index"
-            },
-            {
               "name": "GLM-5.1",
               "type": "other"
             },
             {
               "name": "Claude Sonnet 4.6",
               "type": "other"
+            },
+            {
+              "name": "恒指",
+              "type": "index"
             }
           ],
           "articles": [
@@ -4139,7 +4089,10 @@
               "key_points": [],
               "content_truncated": false,
               "analysis_method": "bypassed",
-              "model_used": "direct"
+              "model_used": "direct",
+              "theme": "general",
+              "attention_reason": "Default medium attention because the story is relevant but not an obvious top-priority market mover.",
+              "must_keep": false
             },
             {
               "source_article_id": "4367085",
@@ -4155,7 +4108,10 @@
               "key_points": [],
               "content_truncated": false,
               "analysis_method": "bypassed",
-              "model_used": "direct"
+              "model_used": "direct",
+              "theme": "general",
+              "attention_reason": "Default medium attention because the story is relevant but not an obvious top-priority market mover.",
+              "must_keep": false
             },
             {
               "source_article_id": "4366073",
@@ -4263,15 +4219,13 @@
       ],
       "analysis_profile": "standard",
       "model_used": "meta-llama/llama-4-scout-17b-16e-instruct",
-      "sub_batch_count": 3,
+      "sub_batch_count": 1,
       "diagnostics": {
-        "sub_batch_count": 3,
+        "sub_batch_count": 1,
         "split_reasons": [],
-        "models_attempted": [
-          "meta-llama/llama-4-scout-17b-16e-instruct"
-        ],
-        "estimated_input_tokens_max": 823,
-        "serialized_request_bytes_max": 4731,
+        "models_attempted": [],
+        "estimated_input_tokens_max": 0,
+        "serialized_request_bytes_max": 0,
         "rate_limit_waits": 0,
         "partial_article_count": 0,
         "synthesis_wait_seconds_total": 0.0,
@@ -4735,15 +4689,13 @@
       ],
       "analysis_profile": "standard",
       "model_used": "meta-llama/llama-4-scout-17b-16e-instruct",
-      "sub_batch_count": 4,
+      "sub_batch_count": 1,
       "diagnostics": {
-        "sub_batch_count": 4,
+        "sub_batch_count": 1,
         "split_reasons": [],
-        "models_attempted": [
-          "meta-llama/llama-4-scout-17b-16e-instruct"
-        ],
-        "estimated_input_tokens_max": 914,
-        "serialized_request_bytes_max": 5564,
+        "models_attempted": [],
+        "estimated_input_tokens_max": 0,
+        "serialized_request_bytes_max": 0,
         "rate_limit_waits": 0,
         "partial_article_count": 0,
         "synthesis_wait_seconds_total": 0.0,
@@ -4964,13 +4916,14 @@
       "article_count": 1,
       "status": "success",
       "key_developments": [
-        "中鋁料（02600）首季盈利增加58%，达到53.02万至55.85万元人民币",
-        "盈利增加的原因是由于完全降本增效，徊全產業鏈優勢得到完全發揭",
-        "中鋁料当季判判待26同期的喻歡判判债度35.35万元"
+        "中鋁料（02600）首季盈利增加58%，达到53.02万至55.85万元人民币。",
+        "盈利增加的原因是公司完全降本增效，产业链优势得到充分发挥。",
+        "中鋁料当季铝材产量与去年同期相比增加50%~58%。",
+        "去年同期铝材产量为35.35万元。"
       ],
       "named_entities": [
         {
-          "name": "中圈鎮業",
+          "name": "中鋁料",
           "type": "company"
         },
         {
@@ -5028,13 +4981,14 @@
           "theme_rationale": "Single subgroup because the category size did not require thematic splitting.",
           "article_count": 1,
           "key_developments": [
-            "中鋁料（02600）首季盈利增加58%，达到53.02万至55.85万元人民币",
-            "盈利增加的原因是由于完全降本增效，徊全產業鏈優勢得到完全發揭",
-            "中鋁料当季判判待26同期的喻歡判判债度35.35万元"
+            "中鋁料（02600）首季盈利增加58%，达到53.02万至55.85万元人民币。",
+            "盈利增加的原因是公司完全降本增效，产业链优势得到充分发挥。",
+            "中鋁料当季铝材产量与去年同期相比增加50%~58%。",
+            "去年同期铝材产量为35.35万元。"
           ],
           "named_entities": [
             {
-              "name": "中圈鎮業",
+              "name": "中鋁料",
               "type": "company"
             },
             {
@@ -5091,15 +5045,13 @@
       ],
       "analysis_profile": "standard",
       "model_used": "meta-llama/llama-4-scout-17b-16e-instruct",
-      "sub_batch_count": 2,
+      "sub_batch_count": 1,
       "diagnostics": {
         "sub_batch_count": 1,
         "split_reasons": [],
-        "models_attempted": [
-          "meta-llama/llama-4-scout-17b-16e-instruct"
-        ],
-        "estimated_input_tokens_max": 640,
-        "serialized_request_bytes_max": 3789,
+        "models_attempted": [],
+        "estimated_input_tokens_max": 0,
+        "serialized_request_bytes_max": 0,
         "rate_limit_waits": 0,
         "partial_article_count": 0,
         "synthesis_wait_seconds_total": 0.0,
@@ -5739,15 +5691,13 @@
       ],
       "analysis_profile": "light",
       "model_used": "meta-llama/llama-4-scout-17b-16e-instruct",
-      "sub_batch_count": 5,
+      "sub_batch_count": 3,
       "diagnostics": {
-        "sub_batch_count": 5,
+        "sub_batch_count": 3,
         "split_reasons": [],
-        "models_attempted": [
-          "meta-llama/llama-4-scout-17b-16e-instruct"
-        ],
-        "estimated_input_tokens_max": 675,
-        "serialized_request_bytes_max": 4081,
+        "models_attempted": [],
+        "estimated_input_tokens_max": 0,
+        "serialized_request_bytes_max": 0,
         "rate_limit_waits": 0,
         "partial_article_count": 0,
         "synthesis_wait_seconds_total": 0.0,
@@ -5762,12 +5712,5 @@
       "error": null
     }
   ],
-  "errors": [
-    {
-      "type": "article",
-      "target": "https://www.hkej.com/instantnews/current/article/4365700/%E4%BC%8A%E6%9C%97%E5%B1%80%E5%8B%A2%E4%B8%A8%E4%B8%AD%E4%BF%84%E5%90%A6%E6%B1%BA%E5%AE%89%E7%90%86%E6%9C%83%E6%B6%89%E9%9C%8D%E7%88%BE%E6%9C%A8%E8%8C%B2%E6%B5%B7%E5%B3%BD%E6%B1%BA%E8%AD%B0",
-      "message": "Model response omitted this article from the delayed retry batch.",
-      "classification": "incomplete_model_output"
-    }
-  ]
+  "errors": []
 }
