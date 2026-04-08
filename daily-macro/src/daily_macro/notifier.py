@@ -265,7 +265,7 @@ def _build_html_body(summary: dict[str, Any]) -> str:
     for category in summary.get("categories") or []:
         category_name = str(category.get("category") or "")
         category_articles = category.get("articles") or []
-        is_property = category_name in {"二手市場", "新盤情報"}
+        is_property = category_name in {"二手市場", "新盤情報", "地產新聞"}
         is_light_only = _is_light_only(category_articles) and not is_property
         
         items_html = ""
@@ -392,7 +392,7 @@ def _build_html_subgroups(category: dict[str, Any], category_name: str = "") -> 
         return f"<div style='margin-top:14px;'>{articles_html}</div>" if articles_html else ""
 
     blocks = []
-    is_property = category_name in {"二手市場", "新盤情報"}
+    is_property = category_name in {"二手市場", "新盤情報", "地產新聞"}
     
     for subgroup in subgroups:
         subgroup_articles = subgroup.get("articles") or []
@@ -484,9 +484,9 @@ def _build_html_articles(articles: list[dict[str, Any]]) -> str:
     if remaining:
         folded_items = "".join([_render_item(a) for a in remaining])
         articles_list += (
-            f"<li style='list-style:none;margin-top:4px;'>"
+            f"<li style='list-style:none;margin-top:8px;'>"
             f"<details style='margin-left:-18px;'>"
-            f"<summary style='color:#6b7280;font-size:12px;cursor:pointer;padding-left:18px;list-style:disclosure-closed;'>"
+            f"<summary style='color:#374151;font-size:12px;cursor:pointer;padding:4px 10px;background:#f3f4f6;border:1px solid #e5e7eb;border-radius:4px;display:inline-block;list-style:disclosure-closed;'>"
             f"Show {len(remaining)} more news..."
             f"</summary>"
             f"<ul style='margin:4px 0 0;padding-left:18px;list-style:inherit;'>{folded_items}</ul>"
@@ -784,7 +784,7 @@ def _build_html_property_table(developments: list[str]) -> str:
 
     return (
         f"<details style='margin-top:10px;border:1px solid #f3f4f6;border-radius:8px;padding:8px;'>"
-        f"<summary style='font-size:14px;font-weight:600;color:#374151;cursor:pointer;'>"
+        f"<summary style='font-size:14px;font-weight:600;color:#374151;cursor:pointer;padding:4px 10px;background:#f3f4f6;border:1px solid #e5e7eb;border-radius:6px;display:inline-block;'>"
         f"Property Market Transactions ({len(developments)} units)"
         f"</summary>"
         f"<div style='margin-top:8px;overflow-x:hidden;'>"
@@ -799,17 +799,29 @@ def _build_html_property_table(developments: list[str]) -> str:
 
 
 def _build_html_executive_summary(summary: dict[str, Any]) -> str:
+    import re
     alerts = summary.get("executive_summary") or []
     if not alerts:
         return ""
     
-    items = "".join(
-        f"<div style='margin-bottom:12px;padding:12px;border-left:4px solid #ef4444;background:#fff5f5;border-radius:0 8px 8px 0;'>"
-        f"<div style='font-weight:700;color:#991b1b;font-size:14px;margin-bottom:4px;'>TOP ALERT</div>"
-        f"<div style='color:#111827;line-height:1.5;'>{_escape_html(alert)}</div>"
-        f"</div>"
-        for alert in alerts
-    )
+    items = []
+    for alert in alerts:
+        # Extract URL in braces if present
+        url_match = re.search(r'\{(https?://[^\}]+)\}', alert)
+        url = url_match.group(1) if url_match else None
+        clean_alert = re.sub(r'\s*\{https?://[^\}]+\}', '', alert).strip()
+        
+        if url:
+            alert_html = f"<a href=\"{_escape_html(url)}\" style=\"color:#111827;text-decoration:none;\">{_escape_html(clean_alert)}</a>"
+        else:
+            alert_html = _escape_html(clean_alert)
+            
+        items.append(
+            f"<div style='margin-bottom:12px;padding:12px;border-left:4px solid #ef4444;background:#fff5f5;border-radius:0 8px 8px 0;'>"
+            f"<div style='font-weight:700;color:#991b1b;font-size:14px;margin-bottom:4px;'>TOP ALERT</div>"
+            f"<div style='line-height:1.5;'>{alert_html}</div>"
+            f"</div>"
+        )
     
     return (
         "<div style='margin-bottom:24px;'>"
@@ -817,7 +829,7 @@ def _build_html_executive_summary(summary: dict[str, Any]) -> str:
         "<span style='background:#ef4444;color:white;padding:2px 8px;border-radius:4px;font-size:12px;margin-right:8px;'>CIO BRIEFING</span>"
         "Executive Summary"
         "</div>"
-        + items
+        + "".join(items)
         + "</div>"
     )
 

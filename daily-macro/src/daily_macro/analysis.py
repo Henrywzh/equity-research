@@ -735,14 +735,19 @@ def _graph_summarize_top_alerts(state: AnalysisGraphState) -> AnalysisGraphState
         for subgroup in category.get("subgroups") or []:
             subgroup_title = subgroup.get("title") or "Overview"
             
-            # Extract relevant articles' titles and times for this subgroup
+            # Extract relevant articles' titles, times, and URLs for this subgroup
             subgroup_articles = subgroup.get("articles") or []
             article_refs: list[str] = []
             for art in subgroup_articles:
                 title = str(art.get("title") or "Untitled")
                 pub_at = str(art.get("published_at") or "")
-                time_str = pub_at[11:16] if len(pub_at) >= 16 else pub_at
-                if time_str:
+                # Use full YYYY-MM-DD HH:MM if available
+                time_str = pub_at[:16].replace("T", " ") if len(pub_at) >= 16 else pub_at
+                url = str(art.get("canonical_url") or "").strip()
+                
+                if time_str and url:
+                    article_refs.append(f"({title} | {time_str}) {{{url}}}")
+                elif time_str:
                     article_refs.append(f"({title} | {time_str})")
                 else:
                     article_refs.append(f"({title})")
@@ -3941,7 +3946,7 @@ def _generate_top_alerts(
         "2. Ensure each alert includes specific data (prices, % changes, specific figures) referenced in the news.\n"
         "3. Do not invent causal links; only cite the facts and their significance.\n"
         "4. Your output must be a valid JSON object with a single key 'top_alerts' containing a list of strings. "
-        "Each string must end with the exact source article title and time in parentheses, e.g., (阿提密斯2號繞月任務 | 15:33)."
+        "Each string must end with the exact source article title, full date/time, and URL in the following format: (Article Title | YYYY-MM-DD HH:MM) {URL}."
     )
 
     user_payload = {
