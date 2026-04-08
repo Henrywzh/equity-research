@@ -944,7 +944,14 @@ def _order_articles_like_input(
 def _load_existing_report(report_path: Path) -> dict[str, Any] | None:
     if not report_path.exists():
         return None
-    payload = json.loads(report_path.read_text(encoding="utf-8"))
+    try:
+        payload = json.loads(report_path.read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError) as exc:
+        LOGGER.warning("Ignoring unreadable analysis report at %s: %s", report_path, exc)
+        return None
+    if not isinstance(payload, dict):
+        LOGGER.warning("Ignoring unexpected analysis report payload at %s: expected JSON object.", report_path)
+        return None
     if payload.get("report_schema_version") != REPORT_SCHEMA_VERSION:
         return None
     return payload

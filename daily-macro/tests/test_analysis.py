@@ -418,6 +418,48 @@ class AnalysisTests(unittest.TestCase):
         self.assertIn(reused["attention_tier"], {"medium", "light", "high"})
         self.assertIn("theme", reused)
 
+    def test_run_analysis_ignores_malformed_previous_day_report(self) -> None:
+        self._insert_article(
+            title="Today pulse",
+            source_article_id="3001",
+            section="時事脈搏",
+            published_at="2026-04-04T08:00:00+08:00",
+            content_text="c" * 800,
+        )
+        broken_report_path = self.data_dir / "analyses" / "2026-04-03" / "hkej-news-analysis.json"
+        broken_report_path.parent.mkdir(parents=True, exist_ok=True)
+        broken_report_path.write_text('{\n  "report_schema_version": 6,\n  invalid\n}\n', encoding="utf-8")
+
+        with patch("daily_macro.analysis._build_analysis_graph") as mock_build_graph:
+            mock_build_graph.return_value.invoke.return_value = {
+                "report": {
+                    "report_schema_version": REPORT_SCHEMA_VERSION,
+                    "report_date": "2026-04-04",
+                    "generated_at": "2026-04-04T00:30:00+00:00",
+                    "source_site": "hkej",
+                    "status": "success",
+                    "model": {"provider": "groq", "primary_model": "qwen/qwen3-32b", "fallback_models": []},
+                    "model_switches": [],
+                    "input": {"article_count": 1, "category_count": 1},
+                    "diagnostics": {"batch_count": 0},
+                    "incremental": {"reused_successful_articles": 0, "new_articles_analyzed": 1},
+                    "totals": {"article_count": 1},
+                    "categories": [],
+                    "errors": [],
+                }
+            }
+            report = run_analysis(date_string="2026-04-04", data_dir=self.data_dir, db_path=self.db_path, force=True)
+
+        self.assertEqual(report["status"], "success")
+        self.assertEqual(
+            Path(report["output_path"]).resolve(),
+            (self.data_dir / "analyses" / "2026-04-04" / "hkej-news-analysis.json").resolve(),
+        )
+        state = mock_build_graph.return_value.invoke.call_args.args[0]
+        self.assertIsNone(state["previous_report"])
+        self.assertEqual(len(state["articles"]), 1)
+        self.assertEqual(state["previous_articles"], [])
+
     def test_run_analysis_retries_previous_day_failed_articles_when_today_is_empty(self) -> None:
         self._insert_article(
             title="Yesterday global",
