@@ -25,14 +25,6 @@ jobs:
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Restore state cache
-        uses: actions/cache@v4
-        with:
-          path: truthsocial-monitor/state
-          key: truthsocial-state-v1-${{ github.run_id }}
-          restore-keys: |
-            truthsocial-state-v1-
-
       - name: Install package
         run: |
           /opt/homebrew/bin/python3 -m pip install --upgrade pip -q
@@ -67,18 +59,18 @@ jobs:
                       sender=sender,
                       app_password=app_password,
                       recipient=recipient,
-                      cooldown_secs=0,   # runs are already 1 hour apart
+                      cooldown_secs=0,
                   )
                   print(f"alert_sent={sent}")
               else:
                   print("Gmail credentials not set — skipping alert.")
           EOF
 
-      - name: Commit updated database
+      - name: Commit state and database
         working-directory: .
         run: |
           git config user.name "truthsocial-monitor[bot]"
           git config user.email "truthsocial-monitor[bot]@users.noreply.github.com"
-          git add truthsocial-monitor/data/trump_posts.db
+          git add truthsocial-monitor/state truthsocial-monitor/data/trump_posts.db
           git diff --staged --quiet || git commit -m "data: update trump_posts.db $(date -u +%Y-%m-%dT%H:%M:%SZ) [skip ci]"
           git push
