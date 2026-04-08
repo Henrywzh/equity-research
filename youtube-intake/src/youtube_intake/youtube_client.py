@@ -68,7 +68,12 @@ class YoutubeClient:
         self.request_timeout = request_timeout
         self.transcript_languages = tuple(transcript_languages)
         self.transcript_api = YouTubeTranscriptApi()
-        self.groq_api_key = (groq_api_key or read_env(GROQ_API_KEY_ENV)).strip()
+        
+        # Handle multiple comma-separated API keys for rotation
+        key_source = groq_api_key or read_env(GROQ_API_KEY_ENV)
+        self.groq_api_keys = [k.strip() for k in key_source.split(",") if k.strip()]
+        self._key_index = 0
+        
         self.yt_cookies = (yt_cookies or read_env(YT_COOKIES_ENV)).strip()
         self.stt_timeout = stt_timeout
         self.sleep_fn = sleep_fn or time.sleep
@@ -77,6 +82,18 @@ class YoutubeClient:
         self.http_get = http_get or requests.get
         self.discovery_source = "youtube_rss"
         self.yt_cookies_available = bool(self.yt_cookies)
+
+    @property
+    def groq_api_key(self) -> str:
+        """Returns the currently active API key (rotatable)."""
+        if not self.groq_api_keys:
+            return ""
+        return self.groq_api_keys[self._key_index % len(self.groq_api_keys)]
+
+    def _rotate_key(self) -> None:
+        """Rotates to the next API key."""
+        if self.groq_api_keys:
+            self._key_index = (self._key_index + 1) % len(self.groq_api_keys)
 
     def list_recent_candidates(
         self,
@@ -261,8 +278,16 @@ class YoutubeClient:
                 downloaded_info = ydl.extract_info(video.webpage_url, download=True)
                 if not isinstance(downloaded_info, dict):
                     raise RuntimeError(f"Unable to download audio for {video.webpage_url}")
+                
                 prepared = Path(ydl.prepare_filename(downloaded_info))
                 if prepared.exists():
+                    # Check file size limit (Groq hard limit is 25MB)
+                    size = prepared.stat().st_size
+                    if size > MAX_STT_AUDIO_BYTES:
+                        raise RuntimeError(
+                            f"Downloaded audio {size/1024/1024:.1f}MB exceeds Groq 25MB limit "
+                            f"for {video.video_id}"
+                        )
                     return prepared
 
         candidates = sorted(
@@ -323,6 +348,8 @@ class YoutubeClient:
                 raise RuntimeError(str(exc)) from exc
 
             if response.status_code in TRANSIENT_STATUS_CODES:
+                if response.status_code == 429 and len(self.groq_api_keys) > 1:
+                    self._rotate_key()
                 last_error = RuntimeError(f"{model_id} returned HTTP {response.status_code}")
                 if attempt_index == MAX_RETRIES - 1:
                     break
@@ -403,10 +430,23 @@ class YoutubeClient:
         return info
 
     def _temporary_cookie_file(self, temp_dir: Path):
+        """Creates a Netscape-formatted cookie file with robust repair logic."""
         if not self.yt_cookies:
             return nullcontext(None)
+        
+        # Robust repair for Netscape format
+        raw = self.yt_cookies.strip().strip("'\"")
+        lines = [line.strip() for line in raw.splitlines() if line.strip()]
+        
+        # Ensure header is present
+        header = "# Netscape HTTP Cookie File"
+        if not lines or header not in lines[0]:
+            lines.insert(0, header)
+            lines.insert(1, "# This file was automatically repaired by youtube-intake")
+        
+        # Write with standard Unix line endings
         cookie_path = temp_dir / "youtube-cookies.txt"
-        cookie_path.write_text(self.yt_cookies + ("\n" if not self.yt_cookies.endswith("\n") else ""), encoding="utf-8")
+        cookie_path.write_text("\n".join(lines) + "\n", encoding="utf-8")
         return nullcontext(cookie_path)
 
 

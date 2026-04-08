@@ -11,6 +11,19 @@ PROJECT_ROOT = Path(__file__).resolve().parents[2]
 def load_local_config() -> None:
     for path in (REPO_ROOT / ".config", PROJECT_ROOT / ".config"):
         merge_config_file(path)
+    
+    # Auto-discovery of standalone .txt cookie files in config/
+    if not os.getenv("YOUTUBE_INTAKE_YT_COOKIES"):
+        config_dir = PROJECT_ROOT / "config"
+        if config_dir.is_dir():
+            for txt_file in config_dir.glob("*.txt"):
+                try:
+                    text = txt_file.read_text(encoding="utf-8")
+                    if text.strip().startswith("# Netscape"):
+                        os.environ["YOUTUBE_INTAKE_YT_COOKIES"] = text
+                        break
+                except Exception:
+                    pass
 
 
 def read_env(primary: str, legacy: str | None = None) -> str:
