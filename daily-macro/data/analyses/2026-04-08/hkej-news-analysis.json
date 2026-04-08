@@ -1,7 +1,7 @@
 {
   "report_schema_version": 6,
   "report_date": "2026-04-08",
-  "generated_at": "2026-04-08T16:41:06.529644+01:00",
+  "generated_at": "2026-04-08T21:20:38.967612+00:00",
   "source_site": "hkej",
   "status": "partial",
   "executive_summary": [
@@ -17,44 +17,97 @@
       "llama-3.1-8b-instant"
     ]
   },
-  "model_switches": [
-    {
-      "switched_at": "2026-04-08T16:36:53.918072+01:00",
-      "from_model": "meta-llama/llama-4-scout-17b-16e-instruct",
-      "to_model": "qwen/qwen3-32b",
-      "reason": "Model meta-llama/llama-4-scout-17b-16e-instruct returned 429 rate_limit_exceeded."
-    }
-  ],
+  "model_switches": [],
   "input": {
-    "article_count": 40,
-    "category_count": 7
+    "article_count": 59,
+    "category_count": 8
   },
   "diagnostics": {
-    "rate_limit_wait_count": 2,
-    "rate_limit_wait_seconds_total": 112.451,
-    "fallback_switch_count": 1,
-    "pre_send_split_count": 8,
+    "rate_limit_wait_count": 0,
+    "rate_limit_wait_seconds_total": 0.0,
+    "fallback_switch_count": 0,
+    "pre_send_split_count": 20,
     "response_413_split_count": 0,
     "json_repair_retry_count": 0,
-    "batch_count": 56,
-    "failed_batch_count": 0,
-    "delayed_retry_candidate_count": 1,
-    "delayed_retry_attempted_count": 1,
+    "batch_count": 97,
+    "failed_batch_count": 15,
+    "delayed_retry_candidate_count": 15,
+    "delayed_retry_attempted_count": 15,
     "delayed_retry_recovered_count": 0,
-    "delayed_retry_failed_count": 1,
-    "high_medium_unresolved_count": 1,
+    "delayed_retry_failed_count": 15,
+    "high_medium_unresolved_count": 15,
     "light_unresolved_count": 0,
-    "delayed_retry_skipped_final_model_count": 1,
+    "delayed_retry_skipped_final_model_count": 15,
     "synthesis_budget_exhausted_count": 0,
     "degraded_merge_count": 0
   },
   "incremental": {
-    "reused_successful_articles": 0,
-    "new_articles_analyzed": 40,
+    "reused_successful_articles": 39,
+    "new_articles_analyzed": 20,
     "retried_previous_day_articles": 0,
     "previous_day_retry_successes": 0
   },
   "unresolved_articles": [
+    {
+      "category": "國際財經",
+      "title": "美股走勢丨道指早段飆1300點 油價跌17%",
+      "canonical_url": "https://www.hkej.com/instantnews/international/article/4367126/%E7%BE%8E%E8%82%A1%E8%B5%B0%E5%8B%A2%E4%B8%A8%E9%81%93%E6%8C%87%E6%97%A9%E6%AE%B5%E9%A3%861300%E9%BB%9E+%E6%B2%B9%E5%83%B9%E8%B7%8C17%25",
+      "source_article_id": "4367126",
+      "attention_tier": "high",
+      "theme": "macro",
+      "must_keep": true,
+      "error_classification": "http_error",
+      "error": "401 Client Error: Unauthorized for url: https://api.groq.com/openai/v1/chat/completions",
+      "model_used": "llama-3.1-8b-instant",
+      "delayed_retry_attempted": true,
+      "delayed_retry_model_chain": [
+        "qwen/qwen3-32b",
+        "llama-3.1-8b-instant",
+        "openai/gpt-oss-20b (skipped missing OPENAI_API_KEY)"
+      ],
+      "delayed_retry_final_model": "openai/gpt-oss-20b",
+      "published_at": "2026-04-08T21:39:00+08:00"
+    },
+    {
+      "category": "國際財經",
+      "title": "IMF指戰爭對國家經濟創傷持續逾10年",
+      "canonical_url": "https://www.hkej.com/instantnews/international/article/4367133/IMF%E6%8C%87%E6%88%B0%E7%88%AD%E5%B0%8D%E5%9C%8B%E5%AE%B6%E7%B6%93%E6%BF%9F%E5%89%B5%E5%82%B7%E6%8C%81%E7%BA%8C%E9%80%BE10%E5%B9%B4",
+      "source_article_id": "4367133",
+      "attention_tier": "high",
+      "theme": "macro",
+      "must_keep": true,
+      "error_classification": "http_error",
+      "error": "401 Client Error: Unauthorized for url: https://api.groq.com/openai/v1/chat/completions",
+      "model_used": "llama-3.1-8b-instant",
+      "delayed_retry_attempted": true,
+      "delayed_retry_model_chain": [
+        "qwen/qwen3-32b",
+        "llama-3.1-8b-instant",
+        "openai/gpt-oss-20b (skipped missing OPENAI_API_KEY)"
+      ],
+      "delayed_retry_final_model": "openai/gpt-oss-20b",
+      "published_at": "2026-04-08T22:09:00+08:00"
+    },
+    {
+      "category": "國際財經",
+      "title": "美股走勢丨美伊暫停火 道指飆逾1000點",
+      "canonical_url": "https://www.hkej.com/instantnews/international/article/4367219/%E7%BE%8E%E8%82%A1%E8%B5%B0%E5%8B%A2%E4%B8%A8%E7%BE%8E%E4%BC%8A%E6%9A%AB%E5%81%9C%E7%81%AB+%E9%81%93%E6%8C%87%E9%A3%86%E9%80%BE1000%E9%BB%9E",
+      "source_article_id": "4367219",
+      "attention_tier": "high",
+      "theme": "geopolitics",
+      "must_keep": true,
+      "error_classification": "http_error",
+      "error": "401 Client Error: Unauthorized for url: https://api.groq.com/openai/v1/chat/completions",
+      "model_used": "llama-3.1-8b-instant",
+      "delayed_retry_attempted": true,
+      "delayed_retry_model_chain": [
+        "qwen/qwen3-32b",
+        "llama-3.1-8b-instant",
+        "openai/gpt-oss-20b (skipped missing OPENAI_API_KEY)"
+      ],
+      "delayed_retry_final_model": "openai/gpt-oss-20b",
+      "published_at": "2026-04-08T23:19:00+08:00"
+    },
     {
       "category": "時事脈搏",
       "title": "伊朗局勢丨中俄否決安理會涉霍爾木茲海峽決議",
@@ -63,27 +116,248 @@
       "attention_tier": "high",
       "theme": "geopolitics",
       "must_keep": true,
-      "error_classification": "incomplete_model_output",
-      "error": "Model response omitted this article from the delayed retry batch.",
+      "error_classification": "http_error",
+      "error": "401 Client Error: Unauthorized for url: https://api.groq.com/openai/v1/chat/completions",
       "model_used": "llama-3.1-8b-instant",
       "delayed_retry_attempted": true,
       "delayed_retry_model_chain": [
+        "qwen/qwen3-32b",
         "llama-3.1-8b-instant",
         "openai/gpt-oss-20b (skipped missing OPENAI_API_KEY)"
       ],
       "delayed_retry_final_model": "openai/gpt-oss-20b",
       "published_at": "2026-04-08T00:16:00+08:00"
+    },
+    {
+      "category": "時事脈搏",
+      "title": "中東局勢丨特朗普:美伊或會聯合管理霍爾木茲海峽通行費",
+      "canonical_url": "https://www.hkej.com/instantnews/current/article/4367028/%E4%B8%AD%E6%9D%B1%E5%B1%80%E5%8B%A2%E4%B8%A8%E7%89%B9%E6%9C%97%E6%99%AE%3A%E7%BE%8E%E4%BC%8A%E6%88%96%E6%9C%83%E8%81%AF%E5%90%88%E7%AE%A1%E7%90%86%E9%9C%8D%E7%88%BE%E6%9C%A8%E8%8C%B2%E6%B5%B7%E5%B3%BD%E9%80%9A%E8%A1%8C%E8%B2%BB",
+      "source_article_id": "4367028",
+      "attention_tier": "high",
+      "theme": "geopolitics",
+      "must_keep": true,
+      "error_classification": "http_error",
+      "error": "401 Client Error: Unauthorized for url: https://api.groq.com/openai/v1/chat/completions",
+      "model_used": "llama-3.1-8b-instant",
+      "delayed_retry_attempted": true,
+      "delayed_retry_model_chain": [
+        "qwen/qwen3-32b",
+        "llama-3.1-8b-instant",
+        "openai/gpt-oss-20b (skipped missing OPENAI_API_KEY)"
+      ],
+      "delayed_retry_final_model": "openai/gpt-oss-20b",
+      "published_at": "2026-04-08T20:02:00+08:00"
+    },
+    {
+      "category": "時事脈搏",
+      "title": "中東局勢丨特朗普威脅對伊朗提供武器國家徵50%關稅",
+      "canonical_url": "https://www.hkej.com/instantnews/current/article/4367107/%E4%B8%AD%E6%9D%B1%E5%B1%80%E5%8B%A2%E4%B8%A8%E7%89%B9%E6%9C%97%E6%99%AE%E5%A8%81%E8%84%85%E5%B0%8D%E4%BC%8A%E6%9C%97%E6%8F%90%E4%BE%9B%E6%AD%A6%E5%99%A8%E5%9C%8B%E5%AE%B6%E5%BE%B550%25%E9%97%9C%E7%A8%85",
+      "source_article_id": "4367107",
+      "attention_tier": "high",
+      "theme": "geopolitics",
+      "must_keep": true,
+      "error_classification": "http_error",
+      "error": "401 Client Error: Unauthorized for url: https://api.groq.com/openai/v1/chat/completions",
+      "model_used": "llama-3.1-8b-instant",
+      "delayed_retry_attempted": true,
+      "delayed_retry_model_chain": [
+        "qwen/qwen3-32b",
+        "llama-3.1-8b-instant",
+        "openai/gpt-oss-20b (skipped missing OPENAI_API_KEY)"
+      ],
+      "delayed_retry_final_model": "openai/gpt-oss-20b",
+      "published_at": "2026-04-08T21:10:00+08:00"
+    },
+    {
+      "category": "時事脈搏",
+      "title": "伊朗局勢丨聯合國秘書長特使抵伊朗推動持久結束戰爭方案",
+      "canonical_url": "https://www.hkej.com/instantnews/current/article/4367169/%E4%BC%8A%E6%9C%97%E5%B1%80%E5%8B%A2%E4%B8%A8%E8%81%AF%E5%90%88%E5%9C%8B%E7%A7%98%E6%9B%B8%E9%95%B7%E7%89%B9%E4%BD%BF%E6%8A%B5%E4%BC%8A%E6%9C%97%E6%8E%A8%E5%8B%95%E6%8C%81%E4%B9%85%E7%B5%90%E6%9D%9F%E6%88%B0%E7%88%AD%E6%96%B9%E6%A1%88",
+      "source_article_id": "4367169",
+      "attention_tier": "high",
+      "theme": "geopolitics",
+      "must_keep": true,
+      "error_classification": "http_error",
+      "error": "401 Client Error: Unauthorized for url: https://api.groq.com/openai/v1/chat/completions",
+      "model_used": "llama-3.1-8b-instant",
+      "delayed_retry_attempted": true,
+      "delayed_retry_model_chain": [
+        "qwen/qwen3-32b",
+        "llama-3.1-8b-instant",
+        "openai/gpt-oss-20b (skipped missing OPENAI_API_KEY)"
+      ],
+      "delayed_retry_final_model": "openai/gpt-oss-20b",
+      "published_at": "2026-04-08T22:49:00+08:00"
+    },
+    {
+      "category": "重要通告",
+      "title": "中鋁料首季盈利增58%",
+      "canonical_url": "https://www.hkej.com/instantnews/announcement/article/4367106/%E4%B8%AD%E9%8B%81%E6%96%99%E9%A6%96%E5%AD%A3%E7%9B%88%E5%88%A9%E5%A2%9E58%25",
+      "source_article_id": "4367106",
+      "attention_tier": "high",
+      "theme": "stocks",
+      "must_keep": true,
+      "error_classification": "http_error",
+      "error": "401 Client Error: Unauthorized for url: https://api.groq.com/openai/v1/chat/completions",
+      "model_used": "llama-3.1-8b-instant",
+      "delayed_retry_attempted": true,
+      "delayed_retry_model_chain": [
+        "qwen/qwen3-32b",
+        "llama-3.1-8b-instant",
+        "openai/gpt-oss-20b (skipped missing OPENAI_API_KEY)"
+      ],
+      "delayed_retry_final_model": "openai/gpt-oss-20b",
+      "published_at": "2026-04-08T21:12:00+08:00"
+    },
+    {
+      "category": "香港財經",
+      "title": "富途:3月期權首次購買人數按月增15.3%",
+      "canonical_url": "https://www.hkej.com/instantnews/hongkong/article/4366787/%E5%AF%8C%E9%80%94%3A3%E6%9C%88%E6%9C%9F%E6%AC%8A%E9%A6%96%E6%AC%A1%E8%B3%BC%E8%B2%B7%E4%BA%BA%E6%95%B8%E6%8C%89%E6%9C%88%E5%A2%9E15.3%25",
+      "source_article_id": "4366787",
+      "attention_tier": "high",
+      "theme": "geopolitics",
+      "must_keep": true,
+      "error_classification": "http_error",
+      "error": "401 Client Error: Unauthorized for url: https://api.groq.com/openai/v1/chat/completions",
+      "model_used": "llama-3.1-8b-instant",
+      "delayed_retry_attempted": true,
+      "delayed_retry_model_chain": [
+        "qwen/qwen3-32b",
+        "llama-3.1-8b-instant",
+        "openai/gpt-oss-20b (skipped missing OPENAI_API_KEY)"
+      ],
+      "delayed_retry_final_model": "openai/gpt-oss-20b",
+      "published_at": "2026-04-08T20:11:00+08:00"
+    },
+    {
+      "category": "中國財經",
+      "title": "三星電子中國業務傳將重組 重心轉向半導體",
+      "canonical_url": "https://www.hkej.com/instantnews/china/article/4366757/%E4%B8%89%E6%98%9F%E9%9B%BB%E5%AD%90%E4%B8%AD%E5%9C%8B%E6%A5%AD%E5%8B%99%E5%82%B3%E5%B0%87%E9%87%8D%E7%B5%84+%E9%87%8D%E5%BF%83%E8%BD%89%E5%90%91%E5%8D%8A%E5%B0%8E%E9%AB%94",
+      "source_article_id": "4366757",
+      "attention_tier": "medium",
+      "theme": "general",
+      "must_keep": false,
+      "error_classification": "http_error",
+      "error": "401 Client Error: Unauthorized for url: https://api.groq.com/openai/v1/chat/completions",
+      "model_used": "llama-3.1-8b-instant",
+      "delayed_retry_attempted": true,
+      "delayed_retry_model_chain": [
+        "qwen/qwen3-32b",
+        "llama-3.1-8b-instant",
+        "openai/gpt-oss-20b (skipped missing OPENAI_API_KEY)"
+      ],
+      "delayed_retry_final_model": "openai/gpt-oss-20b",
+      "published_at": "2026-04-08T18:41:00+08:00"
+    },
+    {
+      "category": "中國財經",
+      "title": "神秘AI模型登榜首 富瑞指由阿里巴巴開發",
+      "canonical_url": "https://www.hkej.com/instantnews/china/article/4367069/%E7%A5%9E%E7%A7%98AI%E6%A8%A1%E5%9E%8B%E7%99%BB%E6%A6%9C%E9%A6%96+%E5%AF%8C%E7%91%9E%E6%8C%87%E7%94%B1%E9%98%BF%E9%87%8C%E5%B7%B4%E5%B7%B4%E9%96%8B%E7%99%BC",
+      "source_article_id": "4367069",
+      "attention_tier": "medium",
+      "theme": "general",
+      "must_keep": false,
+      "error_classification": "http_error",
+      "error": "401 Client Error: Unauthorized for url: https://api.groq.com/openai/v1/chat/completions",
+      "model_used": "llama-3.1-8b-instant",
+      "delayed_retry_attempted": true,
+      "delayed_retry_model_chain": [
+        "qwen/qwen3-32b",
+        "llama-3.1-8b-instant",
+        "openai/gpt-oss-20b (skipped missing OPENAI_API_KEY)"
+      ],
+      "delayed_retry_final_model": "openai/gpt-oss-20b",
+      "published_at": "2026-04-08T20:37:00+08:00"
+    },
+    {
+      "category": "國際財經",
+      "title": "美國上周原油庫存增308萬桶 高預期",
+      "canonical_url": "https://www.hkej.com/instantnews/international/article/4367221/%E7%BE%8E%E5%9C%8B%E4%B8%8A%E5%91%A8%E5%8E%9F%E6%B2%B9%E5%BA%AB%E5%AD%98%E5%A2%9E308%E8%90%AC%E6%A1%B6+%E9%AB%98%E9%A0%90%E6%9C%9F",
+      "source_article_id": "4367221",
+      "attention_tier": "medium",
+      "theme": "general",
+      "must_keep": false,
+      "error_classification": "http_error",
+      "error": "401 Client Error: Unauthorized for url: https://api.groq.com/openai/v1/chat/completions",
+      "model_used": "llama-3.1-8b-instant",
+      "delayed_retry_attempted": true,
+      "delayed_retry_model_chain": [
+        "qwen/qwen3-32b",
+        "llama-3.1-8b-instant",
+        "openai/gpt-oss-20b (skipped missing OPENAI_API_KEY)"
+      ],
+      "delayed_retry_final_model": "openai/gpt-oss-20b",
+      "published_at": "2026-04-08T23:26:00+08:00"
+    },
+    {
+      "category": "地產新聞",
+      "title": "新盤丨Blue Coast四房4407萬沽雙破頂",
+      "canonical_url": "https://www.hkej.com/instantnews/property/article/4366721/%E6%96%B0%E7%9B%A4%E4%B8%A8Blue+Coast%E5%9B%9B%E6%88%BF4407%E8%90%AC%E6%B2%BD%E9%9B%99%E7%A0%B4%E9%A0%82",
+      "source_article_id": "4366721",
+      "attention_tier": "medium",
+      "theme": "general",
+      "must_keep": false,
+      "error_classification": "http_error",
+      "error": "401 Client Error: Unauthorized for url: https://api.groq.com/openai/v1/chat/completions",
+      "model_used": "llama-3.1-8b-instant",
+      "delayed_retry_attempted": true,
+      "delayed_retry_model_chain": [
+        "qwen/qwen3-32b",
+        "llama-3.1-8b-instant",
+        "openai/gpt-oss-20b (skipped missing OPENAI_API_KEY)"
+      ],
+      "delayed_retry_final_model": "openai/gpt-oss-20b",
+      "published_at": "2026-04-08T19:04:00+08:00"
+    },
+    {
+      "category": "港股直擊",
+      "title": "恒指夜期丨報26063 升115點",
+      "canonical_url": "https://www.hkej.com/instantnews/stock/article/4367085/%E6%81%92%E6%8C%87%E5%A4%9C%E6%9C%9F%E4%B8%A8%E5%A0%B126063+%E5%8D%87115%E9%BB%9E",
+      "source_article_id": "4367085",
+      "attention_tier": "medium",
+      "theme": "general",
+      "must_keep": false,
+      "error_classification": "http_error",
+      "error": "401 Client Error: Unauthorized for url: https://api.groq.com/openai/v1/chat/completions",
+      "model_used": "llama-3.1-8b-instant",
+      "delayed_retry_attempted": true,
+      "delayed_retry_model_chain": [
+        "qwen/qwen3-32b",
+        "llama-3.1-8b-instant",
+        "openai/gpt-oss-20b (skipped missing OPENAI_API_KEY)"
+      ],
+      "delayed_retry_final_model": "openai/gpt-oss-20b",
+      "published_at": "2026-04-08T20:37:00+08:00"
+    },
+    {
+      "category": "港股直擊",
+      "title": "恒指夜期丨報25920 跌28點",
+      "canonical_url": "https://www.hkej.com/instantnews/stock/article/4367197/%E6%81%92%E6%8C%87%E5%A4%9C%E6%9C%9F%E4%B8%A8%E5%A0%B125920+%E8%B7%8C28%E9%BB%9E",
+      "source_article_id": "4367197",
+      "attention_tier": "medium",
+      "theme": "general",
+      "must_keep": false,
+      "error_classification": "http_error",
+      "error": "401 Client Error: Unauthorized for url: https://api.groq.com/openai/v1/chat/completions",
+      "model_used": "llama-3.1-8b-instant",
+      "delayed_retry_attempted": true,
+      "delayed_retry_model_chain": [
+        "qwen/qwen3-32b",
+        "llama-3.1-8b-instant",
+        "openai/gpt-oss-20b (skipped missing OPENAI_API_KEY)"
+      ],
+      "delayed_retry_final_model": "openai/gpt-oss-20b",
+      "published_at": "2026-04-08T22:45:00+08:00"
     }
   ],
   "totals": {
-    "article_count": 40,
-    "successful_article_analyses": 39,
-    "failed_article_analyses": 1,
-    "full_text_article_count": 40,
+    "article_count": 59,
+    "successful_article_analyses": 44,
+    "failed_article_analyses": 15,
+    "full_text_article_count": 59,
     "truncated_article_count": 0,
-    "successful_categories": 6,
-    "partial_categories": 1,
-    "failed_categories": 0
+    "successful_categories": 0,
+    "partial_categories": 7,
+    "failed_categories": 1
   },
   "market_context": [
     {
@@ -194,8 +468,8 @@
   "categories": [
     {
       "category": "國際財經",
-      "article_count": 10,
-      "status": "success",
+      "article_count": 14,
+      "status": "partial",
       "key_developments": [],
       "named_entities": [
         {
@@ -220,6 +494,138 @@
         }
       ],
       "articles": [
+        {
+          "source_article_id": "4367221",
+          "title": "美國上周原油庫存增308萬桶 高預期",
+          "canonical_url": "https://www.hkej.com/instantnews/international/article/4367221/%E7%BE%8E%E5%9C%8B%E4%B8%8A%E5%91%A8%E5%8E%9F%E6%B2%B9%E5%BA%AB%E5%AD%98%E5%A2%9E308%E8%90%AC%E6%A1%B6+%E9%AB%98%E9%A0%90%E6%9C%9F",
+          "published_at": "2026-04-08T23:26:00+08:00",
+          "section": "國際財經",
+          "novelty_score": null,
+          "relevance_score": null,
+          "urgency_score": null,
+          "named_entities": [],
+          "key_points": [],
+          "content_truncated": false,
+          "original_content_length_chars": 144,
+          "analyzed_content_length_chars": 144,
+          "original_content_token_estimate": 36,
+          "analyzed_content_token_estimate": 36,
+          "truncation_reason": null,
+          "analysis_method": "full_text",
+          "attention_tier": "medium",
+          "theme": "general",
+          "attention_reason": "Default medium attention because the story is relevant but not an obvious top-priority market mover.",
+          "must_keep": false,
+          "model_used": "llama-3.1-8b-instant",
+          "delayed_retry_attempted": true,
+          "delayed_retry_model_chain": [
+            "qwen/qwen3-32b",
+            "llama-3.1-8b-instant",
+            "openai/gpt-oss-20b (skipped missing OPENAI_API_KEY)"
+          ],
+          "delayed_retry_final_model": "openai/gpt-oss-20b",
+          "error_classification": "http_error",
+          "error": "401 Client Error: Unauthorized for url: https://api.groq.com/openai/v1/chat/completions"
+        },
+        {
+          "source_article_id": "4367219",
+          "title": "美股走勢丨美伊暫停火 道指飆逾1000點",
+          "canonical_url": "https://www.hkej.com/instantnews/international/article/4367219/%E7%BE%8E%E8%82%A1%E8%B5%B0%E5%8B%A2%E4%B8%A8%E7%BE%8E%E4%BC%8A%E6%9A%AB%E5%81%9C%E7%81%AB+%E9%81%93%E6%8C%87%E9%A3%86%E9%80%BE1000%E9%BB%9E",
+          "published_at": "2026-04-08T23:19:00+08:00",
+          "section": "國際財經",
+          "novelty_score": null,
+          "relevance_score": null,
+          "urgency_score": null,
+          "named_entities": [],
+          "key_points": [],
+          "content_truncated": false,
+          "original_content_length_chars": 554,
+          "analyzed_content_length_chars": 554,
+          "original_content_token_estimate": 139,
+          "analyzed_content_token_estimate": 139,
+          "truncation_reason": null,
+          "analysis_method": "full_text",
+          "attention_tier": "high",
+          "theme": "geopolitics",
+          "attention_reason": "High-signal geopolitics headline based on title/summary keywords.",
+          "must_keep": true,
+          "model_used": "llama-3.1-8b-instant",
+          "delayed_retry_attempted": true,
+          "delayed_retry_model_chain": [
+            "qwen/qwen3-32b",
+            "llama-3.1-8b-instant",
+            "openai/gpt-oss-20b (skipped missing OPENAI_API_KEY)"
+          ],
+          "delayed_retry_final_model": "openai/gpt-oss-20b",
+          "error_classification": "http_error",
+          "error": "401 Client Error: Unauthorized for url: https://api.groq.com/openai/v1/chat/completions"
+        },
+        {
+          "source_article_id": "4367133",
+          "title": "IMF指戰爭對國家經濟創傷持續逾10年",
+          "canonical_url": "https://www.hkej.com/instantnews/international/article/4367133/IMF%E6%8C%87%E6%88%B0%E7%88%AD%E5%B0%8D%E5%9C%8B%E5%AE%B6%E7%B6%93%E6%BF%9F%E5%89%B5%E5%82%B7%E6%8C%81%E7%BA%8C%E9%80%BE10%E5%B9%B4",
+          "published_at": "2026-04-08T22:09:00+08:00",
+          "section": "國際財經",
+          "novelty_score": null,
+          "relevance_score": null,
+          "urgency_score": null,
+          "named_entities": [],
+          "key_points": [],
+          "content_truncated": false,
+          "original_content_length_chars": 1150,
+          "analyzed_content_length_chars": 1150,
+          "original_content_token_estimate": 288,
+          "analyzed_content_token_estimate": 288,
+          "truncation_reason": null,
+          "analysis_method": "full_text",
+          "attention_tier": "high",
+          "theme": "macro",
+          "attention_reason": "High-signal macro headline based on title/summary keywords.",
+          "must_keep": true,
+          "model_used": "llama-3.1-8b-instant",
+          "delayed_retry_attempted": true,
+          "delayed_retry_model_chain": [
+            "qwen/qwen3-32b",
+            "llama-3.1-8b-instant",
+            "openai/gpt-oss-20b (skipped missing OPENAI_API_KEY)"
+          ],
+          "delayed_retry_final_model": "openai/gpt-oss-20b",
+          "error_classification": "http_error",
+          "error": "401 Client Error: Unauthorized for url: https://api.groq.com/openai/v1/chat/completions"
+        },
+        {
+          "source_article_id": "4367126",
+          "title": "美股走勢丨道指早段飆1300點 油價跌17%",
+          "canonical_url": "https://www.hkej.com/instantnews/international/article/4367126/%E7%BE%8E%E8%82%A1%E8%B5%B0%E5%8B%A2%E4%B8%A8%E9%81%93%E6%8C%87%E6%97%A9%E6%AE%B5%E9%A3%861300%E9%BB%9E+%E6%B2%B9%E5%83%B9%E8%B7%8C17%25",
+          "published_at": "2026-04-08T21:39:00+08:00",
+          "section": "國際財經",
+          "novelty_score": null,
+          "relevance_score": null,
+          "urgency_score": null,
+          "named_entities": [],
+          "key_points": [],
+          "content_truncated": false,
+          "original_content_length_chars": 189,
+          "analyzed_content_length_chars": 189,
+          "original_content_token_estimate": 48,
+          "analyzed_content_token_estimate": 48,
+          "truncation_reason": null,
+          "analysis_method": "full_text",
+          "attention_tier": "high",
+          "theme": "macro",
+          "attention_reason": "High-signal macro headline based on title/summary keywords.",
+          "must_keep": true,
+          "model_used": "llama-3.1-8b-instant",
+          "delayed_retry_attempted": true,
+          "delayed_retry_model_chain": [
+            "qwen/qwen3-32b",
+            "llama-3.1-8b-instant",
+            "openai/gpt-oss-20b (skipped missing OPENAI_API_KEY)"
+          ],
+          "delayed_retry_final_model": "openai/gpt-oss-20b",
+          "error_classification": "http_error",
+          "error": "401 Client Error: Unauthorized for url: https://api.groq.com/openai/v1/chat/completions"
+        },
         {
           "source_article_id": "4366086",
           "title": "英特爾加入馬斯克Terafab晶片項目 助重構晶片工廠技術",
@@ -1339,41 +1745,33 @@
       ],
       "analysis_profile": "standard",
       "model_used": "qwen/qwen3-32b",
-      "sub_batch_count": 12,
+      "sub_batch_count": 4,
       "diagnostics": {
-        "sub_batch_count": 8,
-        "split_reasons": [
-          "pre_send_budget"
-        ],
+        "sub_batch_count": 4,
+        "split_reasons": [],
         "models_attempted": [
           "meta-llama/llama-4-scout-17b-16e-instruct",
-          "qwen/qwen3-32b"
+          "qwen/qwen3-32b",
+          "llama-3.1-8b-instant"
         ],
-        "estimated_input_tokens_max": 1526,
-        "serialized_request_bytes_max": 7991,
+        "estimated_input_tokens_max": 1387,
+        "serialized_request_bytes_max": 9669,
         "rate_limit_waits": 0,
-        "partial_article_count": 0,
+        "partial_article_count": 4,
         "synthesis_wait_seconds_total": 0.0,
         "synthesis_retry_count": 0,
         "synthesis_retry_skipped_count": 0,
         "synthesis_budget_exhausted": false,
         "degraded_merge_used": false,
         "degraded_merge_reason": "",
-        "synthesis_merge_depth_max": 1,
-        "model_switches": [
-          {
-            "switched_at": "2026-04-08T16:36:53.918072+01:00",
-            "from_model": "meta-llama/llama-4-scout-17b-16e-instruct",
-            "to_model": "qwen/qwen3-32b",
-            "reason": "Model meta-llama/llama-4-scout-17b-16e-instruct returned 429 rate_limit_exceeded."
-          }
-        ]
+        "synthesis_merge_depth_max": 0,
+        "model_switches": []
       },
-      "error": null
+      "error": "401 Client Error: Unauthorized for url: https://api.groq.com/openai/v1/chat/completions"
     },
     {
       "category": "時事脈搏",
-      "article_count": 15,
+      "article_count": 23,
       "status": "partial",
       "key_developments": [],
       "named_entities": [
@@ -1395,6 +1793,185 @@
         }
       ],
       "articles": [
+        {
+          "source_article_id": "4367220",
+          "canonical_url": "https://www.hkej.com/instantnews/current/article/4367220/%E9%81%8B%E8%BC%B8%E7%BD%B2%3A%E7%9B%A3%E5%AF%9F%E5%B1%AF%E9%96%80%E5%B1%85%E6%B0%91%E5%B7%B4%E5%A3%AB%E6%9C%8D%E5%8B%99+%E4%B8%BB%E5%8B%95%E8%81%AF%E7%B5%A1%E9%A6%AC%E7%81%A3%E6%B8%A1%E8%BC%AA%E7%87%9F%E8%BE%A6%E5%95%86",
+          "title": "運輸署:監察屯門居民巴士服務 主動聯絡馬灣渡輪營辦商",
+          "section": "時事脈搏",
+          "published_at": "2026-04-08T23:30:00+08:00",
+          "attention_tier": "light",
+          "novelty_score": 5,
+          "relevance_score": 5,
+          "urgency_score": 5,
+          "named_entities": [],
+          "key_points": [],
+          "content_truncated": false,
+          "analysis_method": "bypassed",
+          "model_used": "direct"
+        },
+        {
+          "source_article_id": "4367202",
+          "canonical_url": "https://www.hkej.com/instantnews/current/article/4367202/%E5%9C%9F%E5%9C%B0%E5%8F%8A%E5%BB%BA%E8%A8%AD%E8%AB%AE%E8%A9%A2%E5%A7%94%E5%93%A1%E6%9C%83%E8%81%BD%E5%8F%96%E7%99%BC%E5%B1%95%E5%B1%80%E5%B0%B1%E5%8A%A0%E5%BF%AB%E5%8C%97%E9%83%BD%E7%99%BC%E5%B1%95%E8%A8%82%E7%AB%8B%E5%B0%88%E5%B1%AC%E6%B3%95%E4%BE%8B+",
+          "title": "土地及建設諮詢委員會聽取發展局就加快北都發展訂立專屬法例",
+          "section": "時事脈搏",
+          "published_at": "2026-04-08T22:58:00+08:00",
+          "attention_tier": "light",
+          "novelty_score": 5,
+          "relevance_score": 5,
+          "urgency_score": 5,
+          "named_entities": [],
+          "key_points": [],
+          "content_truncated": false,
+          "analysis_method": "bypassed",
+          "model_used": "direct"
+        },
+        {
+          "source_article_id": "4367169",
+          "title": "伊朗局勢丨聯合國秘書長特使抵伊朗推動持久結束戰爭方案",
+          "canonical_url": "https://www.hkej.com/instantnews/current/article/4367169/%E4%BC%8A%E6%9C%97%E5%B1%80%E5%8B%A2%E4%B8%A8%E8%81%AF%E5%90%88%E5%9C%8B%E7%A7%98%E6%9B%B8%E9%95%B7%E7%89%B9%E4%BD%BF%E6%8A%B5%E4%BC%8A%E6%9C%97%E6%8E%A8%E5%8B%95%E6%8C%81%E4%B9%85%E7%B5%90%E6%9D%9F%E6%88%B0%E7%88%AD%E6%96%B9%E6%A1%88",
+          "published_at": "2026-04-08T22:49:00+08:00",
+          "section": "時事脈搏",
+          "novelty_score": null,
+          "relevance_score": null,
+          "urgency_score": null,
+          "named_entities": [],
+          "key_points": [],
+          "content_truncated": false,
+          "original_content_length_chars": 228,
+          "analyzed_content_length_chars": 228,
+          "original_content_token_estimate": 57,
+          "analyzed_content_token_estimate": 57,
+          "truncation_reason": null,
+          "analysis_method": "full_text",
+          "attention_tier": "high",
+          "theme": "geopolitics",
+          "attention_reason": "High-signal geopolitics headline based on title/summary keywords.",
+          "must_keep": true,
+          "model_used": "llama-3.1-8b-instant",
+          "delayed_retry_attempted": true,
+          "delayed_retry_model_chain": [
+            "qwen/qwen3-32b",
+            "llama-3.1-8b-instant",
+            "openai/gpt-oss-20b (skipped missing OPENAI_API_KEY)"
+          ],
+          "delayed_retry_final_model": "openai/gpt-oss-20b",
+          "error_classification": "http_error",
+          "error": "401 Client Error: Unauthorized for url: https://api.groq.com/openai/v1/chat/completions"
+        },
+        {
+          "source_article_id": "4367107",
+          "title": "中東局勢丨特朗普威脅對伊朗提供武器國家徵50%關稅",
+          "canonical_url": "https://www.hkej.com/instantnews/current/article/4367107/%E4%B8%AD%E6%9D%B1%E5%B1%80%E5%8B%A2%E4%B8%A8%E7%89%B9%E6%9C%97%E6%99%AE%E5%A8%81%E8%84%85%E5%B0%8D%E4%BC%8A%E6%9C%97%E6%8F%90%E4%BE%9B%E6%AD%A6%E5%99%A8%E5%9C%8B%E5%AE%B6%E5%BE%B550%25%E9%97%9C%E7%A8%85",
+          "published_at": "2026-04-08T21:10:00+08:00",
+          "section": "時事脈搏",
+          "novelty_score": null,
+          "relevance_score": null,
+          "urgency_score": null,
+          "named_entities": [],
+          "key_points": [],
+          "content_truncated": false,
+          "original_content_length_chars": 187,
+          "analyzed_content_length_chars": 187,
+          "original_content_token_estimate": 47,
+          "analyzed_content_token_estimate": 47,
+          "truncation_reason": null,
+          "analysis_method": "full_text",
+          "attention_tier": "high",
+          "theme": "geopolitics",
+          "attention_reason": "High-signal geopolitics headline based on title/summary keywords.",
+          "must_keep": true,
+          "model_used": "llama-3.1-8b-instant",
+          "delayed_retry_attempted": true,
+          "delayed_retry_model_chain": [
+            "qwen/qwen3-32b",
+            "llama-3.1-8b-instant",
+            "openai/gpt-oss-20b (skipped missing OPENAI_API_KEY)"
+          ],
+          "delayed_retry_final_model": "openai/gpt-oss-20b",
+          "error_classification": "http_error",
+          "error": "401 Client Error: Unauthorized for url: https://api.groq.com/openai/v1/chat/completions"
+        },
+        {
+          "source_article_id": "4367077",
+          "canonical_url": "https://www.hkej.com/instantnews/current/article/4367077/%E7%90%86%E5%A4%A7%E9%8C%A2%E5%81%89%E9%95%B7%E9%AB%98%E5%B3%B0%E6%9C%83%E8%AD%B0%E6%BB%99%E8%81%9A%E5%85%A8%E7%90%83%E5%AD%B8%E8%80%85%E6%8E%A2%E7%B4%A2%E7%A7%91%E5%AD%B8%E8%88%87%E5%B7%A5%E7%A8%8B%E5%89%B5%E6%96%B0",
+          "title": "理大錢偉長高峰會議滙聚全球學者探索科學與工程創新",
+          "section": "時事脈搏",
+          "published_at": "2026-04-08T20:41:00+08:00",
+          "attention_tier": "light",
+          "novelty_score": 5,
+          "relevance_score": 5,
+          "urgency_score": 5,
+          "named_entities": [],
+          "key_points": [],
+          "content_truncated": false,
+          "analysis_method": "bypassed",
+          "model_used": "direct"
+        },
+        {
+          "source_article_id": "4367057",
+          "canonical_url": "https://www.hkej.com/instantnews/current/article/4367057/%E5%BC%B5%E5%9C%8B%E6%B8%85%E5%B1%B1%E6%9D%B1%E8%AA%BF%E7%A0%94%3A%E6%8E%A8%E9%80%B2AI%E5%B0%8D%E5%B7%A5%E6%A5%AD%E6%B7%B1%E5%B1%A4%E6%AC%A1%E8%B3%A6%E8%83%BD",
+          "title": "張國清山東調研:推進AI對工業深層次賦能",
+          "section": "時事脈搏",
+          "published_at": "2026-04-08T20:27:00+08:00",
+          "attention_tier": "light",
+          "novelty_score": 5,
+          "relevance_score": 5,
+          "urgency_score": 5,
+          "named_entities": [],
+          "key_points": [],
+          "content_truncated": false,
+          "analysis_method": "bypassed",
+          "model_used": "direct"
+        },
+        {
+          "source_article_id": "4367028",
+          "title": "中東局勢丨特朗普:美伊或會聯合管理霍爾木茲海峽通行費",
+          "canonical_url": "https://www.hkej.com/instantnews/current/article/4367028/%E4%B8%AD%E6%9D%B1%E5%B1%80%E5%8B%A2%E4%B8%A8%E7%89%B9%E6%9C%97%E6%99%AE%3A%E7%BE%8E%E4%BC%8A%E6%88%96%E6%9C%83%E8%81%AF%E5%90%88%E7%AE%A1%E7%90%86%E9%9C%8D%E7%88%BE%E6%9C%A8%E8%8C%B2%E6%B5%B7%E5%B3%BD%E9%80%9A%E8%A1%8C%E8%B2%BB",
+          "published_at": "2026-04-08T20:02:00+08:00",
+          "section": "時事脈搏",
+          "novelty_score": null,
+          "relevance_score": null,
+          "urgency_score": null,
+          "named_entities": [],
+          "key_points": [],
+          "content_truncated": false,
+          "original_content_length_chars": 481,
+          "analyzed_content_length_chars": 481,
+          "original_content_token_estimate": 121,
+          "analyzed_content_token_estimate": 121,
+          "truncation_reason": null,
+          "analysis_method": "full_text",
+          "attention_tier": "high",
+          "theme": "geopolitics",
+          "attention_reason": "High-signal geopolitics headline based on title/summary keywords.",
+          "must_keep": true,
+          "model_used": "llama-3.1-8b-instant",
+          "delayed_retry_attempted": true,
+          "delayed_retry_model_chain": [
+            "qwen/qwen3-32b",
+            "llama-3.1-8b-instant",
+            "openai/gpt-oss-20b (skipped missing OPENAI_API_KEY)"
+          ],
+          "delayed_retry_final_model": "openai/gpt-oss-20b",
+          "error_classification": "http_error",
+          "error": "401 Client Error: Unauthorized for url: https://api.groq.com/openai/v1/chat/completions"
+        },
+        {
+          "source_article_id": "4366797",
+          "canonical_url": "https://www.hkej.com/instantnews/current/article/4366797/%E7%BF%92%E8%BF%91%E5%B9%B3%3A%E5%8A%A0%E5%BC%B7%E5%B9%B9%E9%83%A8%E9%9D%A9%E5%91%BD%E6%80%A7%E9%8D%9B%E9%80%A0+%E4%BF%9D%E6%8C%81%E8%BB%8D%E9%9A%8A%E7%B4%94%E6%BD%94%E5%85%89%E6%A6%AE",
+          "title": "習近平:加強幹部革命性鍛造 保持軍隊純潔光榮",
+          "section": "時事脈搏",
+          "published_at": "2026-04-08T19:05:00+08:00",
+          "attention_tier": "light",
+          "novelty_score": 5,
+          "relevance_score": 5,
+          "urgency_score": 5,
+          "named_entities": [],
+          "key_points": [],
+          "content_truncated": false,
+          "analysis_method": "bypassed",
+          "model_used": "direct"
+        },
         {
           "source_article_id": "4366094",
           "title": "中東局勢丨北京:對美伊達成停火安排表示歡迎",
@@ -1503,7 +2080,10 @@
           "key_points": [],
           "content_truncated": false,
           "analysis_method": "bypassed",
-          "model_used": "direct"
+          "model_used": "direct",
+          "theme": "general",
+          "attention_reason": "Lighter treatment because this story sits in the 時事脈搏 section without strong market-moving signals.",
+          "must_keep": false
         },
         {
           "source_article_id": "4366069",
@@ -1519,7 +2099,10 @@
           "key_points": [],
           "content_truncated": false,
           "analysis_method": "bypassed",
-          "model_used": "direct"
+          "model_used": "direct",
+          "theme": "general",
+          "attention_reason": "Lighter treatment because this story sits in the 時事脈搏 section without strong market-moving signals.",
+          "must_keep": false
         },
         {
           "source_article_id": "4366060",
@@ -1535,7 +2118,10 @@
           "key_points": [],
           "content_truncated": false,
           "analysis_method": "bypassed",
-          "model_used": "direct"
+          "model_used": "direct",
+          "theme": "general",
+          "attention_reason": "Lighter treatment because this story sits in the 時事脈搏 section without strong market-moving signals.",
+          "must_keep": false
         },
         {
           "source_article_id": "4366057",
@@ -1551,7 +2137,10 @@
           "key_points": [],
           "content_truncated": false,
           "analysis_method": "bypassed",
-          "model_used": "direct"
+          "model_used": "direct",
+          "theme": "general",
+          "attention_reason": "Lighter treatment because this story sits in the 時事脈搏 section without strong market-moving signals.",
+          "must_keep": false
         },
         {
           "source_article_id": "4366040",
@@ -1567,7 +2156,10 @@
           "key_points": [],
           "content_truncated": false,
           "analysis_method": "bypassed",
-          "model_used": "direct"
+          "model_used": "direct",
+          "theme": "general",
+          "attention_reason": "Lighter treatment because this story sits in the 時事脈搏 section without strong market-moving signals.",
+          "must_keep": false
         },
         {
           "source_article_id": "4366033",
@@ -1583,7 +2175,10 @@
           "key_points": [],
           "content_truncated": false,
           "analysis_method": "bypassed",
-          "model_used": "direct"
+          "model_used": "direct",
+          "theme": "general",
+          "attention_reason": "Lighter treatment because this story sits in the 時事脈搏 section without strong market-moving signals.",
+          "must_keep": false
         },
         {
           "source_article_id": "4365840",
@@ -1746,7 +2341,10 @@
           "key_points": [],
           "content_truncated": false,
           "analysis_method": "bypassed",
-          "model_used": "direct"
+          "model_used": "direct",
+          "theme": "general",
+          "attention_reason": "Lighter treatment because this story sits in the 時事脈搏 section without strong market-moving signals.",
+          "must_keep": false
         },
         {
           "source_article_id": "4365702",
@@ -1871,12 +2469,13 @@
           "model_used": "llama-3.1-8b-instant",
           "delayed_retry_attempted": true,
           "delayed_retry_model_chain": [
+            "qwen/qwen3-32b",
             "llama-3.1-8b-instant",
             "openai/gpt-oss-20b (skipped missing OPENAI_API_KEY)"
           ],
           "delayed_retry_final_model": "openai/gpt-oss-20b",
-          "error_classification": "incomplete_model_output",
-          "error": "Model response omitted this article from the delayed retry batch."
+          "error_classification": "http_error",
+          "error": "401 Client Error: Unauthorized for url: https://api.groq.com/openai/v1/chat/completions"
         }
       ],
       "subgroups": [
@@ -2396,36 +2995,34 @@
       ],
       "analysis_profile": "light",
       "model_used": "meta-llama/llama-4-scout-17b-16e-instruct",
-      "sub_batch_count": 10,
+      "sub_batch_count": 4,
       "diagnostics": {
-        "sub_batch_count": 6,
-        "split_reasons": [
-          "pre_send_budget"
-        ],
+        "sub_batch_count": 4,
+        "split_reasons": [],
         "models_attempted": [
           "meta-llama/llama-4-scout-17b-16e-instruct",
           "qwen/qwen3-32b",
           "llama-3.1-8b-instant"
         ],
-        "estimated_input_tokens_max": 1462,
-        "serialized_request_bytes_max": 9387,
-        "rate_limit_waits": 2,
-        "partial_article_count": 1,
+        "estimated_input_tokens_max": 1406,
+        "serialized_request_bytes_max": 8964,
+        "rate_limit_waits": 0,
+        "partial_article_count": 4,
         "synthesis_wait_seconds_total": 0.0,
         "synthesis_retry_count": 0,
         "synthesis_retry_skipped_count": 0,
         "synthesis_budget_exhausted": false,
         "degraded_merge_used": false,
         "degraded_merge_reason": "",
-        "synthesis_merge_depth_max": 1,
+        "synthesis_merge_depth_max": 0,
         "model_switches": []
       },
-      "error": null
+      "error": "401 Client Error: Unauthorized for url: https://api.groq.com/openai/v1/chat/completions"
     },
     {
       "category": "香港財經",
-      "article_count": 4,
-      "status": "success",
+      "article_count": 5,
+      "status": "partial",
       "key_developments": [
         "MPF股票基金過去1年平均淨回報16%，混合資產基金達12.7%",
         "近四分之一企業擬增加人民幣融資，渣打報告顯示企業在融資和財資管理方面有待進一步增長",
@@ -2451,6 +3048,39 @@
         }
       ],
       "articles": [
+        {
+          "source_article_id": "4366787",
+          "title": "富途:3月期權首次購買人數按月增15.3%",
+          "canonical_url": "https://www.hkej.com/instantnews/hongkong/article/4366787/%E5%AF%8C%E9%80%94%3A3%E6%9C%88%E6%9C%9F%E6%AC%8A%E9%A6%96%E6%AC%A1%E8%B3%BC%E8%B2%B7%E4%BA%BA%E6%95%B8%E6%8C%89%E6%9C%88%E5%A2%9E15.3%25",
+          "published_at": "2026-04-08T20:11:00+08:00",
+          "section": "香港財經",
+          "novelty_score": null,
+          "relevance_score": null,
+          "urgency_score": null,
+          "named_entities": [],
+          "key_points": [],
+          "content_truncated": false,
+          "original_content_length_chars": 308,
+          "analyzed_content_length_chars": 308,
+          "original_content_token_estimate": 77,
+          "analyzed_content_token_estimate": 77,
+          "truncation_reason": null,
+          "analysis_method": "full_text",
+          "attention_tier": "high",
+          "theme": "geopolitics",
+          "attention_reason": "High-signal geopolitics headline based on title/summary keywords.",
+          "must_keep": true,
+          "model_used": "llama-3.1-8b-instant",
+          "delayed_retry_attempted": true,
+          "delayed_retry_model_chain": [
+            "qwen/qwen3-32b",
+            "llama-3.1-8b-instant",
+            "openai/gpt-oss-20b (skipped missing OPENAI_API_KEY)"
+          ],
+          "delayed_retry_final_model": "openai/gpt-oss-20b",
+          "error_classification": "http_error",
+          "error": "401 Client Error: Unauthorized for url: https://api.groq.com/openai/v1/chat/completions"
+        },
         {
           "source_article_id": "4366042",
           "title": "MPF丨股票基金過去1年平均淨回報16%",
@@ -2848,17 +3478,19 @@
       ],
       "analysis_profile": "standard",
       "model_used": "meta-llama/llama-4-scout-17b-16e-instruct",
-      "sub_batch_count": 4,
+      "sub_batch_count": 1,
       "diagnostics": {
-        "sub_batch_count": 3,
+        "sub_batch_count": 1,
         "split_reasons": [],
         "models_attempted": [
-          "meta-llama/llama-4-scout-17b-16e-instruct"
+          "meta-llama/llama-4-scout-17b-16e-instruct",
+          "qwen/qwen3-32b",
+          "llama-3.1-8b-instant"
         ],
-        "estimated_input_tokens_max": 1180,
-        "serialized_request_bytes_max": 6595,
+        "estimated_input_tokens_max": 679,
+        "serialized_request_bytes_max": 4191,
         "rate_limit_waits": 0,
-        "partial_article_count": 0,
+        "partial_article_count": 1,
         "synthesis_wait_seconds_total": 0.0,
         "synthesis_retry_count": 0,
         "synthesis_retry_skipped_count": 0,
@@ -2868,12 +3500,12 @@
         "synthesis_merge_depth_max": 0,
         "model_switches": []
       },
-      "error": null
+      "error": "401 Client Error: Unauthorized for url: https://api.groq.com/openai/v1/chat/completions"
     },
     {
       "category": "港股直擊",
-      "article_count": 2,
-      "status": "success",
+      "article_count": 4,
+      "status": "partial",
       "key_developments": [
         "智譜發布新一代開源模型GLM-5.1，股價抽升逾一成，最高見925元。",
         "港股走勢丨恒指午市初段升近800點 科技股標青。",
@@ -2903,6 +3535,72 @@
         }
       ],
       "articles": [
+        {
+          "source_article_id": "4367197",
+          "title": "恒指夜期丨報25920 跌28點",
+          "canonical_url": "https://www.hkej.com/instantnews/stock/article/4367197/%E6%81%92%E6%8C%87%E5%A4%9C%E6%9C%9F%E4%B8%A8%E5%A0%B125920+%E8%B7%8C28%E9%BB%9E",
+          "published_at": "2026-04-08T22:45:00+08:00",
+          "section": "港股直擊",
+          "novelty_score": null,
+          "relevance_score": null,
+          "urgency_score": null,
+          "named_entities": [],
+          "key_points": [],
+          "content_truncated": false,
+          "original_content_length_chars": 197,
+          "analyzed_content_length_chars": 197,
+          "original_content_token_estimate": 50,
+          "analyzed_content_token_estimate": 50,
+          "truncation_reason": null,
+          "analysis_method": "full_text",
+          "attention_tier": "medium",
+          "theme": "general",
+          "attention_reason": "Default medium attention because the story is relevant but not an obvious top-priority market mover.",
+          "must_keep": false,
+          "model_used": "llama-3.1-8b-instant",
+          "delayed_retry_attempted": true,
+          "delayed_retry_model_chain": [
+            "qwen/qwen3-32b",
+            "llama-3.1-8b-instant",
+            "openai/gpt-oss-20b (skipped missing OPENAI_API_KEY)"
+          ],
+          "delayed_retry_final_model": "openai/gpt-oss-20b",
+          "error_classification": "http_error",
+          "error": "401 Client Error: Unauthorized for url: https://api.groq.com/openai/v1/chat/completions"
+        },
+        {
+          "source_article_id": "4367085",
+          "title": "恒指夜期丨報26063 升115點",
+          "canonical_url": "https://www.hkej.com/instantnews/stock/article/4367085/%E6%81%92%E6%8C%87%E5%A4%9C%E6%9C%9F%E4%B8%A8%E5%A0%B126063+%E5%8D%87115%E9%BB%9E",
+          "published_at": "2026-04-08T20:37:00+08:00",
+          "section": "港股直擊",
+          "novelty_score": null,
+          "relevance_score": null,
+          "urgency_score": null,
+          "named_entities": [],
+          "key_points": [],
+          "content_truncated": false,
+          "original_content_length_chars": 196,
+          "analyzed_content_length_chars": 196,
+          "original_content_token_estimate": 49,
+          "analyzed_content_token_estimate": 49,
+          "truncation_reason": null,
+          "analysis_method": "full_text",
+          "attention_tier": "medium",
+          "theme": "general",
+          "attention_reason": "Default medium attention because the story is relevant but not an obvious top-priority market mover.",
+          "must_keep": false,
+          "model_used": "llama-3.1-8b-instant",
+          "delayed_retry_attempted": true,
+          "delayed_retry_model_chain": [
+            "qwen/qwen3-32b",
+            "llama-3.1-8b-instant",
+            "openai/gpt-oss-20b (skipped missing OPENAI_API_KEY)"
+          ],
+          "delayed_retry_final_model": "openai/gpt-oss-20b",
+          "error_classification": "http_error",
+          "error": "401 Client Error: Unauthorized for url: https://api.groq.com/openai/v1/chat/completions"
+        },
         {
           "source_article_id": "4366073",
           "title": "異動股丨智譜抽升逾一成 發布開源模型GLM-5.1",
@@ -3144,18 +3842,19 @@
       ],
       "analysis_profile": "standard",
       "model_used": "meta-llama/llama-4-scout-17b-16e-instruct",
-      "sub_batch_count": 5,
+      "sub_batch_count": 2,
       "diagnostics": {
-        "sub_batch_count": 4,
+        "sub_batch_count": 2,
         "split_reasons": [],
         "models_attempted": [
           "meta-llama/llama-4-scout-17b-16e-instruct",
-          "qwen/qwen3-32b"
+          "qwen/qwen3-32b",
+          "llama-3.1-8b-instant"
         ],
-        "estimated_input_tokens_max": 803,
-        "serialized_request_bytes_max": 4790,
+        "estimated_input_tokens_max": 825,
+        "serialized_request_bytes_max": 4736,
         "rate_limit_waits": 0,
-        "partial_article_count": 0,
+        "partial_article_count": 2,
         "synthesis_wait_seconds_total": 0.0,
         "synthesis_retry_count": 0,
         "synthesis_retry_skipped_count": 0,
@@ -3165,12 +3864,12 @@
         "synthesis_merge_depth_max": 0,
         "model_switches": []
       },
-      "error": null
+      "error": "401 Client Error: Unauthorized for url: https://api.groq.com/openai/v1/chat/completions"
     },
     {
       "category": "中國財經",
-      "article_count": 2,
-      "status": "success",
+      "article_count": 4,
+      "status": "partial",
       "key_developments": [
         "上證指數收市報3995點，升104點或2.69%，成交1.07萬億元。",
         "市場成交額增加至2.43萬億元（人民幣）。",
@@ -3191,6 +3890,72 @@
         }
       ],
       "articles": [
+        {
+          "source_article_id": "4367069",
+          "title": "神秘AI模型登榜首 富瑞指由阿里巴巴開發",
+          "canonical_url": "https://www.hkej.com/instantnews/china/article/4367069/%E7%A5%9E%E7%A7%98AI%E6%A8%A1%E5%9E%8B%E7%99%BB%E6%A6%9C%E9%A6%96+%E5%AF%8C%E7%91%9E%E6%8C%87%E7%94%B1%E9%98%BF%E9%87%8C%E5%B7%B4%E5%B7%B4%E9%96%8B%E7%99%BC",
+          "published_at": "2026-04-08T20:37:00+08:00",
+          "section": "中國財經",
+          "novelty_score": null,
+          "relevance_score": null,
+          "urgency_score": null,
+          "named_entities": [],
+          "key_points": [],
+          "content_truncated": false,
+          "original_content_length_chars": 416,
+          "analyzed_content_length_chars": 416,
+          "original_content_token_estimate": 104,
+          "analyzed_content_token_estimate": 104,
+          "truncation_reason": null,
+          "analysis_method": "full_text",
+          "attention_tier": "medium",
+          "theme": "general",
+          "attention_reason": "Default medium attention because the story is relevant but not an obvious top-priority market mover.",
+          "must_keep": false,
+          "model_used": "llama-3.1-8b-instant",
+          "delayed_retry_attempted": true,
+          "delayed_retry_model_chain": [
+            "qwen/qwen3-32b",
+            "llama-3.1-8b-instant",
+            "openai/gpt-oss-20b (skipped missing OPENAI_API_KEY)"
+          ],
+          "delayed_retry_final_model": "openai/gpt-oss-20b",
+          "error_classification": "http_error",
+          "error": "401 Client Error: Unauthorized for url: https://api.groq.com/openai/v1/chat/completions"
+        },
+        {
+          "source_article_id": "4366757",
+          "title": "三星電子中國業務傳將重組 重心轉向半導體",
+          "canonical_url": "https://www.hkej.com/instantnews/china/article/4366757/%E4%B8%89%E6%98%9F%E9%9B%BB%E5%AD%90%E4%B8%AD%E5%9C%8B%E6%A5%AD%E5%8B%99%E5%82%B3%E5%B0%87%E9%87%8D%E7%B5%84+%E9%87%8D%E5%BF%83%E8%BD%89%E5%90%91%E5%8D%8A%E5%B0%8E%E9%AB%94",
+          "published_at": "2026-04-08T18:41:00+08:00",
+          "section": "中國財經",
+          "novelty_score": null,
+          "relevance_score": null,
+          "urgency_score": null,
+          "named_entities": [],
+          "key_points": [],
+          "content_truncated": false,
+          "original_content_length_chars": 273,
+          "analyzed_content_length_chars": 273,
+          "original_content_token_estimate": 69,
+          "analyzed_content_token_estimate": 69,
+          "truncation_reason": null,
+          "analysis_method": "full_text",
+          "attention_tier": "medium",
+          "theme": "general",
+          "attention_reason": "Default medium attention because the story is relevant but not an obvious top-priority market mover.",
+          "must_keep": false,
+          "model_used": "llama-3.1-8b-instant",
+          "delayed_retry_attempted": true,
+          "delayed_retry_model_chain": [
+            "qwen/qwen3-32b",
+            "llama-3.1-8b-instant",
+            "openai/gpt-oss-20b (skipped missing OPENAI_API_KEY)"
+          ],
+          "delayed_retry_final_model": "openai/gpt-oss-20b",
+          "error_classification": "http_error",
+          "error": "401 Client Error: Unauthorized for url: https://api.groq.com/openai/v1/chat/completions"
+        },
         {
           "source_article_id": "4366071",
           "title": "A股走勢丨滬指收升2.7% 成交額增至2.4萬億人民幣",
@@ -3415,17 +4180,19 @@
       ],
       "analysis_profile": "standard",
       "model_used": "meta-llama/llama-4-scout-17b-16e-instruct",
-      "sub_batch_count": 3,
+      "sub_batch_count": 2,
       "diagnostics": {
         "sub_batch_count": 2,
         "split_reasons": [],
         "models_attempted": [
-          "meta-llama/llama-4-scout-17b-16e-instruct"
+          "meta-llama/llama-4-scout-17b-16e-instruct",
+          "qwen/qwen3-32b",
+          "llama-3.1-8b-instant"
         ],
-        "estimated_input_tokens_max": 779,
-        "serialized_request_bytes_max": 3934,
+        "estimated_input_tokens_max": 915,
+        "serialized_request_bytes_max": 5568,
         "rate_limit_waits": 0,
-        "partial_article_count": 0,
+        "partial_article_count": 2,
         "synthesis_wait_seconds_total": 0.0,
         "synthesis_retry_count": 0,
         "synthesis_retry_skipped_count": 0,
@@ -3435,12 +4202,12 @@
         "synthesis_merge_depth_max": 0,
         "model_switches": []
       },
-      "error": null
+      "error": "401 Client Error: Unauthorized for url: https://api.groq.com/openai/v1/chat/completions"
     },
     {
       "category": "即巿股評",
       "article_count": 1,
-      "status": "success",
+      "status": "partial",
       "key_developments": [
         "港股高開656點，恒生指數曾高見25872，現暫守25800-25850。",
         "順豐同城(09699)業績後股價表現不錯，技術走勢轉強，目標價13-15元。",
@@ -3619,15 +4386,13 @@
       ],
       "analysis_profile": "standard",
       "model_used": "meta-llama/llama-4-scout-17b-16e-instruct",
-      "sub_batch_count": 2,
+      "sub_batch_count": 0,
       "diagnostics": {
-        "sub_batch_count": 1,
+        "sub_batch_count": 0,
         "split_reasons": [],
-        "models_attempted": [
-          "meta-llama/llama-4-scout-17b-16e-instruct"
-        ],
-        "estimated_input_tokens_max": 1141,
-        "serialized_request_bytes_max": 8854,
+        "models_attempted": [],
+        "estimated_input_tokens_max": 0,
+        "serialized_request_bytes_max": 0,
         "rate_limit_waits": 0,
         "partial_article_count": 0,
         "synthesis_wait_seconds_total": 0.0,
@@ -3639,12 +4404,80 @@
         "synthesis_merge_depth_max": 0,
         "model_switches": []
       },
-      "error": null
+      "error": "401 Client Error: Unauthorized for url: https://api.groq.com/openai/v1/chat/completions"
+    },
+    {
+      "category": "重要通告",
+      "article_count": 1,
+      "status": "failed",
+      "key_developments": [],
+      "named_entities": [],
+      "articles": [
+        {
+          "source_article_id": "4367106",
+          "title": "中鋁料首季盈利增58%",
+          "canonical_url": "https://www.hkej.com/instantnews/announcement/article/4367106/%E4%B8%AD%E9%8B%81%E6%96%99%E9%A6%96%E5%AD%A3%E7%9B%88%E5%88%A9%E5%A2%9E58%25",
+          "published_at": "2026-04-08T21:12:00+08:00",
+          "section": "重要通告",
+          "novelty_score": null,
+          "relevance_score": null,
+          "urgency_score": null,
+          "named_entities": [],
+          "key_points": [],
+          "content_truncated": false,
+          "original_content_length_chars": 223,
+          "analyzed_content_length_chars": 223,
+          "original_content_token_estimate": 56,
+          "analyzed_content_token_estimate": 56,
+          "truncation_reason": null,
+          "analysis_method": "full_text",
+          "attention_tier": "high",
+          "theme": "stocks",
+          "attention_reason": "High-signal stocks headline based on title/summary keywords.",
+          "must_keep": true,
+          "model_used": "llama-3.1-8b-instant",
+          "delayed_retry_attempted": true,
+          "delayed_retry_model_chain": [
+            "qwen/qwen3-32b",
+            "llama-3.1-8b-instant",
+            "openai/gpt-oss-20b (skipped missing OPENAI_API_KEY)"
+          ],
+          "delayed_retry_final_model": "openai/gpt-oss-20b",
+          "error_classification": "http_error",
+          "error": "401 Client Error: Unauthorized for url: https://api.groq.com/openai/v1/chat/completions"
+        }
+      ],
+      "subgroups": [],
+      "analysis_profile": "standard",
+      "model_used": "llama-3.1-8b-instant",
+      "sub_batch_count": 1,
+      "diagnostics": {
+        "sub_batch_count": 1,
+        "split_reasons": [],
+        "models_attempted": [
+          "meta-llama/llama-4-scout-17b-16e-instruct",
+          "qwen/qwen3-32b",
+          "llama-3.1-8b-instant"
+        ],
+        "estimated_input_tokens_max": 640,
+        "serialized_request_bytes_max": 3789,
+        "rate_limit_waits": 0,
+        "partial_article_count": 1,
+        "synthesis_wait_seconds_total": 0.0,
+        "synthesis_retry_count": 0,
+        "synthesis_retry_skipped_count": 0,
+        "synthesis_budget_exhausted": false,
+        "degraded_merge_used": false,
+        "degraded_merge_reason": "",
+        "synthesis_merge_depth_max": 0,
+        "model_switches": []
+      },
+      "error": "No successful article analyses available for synthesis."
     },
     {
       "category": "地產新聞",
-      "article_count": 6,
-      "status": "success",
+      "article_count": 7,
+      "status": "partial",
       "key_developments": [
         "獅峰地產在何文田推出學生公寓，床位租金預計從9000元起。",
         "海瑅灣I第三度發售261伙，折實平均呎價17032元，項目累沽522伙，套現逾46億元。",
@@ -3670,6 +4503,39 @@
       ],
       "articles": [
         {
+          "source_article_id": "4366721",
+          "title": "新盤丨Blue Coast四房4407萬沽雙破頂",
+          "canonical_url": "https://www.hkej.com/instantnews/property/article/4366721/%E6%96%B0%E7%9B%A4%E4%B8%A8Blue+Coast%E5%9B%9B%E6%88%BF4407%E8%90%AC%E6%B2%BD%E9%9B%99%E7%A0%B4%E9%A0%82",
+          "published_at": "2026-04-08T19:04:00+08:00",
+          "section": "新盤情報",
+          "novelty_score": null,
+          "relevance_score": null,
+          "urgency_score": null,
+          "named_entities": [],
+          "key_points": [],
+          "content_truncated": false,
+          "original_content_length_chars": 358,
+          "analyzed_content_length_chars": 358,
+          "original_content_token_estimate": 90,
+          "analyzed_content_token_estimate": 90,
+          "truncation_reason": null,
+          "analysis_method": "full_text",
+          "attention_tier": "medium",
+          "theme": "general",
+          "attention_reason": "Default medium attention because the story is relevant but not an obvious top-priority market mover.",
+          "must_keep": false,
+          "model_used": "llama-3.1-8b-instant",
+          "delayed_retry_attempted": true,
+          "delayed_retry_model_chain": [
+            "qwen/qwen3-32b",
+            "llama-3.1-8b-instant",
+            "openai/gpt-oss-20b (skipped missing OPENAI_API_KEY)"
+          ],
+          "delayed_retry_final_model": "openai/gpt-oss-20b",
+          "error_classification": "http_error",
+          "error": "401 Client Error: Unauthorized for url: https://api.groq.com/openai/v1/chat/completions"
+        },
+        {
           "source_article_id": "4366096",
           "canonical_url": "https://www.hkej.com/instantnews/property/article/4366096/%E7%8D%85%E5%B3%B0%E5%9C%B0%E7%94%A2%E4%BD%95%E6%96%87%E7%94%B0%E5%AD%B8%E7%94%9F%E5%85%AC%E5%AF%93%E6%8B%9B%E7%A7%9F+%E5%BA%8A%E4%BD%8D%E6%96%999000%E5%85%83%E8%B5%B7",
           "title": "獅峰地產何文田學生公寓招租 床位料9000元起",
@@ -3683,7 +4549,10 @@
           "key_points": [],
           "content_truncated": false,
           "analysis_method": "bypassed",
-          "model_used": "direct"
+          "model_used": "direct",
+          "theme": "property",
+          "attention_reason": "Lighter treatment because this story sits in the 地產新聞 section without strong market-moving signals.",
+          "must_keep": false
         },
         {
           "source_article_id": "4366091",
@@ -4163,37 +5032,169 @@
       ],
       "analysis_profile": "light",
       "model_used": "meta-llama/llama-4-scout-17b-16e-instruct",
-      "sub_batch_count": 6,
+      "sub_batch_count": 1,
       "diagnostics": {
-        "sub_batch_count": 3,
-        "split_reasons": [
-          "pre_send_budget"
-        ],
+        "sub_batch_count": 1,
+        "split_reasons": [],
         "models_attempted": [
-          "meta-llama/llama-4-scout-17b-16e-instruct"
+          "meta-llama/llama-4-scout-17b-16e-instruct",
+          "qwen/qwen3-32b",
+          "llama-3.1-8b-instant"
         ],
-        "estimated_input_tokens_max": 1463,
-        "serialized_request_bytes_max": 8700,
+        "estimated_input_tokens_max": 675,
+        "serialized_request_bytes_max": 4081,
         "rate_limit_waits": 0,
-        "partial_article_count": 0,
+        "partial_article_count": 1,
         "synthesis_wait_seconds_total": 0.0,
         "synthesis_retry_count": 0,
         "synthesis_retry_skipped_count": 0,
         "synthesis_budget_exhausted": false,
         "degraded_merge_used": false,
         "degraded_merge_reason": "",
-        "synthesis_merge_depth_max": 1,
+        "synthesis_merge_depth_max": 0,
         "model_switches": []
       },
-      "error": null
+      "error": "401 Client Error: Unauthorized for url: https://api.groq.com/openai/v1/chat/completions"
     }
   ],
   "errors": [
     {
       "type": "article",
+      "target": "https://www.hkej.com/instantnews/international/article/4367221/%E7%BE%8E%E5%9C%8B%E4%B8%8A%E5%91%A8%E5%8E%9F%E6%B2%B9%E5%BA%AB%E5%AD%98%E5%A2%9E308%E8%90%AC%E6%A1%B6+%E9%AB%98%E9%A0%90%E6%9C%9F",
+      "message": "401 Client Error: Unauthorized for url: https://api.groq.com/openai/v1/chat/completions",
+      "classification": "http_error"
+    },
+    {
+      "type": "article",
+      "target": "https://www.hkej.com/instantnews/international/article/4367219/%E7%BE%8E%E8%82%A1%E8%B5%B0%E5%8B%A2%E4%B8%A8%E7%BE%8E%E4%BC%8A%E6%9A%AB%E5%81%9C%E7%81%AB+%E9%81%93%E6%8C%87%E9%A3%86%E9%80%BE1000%E9%BB%9E",
+      "message": "401 Client Error: Unauthorized for url: https://api.groq.com/openai/v1/chat/completions",
+      "classification": "http_error"
+    },
+    {
+      "type": "article",
+      "target": "https://www.hkej.com/instantnews/international/article/4367133/IMF%E6%8C%87%E6%88%B0%E7%88%AD%E5%B0%8D%E5%9C%8B%E5%AE%B6%E7%B6%93%E6%BF%9F%E5%89%B5%E5%82%B7%E6%8C%81%E7%BA%8C%E9%80%BE10%E5%B9%B4",
+      "message": "401 Client Error: Unauthorized for url: https://api.groq.com/openai/v1/chat/completions",
+      "classification": "http_error"
+    },
+    {
+      "type": "article",
+      "target": "https://www.hkej.com/instantnews/international/article/4367126/%E7%BE%8E%E8%82%A1%E8%B5%B0%E5%8B%A2%E4%B8%A8%E9%81%93%E6%8C%87%E6%97%A9%E6%AE%B5%E9%A3%861300%E9%BB%9E+%E6%B2%B9%E5%83%B9%E8%B7%8C17%25",
+      "message": "401 Client Error: Unauthorized for url: https://api.groq.com/openai/v1/chat/completions",
+      "classification": "http_error"
+    },
+    {
+      "type": "category",
+      "target": "國際財經",
+      "message": "401 Client Error: Unauthorized for url: https://api.groq.com/openai/v1/chat/completions",
+      "classification": "unexpected_error"
+    },
+    {
+      "type": "article",
+      "target": "https://www.hkej.com/instantnews/current/article/4367169/%E4%BC%8A%E6%9C%97%E5%B1%80%E5%8B%A2%E4%B8%A8%E8%81%AF%E5%90%88%E5%9C%8B%E7%A7%98%E6%9B%B8%E9%95%B7%E7%89%B9%E4%BD%BF%E6%8A%B5%E4%BC%8A%E6%9C%97%E6%8E%A8%E5%8B%95%E6%8C%81%E4%B9%85%E7%B5%90%E6%9D%9F%E6%88%B0%E7%88%AD%E6%96%B9%E6%A1%88",
+      "message": "401 Client Error: Unauthorized for url: https://api.groq.com/openai/v1/chat/completions",
+      "classification": "http_error"
+    },
+    {
+      "type": "article",
+      "target": "https://www.hkej.com/instantnews/current/article/4367107/%E4%B8%AD%E6%9D%B1%E5%B1%80%E5%8B%A2%E4%B8%A8%E7%89%B9%E6%9C%97%E6%99%AE%E5%A8%81%E8%84%85%E5%B0%8D%E4%BC%8A%E6%9C%97%E6%8F%90%E4%BE%9B%E6%AD%A6%E5%99%A8%E5%9C%8B%E5%AE%B6%E5%BE%B550%25%E9%97%9C%E7%A8%85",
+      "message": "401 Client Error: Unauthorized for url: https://api.groq.com/openai/v1/chat/completions",
+      "classification": "http_error"
+    },
+    {
+      "type": "article",
+      "target": "https://www.hkej.com/instantnews/current/article/4367028/%E4%B8%AD%E6%9D%B1%E5%B1%80%E5%8B%A2%E4%B8%A8%E7%89%B9%E6%9C%97%E6%99%AE%3A%E7%BE%8E%E4%BC%8A%E6%88%96%E6%9C%83%E8%81%AF%E5%90%88%E7%AE%A1%E7%90%86%E9%9C%8D%E7%88%BE%E6%9C%A8%E8%8C%B2%E6%B5%B7%E5%B3%BD%E9%80%9A%E8%A1%8C%E8%B2%BB",
+      "message": "401 Client Error: Unauthorized for url: https://api.groq.com/openai/v1/chat/completions",
+      "classification": "http_error"
+    },
+    {
+      "type": "article",
       "target": "https://www.hkej.com/instantnews/current/article/4365700/%E4%BC%8A%E6%9C%97%E5%B1%80%E5%8B%A2%E4%B8%A8%E4%B8%AD%E4%BF%84%E5%90%A6%E6%B1%BA%E5%AE%89%E7%90%86%E6%9C%83%E6%B6%89%E9%9C%8D%E7%88%BE%E6%9C%A8%E8%8C%B2%E6%B5%B7%E5%B3%BD%E6%B1%BA%E8%AD%B0",
-      "message": "Model response omitted this article from the delayed retry batch.",
+      "message": "401 Client Error: Unauthorized for url: https://api.groq.com/openai/v1/chat/completions",
+      "classification": "http_error"
+    },
+    {
+      "type": "category",
+      "target": "時事脈搏",
+      "message": "401 Client Error: Unauthorized for url: https://api.groq.com/openai/v1/chat/completions",
+      "classification": "unexpected_error"
+    },
+    {
+      "type": "article",
+      "target": "https://www.hkej.com/instantnews/hongkong/article/4366787/%E5%AF%8C%E9%80%94%3A3%E6%9C%88%E6%9C%9F%E6%AC%8A%E9%A6%96%E6%AC%A1%E8%B3%BC%E8%B2%B7%E4%BA%BA%E6%95%B8%E6%8C%89%E6%9C%88%E5%A2%9E15.3%25",
+      "message": "401 Client Error: Unauthorized for url: https://api.groq.com/openai/v1/chat/completions",
+      "classification": "http_error"
+    },
+    {
+      "type": "category",
+      "target": "香港財經",
+      "message": "401 Client Error: Unauthorized for url: https://api.groq.com/openai/v1/chat/completions",
+      "classification": "unexpected_error"
+    },
+    {
+      "type": "article",
+      "target": "https://www.hkej.com/instantnews/stock/article/4367197/%E6%81%92%E6%8C%87%E5%A4%9C%E6%9C%9F%E4%B8%A8%E5%A0%B125920+%E8%B7%8C28%E9%BB%9E",
+      "message": "401 Client Error: Unauthorized for url: https://api.groq.com/openai/v1/chat/completions",
+      "classification": "http_error"
+    },
+    {
+      "type": "article",
+      "target": "https://www.hkej.com/instantnews/stock/article/4367085/%E6%81%92%E6%8C%87%E5%A4%9C%E6%9C%9F%E4%B8%A8%E5%A0%B126063+%E5%8D%87115%E9%BB%9E",
+      "message": "401 Client Error: Unauthorized for url: https://api.groq.com/openai/v1/chat/completions",
+      "classification": "http_error"
+    },
+    {
+      "type": "category",
+      "target": "港股直擊",
+      "message": "401 Client Error: Unauthorized for url: https://api.groq.com/openai/v1/chat/completions",
+      "classification": "unexpected_error"
+    },
+    {
+      "type": "article",
+      "target": "https://www.hkej.com/instantnews/china/article/4367069/%E7%A5%9E%E7%A7%98AI%E6%A8%A1%E5%9E%8B%E7%99%BB%E6%A6%9C%E9%A6%96+%E5%AF%8C%E7%91%9E%E6%8C%87%E7%94%B1%E9%98%BF%E9%87%8C%E5%B7%B4%E5%B7%B4%E9%96%8B%E7%99%BC",
+      "message": "401 Client Error: Unauthorized for url: https://api.groq.com/openai/v1/chat/completions",
+      "classification": "http_error"
+    },
+    {
+      "type": "article",
+      "target": "https://www.hkej.com/instantnews/china/article/4366757/%E4%B8%89%E6%98%9F%E9%9B%BB%E5%AD%90%E4%B8%AD%E5%9C%8B%E6%A5%AD%E5%8B%99%E5%82%B3%E5%B0%87%E9%87%8D%E7%B5%84+%E9%87%8D%E5%BF%83%E8%BD%89%E5%90%91%E5%8D%8A%E5%B0%8E%E9%AB%94",
+      "message": "401 Client Error: Unauthorized for url: https://api.groq.com/openai/v1/chat/completions",
+      "classification": "http_error"
+    },
+    {
+      "type": "category",
+      "target": "中國財經",
+      "message": "401 Client Error: Unauthorized for url: https://api.groq.com/openai/v1/chat/completions",
+      "classification": "unexpected_error"
+    },
+    {
+      "type": "category",
+      "target": "即巿股評",
+      "message": "401 Client Error: Unauthorized for url: https://api.groq.com/openai/v1/chat/completions",
+      "classification": "unexpected_error"
+    },
+    {
+      "type": "article",
+      "target": "https://www.hkej.com/instantnews/announcement/article/4367106/%E4%B8%AD%E9%8B%81%E6%96%99%E9%A6%96%E5%AD%A3%E7%9B%88%E5%88%A9%E5%A2%9E58%25",
+      "message": "401 Client Error: Unauthorized for url: https://api.groq.com/openai/v1/chat/completions",
+      "classification": "http_error"
+    },
+    {
+      "type": "category",
+      "target": "重要通告",
+      "message": "No successful article analyses available for synthesis.",
       "classification": "incomplete_model_output"
+    },
+    {
+      "type": "article",
+      "target": "https://www.hkej.com/instantnews/property/article/4366721/%E6%96%B0%E7%9B%A4%E4%B8%A8Blue+Coast%E5%9B%9B%E6%88%BF4407%E8%90%AC%E6%B2%BD%E9%9B%99%E7%A0%B4%E9%A0%82",
+      "message": "401 Client Error: Unauthorized for url: https://api.groq.com/openai/v1/chat/completions",
+      "classification": "http_error"
+    },
+    {
+      "type": "category",
+      "target": "地產新聞",
+      "message": "401 Client Error: Unauthorized for url: https://api.groq.com/openai/v1/chat/completions",
+      "classification": "unexpected_error"
     }
   ]
 }
