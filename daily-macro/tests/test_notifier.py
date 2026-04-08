@@ -9,6 +9,7 @@ from pathlib import Path
 from unittest.mock import patch
 
 from daily_macro.notifier import (
+    _build_html_articles,
     load_analysis_result,
     send_analysis_summary_email,
     send_test_email,
@@ -277,6 +278,33 @@ class NotifierTests(unittest.TestCase):
         self.assertTrue(sent)
         self.assertIn("Sent daily macro Gmail summary", message)
         self.assertEqual(len(_FakeSMTP.sent_messages), 1)
+
+    def test_build_html_articles_sorts_iso_timestamps_newest_first_within_tier(self) -> None:
+        html = _build_html_articles(
+            [
+                {
+                    "title": "Older high",
+                    "canonical_url": "https://example.com/older-high",
+                    "published_at": "2026-04-04T07:00:00+00:00",
+                    "attention_tier": "high",
+                },
+                {
+                    "title": "Newer high",
+                    "canonical_url": "https://example.com/newer-high",
+                    "published_at": "2026-04-04T07:05:00+00:00",
+                    "attention_tier": "high",
+                },
+                {
+                    "title": "Medium item",
+                    "canonical_url": "https://example.com/medium",
+                    "published_at": "2026-04-04T07:10:00+00:00",
+                    "attention_tier": "medium",
+                },
+            ]
+        )
+
+        self.assertLess(html.index("Newer high"), html.index("Older high"))
+        self.assertLess(html.index("Older high"), html.index("Medium item"))
 
 
 if __name__ == "__main__":

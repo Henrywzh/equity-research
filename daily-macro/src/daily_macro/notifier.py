@@ -835,7 +835,14 @@ def _to_epoch(date_str: str | None) -> int | None:
         return None
     try:
         from datetime import datetime
-        # Handles 2026-04-07 15:33:21 or similar
-        return int(datetime.strptime(date_str[:19], "%Y-%m-%d %H:%M:%S").timestamp())
+
+        normalized = date_str.strip().replace("Z", "+00:00")
+        return int(datetime.fromisoformat(normalized).timestamp())
     except Exception:
-        return None
+        try:
+            from datetime import datetime
+
+            # Backward-compatible fallback for naive timestamps like "2026-04-07 15:33:21".
+            return int(datetime.strptime(date_str[:19], "%Y-%m-%d %H:%M:%S").timestamp())
+        except Exception:
+            return None
