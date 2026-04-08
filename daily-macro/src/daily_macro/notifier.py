@@ -367,10 +367,15 @@ def _build_plain_subgroup_lines(category: dict[str, Any]) -> list[str]:
     lines: list[str] = []
     for subgroup in subgroups:
         subgroup_articles = subgroup.get("articles") or []
+        count_label = f" ({len(subgroup_articles)} article(s))"
         is_light_only = _is_light_only(subgroup_articles)
+        is_redundant_single = (len(subgroups) == 1)
         
-        lines.append(f"Subgroup: {subgroup.get('title') or 'Overview'}")
-        if not is_light_only:
+        title = subgroup.get('title') or 'Overview'
+        if not is_redundant_single:
+            lines.append(f"Subgroup: {title}{count_label}")
+        
+        if not is_light_only and not is_redundant_single:
             rationale = str(subgroup.get("theme_rationale") or "").strip()
             if rationale:
                 lines.append(f"  Theme: {rationale}")
@@ -381,7 +386,9 @@ def _build_plain_subgroup_lines(category: dict[str, Any]) -> list[str]:
                 labels = ", ".join(entity["name"] for entity in entities[:6] if entity.get("name"))
                 if labels:
                     lines.append(f"  Named entities: {labels}")
-        lines.extend(f"  - {line}" for line in _build_plain_article_lines(subgroup_articles))
+        
+        prefix = "  " if not is_redundant_single else ""
+        lines.extend(f"{prefix}- {line}" for line in _build_plain_article_lines(subgroup_articles))
     return lines
 
 
@@ -413,10 +420,15 @@ def _build_html_subgroups(category: dict[str, Any], category_name: str = "") -> 
     
     for subgroup in subgroups:
         subgroup_articles = subgroup.get("articles") or []
+        count_label = f" ({len(subgroup_articles)} article(s))"
         is_light_only = _is_light_only(subgroup_articles) and not is_property
         
+        # If there's only one subgroup, the summary is already shown at the category level.
+        # We suppress the redundant subgroup header and bullets.
+        is_redundant_single = (len(subgroups) == 1)
+        
         items_html = ""
-        if not is_light_only:
+        if not is_light_only and not is_redundant_single:
             developments = subgroup.get("key_developments") or []
             if is_property and developments:
                 items_html = _build_html_property_table(developments)
@@ -428,23 +440,27 @@ def _build_html_subgroups(category: dict[str, Any], category_name: str = "") -> 
                 items_html = f"<ul style='margin:0;padding-left:18px;color:#374151;line-height:1.6;'>{bullets}</ul>"
 
         rationale_html = ""
-        if not is_light_only:
+        if not is_light_only and not is_redundant_single:
             rationale = str(subgroup.get("theme_rationale") or "").strip()
             if rationale:
                 rationale_html = f"<p style='margin:6px 0 8px;color:#6b7280;'><strong>Theme:</strong> {_escape_html(rationale)}</p>"
 
         entities_html = ""
-        if not is_light_only:
+        if not is_light_only and not is_redundant_single:
             entities = subgroup.get("named_entities") or []
             entity_labels = ", ".join(_escape_html(str(entity.get("name") or "")) for entity in entities[:6] if entity.get("name"))
             if entity_labels:
                 entities_html = f"<p style='margin:8px 0 0;color:#4b5563;'><strong>Named entities:</strong> {entity_labels}</p>"
 
+        header_html = ""
+        if not is_redundant_single:
+            header_html = f'<div style="font-size:15px;font-weight:700;color:#111827;">{_escape_html(str(subgroup.get("title") or "Overview"))}{_escape_html(count_label)}</div>'
+
         article_links = _build_html_articles(subgroup_articles)
         blocks.append(
             f"""
             <div style="margin-top:16px;padding-top:14px;border-top:1px solid #f3f4f6;">
-              <div style="font-size:15px;font-weight:700;color:#111827;">{_escape_html(str(subgroup.get("title") or "Overview"))}</div>
+              {header_html}
               {rationale_html}
               {items_html}
               {entities_html}
