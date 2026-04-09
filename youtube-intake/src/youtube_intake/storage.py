@@ -49,6 +49,32 @@ def save_state(state_path: str | Path, state_by_slug: dict[str, ChannelState]) -
     path.write_text(json.dumps(payload, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
 
 
+def load_retry_manifest(path: str | Path) -> dict:
+    resolved = Path(path).expanduser().resolve()
+    if not resolved.exists():
+        return {"entries": []}
+
+    raw = resolved.read_text(encoding="utf-8").strip()
+    if not raw:
+        return {"entries": []}
+
+    payload = json.loads(raw)
+    if not isinstance(payload, dict):
+        return {"entries": []}
+    entries = payload.get("entries")
+    if not isinstance(entries, list):
+        payload["entries"] = []
+    return payload
+
+
+def save_retry_manifest(path: str | Path, payload: dict) -> None:
+    resolved = Path(path).expanduser().resolve()
+    resolved.parent.mkdir(parents=True, exist_ok=True)
+    normalized = dict(payload)
+    normalized["entries"] = list(payload.get("entries") or [])
+    resolved.write_text(json.dumps(normalized, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+
+
 def write_archive(
     *,
     data_dir: str | Path,

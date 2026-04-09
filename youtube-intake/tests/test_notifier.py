@@ -92,11 +92,32 @@ class NotifierTests(unittest.TestCase):
                 "top_claims_worth_watching": ["Watch whether markets stall near major resistance."],
                 "run_notes": ["meitou-news: transcript unavailable"],
             },
+            "retryable_failure_count": 1,
+            "non_retryable_failure_count": 0,
+            "queued_retry_count": 1,
+            "failed_items": [
+                {
+                    "channel_slug": "meitou-news",
+                    "video_id": "retry-me",
+                    "retryable": True,
+                    "failure_kind": "rate_limit",
+                    "next_retry_after": "2026-04-03T02:10:00+00:00",
+                }
+            ],
             "errors": [],
         }
 
     def test_no_videos_skips_send(self) -> None:
-        sent, message = send_analysis_summary_email({**self.summary, "videos": []})
+        sent, message = send_analysis_summary_email(
+            {
+                **self.summary,
+                "videos": [],
+                "retryable_failure_count": 0,
+                "non_retryable_failure_count": 0,
+                "queued_retry_count": 0,
+                "failed_items": [],
+            }
+        )
         self.assertFalse(sent)
         self.assertIn("No analyzed items", message)
 
@@ -136,6 +157,33 @@ class NotifierTests(unittest.TestCase):
         self.assertIn("metadata only", body)
         self.assertIn("Models used", body)
         self.assertIn("fallback model was activated", body)
+        self.assertIn("queued for retry", body)
+
+    def test_retry_only_summary_still_sends(self) -> None:
+        retry_summary = {
+            **self.summary,
+            "videos": [],
+            "run_summary": {
+                **self.summary["run_summary"],
+                "overall_day_summary": "No videos were analyzed in this attempt, but retryable failures were queued for a later replay.",
+            },
+        }
+        with patch.dict(
+            "os.environ",
+            {
+                GMAIL_SENDER_ENV: "sender@example.com",
+                GMAIL_APP_PASSWORD_ENV: "app-password",
+                GMAIL_RECIPIENT_ENV: "recipient@example.com",
+            },
+            clear=False,
+        ):
+            with patch("smtplib.SMTP_SSL") as mock_smtp:
+                sent, _message = send_analysis_summary_email(retry_summary)
+
+        self.assertTrue(sent)
+        server = mock_smtp.return_value.__enter__.return_value
+        sent_message = server.sendmail.call_args.args[2]
+        self.assertIn("retry scheduled", sent_message)
 
     def test_missing_credentials_raises_when_send_needed(self) -> None:
         with patch.dict("os.environ", {}, clear=True):

@@ -36,6 +36,12 @@ def get_state_path(custom_state_path: str | Path | None = None) -> Path:
     return get_project_root() / "state" / "channels.json"
 
 
+def get_retry_manifest_path(custom_retry_manifest_path: str | Path | None = None) -> Path:
+    if custom_retry_manifest_path is not None:
+        return Path(custom_retry_manifest_path).expanduser().resolve()
+    return get_project_root() / "state" / "analysis-retries.json"
+
+
 def get_data_dir(custom_data_dir: str | Path | None = None) -> Path:
     if custom_data_dir is not None:
         return Path(custom_data_dir).expanduser().resolve()

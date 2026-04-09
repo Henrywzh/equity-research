@@ -6,15 +6,16 @@ import random
 import time
 from collections import defaultdict, deque
 from dataclasses import dataclass
+from datetime import datetime, timedelta, timezone
 from pathlib import Path
 from typing import Any, Callable
 
 import requests
 
-from .config import get_data_dir
+from .config import get_data_dir, get_retry_manifest_path
 from .profiles import AnalysisProfile, get_profile
 from .runtime_env import load_local_config, read_env_list
-from .storage import load_json_document, write_json_document
+from .storage import load_json_document, load_retry_manifest, save_retry_manifest, write_json_document
 
 
 GROQ_API_KEY_ENV = "GROQ_API_KEY"
@@ -28,6 +29,8 @@ TRANSIENT_EXCEPTION_TYPES = (
     requests.ConnectionError,
 )
 DEFAULT_BACKOFF_SECONDS = (2.0, 5.0, 10.0)
+RETRY_BACKOFF_MINUTES = (65, 360, 1440)
+MAX_ANALYSIS_RETRY_ATTEMPTS = 3
 
 
 @dataclass(frozen=True)
@@ -770,25 +773,88 @@ def analyze_run(
     result_path: str | Path,
     analysis_result_path: str | Path,
     data_dir: str | Path | None = None,
+    retry_manifest_path: str | Path | None = None,
     client: GroqAnalystClient | None = None,
 ) -> dict[str, Any]:
     resolved_result_path = Path(result_path).expanduser().resolve()
     resolved_analysis_result_path = Path(analysis_result_path).expanduser().resolve()
     run_result = load_json_document(resolved_result_path)
     resolved_data_dir = get_data_dir(data_dir)
+    resolved_retry_manifest_path = get_retry_manifest_path(retry_manifest_path)
     client = client or GroqAnalystClient()
 
-    analysis_started_at = run_result.get("analysis_started_at") or _utc_now()
-    run_key = _make_run_key(str(run_result.get("run_started_at") or analysis_started_at))
-    analysis_root = resolved_data_dir / "analysis" / run_key
+    result = _analyze_items(
+        items=list(run_result.get("new_items") or []),
+        run_started_at=run_result.get("run_started_at"),
+        analysis_started_at=run_result.get("analysis_started_at") or _utc_now(),
+        analysis_result_path=resolved_analysis_result_path,
+        data_dir=resolved_data_dir,
+        retry_manifest_path=resolved_retry_manifest_path,
+        client=client,
+        analysis_reason="fresh_run",
+    )
+    _update_run_result_with_analysis_paths(
+        resolved_result_path,
+        run_result,
+        analysis_result_path=resolved_analysis_result_path,
+        analysis_artifact_dir=Path(result["analysis_artifact_dir"]),
+    )
+    return result
+
+
+def replay_analyze(
+    *,
+    analysis_result_path: str | Path,
+    archive_paths: list[str] | None = None,
+    archive_dir: str | Path | None = None,
+    retry_manifest_path: str | Path | None = None,
+    data_dir: str | Path | None = None,
+    client: GroqAnalystClient | None = None,
+) -> dict[str, Any]:
+    resolved_analysis_result_path = Path(analysis_result_path).expanduser().resolve()
+    resolved_retry_manifest_path = get_retry_manifest_path(retry_manifest_path)
+    resolved_data_dir = get_data_dir(data_dir)
+    client = client or GroqAnalystClient()
+
+    items = _collect_replay_items(
+        archive_paths=archive_paths,
+        archive_dir=archive_dir,
+        retry_manifest_path=resolved_retry_manifest_path,
+    )
+    return _analyze_items(
+        items=items,
+        run_started_at=_utc_now(),
+        analysis_started_at=_utc_now(),
+        analysis_result_path=resolved_analysis_result_path,
+        data_dir=resolved_data_dir,
+        retry_manifest_path=resolved_retry_manifest_path,
+        client=client,
+        analysis_reason="replay",
+    )
+
+
+def _analyze_items(
+    *,
+    items: list[dict[str, Any]],
+    run_started_at: str | None,
+    analysis_started_at: str,
+    analysis_result_path: Path,
+    data_dir: Path,
+    retry_manifest_path: Path,
+    client: GroqAnalystClient,
+    analysis_reason: str,
+) -> dict[str, Any]:
+    run_key = _make_run_key(str(run_started_at or analysis_started_at))
+    analysis_root = data_dir / "analysis" / run_key
     videos_dir = analysis_root / "videos"
     summary_path = analysis_root / "run-summary.json"
 
     result: dict[str, Any] = {
         "status": "success",
-        "run_started_at": run_result.get("run_started_at"),
+        "run_started_at": run_started_at,
         "analysis_started_at": analysis_started_at,
         "analysis_completed_at": None,
+        "analysis_reason": analysis_reason,
         "analysis_model": getattr(client, "model_id", PRIMARY_ANALYSIS_MODEL_ID),
         "analysis_models_used": [],
         "fallback_activated": False,
@@ -797,6 +863,11 @@ def analyze_run(
         "keys_available": 0,
         "keys_used": [],
         "groq_auth_failure": False,
+        "retryable_failure_count": 0,
+        "non_retryable_failure_count": 0,
+        "queued_retry_count": 0,
+        "retry_manifest_path": str(retry_manifest_path),
+        "retry_scheduled": False,
         "analysis_artifact_dir": str(analysis_root),
         "summary_analysis_path": str(summary_path),
         "summary_analysis_model": None,
@@ -805,40 +876,34 @@ def analyze_run(
         "channels": {},
         "run_summary": {},
         "errors": [],
+        "failed_items": [],
     }
 
-    new_items = list(run_result.get("new_items") or [])
-    if not new_items:
+    if not items:
         result["status"] = "noop"
         result["analysis_completed_at"] = _utc_now()
         result["run_summary"] = {
-            "overall_day_summary": "No newly archived videos were available for analysis.",
+            "overall_day_summary": "No archived videos were available for analysis.",
             "cross_video_themes": [],
             "agreements": [],
             "disagreements": [],
             "top_claims_worth_watching": [],
             "run_notes": [],
         }
-        result["analysis_models_used"] = list(getattr(client, "analysis_models_used", []))
-        result["fallback_activated"] = bool(getattr(client, "fallback_activated", False))
-        result["rate_limit_events"] = list(getattr(client, "rate_limit_events", []))
-        result["key_rotation_count"] = int(getattr(client, "key_rotation_count", 0))
-        result["keys_available"] = int(getattr(client, "keys_available", 0))
-        result["keys_used"] = list(getattr(client, "keys_used", []))
-        result["groq_auth_failure"] = bool(getattr(client, "groq_auth_failure", False))
-        write_json_document(resolved_analysis_result_path, result)
-        _update_run_result_with_analysis_paths(
-            resolved_result_path,
-            run_result,
-            analysis_result_path=resolved_analysis_result_path,
-            analysis_artifact_dir=analysis_root,
-        )
+        _apply_client_diagnostics(result, client)
+        write_json_document(analysis_result_path, result)
         return result
 
-    for item in new_items:
+    successful_archive_paths: set[str] = set()
+    retryable_failures: list[dict[str, Any]] = []
+    non_retryable_failures: list[dict[str, Any]] = []
+
+    for item in items:
         archive_path = item.get("archive_path")
         if not archive_path:
-            result["errors"].append(f"Missing archive path for {item.get('video_id') or 'unknown video'}.")
+            failure = _build_failure_record(item, "non_retryable", "Missing archive path.", retryable=False)
+            non_retryable_failures.append(failure)
+            result["errors"].append(failure["failure_message"])
             result["status"] = "partial_success"
             continue
         try:
@@ -849,9 +914,10 @@ def analyze_run(
                 if "channel_slug" in maybe_analysis and "analysis_model" in maybe_analysis
                 else _normalize_video_analysis(maybe_analysis, archive)
             )
+            resolved_archive_path = str(Path(archive_path).expanduser().resolve())
             video_analysis.update(
                 {
-                    "archive_path": str(Path(archive_path).expanduser().resolve()),
+                    "archive_path": resolved_archive_path,
                     "analysis_path": str(
                         write_json_document(
                             videos_dir / f"{video_analysis['channel_slug']}--{video_analysis['video_id']}.json",
@@ -861,13 +927,34 @@ def analyze_run(
                 }
             )
             result["videos"].append(video_analysis)
+            successful_archive_paths.add(resolved_archive_path)
         except Exception as exc:  # pragma: no cover - API/provider variability
-            result["errors"].append(f"{item.get('channel_slug') or 'unknown'}:{item.get('video_id') or 'unknown'}: {exc}")
+            classification = _classify_analysis_failure(exc)
+            failure = _build_failure_record(
+                item,
+                classification["failure_kind"],
+                f"{item.get('channel_slug') or 'unknown'}:{item.get('video_id') or 'unknown'}: {exc}",
+                retryable=classification["retryable"],
+            )
+            result["errors"].append(failure["failure_message"])
             result["status"] = "partial_success"
+            if classification["retryable"]:
+                retryable_failures.append(failure)
+            else:
+                non_retryable_failures.append(failure)
+
+    retry_manifest = _update_retry_manifest(
+        retry_manifest_path=retry_manifest_path,
+        retryable_failures=retryable_failures,
+        successful_archive_paths=successful_archive_paths,
+    )
 
     if result["videos"]:
         try:
-            run_summary = client.synthesize_run(run_result=run_result, video_analyses=result["videos"])
+            run_summary = client.synthesize_run(
+                run_result={"run_started_at": run_started_at, "new_items": items},
+                video_analyses=result["videos"],
+            )
             result["channels"] = run_summary["channels"]
             result["run_summary"] = run_summary["run_summary"]
             result["summary_analysis_model"] = run_summary.get("summary_analysis_model")
@@ -894,23 +981,31 @@ def analyze_run(
             "run_notes": [],
         }
 
+    result["failed_items"] = retryable_failures + non_retryable_failures
+    result["retryable_failure_count"] = len(retryable_failures)
+    result["non_retryable_failure_count"] = len(non_retryable_failures)
+    result["queued_retry_count"] = int(retry_manifest.get("queued_retry_count", 0))
+    result["retry_scheduled"] = bool(result["queued_retry_count"])
+
     run_notes = list(result["run_summary"].get("run_notes") or [])
     run_notes.extend(str(item) for item in getattr(client, "run_notes", []))
     for video in result["videos"]:
         for note in video.get("analysis_notes") or []:
             run_notes.append(f"{video.get('channel_slug')}/{video.get('video_id')}: {note}")
+    for failure in retryable_failures:
+        run_notes.append(
+            f"{failure['channel_slug']}/{failure['video_id']}: queued for retry after {failure['next_retry_after']} "
+            f"({failure['failure_kind']})."
+        )
+    for failure in non_retryable_failures:
+        run_notes.append(
+            f"{failure['channel_slug']}/{failure['video_id']}: not queued for retry ({failure['failure_kind']})."
+        )
     if result["errors"]:
         run_notes.extend(result["errors"])
     result["run_summary"]["run_notes"] = _dedupe_preserve_order(run_notes)
 
-    result["analysis_model"] = getattr(client, "model_id", result["analysis_model"])
-    result["analysis_models_used"] = list(getattr(client, "analysis_models_used", []))
-    result["fallback_activated"] = bool(getattr(client, "fallback_activated", False))
-    result["rate_limit_events"] = list(getattr(client, "rate_limit_events", []))
-    result["key_rotation_count"] = int(getattr(client, "key_rotation_count", 0))
-    result["keys_available"] = int(getattr(client, "keys_available", 0))
-    result["keys_used"] = list(getattr(client, "keys_used", []))
-    result["groq_auth_failure"] = bool(getattr(client, "groq_auth_failure", False))
+    _apply_client_diagnostics(result, client)
     if not result["videos"] and result["groq_auth_failure"]:
         failure_notes = list(result["run_summary"].get("run_notes") or [])
         result["status"] = "failed"
@@ -922,14 +1017,14 @@ def analyze_run(
             "top_claims_worth_watching": [],
             "run_notes": failure_notes,
         }
+    elif not result["videos"] and result["retryable_failure_count"]:
+        result["status"] = "partial_success"
+        result["run_summary"]["overall_day_summary"] = (
+            "No videos were analyzed in this attempt, but retryable failures were queued for a later replay."
+        )
+
     result["analysis_completed_at"] = _utc_now()
-    write_json_document(resolved_analysis_result_path, result)
-    _update_run_result_with_analysis_paths(
-        resolved_result_path,
-        run_result,
-        analysis_result_path=resolved_analysis_result_path,
-        analysis_artifact_dir=analysis_root,
-    )
+    write_json_document(analysis_result_path, result)
     return result
 
 
@@ -944,6 +1039,214 @@ def _update_run_result_with_analysis_paths(
     updated["analysis_result_path"] = str(analysis_result_path)
     updated["analysis_artifact_dir"] = str(analysis_artifact_dir)
     write_json_document(result_path, updated)
+
+
+def _collect_replay_items(
+    *,
+    archive_paths: list[str] | None,
+    archive_dir: str | Path | None,
+    retry_manifest_path: Path,
+) -> list[dict[str, Any]]:
+    items: list[dict[str, Any]] = []
+    seen: set[str] = set()
+
+    def add_archive(path_value: str | Path, *, from_retry: bool = False) -> None:
+        resolved = str(Path(path_value).expanduser().resolve())
+        if resolved in seen:
+            return
+        try:
+            archive = load_json_document(resolved)
+            channel = archive.get("channel") or {}
+            video = archive.get("video") or {}
+            items.append(
+                {
+                    "archive_path": resolved,
+                    "channel_slug": channel.get("slug") or "unknown",
+                    "channel_handle": channel.get("handle") or "",
+                    "channel_name": channel.get("channel_name"),
+                    "video_id": video.get("video_id") or "",
+                    "title": video.get("title") or "",
+                    "webpage_url": video.get("webpage_url") or "",
+                    "published_at": archive.get("published_at"),
+                    "source_kind": archive.get("source_kind") or "video",
+                    "transcript_status": archive.get("transcript_status") or "unknown",
+                    "description_excerpt": str(archive.get("description") or "")[:240],
+                    "from_retry_manifest": from_retry,
+                }
+            )
+        except FileNotFoundError:
+            items.append(
+                {
+                    "archive_path": resolved,
+                    "channel_slug": "unknown",
+                    "channel_handle": "",
+                    "channel_name": None,
+                    "video_id": "",
+                    "title": "",
+                    "webpage_url": "",
+                    "published_at": None,
+                    "source_kind": "video",
+                    "transcript_status": "unknown",
+                    "description_excerpt": "",
+                    "from_retry_manifest": from_retry,
+                }
+            )
+        seen.add(resolved)
+
+    for path_value in archive_paths or []:
+        add_archive(path_value)
+
+    if archive_dir:
+        for candidate in sorted(Path(archive_dir).expanduser().resolve().glob("*.json")):
+            add_archive(candidate)
+
+    manifest = load_retry_manifest(retry_manifest_path)
+    for entry in manifest.get("entries") or []:
+        if not _is_retry_due(entry):
+            continue
+        archive_path = entry.get("archive_path")
+        if archive_path:
+            add_archive(archive_path, from_retry=True)
+
+    return items
+
+
+def _apply_client_diagnostics(result: dict[str, Any], client: GroqAnalystClient) -> None:
+    result["analysis_model"] = getattr(client, "model_id", result["analysis_model"])
+    result["analysis_models_used"] = list(getattr(client, "analysis_models_used", []))
+    result["fallback_activated"] = bool(getattr(client, "fallback_activated", False))
+    result["rate_limit_events"] = list(getattr(client, "rate_limit_events", []))
+    result["key_rotation_count"] = int(getattr(client, "key_rotation_count", 0))
+    result["keys_available"] = int(getattr(client, "keys_available", 0))
+    result["keys_used"] = list(getattr(client, "keys_used", []))
+    result["groq_auth_failure"] = bool(getattr(client, "groq_auth_failure", False))
+
+
+def _classify_analysis_failure(exc: Exception) -> dict[str, Any]:
+    message = str(exc)
+    retryable = False
+    failure_kind = "non_retryable"
+    if isinstance(exc, GroqKeyExhaustionError):
+        retryable = not exc.auth_failure
+        failure_kind = "groq_auth_failure" if exc.auth_failure else "provider_exhaustion"
+    elif isinstance(exc, RetryExhaustedError):
+        retryable = True
+        failure_kind = "provider_retry_exhausted"
+    elif isinstance(exc, (requests.Timeout, requests.ConnectionError)):
+        retryable = True
+        failure_kind = "connection_error"
+    else:
+        lowered = message.lower()
+        if any(code in lowered for code in ("http 429", " 429 ", "rate limit", "too many requests")):
+            retryable = True
+            failure_kind = "rate_limit"
+        elif any(code in lowered for code in ("http 408", "http 500", "http 502", "http 503", "http 504")):
+            retryable = True
+            failure_kind = "provider_http_error"
+        elif "401" in lowered and "unauthorized" in lowered:
+            retryable = False
+            failure_kind = "groq_auth_failure"
+    return {"retryable": retryable, "failure_kind": failure_kind}
+
+
+def _build_failure_record(
+    item: dict[str, Any],
+    failure_kind: str,
+    failure_message: str,
+    *,
+    retryable: bool,
+) -> dict[str, Any]:
+    return {
+        "channel_slug": item.get("channel_slug") or "unknown",
+        "video_id": item.get("video_id") or "unknown",
+        "archive_path": str(item.get("archive_path") or ""),
+        "failure_kind": failure_kind,
+        "failure_message": failure_message,
+        "retryable": retryable,
+    }
+
+
+def _update_retry_manifest(
+    *,
+    retry_manifest_path: Path,
+    retryable_failures: list[dict[str, Any]],
+    successful_archive_paths: set[str],
+) -> dict[str, Any]:
+    manifest = load_retry_manifest(retry_manifest_path)
+    entries = list(manifest.get("entries") or [])
+    filtered_entries: list[dict[str, Any]] = []
+    for entry in entries:
+        archive_path = str(entry.get("archive_path") or "")
+        if archive_path and archive_path in successful_archive_paths:
+            continue
+        filtered_entries.append(entry)
+
+    by_archive_path = {str(entry.get("archive_path") or ""): dict(entry) for entry in filtered_entries if entry.get("archive_path")}
+    queued_retry_count = 0
+    for failure in retryable_failures:
+        archive_path = failure["archive_path"]
+        existing = by_archive_path.get(archive_path)
+        attempt_count = int(existing.get("attempt_count", 0)) + 1 if existing else 1
+        if attempt_count > MAX_ANALYSIS_RETRY_ATTEMPTS:
+            by_archive_path[archive_path] = {
+                "channel_slug": failure["channel_slug"],
+                "video_id": failure["video_id"],
+                "archive_path": archive_path,
+                "failed_at": _utc_now(),
+                "failure_kind": failure["failure_kind"],
+                "failure_message": failure["failure_message"],
+                "attempt_count": attempt_count - 1,
+                "next_retry_after": None,
+                "retry_exhausted": True,
+                "exhausted_at": _utc_now(),
+            }
+            failure["retry_exhausted"] = True
+            continue
+        payload = {
+            "channel_slug": failure["channel_slug"],
+            "video_id": failure["video_id"],
+            "archive_path": archive_path,
+            "failed_at": _utc_now(),
+            "failure_kind": failure["failure_kind"],
+            "failure_message": failure["failure_message"],
+            "attempt_count": attempt_count,
+            "next_retry_after": _compute_next_retry_after(attempt_count),
+            "retry_exhausted": False,
+        }
+        failure["attempt_count"] = attempt_count
+        failure["next_retry_after"] = payload["next_retry_after"]
+        by_archive_path[archive_path] = payload
+        queued_retry_count += 1
+
+    updated_entries = sorted(by_archive_path.values(), key=lambda entry: (entry.get("next_retry_after") or "", entry.get("archive_path") or ""))
+    updated_manifest = {
+        "updated_at": _utc_now(),
+        "entries": updated_entries,
+        "queued_retry_count": queued_retry_count,
+    }
+    save_retry_manifest(retry_manifest_path, updated_manifest)
+    return updated_manifest
+
+
+def _is_retry_due(entry: dict[str, Any]) -> bool:
+    next_retry_after = entry.get("next_retry_after")
+    failed_at = entry.get("failed_at")
+    if not next_retry_after or not failed_at:
+        return False
+    try:
+        due_at = _parse_iso_datetime(str(next_retry_after))
+        failed_time = _parse_iso_datetime(str(failed_at))
+    except ValueError:
+        return False
+    now = datetime.now(timezone.utc)
+    if now < due_at:
+        return False
+    return now >= failed_time + timedelta(minutes=65)
+
+
+def _compute_next_retry_after(attempt_count: int) -> str:
+    minutes = RETRY_BACKOFF_MINUTES[min(max(attempt_count - 1, 0), len(RETRY_BACKOFF_MINUTES) - 1)]
+    return (datetime.now(timezone.utc) + timedelta(minutes=minutes)).isoformat()
 
 
 def _normalize_video_analysis(raw: dict[str, Any], archive: dict[str, Any], *, profile: AnalysisProfile | None = None) -> dict[str, Any]:
@@ -1518,8 +1821,6 @@ def _dedupe_preserve_order(values: list[str]) -> list[str]:
 
 
 def _utc_now() -> str:
-    from datetime import datetime, timezone
-
     return datetime.now(timezone.utc).isoformat()
 
 
@@ -1530,3 +1831,11 @@ def _make_run_key(value: str) -> str:
         .replace("/", "-")
         .replace(" ", "_")
     )
+
+
+def _parse_iso_datetime(value: str) -> datetime:
+    normalized = value.replace("Z", "+00:00")
+    parsed = datetime.fromisoformat(normalized)
+    if parsed.tzinfo is None:
+        parsed = parsed.replace(tzinfo=timezone.utc)
+    return parsed.astimezone(timezone.utc)

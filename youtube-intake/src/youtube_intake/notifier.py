@@ -30,7 +30,8 @@ def load_run_result(result_path: str | Path) -> dict[str, Any]:
 
 def send_analysis_summary_email(summary: dict[str, Any]) -> tuple[bool, str]:
     videos = list(summary.get("videos") or [])
-    if not videos:
+    has_retry_note = bool(summary.get("queued_retry_count")) or bool(summary.get("retryable_failure_count"))
+    if not videos and not has_retry_note:
         return False, "No analyzed items to email."
 
     sender, app_password, recipient = _get_gmail_credentials()
@@ -157,11 +158,16 @@ def send_test_email() -> tuple[bool, str]:
 
 def _build_subject(summary: dict[str, Any]) -> str:
     videos = list(summary.get("videos") or [])
+    queued_retry_count = int(summary.get("queued_retry_count") or 0)
     channels = sorted({item.get("channel_name") or item.get("channel_slug") or "Unknown" for item in videos})
     if len(channels) == 1:
         channel_label = channels[0]
     else:
         channel_label = f"{len(channels)} channels"
+    if not videos and queued_retry_count:
+        return f"[YOUTUBE ANALYST] retry scheduled for {queued_retry_count} video(s)"
+    if queued_retry_count:
+        return f"[YOUTUBE ANALYST] {len(videos)} video(s) across {channel_label} + {queued_retry_count} retry"
     return f"[YOUTUBE ANALYST] {len(videos)} video(s) across {channel_label}"
 
 
@@ -198,6 +204,17 @@ def _build_plain_body(summary: dict[str, Any]) -> str:
         str(run_summary.get("overall_day_summary") or "No summary available."),
         "",
     ]
+
+    if summary.get("retryable_failure_count") or summary.get("non_retryable_failure_count"):
+        lines.extend(
+            [
+                "Partial analysis status:",
+                f"- Analyzed videos: {len(summary.get('videos') or [])}",
+                f"- Queued retries: {summary.get('queued_retry_count') or 0}",
+                f"- Non-retryable failures: {summary.get('non_retryable_failure_count') or 0}",
+                "",
+            ]
+        )
 
     if run_summary.get("cross_video_themes"):
         lines.append("Cross-video themes:")
@@ -327,6 +344,7 @@ def _build_html_body(summary: dict[str, Any]) -> str:
       <p style="margin:0 0 12px;color:#4b5563;">Run started at {_escape_html(str(summary.get('run_started_at') or 'Unknown'))}.</p>
       <p style="margin:0 0 12px;color:#4b5563;">Models used: {_escape_html(', '.join(str(model) for model in (summary.get('analysis_models_used') or []) if str(model).strip()) or '(not recorded)')}</p>
       <p style="margin:0;color:#111827;line-height:1.7;"><strong>Top run summary:</strong> {_escape_html(run_summary.get('overall_day_summary') or 'No summary available.')}</p>
+      {_build_partial_status_html(summary)}
       {themes_html}
       {crowded_html}
       {contrarian_html}
@@ -433,6 +451,21 @@ def _build_notes(summary: dict[str, Any]) -> list[str]:
     notes = list(summary.get("errors") or [])
     run_summary = summary.get("run_summary") or {}
     notes.extend(str(item) for item in (run_summary.get("run_notes") or []))
+    for failed_item in summary.get("failed_items") or []:
+        if failed_item.get("retry_exhausted"):
+            notes.append(
+                f"{failed_item.get('channel_slug')}/{failed_item.get('video_id')}: retry budget exhausted."
+            )
+        elif failed_item.get("retryable"):
+            notes.append(
+                f"{failed_item.get('channel_slug')}/{failed_item.get('video_id')}: queued for retry after "
+                f"{failed_item.get('next_retry_after') or 'unknown time'}."
+            )
+        else:
+            notes.append(
+                f"{failed_item.get('channel_slug')}/{failed_item.get('video_id')}: "
+                f"{failed_item.get('failure_kind') or 'analysis failure'}."
+            )
 
     metadata_only = [
         f"{item.get('channel_name') or item.get('channel_slug')}: analyzed from metadata only."
@@ -450,6 +483,21 @@ def _build_notes(summary: dict[str, Any]) -> list[str]:
         seen.add(note)
         unique_notes.append(note)
     return unique_notes
+
+
+def _build_partial_status_html(summary: dict[str, Any]) -> str:
+    retryable_failure_count = int(summary.get("retryable_failure_count") or 0)
+    non_retryable_failure_count = int(summary.get("non_retryable_failure_count") or 0)
+    queued_retry_count = int(summary.get("queued_retry_count") or 0)
+    if not (retryable_failure_count or non_retryable_failure_count or queued_retry_count):
+        return ""
+    return (
+        "<div style='margin:18px 0;padding:14px;border:1px solid #f59e0b;background:#fffbeb;border-radius:10px;'>"
+        "<div style='font-weight:700;margin-bottom:6px;color:#92400e;'>Partial analysis status</div>"
+        f"<div style='color:#78350f;'>Analyzed videos: {len(summary.get('videos') or [])}<br />"
+        f"Queued retries: {queued_retry_count}<br />"
+        f"Non-retryable failures: {non_retryable_failure_count}</div></div>"
+    )
 
 
 def _escape_html(value: Any) -> str:

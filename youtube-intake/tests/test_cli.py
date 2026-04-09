@@ -91,6 +91,32 @@ class CliTests(unittest.TestCase):
         payload = json.loads(buffer.getvalue())
         self.assertEqual(payload["status"], "failed")
 
+    def test_replay_analyze_passes_expected_inputs(self) -> None:
+        with patch(
+            "youtube_intake.cli.replay_analyze",
+            return_value={"status": "partial_success", "videos": [], "queued_retry_count": 1},
+        ) as mock_replay:
+            exit_code = main(
+                [
+                    "replay-analyze",
+                    "--archive-path",
+                    "/tmp/archive.json",
+                    "--retry-manifest",
+                    "/tmp/retries.json",
+                    "--analysis-result-path",
+                    "/tmp/replay-analysis.json",
+                ]
+            )
+
+        self.assertEqual(exit_code, 0)
+        mock_replay.assert_called_once_with(
+            archive_paths=["/tmp/archive.json"],
+            archive_dir=None,
+            retry_manifest_path="/tmp/retries.json",
+            analysis_result_path="/tmp/replay-analysis.json",
+            data_dir=None,
+        )
+
 
 if __name__ == "__main__":
     unittest.main()

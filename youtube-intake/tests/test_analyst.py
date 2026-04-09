@@ -16,8 +16,9 @@ from youtube_intake.analyst import (
     SlidingWindowRateLimiter,
     _normalize_video_analysis,
     analyze_run,
+    replay_analyze,
 )
-from youtube_intake.storage import write_json_document
+from youtube_intake.storage import load_retry_manifest, write_json_document
 
 
 class FakeResponse:
@@ -117,6 +118,7 @@ class AnalystTests(unittest.TestCase):
         self.data_dir = self.root / "data"
         self.run_result_path = self.root / "run-result.json"
         self.analysis_result_path = self.root / "analysis-result.json"
+        self.retry_manifest_path = self.root / "analysis-retries.json"
 
     def tearDown(self) -> None:
         self.temp_dir.cleanup()
@@ -561,6 +563,7 @@ class AnalystTests(unittest.TestCase):
             result_path=self.run_result_path,
             analysis_result_path=self.analysis_result_path,
             data_dir=self.data_dir,
+            retry_manifest_path=self.retry_manifest_path,
             client=PartialFailureClient(),
         )
 
@@ -568,6 +571,8 @@ class AnalystTests(unittest.TestCase):
         self.assertEqual(len(result["videos"]), 1)
         self.assertIn("fallback exhausted", " ".join(result["errors"]))
         self.assertIn("Second video failed after fallback retries.", result["run_summary"]["run_notes"])
+        self.assertEqual(result["retryable_failure_count"], 0)
+        self.assertEqual(result["non_retryable_failure_count"], 1)
 
     def test_analyze_run_records_models_used_and_run_summary(self) -> None:
         clock = FakeClock()
@@ -622,6 +627,7 @@ class AnalystTests(unittest.TestCase):
             result_path=self.run_result_path,
             analysis_result_path=self.analysis_result_path,
             data_dir=self.data_dir,
+            retry_manifest_path=self.retry_manifest_path,
             client=client,
         )
 
@@ -650,11 +656,225 @@ class AnalystTests(unittest.TestCase):
             result_path=self.run_result_path,
             analysis_result_path=self.analysis_result_path,
             data_dir=self.data_dir,
+            retry_manifest_path=self.retry_manifest_path,
             client=PartialFailureClient(),
         )
 
         self.assertEqual(result["status"], "noop")
         self.assertEqual(result["videos"], [])
+
+    def test_retryable_failures_are_queued_for_retry(self) -> None:
+        archive_one = write_json_document(
+            self.data_dir / "youtube" / "top3pct" / "videos" / "abc.json",
+            _archive_payload("top3pct", "3% 財富覺醒", "abc"),
+        )
+        write_json_document(
+            self.run_result_path,
+            {
+                "status": "success",
+                "run_started_at": "2026-04-03T01:00:00+00:00",
+                "new_items": [{"archive_path": str(archive_one), "channel_slug": "top3pct", "video_id": "abc"}],
+                "errors": [],
+            },
+        )
+        transport = FakeTransport(responses=[FakeResponse(status_code=429), FakeResponse(status_code=429)])
+        client = GroqAnalystClient(api_key="key-one,key-two", jitter_fn=lambda: 0.0, transport=transport)
+
+        result = analyze_run(
+            result_path=self.run_result_path,
+            analysis_result_path=self.analysis_result_path,
+            data_dir=self.data_dir,
+            retry_manifest_path=self.retry_manifest_path,
+            client=client,
+        )
+
+        manifest = load_retry_manifest(self.retry_manifest_path)
+        self.assertEqual(result["status"], "partial_success")
+        self.assertEqual(result["videos"], [])
+        self.assertEqual(result["retryable_failure_count"], 1)
+        self.assertEqual(result["queued_retry_count"], 1)
+        self.assertTrue(result["retry_scheduled"])
+        self.assertEqual(len(manifest["entries"]), 1)
+        self.assertEqual(manifest["entries"][0]["video_id"], "abc")
+
+    def test_replay_analyze_succeeds_for_single_archive_path(self) -> None:
+        archive_one = write_json_document(
+            self.data_dir / "youtube" / "top3pct" / "videos" / "abc.json",
+            _archive_payload("top3pct", "3% 財富覺醒", "abc"),
+        )
+        transport = FakeTransport(
+            responses=[
+                _success_response(
+                    {
+                        "executive_summary": "Video summary.",
+                        "tickers_mentioned": [],
+                        "macro_developments": [],
+                        "key_timestamps": [],
+                        "topic_tags": [{"tag": "macro", "score": 90}],
+                        "confidence": 0.8,
+                    }
+                ),
+                _success_response(
+                    {
+                        "overall_day_summary": "Replay summary.",
+                        "channel_summaries": [{"channel_slug": "top3pct", "summary": "Channel summary.", "top_topics": ["macro"]}],
+                        "cross_video_themes": ["macro"],
+                        "agreements": [],
+                        "disagreements": [],
+                        "top_claims_worth_watching": [],
+                        "crowded_trades": [],
+                        "contrarian_flags": [],
+                    }
+                ),
+            ]
+        )
+        client = GroqAnalystClient(api_key="test-key", jitter_fn=lambda: 0.0, transport=transport)
+
+        result = replay_analyze(
+            archive_paths=[str(archive_one)],
+            analysis_result_path=self.analysis_result_path,
+            data_dir=self.data_dir,
+            retry_manifest_path=self.retry_manifest_path,
+            client=client,
+        )
+
+        self.assertEqual(result["status"], "success")
+        self.assertEqual(result["analysis_reason"], "replay")
+        self.assertEqual(len(result["videos"]), 1)
+
+    def test_replay_analyze_processes_only_due_retry_entries(self) -> None:
+        archive_one = write_json_document(
+            self.data_dir / "youtube" / "top3pct" / "videos" / "abc.json",
+            _archive_payload("top3pct", "3% 財富覺醒", "abc"),
+        )
+        archive_two = write_json_document(
+            self.data_dir / "youtube" / "meitou-news" / "videos" / "def.json",
+            _archive_payload("meitou-news", "美投君", "def"),
+        )
+        write_json_document(
+            self.retry_manifest_path,
+            {
+                "entries": [
+                    {
+                        "channel_slug": "top3pct",
+                        "video_id": "abc",
+                        "archive_path": str(archive_one),
+                        "failed_at": "2026-04-03T00:00:00+00:00",
+                        "failure_kind": "rate_limit",
+                        "failure_message": "429",
+                        "attempt_count": 1,
+                        "next_retry_after": "2026-04-03T01:05:00+00:00",
+                    },
+                    {
+                        "channel_slug": "meitou-news",
+                        "video_id": "def",
+                        "archive_path": str(archive_two),
+                        "failed_at": "2099-04-03T00:00:00+00:00",
+                        "failure_kind": "rate_limit",
+                        "failure_message": "429",
+                        "attempt_count": 1,
+                        "next_retry_after": "2099-04-03T01:05:00+00:00",
+                    },
+                ]
+            },
+        )
+        transport = FakeTransport(
+            responses=[
+                _success_response(
+                    {
+                        "executive_summary": "Replay summary.",
+                        "tickers_mentioned": [],
+                        "macro_developments": [],
+                        "key_timestamps": [],
+                        "topic_tags": [{"tag": "macro", "score": 88}],
+                        "confidence": 0.8,
+                    }
+                ),
+                _success_response(
+                    {
+                        "overall_day_summary": "Replay rollup.",
+                        "channel_summaries": [{"channel_slug": "top3pct", "summary": "Channel summary.", "top_topics": ["macro"]}],
+                        "cross_video_themes": ["macro"],
+                        "agreements": [],
+                        "disagreements": [],
+                        "top_claims_worth_watching": [],
+                        "crowded_trades": [],
+                        "contrarian_flags": [],
+                    }
+                ),
+            ]
+        )
+        client = GroqAnalystClient(api_key="test-key", jitter_fn=lambda: 0.0, transport=transport)
+
+        result = replay_analyze(
+            retry_manifest_path=self.retry_manifest_path,
+            analysis_result_path=self.analysis_result_path,
+            data_dir=self.data_dir,
+            client=client,
+        )
+
+        self.assertEqual(len(result["videos"]), 1)
+        self.assertEqual(result["videos"][0]["video_id"], "abc")
+
+    def test_successful_replay_removes_entry_from_retry_manifest(self) -> None:
+        archive_one = write_json_document(
+            self.data_dir / "youtube" / "top3pct" / "videos" / "abc.json",
+            _archive_payload("top3pct", "3% 財富覺醒", "abc"),
+        )
+        write_json_document(
+            self.retry_manifest_path,
+            {
+                "entries": [
+                    {
+                        "channel_slug": "top3pct",
+                        "video_id": "abc",
+                        "archive_path": str(archive_one),
+                        "failed_at": "2026-04-03T00:00:00+00:00",
+                        "failure_kind": "rate_limit",
+                        "failure_message": "429",
+                        "attempt_count": 1,
+                        "next_retry_after": "2026-04-03T01:05:00+00:00",
+                    }
+                ]
+            },
+        )
+        transport = FakeTransport(
+            responses=[
+                _success_response(
+                    {
+                        "executive_summary": "Replay summary.",
+                        "tickers_mentioned": [],
+                        "macro_developments": [],
+                        "key_timestamps": [],
+                        "topic_tags": [{"tag": "macro", "score": 88}],
+                        "confidence": 0.8,
+                    }
+                ),
+                _success_response(
+                    {
+                        "overall_day_summary": "Replay rollup.",
+                        "channel_summaries": [{"channel_slug": "top3pct", "summary": "Channel summary.", "top_topics": ["macro"]}],
+                        "cross_video_themes": ["macro"],
+                        "agreements": [],
+                        "disagreements": [],
+                        "top_claims_worth_watching": [],
+                        "crowded_trades": [],
+                        "contrarian_flags": [],
+                    }
+                ),
+            ]
+        )
+        client = GroqAnalystClient(api_key="test-key", jitter_fn=lambda: 0.0, transport=transport)
+
+        replay_analyze(
+            retry_manifest_path=self.retry_manifest_path,
+            analysis_result_path=self.analysis_result_path,
+            data_dir=self.data_dir,
+            client=client,
+        )
+
+        manifest = load_retry_manifest(self.retry_manifest_path)
+        self.assertEqual(manifest["entries"], [])
 
 
 def _success_response(payload: dict) -> FakeResponse:
