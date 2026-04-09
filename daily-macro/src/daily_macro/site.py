@@ -471,33 +471,19 @@ def _render_subgroup_block(subgroup: dict[str, Any], *, force_plain_title: bool)
     count = subgroup.get("article_count", 0)
     key_developments = _render_bullet_list(subgroup.get("key_developments") or [], fallback="No subgroup summary was produced.")
     
-    # Sorting & Folding Logic
+    # Sorting & Visibility Logic
     articles = subgroup.get("articles") or []
-    # Sort by published_at (most recent first)
     sorted_articles = sorted(
         articles, 
         key=lambda x: str(x.get("published_at") or ""), 
         reverse=True
     )
     
-    high_count = sum(1 for a in sorted_articles if str(a.get("attention_tier")).lower() == "high")
-    show_limit = max(3, high_count)
-    
-    full_articles = sorted_articles[:show_limit]
-    remaining_articles = sorted_articles[show_limit:]
-    
-    articles_html = "".join(_render_article_line(article) for article in full_articles)
-    
-    more_html = ""
-    if remaining_articles:
-        more_html = f"""
-        <div class="more-headlines">
-          <h5>And {len(remaining_articles)} more headline(s):</h5>
-          <ul>
-            {''.join(f'<li class="headline-item">{escape(str(a.get("title") or "Untitled"))}</li>' for a in remaining_articles)}
-          </ul>
-        </div>
-        """
+    articles_html = ""
+    for index, article in enumerate(sorted_articles):
+        is_high = str(article.get("attention_tier")).lower() == "high"
+        should_expand = (index < 3) or is_high
+        articles_html += _render_article_line(article, is_expanded=should_expand)
         
     theme_html = f"<div class='theme-box'><strong>Theme:</strong> {rationale}</div>" if rationale else ""
     
@@ -506,23 +492,22 @@ def _render_subgroup_block(subgroup: dict[str, Any], *, force_plain_title: bool)
         for entity in subgroup.get("named_entities") or []
         if str(entity.get("name") or "").strip()
     )
-    entity_html = f"<p class='muted'><strong>Named entities:</strong> {named_entities}</p>" if named_entities else ""
+    entity_html = f"<div class='theme-box' style='border-top:none;background:#fafafa'><strong>Entities:</strong> {named_entities}</div>" if named_entities else ""
     
     return f"""
     <article class="subgroup-card">
       <h4>{title} ({count} article(s))</h4>
       {theme_html}
-      {key_developments}
       {entity_html}
-      <div class="articles-header">Articles</div>
-      <ul class="article-list">{articles_html}</ul>
-      {more_html}
+      {key_developments}
+      <div class="article-list">{articles_html}</div>
     </article>
     """
 
 
-def _render_article_line(article: dict[str, Any]) -> str:
+def _render_article_line(article: dict[str, Any], *, is_expanded: bool = False) -> str:
     title = escape(str(article.get("title") or "Untitled article"))
+    snippet = escape(str(article.get("summary_snippet") or ""))
     url = escape(str(article.get("canonical_url") or "#"))
     raw_pub = str(article.get("published_at") or "")
     # Format: 2026-04-09 15:46
@@ -537,9 +522,6 @@ def _render_article_line(article: dict[str, Any]) -> str:
     if is_new:
         badges.append("<span class='pill pill-new'>NEW</span>")
     badges.append(f"<span class='pill pill-{attention.lower()}'>{attention}</span>")
-    if error:
-        badges.append("<span class='pill pill-unresolved'>UNRESOLVED</span>")
-    badges_html = "".join(badges)
     
     points = _render_bullet_list(article.get("key_points") or [], fallback="", compact=True)
     error_html = ""
@@ -548,16 +530,27 @@ def _render_article_line(article: dict[str, Any]) -> str:
         detail = escape(error)
         error_html = f"<p class='article-error'><strong>{reason}</strong>: {detail}</p>"
         
-    return (
-        "<li class='article-item'>"
-        f"<div class='article-main'>"
-        f"{badges_html} <a href='{url}' target='_blank' rel='noopener noreferrer'>{title}</a>"
-        f" <span class='article-meta'>({date_display})</span>"
-        "</div>"
-        f"{points}"
-        f"{error_html}"
-        "</li>"
-    )
+    open_attr = "open" if is_expanded else ""
+    return f"""
+    <div class="article-item">
+      <details {open_attr}>
+        <summary>
+          <div class="article-main">
+            {"".join(badges)}
+            <span class="article-title">{title}</span>
+            {f'<span class="article-snippet">— {snippet}</span>' if snippet else ""}
+          </div>
+          <span class="article-meta">{date_display}</span>
+          <span class="fold-trigger">▼</span>
+        </summary>
+        <div class="article-details">
+          <p><a href="{url}" target="_blank" rel="noopener noreferrer">View source article</a></p>
+          {points}
+          {error_html}
+        </div>
+      </details>
+    </div>
+    """
 
 
 def _render_unresolved_section(unresolved_articles: list[dict[str, Any]]) -> str:
@@ -685,11 +678,12 @@ a:hover { text-decoration: underline; }
 }
 .hero {
   background: white;
-  padding: 32px;
+  padding: 24px 32px;
   margin-bottom: 24px;
-  border: 1px solid var(--border);
-  border-radius: 12px;
-  box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
 }
 .eyebrow {
   text-transform: uppercase;
@@ -697,11 +691,10 @@ a:hover { text-decoration: underline; }
   font-size: 11px;
   font-weight: 800;
   color: var(--accent);
-  margin: 0 0 16px;
+  margin: 0;
 }
-.hero h1 { margin: 0 0 12px; font-size: 36px; font-weight: 800; color: var(--ink); letter-spacing: -0.03em; }
-.hero-meta, .hero-copy { margin: 0; color: var(--muted); font-size: 15px; }
-.hero-copy { margin-top: 12px; max-width: 720px; font-weight: 500; }
+.hero h1 { margin: 0; font-size: 24px; font-weight: 800; color: var(--ink); letter-spacing: -0.02em; }
+.hero-meta, .hero-copy { margin: 0; color: var(--muted); font-size: 13px; font-weight: 500; }
 .metrics-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
@@ -740,24 +733,40 @@ a:hover { text-decoration: underline; }
   gap: 12px;
   margin-top: 16px;
 }
-.subgroup-card { padding: 20px; background: white; border: 1px solid var(--border); border-radius: 8px; }
-.subgroup-card h4 { margin: 0 0 12px; font-size: 18px; font-weight: 700; color: var(--ink); }
-.theme-box { font-size: 13px; color: var(--muted); margin-bottom: 16px; padding-bottom: 12px; border-bottom: 1px dotted var(--border); }
-.articles-header { font-size: 14px; font-weight: 700; color: var(--ink); margin: 20px 0 12px; text-transform: uppercase; letter-spacing: 0.05em; }
-.article-item, .unresolved-item { margin: 16px 0; }
+.subgroup-card { padding: 0; background: white; border: 1px solid var(--border); border-radius: 8px; overflow: hidden; }
+.subgroup-card h4 { padding: 16px 20px; margin: 0; font-size: 16px; background: #f8fafc; border-bottom: 1px solid var(--border); font-weight: 700; color: var(--ink); }
+.theme-box { font-size: 13px; color: var(--muted); padding: 12px 20px; background: #fff; border-bottom: 1px solid var(--border); }
+.articles-header { display: none; }
+.article-list { margin: 0; padding: 0; list-style: none; }
+.article-item { border-bottom: 1px solid #f1f5f9; }
+.article-item:last-child { border-bottom: none; }
+.article-item:hover { background-color: #f8fafc; }
+details { display: block; width: 100%; }
+summary {
+  display: flex !important;
+  align-items: center;
+  padding: 10px 20px;
+  cursor: pointer;
+  list-style: none;
+  outline: none;
+}
+summary::-webkit-details-marker { display: none; }
+
 .article-main {
   display: flex;
-  flex-wrap: wrap;
+  align-items: center;
   gap: 12px;
-  align-items: flex-start;
-  font-weight: 600;
-  font-size: 16px;
+  width: 100%;
+  font-size: 14px;
+  white-space: nowrap;
+  overflow: hidden;
 }
-.article-meta { color: var(--muted); font-size: 13px; margin-top: 6px; font-weight: 400; }
-.more-headlines { margin-top: 24px; padding-top: 16px; border-top: 1px solid var(--border); }
-.more-headlines h5 { margin: 0 0 12px; font-size: 14px; color: var(--muted); font-weight: 600; }
-.headline-item { font-size: 14px; margin-bottom: 8px; color: var(--ink); }
-.article-error { color: var(--warn); margin: 8px 0 0; font-size: 14px; }
+.article-title { font-weight: 600; color: var(--ink); }
+.article-snippet { color: var(--muted); font-weight: 400; flex: 1; overflow: hidden; text-overflow: ellipsis; margin-left: 4px; }
+.article-meta { color: var(--muted); font-size: 12px; margin-left: 12px; white-space: nowrap; font-weight: 500; }
+.fold-trigger { color: var(--muted); font-size: 12px; margin-left: 10px; opacity: 0.6; transition: transform 0.2s; }
+details[open] .fold-trigger { transform: rotate(180deg); }
+.article-details { padding: 0 20px 16px 52px; font-size: 14px; background: #ffffff; }
 .pill, .status-badge {
   display: inline-flex;
   align-items: center;
