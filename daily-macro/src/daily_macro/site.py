@@ -332,7 +332,7 @@ def _render_report_page(report: dict[str, Any], *, page_title: str, nav_prefix: 
         market_context_html = f"""
         <section class="panel">
           <h2>Market context</h2>
-          {_render_bullet_list(market_bullets)}
+          {_render_bullet_list(market_bullets, fallback="")}
         </section>
         """
     return f"""<!DOCTYPE html>
