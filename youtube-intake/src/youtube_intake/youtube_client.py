@@ -1,7 +1,11 @@
 from __future__ import annotations
 
+import dataclasses
+import logging
+import os
 import random
 import re
+import subprocess
 import tempfile
 import time
 import xml.etree.ElementTree as ET
@@ -9,6 +13,20 @@ from contextlib import nullcontext
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Iterable
+
+# --- Environment Setup (Must happen before yt_dlp import for capability discovery) ---
+def _bootstrap_environment() -> None:
+    """Find essential directories and ensure they are in PATH."""
+    search_dirs = ["/opt/homebrew/bin", "/usr/local/bin", "/usr/bin", "/bin"]
+    current_path = os.environ.get("PATH", "")
+    paths_to_add = [d for d in search_dirs if d not in current_path and os.path.isdir(d)]
+    if paths_to_add:
+        os.environ["PATH"] = os.pathsep.join(paths_to_add + [current_path])
+
+_bootstrap_environment()
+# -----------------------------------------------------------------------------------
+
+LOGGER = logging.getLogger(__name__)
 
 import requests
 from youtube_transcript_api import YouTubeTranscriptApi
@@ -37,7 +55,7 @@ YT_COOKIES_ENV = "YOUTUBE_INTAKE_YT_COOKIES"
 GROQ_AUDIO_TRANSCRIPTIONS_URL = "https://api.groq.com/openai/v1/audio/transcriptions"
 PRIMARY_STT_MODEL_ID = "whisper-large-v3-turbo"
 FALLBACK_STT_MODEL_ID = "whisper-large-v3"
-MAX_STT_VIDEO_DURATION_SECONDS = 3600
+MAX_STT_PROCESS_DURATION_SECONDS = 50 * 60  # 3000 — audio cut to this limit; note added
 DEFAULT_STT_TIMEOUT = 600
 MAX_RETRIES = 3
 MAX_STT_AUDIO_BYTES = 24 * 1024 * 1024
@@ -74,14 +92,22 @@ class YoutubeClient:
         self.groq_api_keys = [k.strip() for k in key_source.split(",") if k.strip()]
         self._key_index = 0
         
-        self.yt_cookies = (yt_cookies or read_env(YT_COOKIES_ENV)).strip()
+        if yt_cookies is None:
+            yt_cookies = read_env(YT_COOKIES_ENV)
+        self.yt_cookies = yt_cookies.strip()
         self.stt_timeout = stt_timeout
         self.sleep_fn = sleep_fn or time.sleep
         self.jitter_fn = jitter_fn or (lambda: random.uniform(0.0, 0.75))
         self.transcription_transport = transcription_transport or requests.post
         self.http_get = http_get or requests.get
         self.discovery_source = "youtube_rss"
-        self.yt_cookies_available = bool(self.yt_cookies)
+        # Specifically locate ffmpeg for our internal truncation logic
+        import shutil
+        found_ffmpeg = shutil.which("ffmpeg")
+        self._ffmpeg_path = Path(found_ffmpeg) if found_ffmpeg else None
+        
+        # Per-(model_id, key_index) rate-limit state for proactive STT slot selection.
+        self._stt_rate_states: dict[tuple[str, int], dict] = {}
 
     @property
     def groq_api_key(self) -> str:
@@ -212,18 +238,7 @@ class YoutubeClient:
     ) -> TranscriptPayload:
         errors = [value for value in (prior_error,) if value]
 
-        if video.duration_seconds is not None and video.duration_seconds > MAX_STT_VIDEO_DURATION_SECONDS:
-            errors.append(
-                "Groq STT skipped due to duration limit "
-                f"({video.duration_seconds}s > {MAX_STT_VIDEO_DURATION_SECONDS}s)."
-            )
-            return _build_unavailable_transcript(errors)
-
-        if not self.yt_cookies:
-            errors.append(
-                "Groq STT skipped because YOUTUBE_INTAKE_YT_COOKIES is not configured for audio fallback."
-            )
-            return _build_unavailable_transcript(errors)
+        # removed mandatory cookie check - fallback is now allowed without cookies if they are missing
 
         if not self.groq_api_key:
             errors.append("Groq STT skipped because GROQ_API_KEY is not configured.")
@@ -234,15 +249,42 @@ class YoutubeClient:
             try:
                 audio_path = self._download_audio(video, temp_dir=temp_dir)
             except Exception as exc:  # pragma: no cover - yt-dlp/provider variability
-                message = str(exc).strip()
-                if message.startswith("Groq STT skipped due to duration limit"):
-                    errors.append(message)
-                else:
-                    errors.append(f"Groq STT audio download failed: {exc}")
+                errors.append(f"Groq STT audio download failed: {exc}")
+                return _build_unavailable_transcript(errors)
+
+            # Truncate audio to the first MAX_STT_PROCESS_DURATION_SECONDS if video is longer.
+            duration = video.duration_seconds
+            truncated = False
+            truncation_note: str | None = None
+            if duration is not None and duration > MAX_STT_PROCESS_DURATION_SECONDS:
+                try:
+                    audio_path = self._truncate_audio(audio_path, MAX_STT_PROCESS_DURATION_SECONDS)
+                    truncated = True
+                    truncation_note = (
+                        f"[Note: Video is {duration}s ({duration // 60}m). "
+                        f"Only the first {MAX_STT_PROCESS_DURATION_SECONDS // 60} minutes were transcribed.]"
+                    )
+                    LOGGER.info(
+                        "Video %s is %ds; truncating audio to first %ds for STT.",
+                        video.video_id, duration, MAX_STT_PROCESS_DURATION_SECONDS,
+                    )
+                except Exception as exc:  # pragma: no cover
+                    errors.append(f"Audio truncation failed, skipping STT: {exc}")
+                    return _build_unavailable_transcript(errors)
+
+            # Final safety size check after potential local truncation (Groq limit is 25MB)
+            size = audio_path.stat().st_size
+            if size > MAX_STT_AUDIO_BYTES:
+                errors.append(
+                    f"Groq STT audio failed: Transcoded file {size/1024/1024:.1f}MB exceeds Groq 25MB limit "
+                    f"for {video.video_id}"
+                )
                 return _build_unavailable_transcript(errors)
 
             transcript, stt_errors = self._transcribe_audio_with_fallback(audio_path)
             if transcript is not None:
+                if truncation_note:
+                    transcript = dataclasses.replace(transcript, truncation_note=truncation_note)
                 return transcript
             errors.extend(stt_errors)
             return _build_unavailable_transcript(errors)
@@ -251,12 +293,22 @@ class YoutubeClient:
         with self._temporary_cookie_file(temp_dir) as cookiefile:
             info = self._extract_info(video.webpage_url, cookiefile=cookiefile)
             duration_seconds = _coerce_int(info.get("duration"))
-            if duration_seconds is not None and duration_seconds > MAX_STT_VIDEO_DURATION_SECONDS:
-                raise RuntimeError(
-                    "Groq STT skipped due to duration limit "
-                    f"({duration_seconds}s > {MAX_STT_VIDEO_DURATION_SECONDS}s)."
+            if duration_seconds is not None:
+                video.duration_seconds = duration_seconds
+            # If video is long, optimization: only download the first section we need.
+            section = []
+            if duration_seconds is not None and duration_seconds > MAX_STT_PROCESS_DURATION_SECONDS:
+                section = [f"*0-{MAX_STT_PROCESS_DURATION_SECONDS}"]
+                LOGGER.info(
+                    "Video %s is long (%ds); downloading first %ds only.",
+                    video.video_id, duration_seconds, MAX_STT_PROCESS_DURATION_SECONDS
                 )
-            format_id = _select_audio_format_id(info.get("formats") or [], max_bytes=MAX_STT_AUDIO_BYTES)
+            max_duration = MAX_STT_PROCESS_DURATION_SECONDS if duration_seconds is not None and duration_seconds > MAX_STT_PROCESS_DURATION_SECONDS else None
+            format_id = _select_audio_format_id(
+                info.get("formats") or [], 
+                max_bytes=MAX_STT_AUDIO_BYTES,
+                max_duration=max_duration
+            )
             outtmpl = str(temp_dir / "%(id)s.%(ext)s")
             options = {
                 "quiet": True,
@@ -271,7 +323,11 @@ class YoutubeClient:
                     "bestaudio[filesize<24500000]/bestaudio[filesize_approx<24500000]/bestaudio/best"
                 ),
                 "outtmpl": outtmpl,
+                "download_sections": section if section else None,
             }
+            if self._ffmpeg_path:
+                options["ffmpeg_location"] = str(self._ffmpeg_path.parent)
+                LOGGER.info("Using ffmpeg from: %s", self._ffmpeg_path)
             if cookiefile is not None:
                 options["cookiefile"] = str(cookiefile)
             with YoutubeDL(options) as ydl:
@@ -281,13 +337,6 @@ class YoutubeClient:
                 
                 prepared = Path(ydl.prepare_filename(downloaded_info))
                 if prepared.exists():
-                    # Check file size limit (Groq hard limit is 25MB)
-                    size = prepared.stat().st_size
-                    if size > MAX_STT_AUDIO_BYTES:
-                        raise RuntimeError(
-                            f"Downloaded audio {size/1024/1024:.1f}MB exceeds Groq 25MB limit "
-                            f"for {video.video_id}"
-                        )
                     return prepared
 
         candidates = sorted(
@@ -299,30 +348,132 @@ class YoutubeClient:
             raise RuntimeError(f"No audio file was downloaded for {video.video_id}")
         return candidates[0]
 
+    def _truncate_audio(self, audio_path: Path, max_seconds: int) -> Path:
+        """Trim audio to the first max_seconds using ffmpeg. Returns path to trimmed file."""
+        # Force .mp3 extension for the trimmed file as we re-encode to libmp3lame
+        trimmed_path = audio_path.with_name(audio_path.stem + "_trimmed.mp3")
+        
+        orig_size = audio_path.stat().st_size
+        LOGGER.info("Truncating %s (%d bytes) to %ds...", audio_path.name, orig_size, max_seconds)
+        LOGGER.debug("Current PATH: %s", os.environ.get("PATH"))
+        
+        try:
+            # We use "ffmpeg" directly because _discover_ffmpeg has already injected the path into os.environ["PATH"]
+            result = subprocess.run(
+                [
+                    "ffmpeg", "-y",
+                    "-t", str(max_seconds),
+                    "-i", str(audio_path),
+                    "-c:a", "libmp3lame", "-b:a", "48k",
+                    str(trimmed_path)
+                ],
+                check=True,
+                capture_output=True,
+                text=True
+            )
+            LOGGER.debug("ffmpeg output: %s", result.stderr)
+        except (subprocess.CalledProcessError, FileNotFoundError) as exc:
+            stderr = getattr(exc, "stderr", "")
+            if isinstance(exc, FileNotFoundError):
+                raise RuntimeError(
+                    f"Automatic cutting failed: ffmpeg not found in PATH. Path was: {os.environ.get('PATH')}"
+                ) from exc
+            raise RuntimeError(f"ffmpeg truncation failed: {exc}. Stderr: {stderr}") from exc
+            
+        new_size = trimmed_path.stat().st_size
+        LOGGER.info("Truncation complete: %s (%d bytes)", trimmed_path.name, new_size)
+        
+        audio_path.unlink(missing_ok=True)
+        return trimmed_path
+
+    def _select_stt_slot(self) -> tuple[str, int]:
+        """Pick the (model_id, key_index) slot with the most remaining request capacity.
+
+        Checks both Whisper models across all API keys so both quotas are utilized.
+        """
+        now = time.monotonic()
+        best_slot: tuple[str, int] | None = None
+        best_remaining = -1
+        for model_id in (PRIMARY_STT_MODEL_ID, FALLBACK_STT_MODEL_ID):
+            for ki in range(len(self.groq_api_keys)):
+                state = self._stt_rate_states.get((model_id, ki), {})
+                reset_at = state.get("reset_at", 0.0)
+                remaining = state.get("remaining_requests", 999)
+                if reset_at > now:
+                    # Within the rate-limit window: usable only if requests remain.
+                    effective = remaining
+                else:
+                    # Window expired — treat as full capacity.
+                    effective = 999
+                if effective > best_remaining:
+                    best_slot = (model_id, ki)
+                    best_remaining = effective
+        return best_slot or (PRIMARY_STT_MODEL_ID, 0)
+
+    def _record_stt_response(self, model_id: str, key_index: int, response: Any) -> None:
+        """Parse Groq rate-limit headers and update per-slot state."""
+        now = time.monotonic()
+        state = self._stt_rate_states.setdefault((model_id, key_index), {})
+        headers = {k.lower(): v for k, v in response.headers.items()}
+        try:
+            remaining = int(headers.get("x-ratelimit-remaining-requests", ""))
+            state["remaining_requests"] = remaining
+        except (ValueError, TypeError):
+            pass
+        # x-ratelimit-reset-requests is formatted like "1s" or "500ms"
+        reset_raw = headers.get("x-ratelimit-reset-requests", "")
+        if reset_raw:
+            try:
+                if reset_raw.endswith("ms"):
+                    state["reset_at"] = now + float(reset_raw[:-2]) / 1000
+                elif reset_raw.endswith("s"):
+                    state["reset_at"] = now + float(reset_raw[:-1])
+            except (ValueError, TypeError):
+                pass
+        if response.status_code == 429:
+            state["remaining_requests"] = 0
+            retry_after = headers.get("retry-after", "")
+            try:
+                state["reset_at"] = now + float(retry_after)
+            except (ValueError, TypeError):
+                state["reset_at"] = now + 60.0
+
     def _transcribe_audio_with_fallback(self, audio_path: Path) -> tuple[TranscriptPayload | None, list[str]]:
         errors: list[str] = []
-        for model_id in (PRIMARY_STT_MODEL_ID, FALLBACK_STT_MODEL_ID):
+        num_slots = len(self.groq_api_keys) * 2  # both models × all keys
+        tried_slots: set[tuple[str, int]] = set()
+
+        for _ in range(num_slots):
+            slot = self._select_stt_slot()
+            if slot in tried_slots:
+                break
+            tried_slots.add(slot)
+            model_id, key_index = slot
             try:
-                payload = self._request_groq_transcription(audio_path, model_id=model_id)
+                payload = self._request_groq_transcription(audio_path, model_id=model_id, key_index=key_index)
             except Exception as exc:  # pragma: no cover - provider variability
-                errors.append(f"{model_id}: {exc}")
+                errors.append(f"{model_id}[key={key_index}]: {exc}")
+                # Mark slot as exhausted so _select_stt_slot picks another.
+                self._stt_rate_states.setdefault((model_id, key_index), {})["remaining_requests"] = 0
                 continue
 
             transcript = _build_transcript_from_stt_payload(payload, model_id=model_id)
             if transcript is not None:
                 return transcript, errors
-            errors.append(f"{model_id}: returned unusable transcription output.")
+            errors.append(f"{model_id}[key={key_index}]: returned unusable transcription output.")
         return None, errors
 
-    def _request_groq_transcription(self, audio_path: Path, *, model_id: str) -> dict[str, Any]:
+    def _request_groq_transcription(self, audio_path: Path, *, model_id: str, key_index: int = 0) -> dict[str, Any]:
         last_error: Exception | None = None
+        current_ki = key_index
 
         for attempt_index in range(MAX_RETRIES):
+            api_key = self.groq_api_keys[current_ki] if self.groq_api_keys else ""
             try:
                 with audio_path.open("rb") as audio_file:
                     response = self.transcription_transport(
                         GROQ_AUDIO_TRANSCRIPTIONS_URL,
-                        headers={"Authorization": f"Bearer {self.groq_api_key}"},
+                        headers={"Authorization": f"Bearer {api_key}"},
                         data=[
                             ("model", model_id),
                             ("response_format", "verbose_json"),
@@ -347,9 +498,11 @@ class YoutubeClient:
             except requests.RequestException as exc:
                 raise RuntimeError(str(exc)) from exc
 
+            self._record_stt_response(model_id, current_ki, response)
+
             if response.status_code in TRANSIENT_STATUS_CODES:
                 if response.status_code == 429 and len(self.groq_api_keys) > 1:
-                    self._rotate_key()
+                    current_ki = (current_ki + 1) % len(self.groq_api_keys)
                 last_error = RuntimeError(f"{model_id} returned HTTP {response.status_code}")
                 if attempt_index == MAX_RETRIES - 1:
                     break
@@ -819,7 +972,16 @@ def _guess_audio_mime_type(path: Path) -> str:
     return "application/octet-stream"
 
 
-def _select_audio_format_id(formats: Iterable[dict[str, Any]], *, max_bytes: int) -> str | None:
+def _select_audio_format_id(
+    formats: Iterable[Any], 
+    *, 
+    max_bytes: int,
+    max_duration: int | None = None
+) -> str | None:
+    """Select the best audio format ID that fits within max_bytes.
+    
+    If max_duration is provided, estimates file size specifically for that duration.
+    """
     audio_formats: list[dict[str, Any]] = []
     for item in formats:
         if not isinstance(item, dict):
@@ -835,24 +997,28 @@ def _select_audio_format_id(formats: Iterable[dict[str, Any]], *, max_bytes: int
     if not audio_formats:
         return None
 
-    within_limit = [item for item in audio_formats if (_audio_format_size(item) or 0) > 0 and (_audio_format_size(item) or 0) <= max_bytes]
+    within_limit = [
+        item for item in audio_formats 
+        if (_audio_format_size(item, max_duration) or 0) > 0 
+        and (_audio_format_size(item, max_duration) or 0) <= max_bytes
+    ]
     if within_limit:
         best = max(
             within_limit,
             key=lambda item: (
                 _coerce_float(item.get("abr")) or _coerce_float(item.get("tbr")) or 0.0,
                 -_audio_ext_priority(item),
-                -float(_audio_format_size(item) or max_bytes),
+                -float(_audio_format_size(item, max_duration) or max_bytes),
             ),
         )
         return str(best.get("format_id") or "").strip() or None
 
-    known_size = [item for item in audio_formats if _audio_format_size(item) is not None]
+    known_size = [item for item in audio_formats if _audio_format_size(item, max_duration) is not None]
     if known_size:
         smallest = min(
             known_size,
             key=lambda item: (
-                _audio_format_size(item) or float("inf"),
+                _audio_format_size(item, max_duration) or float("inf"),
                 _audio_ext_priority(item),
                 -(_coerce_float(item.get("abr")) or _coerce_float(item.get("tbr")) or 0.0),
             ),
@@ -869,7 +1035,15 @@ def _select_audio_format_id(formats: Iterable[dict[str, Any]], *, max_bytes: int
     return str(fallback.get("format_id") or "").strip() or None
 
 
-def _audio_format_size(item: dict[str, Any]) -> int | None:
+def _audio_format_size(item: dict[str, Any], for_duration: int | None = None) -> int | None:
+    """Estimated or actual file size in bytes."""
+    if for_duration:
+        # abr (average bitrate) is in kbps from yt-dlp.
+        abr = _coerce_float(item.get("abr")) or _coerce_float(item.get("tbr"))
+        if abr:
+            # (abr * 1000 / 8) bytes/sec * duration. Added 5% overhead buffer.
+            return int((abr * 1000 / 8) * for_duration * 1.05)
+            
     return _coerce_int(item.get("filesize")) or _coerce_int(item.get("filesize_approx"))
 
 

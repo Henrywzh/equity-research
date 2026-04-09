@@ -73,10 +73,10 @@ def run_sync(
 
             if channel.title_filter:
                 before_count = len(selected)
-                selected = [v for v in selected if _matches_title_filter(v, channel)]
+                selected = [v for v in selected if _matches_content_filter(v, channel)]
                 skipped = before_count - len(selected)
                 if skipped:
-                    note = f"{channel.slug}: skipped {skipped} video(s) not matching title_filter '{channel.title_filter}'."
+                    note = f"{channel.slug}: skipped {skipped} video(s) not matching content_filter '{channel.title_filter}'."
                     result["notes"].append(note)
                     summary["run_notes"].append(note)
 
@@ -260,10 +260,13 @@ def _parse_iso_timestamp(value: str | None) -> int | None:
         return None
 
 
-def _matches_title_filter(video: VideoMetadata, channel: ChannelTarget) -> bool:
+def _matches_content_filter(video: VideoMetadata, channel: ChannelTarget) -> bool:
     if channel.title_filter is None:
         return True
-    return bool(re.search(channel.title_filter, video.title or ""))
+    
+    # Check both title and description for the filter pattern
+    content = f"{video.title or ''}\n{video.description or ''}"
+    return bool(re.search(channel.title_filter, content))
 
 
 def _build_new_item_summary(

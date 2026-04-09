@@ -93,6 +93,7 @@ def write_archive(
         "transcript_text": transcript.text,
         "transcript_segments": [segment.to_mapping() for segment in transcript.segments],
         "transcript_source": transcript.source,
+        "transcript_truncation_note": transcript.truncation_note,
         "error": transcript.error,
     }
     write_json_document(archive_path, payload)

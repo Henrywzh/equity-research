@@ -4,7 +4,7 @@ from dataclasses import dataclass, field
 from typing import Any
 
 
-@dataclass(slots=True)
+@dataclass
 class ChannelTarget:
     slug: str
     handle: str
@@ -16,7 +16,7 @@ class ChannelTarget:
     title_filter: str | None = None
 
 
-@dataclass(slots=True)
+@dataclass
 class ChannelState:
     last_processed_video_id: str | None = None
     last_processed_published_at: str | None = None
@@ -42,7 +42,7 @@ class ChannelState:
         }
 
 
-@dataclass(slots=True)
+@dataclass
 class FlatPlaylistEntry:
     video_id: str
     url: str
@@ -57,7 +57,7 @@ class FlatPlaylistEntry:
     thumbnail_url: str | None = None
 
 
-@dataclass(slots=True)
+@dataclass
 class VideoMetadata:
     video_id: str
     title: str
@@ -84,7 +84,7 @@ class VideoMetadata:
         return "livestream_replay" if self.was_live or self.live_status == "was_live" else "video"
 
 
-@dataclass(slots=True)
+@dataclass
 class TranscriptPayload:
     status: str
     language: str | None
@@ -92,9 +92,10 @@ class TranscriptPayload:
     source: str | None
     segments: list["TranscriptSegment"] = field(default_factory=list)
     error: str | None = None
+    truncation_note: str | None = None
 
 
-@dataclass(slots=True)
+@dataclass
 class ArchivedItemSummary:
     archive_path: str
     channel_slug: str
@@ -124,7 +125,7 @@ class ArchivedItemSummary:
         }
 
 
-@dataclass(slots=True)
+@dataclass
 class TranscriptSegment:
     start_seconds: float
     duration_seconds: float | None

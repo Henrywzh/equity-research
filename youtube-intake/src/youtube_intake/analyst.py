@@ -30,7 +30,7 @@ TRANSIENT_EXCEPTION_TYPES = (
 DEFAULT_BACKOFF_SECONDS = (2.0, 5.0, 10.0)
 
 
-@dataclass(frozen=True, slots=True)
+@dataclass(frozen=True)
 class ModelLimits:
     rpm: int
     tpm: int
@@ -39,7 +39,7 @@ class ModelLimits:
     chunk_input_tokens: int
 
 
-@dataclass(slots=True)
+@dataclass
 class CallResult:
     payload: dict[str, Any]
     model_id: str
@@ -47,7 +47,7 @@ class CallResult:
     estimated_input_tokens: int
 
 
-@dataclass(slots=True)
+@dataclass
 class HeaderBudget:
     remaining_requests: int | None = None
     remaining_tokens: int | None = None
