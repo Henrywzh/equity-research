@@ -445,11 +445,12 @@ def _render_category_block(category: dict[str, Any]) -> str:
         f"splits {escape(', '.join(diagnostics.get('split_reasons') or []) or 'none')}"
         "</p>"
     )
+    article_count = category.get("article_count", 0)
     return f"""
     <section class="category-card">
       <div class="section-header">
         <div>
-          <h3>{category_name}</h3>
+          <h3>{category_name} ({article_count} article(s))</h3>
           <p class="muted">Profile: {profile}</p>
         </div>
         <span class="status-badge status-{status}">{status.upper()}</span>
@@ -467,15 +468,55 @@ def _render_category_block(category: dict[str, Any]) -> str:
 def _render_subgroup_block(subgroup: dict[str, Any], *, force_plain_title: bool) -> str:
     title = escape(str(subgroup.get("title") or "Subgroup"))
     rationale = escape(str(subgroup.get("theme_rationale") or ""))
-    rationale_html = f"<p class='muted'>{rationale}</p>" if rationale and not force_plain_title else ""
+    count = subgroup.get("article_count", 0)
     key_developments = _render_bullet_list(subgroup.get("key_developments") or [], fallback="No subgroup summary was produced.")
-    articles = "".join(_render_article_line(article) for article in subgroup.get("articles") or [])
+    
+    # Sorting & Folding Logic
+    articles = subgroup.get("articles") or []
+    # Sort by published_at (most recent first)
+    sorted_articles = sorted(
+        articles, 
+        key=lambda x: str(x.get("published_at") or ""), 
+        reverse=True
+    )
+    
+    high_count = sum(1 for a in sorted_articles if str(a.get("attention_tier")).lower() == "high")
+    show_limit = max(3, high_count)
+    
+    full_articles = sorted_articles[:show_limit]
+    remaining_articles = sorted_articles[show_limit:]
+    
+    articles_html = "".join(_render_article_line(article) for article in full_articles)
+    
+    more_html = ""
+    if remaining_articles:
+        more_html = f"""
+        <div class="more-headlines">
+          <h5>And {len(remaining_articles)} more headline(s):</h5>
+          <ul>
+            {''.join(f'<li class="headline-item">{escape(str(a.get("title") or "Untitled"))}</li>' for a in remaining_articles)}
+          </ul>
+        </div>
+        """
+        
+    theme_html = f"<div class='theme-box'><strong>Theme:</strong> {rationale}</div>" if rationale else ""
+    
+    named_entities = ", ".join(
+        escape(str(entity.get("name") or ""))
+        for entity in subgroup.get("named_entities") or []
+        if str(entity.get("name") or "").strip()
+    )
+    entity_html = f"<p class='muted'><strong>Named entities:</strong> {named_entities}</p>" if named_entities else ""
+    
     return f"""
     <article class="subgroup-card">
-      <h4>{title}</h4>
-      {rationale_html}
+      <h4>{title} ({count} article(s))</h4>
+      {theme_html}
       {key_developments}
-      <ul class="article-list">{articles}</ul>
+      {entity_html}
+      <div class="articles-header">Articles</div>
+      <ul class="article-list">{articles_html}</ul>
+      {more_html}
     </article>
     """
 
@@ -483,7 +524,10 @@ def _render_subgroup_block(subgroup: dict[str, Any], *, force_plain_title: bool)
 def _render_article_line(article: dict[str, Any]) -> str:
     title = escape(str(article.get("title") or "Untitled article"))
     url = escape(str(article.get("canonical_url") or "#"))
-    published_at = escape(str(article.get("published_at") or ""))
+    raw_pub = str(article.get("published_at") or "")
+    # Format: 2026-04-09 15:46
+    date_display = raw_pub.replace("T", " ")[:16] if "T" in raw_pub else raw_pub[:16]
+    
     attention = escape(str(article.get("attention_tier") or "medium").upper())
     is_new = bool(article.get("is_new"))
     error = str(article.get("error") or "")
@@ -496,16 +540,20 @@ def _render_article_line(article: dict[str, Any]) -> str:
     if error:
         badges.append("<span class='pill pill-unresolved'>UNRESOLVED</span>")
     badges_html = "".join(badges)
+    
     points = _render_bullet_list(article.get("key_points") or [], fallback="", compact=True)
     error_html = ""
     if error:
         reason = escape(error_classification or error)
         detail = escape(error)
         error_html = f"<p class='article-error'><strong>{reason}</strong>: {detail}</p>"
+        
     return (
         "<li class='article-item'>"
-        f"<div class='article-main'><a href='{url}' target='_blank' rel='noopener noreferrer'>{title}</a>{badges_html}</div>"
-        f"<div class='article-meta'>{published_at}</div>"
+        f"<div class='article-main'>"
+        f"{badges_html} <a href='{url}' target='_blank' rel='noopener noreferrer'>{title}</a>"
+        f" <span class='article-meta'>({date_display})</span>"
+        "</div>"
         f"{points}"
         f"{error_html}"
         "</li>"
@@ -637,21 +685,23 @@ a:hover { text-decoration: underline; }
 }
 .hero {
   background: white;
-  padding: 0 0 32px;
-  margin-bottom: 32px;
-  border-bottom: 1px solid var(--border);
+  padding: 32px;
+  margin-bottom: 24px;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
 }
 .eyebrow {
   text-transform: uppercase;
-  letter-spacing: 0.1em;
+  letter-spacing: 0.15em;
   font-size: 11px;
-  font-weight: 700;
-  color: var(--muted);
-  margin: 0 0 12px;
+  font-weight: 800;
+  color: var(--accent);
+  margin: 0 0 16px;
 }
-.hero h1 { margin: 0 0 12px; font-size: 32px; font-weight: 800; color: var(--ink); letter-spacing: -0.02em; }
-.hero-meta, .hero-copy { margin: 0; color: var(--muted); font-size: 14px; }
-.hero-copy { margin-top: 8px; max-width: 720px; }
+.hero h1 { margin: 0 0 12px; font-size: 36px; font-weight: 800; color: var(--ink); letter-spacing: -0.03em; }
+.hero-meta, .hero-copy { margin: 0; color: var(--muted); font-size: 15px; }
+.hero-copy { margin-top: 12px; max-width: 720px; font-weight: 500; }
 .metrics-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
@@ -690,15 +740,23 @@ a:hover { text-decoration: underline; }
   gap: 12px;
   margin-top: 16px;
 }
-.subgroup-card { padding: 16px; background: linear-gradient(180deg, #fffdf8, #fbf8ef); }
-.article-item, .unresolved-item { margin: 12px 0; }
+.subgroup-card { padding: 20px; background: white; border: 1px solid var(--border); border-radius: 8px; }
+.subgroup-card h4 { margin: 0 0 12px; font-size: 18px; font-weight: 700; color: var(--ink); }
+.theme-box { font-size: 13px; color: var(--muted); margin-bottom: 16px; padding-bottom: 12px; border-bottom: 1px dotted var(--border); }
+.articles-header { font-size: 14px; font-weight: 700; color: var(--ink); margin: 20px 0 12px; text-transform: uppercase; letter-spacing: 0.05em; }
+.article-item, .unresolved-item { margin: 16px 0; }
 .article-main {
   display: flex;
   flex-wrap: wrap;
-  gap: 8px;
-  align-items: center;
+  gap: 12px;
+  align-items: flex-start;
+  font-weight: 600;
+  font-size: 16px;
 }
-.article-meta { color: var(--muted); font-size: 13px; margin-top: 4px; }
+.article-meta { color: var(--muted); font-size: 13px; margin-top: 6px; font-weight: 400; }
+.more-headlines { margin-top: 24px; padding-top: 16px; border-top: 1px solid var(--border); }
+.more-headlines h5 { margin: 0 0 12px; font-size: 14px; color: var(--muted); font-weight: 600; }
+.headline-item { font-size: 14px; margin-bottom: 8px; color: var(--ink); }
 .article-error { color: var(--warn); margin: 8px 0 0; font-size: 14px; }
 .pill, .status-badge {
   display: inline-flex;
