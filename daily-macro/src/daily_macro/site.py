@@ -276,6 +276,7 @@ def _render_report_page(report: dict[str, Any], *, page_title: str, nav_prefix: 
     categories = list(report.get("categories") or [])
     totals = report.get("totals") or {}
     diagnostics = report.get("diagnostics") or {}
+    unresolved_articles = list(report.get("unresolved_articles") or [])
     unresolved_section = _render_unresolved_section(unresolved_articles)
     
     # Handle sectioned executive summary
