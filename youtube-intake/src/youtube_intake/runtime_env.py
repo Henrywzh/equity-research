@@ -35,6 +35,13 @@ def read_env(primary: str, legacy: str | None = None) -> str:
     return ""
 
 
+def read_env_list(primary: str, legacy: str | None = None) -> list[str]:
+    value = read_env(primary, legacy)
+    if not value:
+        return []
+    return [item.strip() for item in value.split(",") if item.strip()]
+
+
 def merge_config_file(path: Path) -> None:
     if not path.exists():
         return

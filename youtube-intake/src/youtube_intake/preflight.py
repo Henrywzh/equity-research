@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from typing import Any
 
-from .runtime_env import load_local_config, read_env
+from .runtime_env import load_local_config, read_env, read_env_list
 
 
 GROQ_API_KEY_ENV = "GROQ_API_KEY"
@@ -21,16 +21,20 @@ REQUIRED_ENV_VARS = (
 
 def run_preflight() -> dict[str, Any]:
     load_local_config()
+    groq_keys = read_env_list(GROQ_API_KEY_ENV)
     missing_required = [name for name in REQUIRED_ENV_VARS if not read_env(name)]
+    if not groq_keys and GROQ_API_KEY_ENV not in missing_required:
+        missing_required.append(GROQ_API_KEY_ENV)
     yt_cookies_available = bool(read_env(YT_COOKIES_ENV))
 
     payload: dict[str, Any] = {
         "status": "success" if not missing_required else "failed",
         "required_env": {
-            name: bool(read_env(name))
+            name: (bool(groq_keys) if name == GROQ_API_KEY_ENV else bool(read_env(name)))
             for name in REQUIRED_ENV_VARS
         },
         "missing_required": missing_required,
+        "groq_key_count": len(groq_keys),
         "optional_env": {
             YT_COOKIES_ENV: yt_cookies_available,
         },

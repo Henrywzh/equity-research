@@ -13,7 +13,7 @@ import requests
 
 from .config import get_data_dir
 from .profiles import AnalysisProfile, get_profile
-from .runtime_env import load_local_config, read_env
+from .runtime_env import load_local_config, read_env_list
 from .storage import load_json_document, write_json_document
 
 
@@ -61,6 +61,12 @@ class RetryExhaustedError(RuntimeError):
 
 class InputTooLargeForModel(RuntimeError):
     pass
+
+
+class GroqKeyExhaustionError(RuntimeError):
+    def __init__(self, message: str, *, auth_failure: bool) -> None:
+        super().__init__(message)
+        self.auth_failure = auth_failure
 
 
 MODEL_LIMITS: dict[str, ModelLimits] = {
@@ -198,7 +204,13 @@ class GroqAnalystClient:
         transport: Callable[..., requests.Response] | None = None,
     ) -> None:
         load_local_config()
-        self.api_key = (api_key or read_env(GROQ_API_KEY_ENV)).strip()
+        key_source = api_key if api_key is not None else None
+        self.groq_api_keys = (
+            [item.strip() for item in key_source.split(",") if item.strip()]
+            if key_source is not None
+            else read_env_list(GROQ_API_KEY_ENV)
+        )
+        self.current_key_index = 0
         self.primary_model = primary_model
         self.fallback_model = fallback_model
         self.active_model = primary_model
@@ -211,6 +223,9 @@ class GroqAnalystClient:
         self.fallback_activated = False
         self.rate_limit_events: list[dict[str, Any]] = []
         self.run_notes: list[str] = []
+        self.key_rotation_count = 0
+        self.keys_used: list[str] = []
+        self.groq_auth_failure = False
         self.rate_limiter = SlidingWindowRateLimiter(
             model_limits=MODEL_LIMITS,
             time_fn=self.time_fn,
@@ -221,6 +236,35 @@ class GroqAnalystClient:
     @property
     def model_id(self) -> str:
         return self.active_model
+
+    @property
+    def keys_available(self) -> int:
+        return len(self.groq_api_keys)
+
+    @property
+    def active_api_key(self) -> str:
+        if not self.groq_api_keys:
+            return ""
+        return self.groq_api_keys[self.current_key_index]
+
+    def _key_label(self, index: int | None = None) -> str:
+        resolved = self.current_key_index if index is None else index
+        return f"key_{resolved + 1}"
+
+    def _mark_key_used(self, index: int | None = None) -> None:
+        label = self._key_label(index)
+        if label not in self.keys_used:
+            self.keys_used.append(label)
+
+    def _rotate_key(self, *, reason: str) -> None:
+        if len(self.groq_api_keys) <= 1:
+            return
+        previous_label = self._key_label()
+        self.current_key_index = (self.current_key_index + 1) % len(self.groq_api_keys)
+        self.key_rotation_count += 1
+        note = f"Rotated Groq key from {previous_label} to {self._key_label()} ({reason})."
+        if note not in self.run_notes:
+            self.run_notes.append(note)
 
     def _get_video_language_instruction(self, archive: dict[str, Any]) -> str:
         """Resolve the content language from the archive and return an LLM instruction."""
@@ -520,7 +564,7 @@ class GroqAnalystClient:
                 chunk_token_limit = max(chunk_token_limit // 2, 400)
 
     def _chat_json(self, *, system_prompt: str, user_payload: dict[str, Any]) -> CallResult:
-        if not self.api_key:
+        if not self.groq_api_keys:
             raise RuntimeError(f"{GROQ_API_KEY_ENV} is required for youtube-intake analysis.")
 
         user_content = json.dumps(user_payload, ensure_ascii=False)
@@ -593,72 +637,112 @@ class GroqAnalystClient:
         reserve_output_tokens: int,
     ) -> tuple[dict[str, Any], int]:
         last_error: Exception | None = None
-        for attempt in range(1, MAX_RETRIES + 1):
-            self.rate_limiter.wait_for_capacity(model_id, estimated_total_tokens)
-            self.rate_limiter.register_request(model_id, estimated_total_tokens)
-            try:
-                response = self.transport(
-                    GROQ_CHAT_COMPLETIONS_URL,
-                    headers={
-                        "Authorization": f"Bearer {self.api_key}",
-                        "Content-Type": "application/json",
-                    },
-                    json={
-                        "model": model_id,
-                        "temperature": 0.2,
-                        "max_completion_tokens": reserve_output_tokens,
-                        "response_format": {"type": "json_object"},
-                        "messages": [
-                            {"role": "system", "content": system_prompt},
-                            {"role": "user", "content": user_content},
-                        ],
-                    },
-                    timeout=self.request_timeout,
-                )
-            except TRANSIENT_EXCEPTION_TYPES as exc:
-                last_error = exc
-                if attempt >= MAX_RETRIES:
-                    raise RetryExhaustedError(f"{model_id} transient connection failure after {attempt} attempts: {exc}") from exc
-                wait_seconds = DEFAULT_BACKOFF_SECONDS[min(attempt - 1, len(DEFAULT_BACKOFF_SECONDS) - 1)] + self.jitter_fn()
-                self._record_rate_limit_event(
-                    {
-                        "event_type": "transient_exception",
-                        "model_id": model_id,
-                        "attempt": attempt,
-                        "wait_seconds": round(wait_seconds, 3),
-                        "detail": str(exc),
-                    }
-                )
-                self.sleep_fn(wait_seconds)
-                continue
+        attempted_key_indices: set[int] = set()
 
-            self.rate_limiter.update_from_headers(model_id, dict(response.headers))
-            if response.status_code in TRANSIENT_STATUS_CODES:
-                last_error = RetryExhaustedError(f"{model_id} returned HTTP {response.status_code}")
-                wait_seconds = _compute_retry_wait_seconds(response, attempt, jitter_fn=self.jitter_fn)
-                self._record_rate_limit_event(
-                    {
-                        "event_type": "http_retry",
-                        "model_id": model_id,
-                        "status_code": response.status_code,
-                        "attempt": attempt,
-                        "wait_seconds": round(wait_seconds, 3),
-                    }
-                )
-                if attempt >= MAX_RETRIES:
-                    raise RetryExhaustedError(
-                        f"{model_id} returned HTTP {response.status_code} after {attempt} attempts."
+        while True:
+            key_index = self.current_key_index
+            attempted_key_indices.add(key_index)
+            self._mark_key_used(key_index)
+
+            for attempt in range(1, MAX_RETRIES + 1):
+                self.rate_limiter.wait_for_capacity(model_id, estimated_total_tokens)
+                self.rate_limiter.register_request(model_id, estimated_total_tokens)
+                try:
+                    response = self.transport(
+                        GROQ_CHAT_COMPLETIONS_URL,
+                        headers={
+                            "Authorization": f"Bearer {self.active_api_key}",
+                            "Content-Type": "application/json",
+                        },
+                        json={
+                            "model": model_id,
+                            "temperature": 0.2,
+                            "max_completion_tokens": reserve_output_tokens,
+                            "response_format": {"type": "json_object"},
+                            "messages": [
+                                {"role": "system", "content": system_prompt},
+                                {"role": "user", "content": user_content},
+                            ],
+                        },
+                        timeout=self.request_timeout,
                     )
-                self.sleep_fn(wait_seconds)
-                continue
+                except TRANSIENT_EXCEPTION_TYPES as exc:
+                    last_error = exc
+                    if attempt >= MAX_RETRIES:
+                        raise RetryExhaustedError(f"{model_id} transient connection failure after {attempt} attempts: {exc}") from exc
+                    wait_seconds = DEFAULT_BACKOFF_SECONDS[min(attempt - 1, len(DEFAULT_BACKOFF_SECONDS) - 1)] + self.jitter_fn()
+                    self._record_rate_limit_event(
+                        {
+                            "event_type": "transient_exception",
+                            "model_id": model_id,
+                            "attempt": attempt,
+                            "wait_seconds": round(wait_seconds, 3),
+                            "detail": str(exc),
+                            "key": self._key_label(key_index),
+                        }
+                    )
+                    self.sleep_fn(wait_seconds)
+                    continue
 
-            response.raise_for_status()
-            payload = response.json()
-            content = payload.get("choices", [{}])[0].get("message", {}).get("content", "")
-            parsed = _extract_json_object(content)
-            if not isinstance(parsed, dict):
-                raise RuntimeError("Groq response was not a JSON object.")
-            return parsed, attempt
+                self.rate_limiter.update_from_headers(model_id, dict(response.headers))
+
+                if response.status_code in {401, 429}:
+                    is_auth_failure = response.status_code == 401
+                    if len(attempted_key_indices) < len(self.groq_api_keys):
+                        self._record_rate_limit_event(
+                            {
+                                "event_type": "key_rotation",
+                                "model_id": model_id,
+                                "status_code": response.status_code,
+                                "attempt": attempt,
+                                "key": self._key_label(key_index),
+                            }
+                        )
+                        self._rotate_key(reason=f"HTTP {response.status_code}")
+                        break
+
+                    if is_auth_failure:
+                        self.groq_auth_failure = True
+                    raise GroqKeyExhaustionError(
+                        f"All configured Groq keys were exhausted by HTTP {response.status_code}.",
+                        auth_failure=is_auth_failure,
+                    )
+
+                if response.status_code in TRANSIENT_STATUS_CODES:
+                    last_error = RetryExhaustedError(f"{model_id} returned HTTP {response.status_code}")
+                    wait_seconds = _compute_retry_wait_seconds(response, attempt, jitter_fn=self.jitter_fn)
+                    self._record_rate_limit_event(
+                        {
+                            "event_type": "http_retry",
+                            "model_id": model_id,
+                            "status_code": response.status_code,
+                            "attempt": attempt,
+                            "wait_seconds": round(wait_seconds, 3),
+                            "key": self._key_label(key_index),
+                        }
+                    )
+                    if attempt >= MAX_RETRIES:
+                        raise RetryExhaustedError(
+                            f"{model_id} returned HTTP {response.status_code} after {attempt} attempts."
+                        )
+                    self.sleep_fn(wait_seconds)
+                    continue
+
+                response.raise_for_status()
+                payload = response.json()
+                content = payload.get("choices", [{}])[0].get("message", {}).get("content", "")
+                parsed = _extract_json_object(content)
+                if not isinstance(parsed, dict):
+                    raise RuntimeError("Groq response was not a JSON object.")
+                return parsed, attempt
+            else:
+                break
+
+            if len(attempted_key_indices) >= len(self.groq_api_keys):
+                raise GroqKeyExhaustionError(
+                    "All configured Groq keys were exhausted before a successful response was returned.",
+                    auth_failure=self.groq_auth_failure,
+                )
 
         raise RetryExhaustedError(str(last_error) if last_error else "Groq request failed.")
 
@@ -709,6 +793,10 @@ def analyze_run(
         "analysis_models_used": [],
         "fallback_activated": False,
         "rate_limit_events": [],
+        "key_rotation_count": 0,
+        "keys_available": 0,
+        "keys_used": [],
+        "groq_auth_failure": False,
         "analysis_artifact_dir": str(analysis_root),
         "summary_analysis_path": str(summary_path),
         "summary_analysis_model": None,
@@ -734,6 +822,10 @@ def analyze_run(
         result["analysis_models_used"] = list(getattr(client, "analysis_models_used", []))
         result["fallback_activated"] = bool(getattr(client, "fallback_activated", False))
         result["rate_limit_events"] = list(getattr(client, "rate_limit_events", []))
+        result["key_rotation_count"] = int(getattr(client, "key_rotation_count", 0))
+        result["keys_available"] = int(getattr(client, "keys_available", 0))
+        result["keys_used"] = list(getattr(client, "keys_used", []))
+        result["groq_auth_failure"] = bool(getattr(client, "groq_auth_failure", False))
         write_json_document(resolved_analysis_result_path, result)
         _update_run_result_with_analysis_paths(
             resolved_result_path,
@@ -815,6 +907,21 @@ def analyze_run(
     result["analysis_models_used"] = list(getattr(client, "analysis_models_used", []))
     result["fallback_activated"] = bool(getattr(client, "fallback_activated", False))
     result["rate_limit_events"] = list(getattr(client, "rate_limit_events", []))
+    result["key_rotation_count"] = int(getattr(client, "key_rotation_count", 0))
+    result["keys_available"] = int(getattr(client, "keys_available", 0))
+    result["keys_used"] = list(getattr(client, "keys_used", []))
+    result["groq_auth_failure"] = bool(getattr(client, "groq_auth_failure", False))
+    if not result["videos"] and result["groq_auth_failure"]:
+        failure_notes = list(result["run_summary"].get("run_notes") or [])
+        result["status"] = "failed"
+        result["run_summary"] = {
+            "overall_day_summary": "Analysis could not be generated because all configured Groq keys were rejected.",
+            "cross_video_themes": [],
+            "agreements": [],
+            "disagreements": [],
+            "top_claims_worth_watching": [],
+            "run_notes": failure_notes,
+        }
     result["analysis_completed_at"] = _utc_now()
     write_json_document(resolved_analysis_result_path, result)
     _update_run_result_with_analysis_paths(

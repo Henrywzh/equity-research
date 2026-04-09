@@ -37,7 +37,7 @@ class FakeResponse:
 
     def raise_for_status(self) -> None:
         if self.status_code >= 400:
-            raise requests.HTTPError(f"HTTP {self.status_code}")
+            raise requests.HTTPError(f"HTTP {self.status_code}", response=self)
 
 
 class FakeTransport:
@@ -152,7 +152,7 @@ class AnalystTests(unittest.TestCase):
             ]
         )
         client = GroqAnalystClient(
-            api_key="test-key",
+            api_key="test-key,backup-key",
             sleep_fn=clock.sleep,
             time_fn=clock.time,
             jitter_fn=lambda: 0.0,
@@ -161,8 +161,10 @@ class AnalystTests(unittest.TestCase):
 
         result = client._chat_json(system_prompt="system", user_payload={"task": "video_analysis", "video": {"id": "abc"}})
 
-        self.assertEqual(result.attempts, 2)
-        self.assertEqual(clock.sleeps, [3.0])
+        self.assertEqual(result.attempts, 1)
+        self.assertEqual(clock.sleeps, [])
+        self.assertEqual(client.key_rotation_count, 1)
+        self.assertEqual(client.keys_used, ["key_1", "key_2"])
         self.assertEqual(transport.calls[0]["url"], GROQ_CHAT_COMPLETIONS_URL)
 
     def test_primary_failures_activate_fallback_for_remaining_calls(self) -> None:
@@ -192,6 +194,94 @@ class AnalystTests(unittest.TestCase):
         self.assertEqual(second.model_id, FALLBACK_ANALYSIS_MODEL_ID)
         self.assertIn(FALLBACK_ANALYSIS_MODEL_ID, client.analysis_models_used)
         self.assertTrue(any(FALLBACK_ANALYSIS_MODEL_ID == call["json"]["model"] for call in transport.calls))
+
+    def test_comma_separated_groq_keys_are_parsed(self) -> None:
+        client = GroqAnalystClient(api_key="key-one, key-two , key-three")
+
+        self.assertEqual(client.keys_available, 3)
+        self.assertEqual(client.active_api_key, "key-one")
+
+    def test_401_rotates_to_next_key_and_succeeds(self) -> None:
+        transport = FakeTransport(
+            responses=[
+                FakeResponse(status_code=401),
+                _success_response({"executive_summary": "ok", "tickers_mentioned": [], "key_timestamps": [], "topic_tags": [], "confidence": 0.7}),
+            ]
+        )
+        client = GroqAnalystClient(
+            api_key="key-one,key-two",
+            jitter_fn=lambda: 0.0,
+            transport=transport,
+        )
+
+        result = client._chat_json(system_prompt="system", user_payload={"task": "video_analysis", "video": {"id": "abc"}})
+
+        self.assertEqual(result.attempts, 1)
+        self.assertEqual(client.key_rotation_count, 1)
+        self.assertEqual(client.keys_available, 2)
+        self.assertEqual(client.keys_used, ["key_1", "key_2"])
+        self.assertEqual(transport.calls[0]["headers"]["Authorization"], "Bearer key-one")
+        self.assertEqual(transport.calls[1]["headers"]["Authorization"], "Bearer key-two")
+
+    def test_429_rotates_to_next_key_and_succeeds(self) -> None:
+        transport = FakeTransport(
+            responses=[
+                FakeResponse(status_code=429),
+                _success_response({"executive_summary": "ok", "tickers_mentioned": [], "key_timestamps": [], "topic_tags": [], "confidence": 0.7}),
+            ]
+        )
+        client = GroqAnalystClient(
+            api_key="key-one,key-two",
+            jitter_fn=lambda: 0.0,
+            transport=transport,
+        )
+
+        result = client._chat_json(system_prompt="system", user_payload={"task": "video_analysis", "video": {"id": "abc"}})
+
+        self.assertEqual(result.attempts, 1)
+        self.assertEqual(client.key_rotation_count, 1)
+        self.assertEqual(client.keys_used, ["key_1", "key_2"])
+
+    def test_all_401_keys_cause_failed_analysis_result(self) -> None:
+        archive_one = write_json_document(
+            self.data_dir / "youtube" / "top3pct" / "videos" / "abc.json",
+            _archive_payload("top3pct", "3% 財富覺醒", "abc"),
+        )
+        write_json_document(
+            self.run_result_path,
+            {
+                "status": "success",
+                "run_started_at": "2026-04-03T01:00:00+00:00",
+                "new_items": [{"archive_path": str(archive_one), "channel_slug": "top3pct", "video_id": "abc"}],
+                "errors": [],
+            },
+        )
+        transport = FakeTransport(
+            responses=[
+                FakeResponse(status_code=401),
+                FakeResponse(status_code=401),
+            ]
+        )
+        client = GroqAnalystClient(
+            api_key="key-one,key-two",
+            jitter_fn=lambda: 0.0,
+            transport=transport,
+        )
+
+        result = analyze_run(
+            result_path=self.run_result_path,
+            analysis_result_path=self.analysis_result_path,
+            data_dir=self.data_dir,
+            client=client,
+        )
+
+        self.assertEqual(result["status"], "failed")
+        self.assertTrue(result["groq_auth_failure"])
+        self.assertEqual(result["key_rotation_count"], 1)
+        self.assertEqual(result["keys_available"], 2)
+        self.assertEqual(result["keys_used"], ["key_1", "key_2"])
+        self.assertEqual(result["videos"], [])
+        self.assertTrue(any("exhausted" in note.lower() and "401" in note for note in result["run_summary"]["run_notes"]))
 
     def test_oversized_transcript_uses_chunked_mode(self) -> None:
         clock = FakeClock()
@@ -538,6 +628,10 @@ class AnalystTests(unittest.TestCase):
         self.assertEqual(result["status"], "success")
         self.assertEqual(result["analysis_models_used"], [PRIMARY_ANALYSIS_MODEL_ID])
         self.assertFalse(result["fallback_activated"])
+        self.assertEqual(result["key_rotation_count"], 0)
+        self.assertEqual(result["keys_available"], 1)
+        self.assertEqual(result["keys_used"], ["key_1"])
+        self.assertFalse(result["groq_auth_failure"])
         self.assertEqual(result["summary_analysis_model"], PRIMARY_ANALYSIS_MODEL_ID)
         self.assertEqual(result["videos"][0]["analysis_mode"], "single_pass")
 

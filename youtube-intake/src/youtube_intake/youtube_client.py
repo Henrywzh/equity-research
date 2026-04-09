@@ -398,10 +398,13 @@ class YoutubeClient:
             for ki in range(len(self.groq_api_keys)):
                 state = self._stt_rate_states.get((model_id, ki), {})
                 reset_at = state.get("reset_at", 0.0)
-                remaining = state.get("remaining_requests", 999)
+                remaining = state.get("remaining_requests")
                 if reset_at > now:
                     # Within the rate-limit window: usable only if requests remain.
-                    effective = remaining
+                    effective = 999 if remaining is None else remaining
+                elif remaining is not None and remaining <= 0:
+                    # Explicitly exhausted slot with no reset hint yet: deprioritize it.
+                    effective = 0
                 else:
                     # Window expired — treat as full capacity.
                     effective = 999

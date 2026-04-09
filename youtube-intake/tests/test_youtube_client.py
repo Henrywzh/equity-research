@@ -51,7 +51,7 @@ class StubYoutubeClient(YoutubeClient):
         path.write_bytes(b"fake audio")
         return path
 
-    def _request_groq_transcription(self, audio_path: Path, *, model_id: str):
+    def _request_groq_transcription(self, audio_path: Path, *, model_id: str, key_index: int = 0):
         self.model_calls.append(model_id)
         if model_id in self.stt_errors:
             raise self.stt_errors[model_id]
@@ -202,18 +202,21 @@ class YoutubeClientTests(unittest.TestCase):
         self.assertIn(PRIMARY_STT_MODEL_ID, transcript.error or "")
         self.assertIn(FALLBACK_STT_MODEL_ID, transcript.error or "")
 
-    def test_long_videos_skip_stt_and_keep_metadata_only(self) -> None:
+    def test_long_videos_attempt_stt_with_truncated_audio_window(self) -> None:
         client = StubYoutubeClient(
             caption_fallback=_unavailable_transcript("no captions"),
+            stt_payloads={
+                PRIMARY_STT_MODEL_ID: _stt_payload("Turbo transcript", start=12.0),
+            },
         )
 
         transcript = client.fetch_transcript(_video("abc", duration_seconds=4200))
 
         self.assertEqual(transcript.status, "unavailable")
-        self.assertEqual(client.download_calls, [])
-        self.assertIn("duration limit", transcript.error or "")
+        self.assertEqual(client.download_calls, ["abc"])
+        self.assertIn("Audio truncation failed", transcript.error or "")
 
-    def test_missing_cookies_skips_stt_and_keeps_metadata_only(self) -> None:
+    def test_missing_cookies_still_attempts_stt(self) -> None:
         client = YoutubeClient(groq_api_key="test-key", yt_cookies=" ", sleep_fn=lambda _: None, jitter_fn=lambda: 0.0)
         client.transcript_api = FakeTranscriptApi()
         client._fetch_caption_fallback = lambda video, transcript_api_error=None: _unavailable_transcript("no captions")  # type: ignore[method-assign]
@@ -221,7 +224,7 @@ class YoutubeClientTests(unittest.TestCase):
         transcript = client.fetch_transcript(_video("abc", duration_seconds=1800))
 
         self.assertEqual(transcript.status, "unavailable")
-        self.assertIn("YOUTUBE_INTAKE_YT_COOKIES", transcript.error or "")
+        self.assertIn("audio download failed", transcript.error or "")
 
 
 def _video(video_id: str, *, duration_seconds: int) -> VideoMetadata:

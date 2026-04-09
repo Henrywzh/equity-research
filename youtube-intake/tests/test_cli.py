@@ -69,6 +69,25 @@ class CliTests(unittest.TestCase):
                 exit_code = main(["preflight"])
 
         self.assertEqual(exit_code, 1)
+
+    def test_analyze_returns_nonzero_on_failed_status(self) -> None:
+        with patch(
+            "youtube_intake.cli.analyze_run",
+            return_value={"status": "failed", "errors": ["all keys rejected"]},
+        ):
+            buffer = io.StringIO()
+            with redirect_stdout(buffer):
+                exit_code = main(
+                    [
+                        "analyze",
+                        "--result-path",
+                        "/tmp/run-result.json",
+                        "--analysis-result-path",
+                        "/tmp/analysis-result.json",
+                    ]
+                )
+
+        self.assertEqual(exit_code, 1)
         payload = json.loads(buffer.getvalue())
         self.assertEqual(payload["status"], "failed")
 

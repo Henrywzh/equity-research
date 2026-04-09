@@ -67,7 +67,7 @@ def main(argv: list[str] | None = None) -> int:
                 data_dir=args.data_dir,
             )
             print(json.dumps(payload, ensure_ascii=False, indent=2))
-            return 0
+            return 1 if payload.get("status") == "failed" else 0
 
         if args.command == "smoke":
             payload = run_smoke(config_path=args.config_path)
