@@ -852,7 +852,11 @@ def _graph_summarize_top_alerts(state: AnalysisGraphState) -> AnalysisGraphState
                 # If we are in an incremental run, we should only focus on developments 
                 # that were derived from the newly analyzed articles.
                 if state.get("legacy_executive_summary") and state.get("newly_analyzed_keys"):
-                    if not any(rid in state["newly_analyzed_keys"] for rid in ref_ids):
+                    subgroup_keys = {
+                        _article_key(a.get("source_article_id"), a.get("canonical_url"))
+                        for a in subgroup_articles
+                    }
+                    if not (subgroup_keys & state["newly_analyzed_keys"]):
                         continue
 
                 all_developments.append(

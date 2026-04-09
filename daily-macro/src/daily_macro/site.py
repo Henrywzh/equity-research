@@ -301,12 +301,14 @@ def _render_report_page(report: dict[str, Any], *, page_title: str, nav_prefix: 
         </section>
         """
     if not summary_html:
-        summary_html = '<section class="panel"><h2>Executive summary</h2><p class="muted">No executive summary was produced.</p></section>'
+        # Hide section entirely if empty per user preference for high-signal UI
+        summary_html = ""
 
     category_sections = "".join(_render_category_block(category) for category in categories)
     notes = _build_run_notes(report)
+    status_val = str(report.get("status") or "unknown").upper()
     cards = [
-        ("Status", str(report.get("status") or "unknown").upper()),
+        ("Status", f"<span class='status-{status_val}'>{status_val}</span>"),
         ("Articles", str(totals.get("article_count", 0))),
         ("Coverage", f"{(report.get('daily_stats') or {}).get('analyzed', 0)} / {(report.get('daily_stats') or {}).get('total_scraped', 0)}"),
         ("Unresolved", str(len(unresolved_articles))),
@@ -314,7 +316,7 @@ def _render_report_page(report: dict[str, Any], *, page_title: str, nav_prefix: 
         ("Truncated", str(totals.get("truncated_article_count", 0))),
     ]
     cards_html = "".join(
-        f"<div class='metric-card'><div class='metric-label'>{escape(label)}</div><div class='metric-value'>{escape(value)}</div></div>"
+        f"<div class='metric-card'><div class='metric-label'>{label}</div><div class='metric-value'>{value}</div></div>"
         for label, value in cards
     )
     model_chain = [str((report.get("model") or {}).get("primary_model") or "")]
@@ -323,7 +325,16 @@ def _render_report_page(report: dict[str, Any], *, page_title: str, nav_prefix: 
     model_html = " → ".join(escape(item) for item in model_chain) if model_chain else "Unavailable"
     site_title = escape(page_title)
     nav = _render_nav(nav_prefix)
-    market_context = _render_bullet_list(report.get("market_context") or [], fallback="No additional market context was captured.")
+    
+    market_bullets = list(report.get("market_context") or [])
+    market_context_html = ""
+    if market_bullets:
+        market_context_html = f"""
+        <section class="panel">
+          <h2>Market context</h2>
+          {_render_bullet_list(market_bullets)}
+        </section>
+        """
     return f"""<!DOCTYPE html>
 <html lang="en">
 <head>
@@ -338,8 +349,7 @@ def _render_report_page(report: dict[str, Any], *, page_title: str, nav_prefix: 
     <header class="hero">
       <p class="eyebrow">Daily Macro</p>
       <h1>{site_title}</h1>
-      <p class="hero-meta">Report date {report_date} • Source {escape(str(report.get("source_site") or "hkej"))}</p>
-      <p class="hero-copy">One shared daily pipeline, published as a read-only archive.</p>
+      <p class="hero-meta">Report date {report_date} • Source <a href="https://www.hkej.com/" target="_blank">hkej.com</a></p>
     </header>
     <section class="metrics-grid">{cards_html}</section>
     <section class="panel">
@@ -349,10 +359,7 @@ def _render_report_page(report: dict[str, Any], *, page_title: str, nav_prefix: 
     </section>
     {unresolved_section}
     {summary_html}
-    <section class="panel">
-      <h2>Market context</h2>
-      {market_context}
-    </section>
+    {market_context_html}
     <section class="panel">
       <h2>Sections</h2>
       {category_sections}
@@ -473,17 +480,38 @@ def _render_subgroup_block(subgroup: dict[str, Any], *, force_plain_title: bool)
     
     # Sorting & Visibility Logic
     articles = subgroup.get("articles") or []
+    
+    # Priority Mapping: HIGH=0, MEDIUM=1, LIGHT=2, DEFAULT=3
+    priority_map = {"high": 0, "medium": 1, "light": 2}
+    
+    # Sort: Priority ASC (0 before 1), then Time DESC
     sorted_articles = sorted(
         articles, 
-        key=lambda x: str(x.get("published_at") or ""), 
-        reverse=True
+        key=lambda x: (
+            priority_map.get(str(x.get("attention_tier")).lower(), 3),
+            -len(str(x.get("published_at") or ""))  # Dummy for descending if time is string, better to actually parse or string compare
+        )
     )
+    # Correct secondary sort for ISO strings DESC: reverse the whole list if same priority?
+    # Actually, a better key for secondary: reverse time string
+    sorted_articles = sorted(
+        articles,
+        key=lambda x: (
+            priority_map.get(str(x.get("attention_tier")).lower(), 3),
+            str(x.get("published_at") or "")
+        )
+    )
+    # Wait, the above is Priority ASC, Time ASC. I want Priority ASC, Time DESC.
+    # Let's do it in two steps for clarity:
+    # 1. Sort by Time DESC
+    # 2. Sort by Priority ASC (stable sort preserves Time DESC)
+    sorted_articles.sort(key=lambda x: str(x.get("published_at") or ""), reverse=True)
+    sorted_articles.sort(key=lambda x: priority_map.get(str(x.get("attention_tier")).lower(), 3))
     
     articles_html = ""
-    for index, article in enumerate(sorted_articles):
-        is_high = str(article.get("attention_tier")).lower() == "high"
-        should_expand = (index < 3) or is_high
-        articles_html += _render_article_line(article, is_expanded=should_expand)
+    for article in sorted_articles:
+        # All articles folded by default per user request
+        articles_html += _render_article_line(article, is_expanded=False)
         
     theme_html = f"<div class='theme-box'><strong>Theme:</strong> {rationale}</div>" if rationale else ""
     
@@ -678,12 +706,9 @@ a:hover { text-decoration: underline; }
 }
 .hero {
   background: white;
-  padding: 24px 32px;
+  padding: 32px;
   margin-bottom: 24px;
   border-bottom: 1px solid var(--border);
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
 }
 .eyebrow {
   text-transform: uppercase;
@@ -691,24 +716,33 @@ a:hover { text-decoration: underline; }
   font-size: 11px;
   font-weight: 800;
   color: var(--accent);
-  margin: 0;
+  margin: 0 0 8px;
 }
-.hero h1 { margin: 0; font-size: 24px; font-weight: 800; color: var(--ink); letter-spacing: -0.02em; }
-.hero-meta, .hero-copy { margin: 0; color: var(--muted); font-size: 13px; font-weight: 500; }
+.hero h1 { margin: 0 0 12px; font-size: 32px; font-weight: 800; color: var(--ink); letter-spacing: -0.02em; }
+.hero-meta { margin: 0; color: var(--muted); font-size: 14px; font-weight: 500; }
+.hero-meta a { color: var(--accent); font-weight: 600; }
 .metrics-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
-  gap: 12px;
-  margin-bottom: 20px;
-}
-.metric-card, .panel, .category-card, .archive-card, .subgroup-card {
-  background: var(--panel);
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  margin-bottom: 32px;
+  padding: 16px 20px;
+  background: white;
   border: 1px solid var(--border);
   border-radius: 12px;
 }
-.metric-card { padding: 14px; }
-.metric-label { color: var(--muted); font-size: 11px; text-transform: uppercase; font-weight: 600; letter-spacing: 0.05em; }
-.metric-value { font-size: 24px; font-weight: 700; margin-top: 4px; color: var(--ink); }
+.metric-card {
+  flex: 1;
+  min-width: 100px;
+  border: none;
+  padding: 0;
+}
+.metric-label { color: var(--muted); font-size: 10px; text-transform: uppercase; font-weight: 700; letter-spacing: 0.1em; margin-bottom: 4px; }
+.metric-value { font-size: 18px; font-weight: 800; color: var(--ink); }
+
+.status-SUCCESS { color: #059669; }
+.status-PARTIAL { color: #d97706; }
+.status-FAILED { color: #dc2626; }
 .panel { padding: 20px; margin-bottom: 24px; }
 .panel h2 { margin-top: 0; font-size: 18px; font-weight: 700; color: var(--ink); margin-bottom: 16px; display: flex; align-items: center; }
 .cio-badge { background: #ef4444; color: white; padding: 2px 8px; border-radius: 4px; font-size: 11px; margin-right: 10px; font-weight: 800; }
@@ -764,8 +798,16 @@ summary::-webkit-details-marker { display: none; }
 .article-title { font-weight: 600; color: var(--ink); }
 .article-snippet { color: var(--muted); font-weight: 400; flex: 1; overflow: hidden; text-overflow: ellipsis; margin-left: 4px; }
 .article-meta { color: var(--muted); font-size: 12px; margin-left: 12px; white-space: nowrap; font-weight: 500; }
-.fold-trigger { color: var(--muted); font-size: 12px; margin-left: 10px; opacity: 0.6; transition: transform 0.2s; }
-details[open] .fold-trigger { transform: rotate(180deg); }
+.fold-trigger { 
+  color: var(--muted); 
+  font-size: 10px; 
+  margin-left: 10px; 
+  opacity: 0.6; 
+  transition: transform 0.2s;
+  display: inline-block;
+}
+details .fold-trigger { transform: rotate(90deg); }
+details[open] .fold-trigger { transform: rotate(0deg); }
 .article-details { padding: 0 20px 16px 52px; font-size: 14px; background: #ffffff; }
 .pill, .status-badge {
   display: inline-flex;
