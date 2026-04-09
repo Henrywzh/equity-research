@@ -276,10 +276,32 @@ def _render_report_page(report: dict[str, Any], *, page_title: str, nav_prefix: 
     categories = list(report.get("categories") or [])
     totals = report.get("totals") or {}
     diagnostics = report.get("diagnostics") or {}
-    unresolved_articles = list(report.get("unresolved_articles") or [])
-    executive_summary = _render_bullet_list(report.get("executive_summary") or [], fallback="No executive summary was produced.")
-    market_context = _render_bullet_list(report.get("market_context") or [], fallback="No additional market context was captured.")
     unresolved_section = _render_unresolved_section(unresolved_articles)
+    
+    # Handle sectioned executive summary
+    new_alerts = report.get("executive_summary") or []
+    legacy_alerts = report.get("legacy_executive_summary") or []
+    
+    summary_html = ""
+    if new_alerts:
+        title = "NEW IN THIS UPDATE" if legacy_alerts else "Executive summary"
+        badge = '<span class="cio-badge">CIO BRIEFING</span>' if not legacy_alerts else ""
+        summary_html += f"""
+        <section class="panel">
+          <h2>{badge}{escape(title)}</h2>
+          {''.join(f'<div class="alert-box"><strong>Top Alert</strong>{escape(item)}</div>' for item in new_alerts)}
+        </section>
+        """
+    if legacy_alerts:
+        summary_html += f"""
+        <section class="panel">
+          <h2>PREVIOUSLY TODAY</h2>
+          {''.join(f'<div class="alert-box alert-box-legacy"><strong>Previous Alert</strong>{escape(item)}</div>' for item in legacy_alerts)}
+        </section>
+        """
+    if not summary_html:
+        summary_html = '<section class="panel"><h2>Executive summary</h2><p class="muted">No executive summary was produced.</p></section>'
+
     category_sections = "".join(_render_category_block(category) for category in categories)
     notes = _build_run_notes(report)
     cards = [
@@ -324,10 +346,7 @@ def _render_report_page(report: dict[str, Any], *, page_title: str, nav_prefix: 
       <p class="muted"><strong>Models:</strong> {model_html}</p>
     </section>
     {unresolved_section}
-    <section class="panel">
-      <h2>Executive summary</h2>
-      {executive_summary}
-    </section>
+    {summary_html}
     <section class="panel">
       <h2>Market context</h2>
       {market_context}
@@ -464,9 +483,14 @@ def _render_article_line(article: dict[str, Any]) -> str:
     url = escape(str(article.get("canonical_url") or "#"))
     published_at = escape(str(article.get("published_at") or ""))
     attention = escape(str(article.get("attention_tier") or "medium").upper())
+    is_new = bool(article.get("is_new"))
     error = str(article.get("error") or "")
     error_classification = str(article.get("error_classification") or "")
-    badges = [f"<span class='pill pill-{attention.lower()}'>{attention}</span>"]
+    
+    badges = []
+    if is_new:
+        badges.append("<span class='pill pill-new'>NEW</span>")
+    badges.append(f"<span class='pill pill-{attention.lower()}'>{attention}</span>")
     if error:
         badges.append("<span class='pill pill-unresolved'>UNRESOLVED</span>")
     badges_html = "".join(badges)
@@ -572,34 +596,36 @@ def _render_bullet_list(items: list[str], *, fallback: str, compact: bool = Fals
 def _render_stylesheet() -> str:
     return """
 :root {
-  --bg: #f5f1e7;
-  --panel: #fffdf7;
-  --ink: #1e2a22;
-  --muted: #5f6a64;
-  --border: #d8d0bd;
-  --accent: #1f4f46;
-  --accent-soft: #dbe9e3;
-  --warn: #8a3b12;
-  --warn-soft: #f7e2d6;
-  --high: #2443a6;
-  --medium: #256f5a;
-  --light: #866a1b;
+  --bg: #f3f4f6;
+  --panel: #ffffff;
+  --ink: #111827;
+  --muted: #6b7280;
+  --border: #e5e7eb;
+  --accent: #2563eb;
+  --accent-soft: #dbeafe;
+  --warn: #dc2626;
+  --warn-soft: #fee2e2;
+  --high: #991b1b;
+  --high-soft: #fee2e2;
+  --medium: #1d4ed8;
+  --medium-soft: #dbeafe;
+  --light: #374151;
+  --light-soft: #f3f4f6;
 }
 * { box-sizing: border-box; }
 body {
   margin: 0;
-  font-family: Georgia, "Iowan Old Style", "Palatino Linotype", serif;
-  background:
-    radial-gradient(circle at top left, rgba(31,79,70,0.12), transparent 30%),
-    linear-gradient(180deg, #f8f3e8 0%, var(--bg) 100%);
-  color: var(--ink);
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  background-color: var(--bg);
+  color: #374151;
+  line-height: 1.5;
 }
 a { color: var(--accent); text-decoration: none; }
 a:hover { text-decoration: underline; }
 .page-shell {
-  max-width: 1100px;
+  max-width: 800px;
   margin: 0 auto;
-  padding: 24px 20px 56px;
+  padding: 40px 20px;
 }
 .top-nav {
   display: flex;
@@ -608,21 +634,21 @@ a:hover { text-decoration: underline; }
   font-size: 15px;
 }
 .hero {
-  background: linear-gradient(135deg, rgba(31,79,70,0.95), rgba(19,34,53,0.95));
-  color: #f7f4ec;
-  padding: 28px;
-  border-radius: 22px;
-  margin-bottom: 20px;
+  background: white;
+  padding: 0 0 32px;
+  margin-bottom: 32px;
+  border-bottom: 1px solid var(--border);
 }
 .eyebrow {
   text-transform: uppercase;
-  letter-spacing: 0.18em;
-  font-size: 12px;
-  margin: 0 0 10px;
-  opacity: 0.82;
+  letter-spacing: 0.1em;
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--muted);
+  margin: 0 0 12px;
 }
-.hero h1 { margin: 0 0 8px; font-size: clamp(32px, 5vw, 52px); line-height: 1.05; }
-.hero-meta, .hero-copy { margin: 0; color: rgba(247,244,236,0.88); }
+.hero h1 { margin: 0 0 12px; font-size: 32px; font-weight: 800; color: var(--ink); letter-spacing: -0.02em; }
+.hero-meta, .hero-copy { margin: 0; color: var(--muted); font-size: 14px; }
 .hero-copy { margin-top: 8px; max-width: 720px; }
 .metrics-grid {
   display: grid;
@@ -633,14 +659,19 @@ a:hover { text-decoration: underline; }
 .metric-card, .panel, .category-card, .archive-card, .subgroup-card {
   background: var(--panel);
   border: 1px solid var(--border);
-  border-radius: 18px;
-  box-shadow: 0 12px 24px rgba(38, 44, 40, 0.05);
+  border-radius: 12px;
 }
-.metric-card { padding: 16px; }
-.metric-label { color: var(--muted); font-size: 13px; text-transform: uppercase; letter-spacing: 0.08em; }
-.metric-value { font-size: 28px; margin-top: 8px; }
-.panel { padding: 20px; margin-bottom: 18px; }
-.warning-panel { border-color: rgba(138,59,18,0.35); background: linear-gradient(180deg, #fff9f4, var(--panel)); }
+.metric-card { padding: 14px; }
+.metric-label { color: var(--muted); font-size: 11px; text-transform: uppercase; font-weight: 600; letter-spacing: 0.05em; }
+.metric-value { font-size: 24px; font-weight: 700; margin-top: 4px; color: var(--ink); }
+.panel { padding: 20px; margin-bottom: 24px; }
+.panel h2 { margin-top: 0; font-size: 18px; font-weight: 700; color: var(--ink); margin-bottom: 16px; display: flex; align-items: center; }
+.cio-badge { background: #ef4444; color: white; padding: 2px 8px; border-radius: 4px; font-size: 11px; margin-right: 10px; font-weight: 800; }
+.alert-box { margin-bottom: 12px; padding: 12px 16px; border-left: 4px solid #ef4444; background: #fee2e2; border-radius: 0 8px 8px 0; font-size: 15px; color: #111827; }
+.alert-box strong { color: #991b1b; display: block; font-size: 12px; margin-bottom: 4px; text-transform: uppercase; }
+.alert-box-legacy { border-left-color: #d1d5db; background: #f9fafb; color: #4b5563; }
+.alert-box-legacy strong { color: #6b7280; }
+.warning-panel { border-color: #fecaca; background: #fff7f7; }
 .muted { color: var(--muted); }
 .compact-list, .bullet-list, .article-list, .unresolved-list { margin: 0; padding-left: 20px; }
 .compact-list li, .bullet-list li, .article-list li, .unresolved-list li { margin: 6px 0; }
@@ -671,18 +702,18 @@ a:hover { text-decoration: underline; }
   display: inline-flex;
   align-items: center;
   border-radius: 999px;
-  padding: 4px 10px;
-  font-size: 12px;
+  padding: 2px 10px;
+  font-size: 11px;
   font-weight: 700;
-  letter-spacing: 0.03em;
 }
 .status-badge { background: var(--accent-soft); color: var(--accent); }
 .status-success { background: #ddefe7; color: #23614d; }
-.status-partial { background: #f8e4d9; color: #8a3b12; }
-.status-failed, .status-empty { background: #ead8d4; color: #7a2525; }
-.pill-high { background: rgba(36,67,166,0.12); color: var(--high); }
-.pill-medium { background: rgba(37,111,90,0.12); color: var(--medium); }
-.pill-light { background: rgba(134,106,27,0.12); color: var(--light); }
+.status-partial { background: #fef2f2; color: #991b1b; }
+.status-failed, .status-empty { background: #fee2e2; color: #991b1b; }
+.pill-high { background: var(--high-soft); color: var(--high); }
+.pill-medium { background: var(--medium-soft); color: var(--medium); }
+.pill-light { background: var(--light-soft); color: var(--light); }
+.pill-new { background: #dcfce7; color: #166534; }
 .pill-unresolved { background: var(--warn-soft); color: var(--warn); }
 .archive-grid {
   display: grid;

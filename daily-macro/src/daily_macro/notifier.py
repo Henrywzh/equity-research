@@ -556,13 +556,20 @@ def _attention_badge(article: dict[str, Any]) -> str:
 
 def _attention_badge_html(article: dict[str, Any]) -> str:
     tier = str(article.get("attention_tier") or "").strip().lower()
+    is_new = bool(article.get("is_new"))
+    
+    badges = []
+    if is_new:
+        badges.append("<span style='display:inline-block;margin-right:6px;padding:1px 6px;border-radius:999px;background:#dcfce7;color:#166534;font-size:11px;font-weight:700;'>NEW</span>")
+    
     if tier == "high":
-        return "<span style='display:inline-block;margin-right:6px;padding:1px 6px;border-radius:999px;background:#fee2e2;color:#991b1b;font-size:11px;font-weight:700;'>HIGH</span>"
-    if tier == "light":
-        return "<span style='display:inline-block;margin-right:6px;padding:1px 6px;border-radius:999px;background:#e5e7eb;color:#374151;font-size:11px;font-weight:700;'>LIGHT</span>"
-    if tier == "medium":
-        return "<span style='display:inline-block;margin-right:6px;padding:1px 6px;border-radius:999px;background:#dbeafe;color:#1d4ed8;font-size:11px;font-weight:700;'>MEDIUM</span>"
-    return ""
+        badges.append("<span style='display:inline-block;margin-right:6px;padding:1px 6px;border-radius:999px;background:#fee2e2;color:#991b1b;font-size:11px;font-weight:700;'>HIGH</span>")
+    elif tier == "light":
+        badges.append("<span style='display:inline-block;margin-right:6px;padding:1px 6px;border-radius:999px;background:#e5e7eb;color:#374151;font-size:11px;font-weight:700;'>LIGHT</span>")
+    elif tier == "medium":
+        badges.append("<span style='display:inline-block;margin-right:6px;padding:1px 6px;border-radius:999px;background:#dbeafe;color:#1d4ed8;font-size:11px;font-weight:700;'>MEDIUM</span>")
+    
+    return "".join(badges)
 
 
 def _build_run_notes(summary: dict[str, Any]) -> list[str]:
@@ -843,37 +850,53 @@ def _build_html_property_table(developments: list[str]) -> str:
 def _build_html_executive_summary(summary: dict[str, Any]) -> str:
     import re
     alerts = summary.get("executive_summary") or []
-    if not alerts:
+    legacy_alerts = summary.get("legacy_executive_summary") or []
+    
+    if not alerts and not legacy_alerts:
         return ""
     
-    items = []
-    for alert in alerts:
-        # Extract URL in braces if present
-        url_match = re.search(r'\{(https?://[^\}]+)\}', alert)
-        url = url_match.group(1) if url_match else None
-        clean_alert = re.sub(r'\s*\{https?://[^\}]+\}', '', alert).strip()
-        
-        if url:
-            alert_html = f"<a href=\"{_escape_html(url)}\" style=\"color:#111827;text-decoration:none;\">{_escape_html(clean_alert)}</a>"
-        else:
-            alert_html = _escape_html(clean_alert)
+    def _render_boxes(items, is_legacy=False):
+        boxes = []
+        for alert in items:
+            url_match = re.search(r'\{(https?://[^\}]+)\}', alert)
+            url = url_match.group(1) if url_match else None
+            clean_alert = re.sub(r'\s*\{https?://[^\}]+\}', '', alert).strip()
             
-        items.append(
-            f"<div style='margin-bottom:12px;padding:12px;border-left:4px solid #ef4444;background:#fff5f5;border-radius:0 8px 8px 0;'>"
-            f"<div style='font-weight:700;color:#991b1b;font-size:14px;margin-bottom:4px;'>TOP ALERT</div>"
-            f"<div style='line-height:1.5;'>{alert_html}</div>"
+            border = "#ef4444" if not is_legacy else "#9ca3af"
+            bg = "#fff5f5" if not is_legacy else "#f9fafb"
+            label = "TOP ALERT" if not is_legacy else "PREVIOUS ALERT"
+            label_color = "#991b1b" if not is_legacy else "#4b5563"
+            
+            alert_html = f"<a href=\"{_escape_html(url)}\" style=\"color:#111827;text-decoration:none;\">{_escape_html(clean_alert)}</a>" if url else _escape_html(clean_alert)
+            
+            boxes.append(
+                f"<div style='margin-bottom:12px;padding:12px;border-left:4px solid {border};background:{bg};border-radius:0 8px 8px 0;'>"
+                f"<div style='font-weight:700;color:{label_color};font-size:14px;margin-bottom:4px;'>{label}</div>"
+                f"<div style='line-height:1.5;'>{alert_html}</div>"
+                f"</div>"
+            )
+        return "".join(boxes)
+    
+    html = []
+    if alerts:
+        title = "NEW IN THIS UPDATE" if legacy_alerts else "Executive Summary"
+        badge = "<span style='background:#ef4444;color:white;padding:2px 8px;border-radius:4px;font-size:12px;margin-right:8px;'>CIO BRIEFING</span>" if not legacy_alerts else ""
+        html.append(
+            f"<div style='margin-bottom:24px;'>"
+            f"<div style='font-size:18px;font-weight:700;color:#111827;margin-bottom:12px;display:flex;align-items:center;'>{badge}{title}</div>"
+            f"{_render_boxes(alerts, is_legacy=False)}"
             f"</div>"
         )
     
-    return (
-        "<div style='margin-bottom:24px;'>"
-        "<div style='font-size:18px;font-weight:700;color:#111827;margin-bottom:12px;display:flex;align-items:center;'>"
-        "<span style='background:#ef4444;color:white;padding:2px 8px;border-radius:4px;font-size:12px;margin-right:8px;'>CIO BRIEFING</span>"
-        "Executive Summary"
-        "</div>"
-        + "".join(items)
-        + "</div>"
-    )
+    if legacy_alerts:
+        html.append(
+            f"<div style='margin-bottom:24px;'>"
+            f"<div style='font-size:16px;font-weight:700;color:#4b5563;margin-bottom:12px;'>PREVIOUSLY TODAY</div>"
+            f"{_render_boxes(legacy_alerts, is_legacy=True)}"
+            f"</div>"
+        )
+        
+    return "".join(html)
 
 
 def _escape_html(value: str) -> str:

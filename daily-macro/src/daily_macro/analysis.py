@@ -10,7 +10,15 @@ from collections import defaultdict
 from dataclasses import dataclass, field
 from datetime import datetime, timedelta
 from pathlib import Path
-from typing import Any, NotRequired, TypedDict
+from typing import Any, TypedDict
+try:
+    from typing import NotRequired
+except ImportError:
+    try:
+        from typing_extensions import NotRequired
+    except ImportError:
+        # Fallback for Python < 3.11 without typing_extensions
+        from typing import Optional as NotRequired
 
 import requests
 from langgraph.graph import END, START, StateGraph
@@ -149,8 +157,10 @@ class AnalysisGraphState(TypedDict):
     incremental: dict[str, int]
     market_context_string: str
     top_alerts: list[str]
+    legacy_executive_summary: list[str]
     report: dict[str, Any]
     total_scraped_articles: int
+    newly_analyzed_keys: set[str]
 
 
 @dataclass(frozen=True, slots=True)
@@ -721,6 +731,8 @@ def _graph_initialize(state: AnalysisGraphState) -> AnalysisGraphState:
     state["today_plan"] = today_plan
     state["previous_retry_plan"] = previous_retry_plan
     state["runtime"] = runtime
+    state["legacy_executive_summary"] = (state["existing_report"] or {}).get("executive_summary") or []
+    state["newly_analyzed_keys"] = set()
     state["incremental"] = {
         "reused_successful_articles": today_plan["reused_successful_articles"],
         "new_articles_analyzed": today_plan["new_articles_analyzed"],
@@ -769,6 +781,11 @@ def _graph_analyze_today(state: AnalysisGraphState) -> AnalysisGraphState:
         existing_report=state["existing_report"],
         plan=state["today_plan"],
         retry_only=False,
+    )
+    # Record which articles were actually newly analyzed in this run
+    state["newly_analyzed_keys"].update(
+        str(a.get("source_article_id") or a.get("canonical_url") or "")
+        for a in state["today_plan"]["work_articles"]
     )
     return state
 
@@ -831,11 +848,18 @@ def _graph_summarize_top_alerts(state: AnalysisGraphState) -> AnalysisGraphState
                     ref_ids.append(aid)
             
             for dev in subgroup.get("key_developments") or []:
+                dev_text = str(dev)
+                # If we are in an incremental run, we should only focus on developments 
+                # that were derived from the newly analyzed articles.
+                if state.get("legacy_executive_summary") and state.get("newly_analyzed_keys"):
+                    if not any(rid in state["newly_analyzed_keys"] for rid in ref_ids):
+                        continue
+
                 all_developments.append(
                     {
                         "category": cat_name,
                         "subgroup": subgroup_title,
-                        "text": str(dev),
+                        "text": dev_text,
                         "ref_ids": ref_ids,
                     }
                 )
@@ -849,6 +873,7 @@ def _graph_summarize_top_alerts(state: AnalysisGraphState) -> AnalysisGraphState
             market_context=state["market_context_string"],
             developments=all_developments,
             article_metadata=article_metadata,
+            is_incremental=bool(state.get("legacy_executive_summary")),
         )
         state["executive_summary"] = top_alerts
         # Legacy key support
@@ -881,6 +906,8 @@ def _graph_finalize(state: AnalysisGraphState) -> AnalysisGraphState:
         incremental=state["incremental"],
         total_scraped_count=state.get("total_scraped_articles") or 0,
         market_snapshots=state.get("market_snapshots"),
+        legacy_executive_summary=state.get("legacy_executive_summary"),
+        newly_analyzed_keys=state.get("newly_analyzed_keys"),
     )
     _write_report(state["report_path"], report)
     state["report"] = report
@@ -1574,7 +1601,17 @@ def _finalize_report(
     incremental: dict[str, int],
     total_scraped_count: int,
     market_snapshots: list[dict[str, Any]] | None = None,
+    legacy_executive_summary: list[str] | None = None,
+    newly_analyzed_keys: set[tuple[str | None, str]] | None = None,
 ) -> dict[str, Any]:
+    # Flag new articles
+    if newly_analyzed_keys:
+        for category in category_reports:
+            for article in category.get("articles", []):
+                key = _article_key(article.get("source_article_id"), article.get("canonical_url"))
+                if key in newly_analyzed_keys:
+                    article["is_new"] = True
+
     all_articles = [article for category in category_reports for article in category["articles"]]
     unresolved_articles = _collect_unresolved_articles(category_reports)
     successful_article_analyses = sum(1 for article in all_articles if not article.get("error"))
@@ -1601,6 +1638,7 @@ def _finalize_report(
         "source_site": source_site,
         "status": status,
         "executive_summary": top_alerts,
+        "legacy_executive_summary": legacy_executive_summary or [],
         "model": {
             "provider": DEFAULT_PROVIDER,
             "primary_model": PRIMARY_MODEL_ID,
@@ -4067,13 +4105,15 @@ def _generate_top_alerts(
     market_context: str,
     developments: list[dict[str, Any]],
     article_metadata: dict[str, dict[str, str]],
+    is_incremental: bool = False,
 ) -> list[str]:
     """Uses LLM to pick exactly 3 most critical macro-moving developments."""
     import json
 
+    morning_briefing = "morning briefing" if not is_incremental else "INTRA-DAY UPDATE session"
     system_prompt = (
-        "You are a Chief Investment Officer. Your task is to pick the 3 most critical news developments "
-        "from the following list for a morning briefing. Your goal is high 'Alpha' — prioritize events "
+        f"You are a Chief Investment Officer. Your task is to pick the 3 most critical news developments "
+        f"from the following list for a {morning_briefing}. Your goal is high 'Alpha' — prioritize events "
         "that have the greatest macro impact, structural significance, or immediate market urgency.\n\n"
         "Guidelines:\n"
         "1. Pick EXACTLY 3 developments. If fewer than 3 are significant, pick the best available.\n"
