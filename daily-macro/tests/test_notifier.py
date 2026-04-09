@@ -9,6 +9,7 @@ from pathlib import Path
 from unittest.mock import patch
 
 from daily_macro.notifier import (
+    _build_html_body,
     _build_html_articles,
     load_analysis_result,
     send_analysis_summary_email,
@@ -323,6 +324,21 @@ class NotifierTests(unittest.TestCase):
         rendered_text = "\n".join(decoded_parts)
         self.assertIn("Model switch", rendered_text)
         self.assertIn("International subgroup development", rendered_text)
+
+    def test_build_html_body_keeps_run_notes_after_coverage_stats(self) -> None:
+        report = _success_report()
+        report["daily_stats"] = {
+            "total_scraped": 10,
+            "analyzed": 3,
+            "success_rate": 30.0,
+        }
+
+        rendered = _build_html_body(report)
+
+        self.assertIn("Market Coverage:</b> 3 analyzed / 10 scraped (30.0% success)", rendered)
+        self.assertIn("Run notes", rendered)
+        self.assertIn("Stored analysis report: /tmp/hkej-news-analysis.json", rendered)
+        self.assertIn("Articles: 3 |", rendered)
 
     def test_send_analysis_summary_email_skips_empty_categories(self) -> None:
         report = _success_report()
