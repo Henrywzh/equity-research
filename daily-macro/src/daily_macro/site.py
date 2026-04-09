@@ -323,6 +323,7 @@ def _render_report_page(report: dict[str, Any], *, page_title: str, nav_prefix: 
     model_html = " → ".join(escape(item) for item in model_chain) if model_chain else "Unavailable"
     site_title = escape(page_title)
     nav = _render_nav(nav_prefix)
+    market_context = _render_bullet_list(report.get("market_context") or [], fallback="No additional market context was captured.")
     return f"""<!DOCTYPE html>
 <html lang="en">
 <head>
