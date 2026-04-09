@@ -216,6 +216,20 @@ def _build_plain_body(summary: dict[str, Any]) -> str:
             ]
         )
 
+    failed_items = list(summary.get("failed_items") or [])
+    if failed_items:
+        lines.append("Failed videos:")
+        for failed_item in failed_items:
+            label = f"{failed_item.get('channel_slug') or 'unknown'} / {failed_item.get('video_id') or 'unknown'}"
+            if failed_item.get("retry_exhausted"):
+                status = "retry budget exhausted"
+            elif failed_item.get("retryable"):
+                status = f"queued for retry after {failed_item.get('next_retry_after') or 'unknown time'}"
+            else:
+                status = failed_item.get("failure_kind") or "analysis failure"
+            lines.append(f"- {label}: {status}")
+        lines.append("")
+
     if run_summary.get("cross_video_themes"):
         lines.append("Cross-video themes:")
         lines.extend(f"- {item}" for item in run_summary.get("cross_video_themes") or [])
@@ -345,6 +359,7 @@ def _build_html_body(summary: dict[str, Any]) -> str:
       <p style="margin:0 0 12px;color:#4b5563;">Models used: {_escape_html(', '.join(str(model) for model in (summary.get('analysis_models_used') or []) if str(model).strip()) or '(not recorded)')}</p>
       <p style="margin:0;color:#111827;line-height:1.7;"><strong>Top run summary:</strong> {_escape_html(run_summary.get('overall_day_summary') or 'No summary available.')}</p>
       {_build_partial_status_html(summary)}
+      {_build_failed_items_html(summary)}
       {themes_html}
       {crowded_html}
       {contrarian_html}
@@ -497,6 +512,31 @@ def _build_partial_status_html(summary: dict[str, Any]) -> str:
         f"<div style='color:#78350f;'>Analyzed videos: {len(summary.get('videos') or [])}<br />"
         f"Queued retries: {queued_retry_count}<br />"
         f"Non-retryable failures: {non_retryable_failure_count}</div></div>"
+    )
+
+
+def _build_failed_items_html(summary: dict[str, Any]) -> str:
+    failed_items = list(summary.get("failed_items") or [])
+    if not failed_items:
+        return ""
+
+    list_items = []
+    for failed_item in failed_items:
+        label = f"{failed_item.get('channel_slug') or 'unknown'} / {failed_item.get('video_id') or 'unknown'}"
+        if failed_item.get("retry_exhausted"):
+            status = "retry budget exhausted"
+        elif failed_item.get("retryable"):
+            status = f"queued for retry after {failed_item.get('next_retry_after') or 'unknown time'}"
+        else:
+            status = failed_item.get("failure_kind") or "analysis failure"
+        list_items.append(f"<li><strong>{_escape_html(label)}</strong>: {_escape_html(status)}</li>")
+
+    return (
+        "<div style='margin:18px 0;padding:14px;border:1px solid #d1d5db;background:#f9fafb;border-radius:10px;'>"
+        "<div style='font-weight:700;margin-bottom:6px;color:#111827;'>Failed videos</div>"
+        "<ul style='margin:0;padding-left:18px;color:#374151;'>"
+        + "".join(list_items)
+        + "</ul></div>"
     )
 
 

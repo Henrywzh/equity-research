@@ -169,6 +169,26 @@ class CliTests(unittest.TestCase):
         finally:
             logger.setLevel(previous_level)
 
+    def test_build_site_json_output(self) -> None:
+        with patch(
+            "daily_macro.cli.build_site",
+            return_value={
+                "status": "success",
+                "report_count": 3,
+                "latest_report_date": "2026-04-09",
+                "output_dir": "/tmp/site",
+                "generated_files": ["/tmp/site/index.html"],
+            },
+        ) as mock_build_site:
+            buffer = io.StringIO()
+            with redirect_stdout(buffer):
+                exit_code = main(["build-site", "--json", "--data-dir", "/tmp/data", "--output-dir", "/tmp/site"])
+
+        self.assertEqual(exit_code, 0)
+        payload = json.loads(buffer.getvalue())
+        self.assertEqual(payload["latest_report_date"], "2026-04-09")
+        mock_build_site.assert_called_once_with(data_dir="/tmp/data", output_dir="/tmp/site")
+
     def test_inspect_default_returns_zero_with_empty_db(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
             db_path = f"{tmp}/news.sqlite"

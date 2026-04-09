@@ -305,6 +305,11 @@ class RateLimitGovernor:
 
         for ki in range(num_keys):
             state = self._state(model_id, ki)
+            is_observed_key = (
+                ki == current_key
+                or state.remaining_requests is not None
+                or state.remaining_tokens is not None
+            )
             req_ok = (
                 state.remaining_requests is None
                 or state.remaining_requests > RATE_LIMIT_REQUEST_FLOOR
@@ -313,7 +318,7 @@ class RateLimitGovernor:
                 state.remaining_tokens is None
                 or state.remaining_tokens > estimated_input_tokens + RATE_LIMIT_TOKEN_FLOOR
             )
-            if req_ok and tok_ok:
+            if req_ok and tok_ok and is_observed_key:
                 remaining = state.remaining_tokens if state.remaining_tokens is not None else 9_999_999
                 if best_key is None or remaining > best_remaining_tokens:
                     best_key = ki
@@ -377,9 +382,10 @@ class RateLimitGovernor:
 
 @dataclass(slots=True)
 class AnalysisRuntime:
-    groq_api_keys: list[str]
     governor: RateLimitGovernor
     model_chain: list[ModelConfig]
+    groq_api_keys: list[str] = field(default_factory=list)
+    session: requests.Session | None = None
     delayed_retry_final_model: ModelConfig | None = None
     current_model_index: int = 0
     current_key_index: int = 0
@@ -391,6 +397,12 @@ class AnalysisRuntime:
     category_budgets: dict[str, CategoryBudgetState] = field(default_factory=dict)
     provider_sessions: dict[str, requests.Session] = field(default_factory=dict)
     market_context_string: str = ""
+
+    def __post_init__(self) -> None:
+        if self.session is not None:
+            if not self.groq_api_keys:
+                self.groq_api_keys = ["session-backed-groq-key"]
+            self.groq_sessions.setdefault(0, self.session)
 
     @property
     def primary_model(self) -> ModelConfig:
@@ -1460,6 +1472,7 @@ def _retry_previous_report(
             "retried_previous_day_articles": retry_plan["retried_previous_day_articles"],
             "previous_day_retry_successes": 0,
         },
+        total_scraped_count=int((existing_report.get("daily_stats") or {}).get("total_scraped") or len(db_articles)),
     )
 
     existing_articles = _existing_articles_by_key(existing_report)

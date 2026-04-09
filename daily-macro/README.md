@@ -29,6 +29,7 @@ PYTHONPATH=src python -m daily_macro scrape
 PYTHONPATH=src python -m daily_macro cleanup --retention-days 30
 PYTHONPATH=src python -m daily_macro analyze today
 PYTHONPATH=src python -m daily_macro analyze today --force --verbose
+PYTHONPATH=src python -m daily_macro build-site --json
 PYTHONPATH=src python -m daily_macro notify --result-path data/analyses/2026-04-03/hkej-news-analysis.json
 PYTHONPATH=src python -m daily_macro test-email
 PYTHONPATH=src python -m daily_macro inspect
@@ -43,6 +44,7 @@ What they do:
 - `cleanup`: remove old parsed JSON backups based on retention
 - `analyze today`: analyze articles published on a day and save a reusable JSON report under `data/analyses/`
   - add `--verbose` to print category/batch sizing, waits, splits, fallbacks, and retry diagnostics
+- `build-site`: generate a public static site under `site/` from the saved daily analysis reports
 - `notify`: send a Gmail summary for a previously generated analysis report
 - `test-email`: send a Gmail connectivity check email
 - `inspect`: show a quick overview of the latest scrape run and a short list of recent items
@@ -56,6 +58,7 @@ Runtime data lives in:
 - `data/news.sqlite`
 - `data/article_backups/`
 - `data/analyses/`
+- `site/` (generated static reader site)
 
 The SQLite database is the primary store for normalized article data.
 
@@ -71,7 +74,8 @@ Gmail notification can use either daily-macro-specific env vars or generic Gmail
 
 GitHub Actions automation is split into two workflows:
 - `Daily Macro Scraper`: scrape and persist `daily-macro/data/`
-- `Daily Macro Analysis`: runs after a successful scrape, generates `data/analyses/`, and sends Gmail only when the report status is `success`
+- `Daily Macro Analysis`: runs after a successful scrape, generates `data/analyses/`, and sends Gmail when the report status is `success` or `partial`
+- `Daily Macro Site`: rebuilds a public GitHub Pages site from the saved reports and publishes the latest digest plus archive
 
 GitHub Secrets for the analysis/email workflow:
 - `GROQ_API_KEY`
@@ -86,5 +90,5 @@ GitHub Secrets for the analysis/email workflow:
 - Saved analysis reports include compact diagnostics for rate-limit waits, batch splits, fallback switches, JSON-repair retries, and failed batches
 - Long articles are analyzed in full when they fit the working request budget; otherwise the analyzed slice is truncated and explicitly flagged in the report JSON
 - The analysis path uses only non-deprecated Groq models
-- Analysis/email automation currently runs after both daily scrape runs, but email is sent only for successful analysis reports
+- Analysis/email automation currently runs after both daily scrape runs, and the public site is rebuilt from the saved report JSON without re-running LLM analysis
 - Future downstream workflows can read from the SQLite database, parsed JSON backups, or saved daily analysis reports

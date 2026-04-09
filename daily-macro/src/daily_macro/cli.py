@@ -8,6 +8,7 @@ from .analysis import run_analysis
 from .config import DEFAULT_RETENTION_DAYS, get_db_path
 from .notifier import load_analysis_result, send_analysis_summary_email, send_test_email
 from .pipeline import cleanup_old_snapshots, run_scrape, run_smoke
+from .site import build_site
 from .storage import Storage
 
 
@@ -37,6 +38,11 @@ def build_parser() -> argparse.ArgumentParser:
     analyze_parser.add_argument("--verbose", action="store_true", help="Enable detailed analysis diagnostics logging.")
     analyze_parser.add_argument("--data-dir", default=None, help="Override the data directory.")
     analyze_parser.add_argument("--db-path", default=None, help="Override the SQLite database path.")
+
+    site_parser = subparsers.add_parser("build-site", help="Build a static public site from saved daily analysis reports.")
+    site_parser.add_argument("--json", action="store_true", help="Print the site build result as JSON.")
+    site_parser.add_argument("--data-dir", default=None, help="Override the data directory.")
+    site_parser.add_argument("--output-dir", default=None, help="Override the generated site output directory.")
 
     local_test_parser = subparsers.add_parser(
         "local-test",
@@ -134,6 +140,17 @@ def main(argv: list[str] | None = None) -> int:
             print(json.dumps(result, ensure_ascii=False, indent=2))
         else:
             _print_analysis_result(result)
+        return 0 if result["status"] != "failed" else 1
+
+    if args.command == "build-site":
+        result = build_site(
+            data_dir=args.data_dir,
+            output_dir=args.output_dir,
+        )
+        if args.json:
+            print(json.dumps(result, ensure_ascii=False, indent=2))
+        else:
+            _print_site_build_result(result)
         return 0 if result["status"] != "failed" else 1
 
     if args.command == "local-test":
@@ -395,6 +412,13 @@ def _print_analysis_result(result: dict[str, object]) -> None:
     if result.get("cached"):
         print("Used cached report: yes")
     print(f"Output: {result['output_path']}")
+
+
+def _print_site_build_result(result: dict[str, object]) -> None:
+    print(f"Status: {result.get('status')}")
+    print(f"Reports published: {result.get('report_count', 0)}")
+    print(f"Latest report: {result.get('latest_report_date') or 'N/A'}")
+    print(f"Output dir: {result.get('output_dir')}")
 
 
 def _print_local_test_result(result: dict[str, object]) -> None:

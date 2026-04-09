@@ -380,14 +380,15 @@ def _build_plain_subgroup_lines(category: dict[str, Any]) -> list[str]:
         if not is_redundant_single:
             lines.append(f"Subgroup: {title}{count_label}")
         
-        if not is_light_only and not is_redundant_single:
+        if not is_light_only:
             rationale = str(subgroup.get("theme_rationale") or "").strip()
-            if rationale:
+            if rationale and not is_redundant_single:
                 lines.append(f"  Theme: {rationale}")
             for item in (subgroup.get("key_developments") or [])[:4]:
-                lines.append(f"  - {item}")
+                prefix = "  - " if not is_redundant_single else "- "
+                lines.append(f"{prefix}{item}")
             entities = subgroup.get("named_entities") or []
-            if entities:
+            if entities and not is_redundant_single:
                 labels = ", ".join(entity["name"] for entity in entities[:6] if entity.get("name"))
                 if labels:
                     lines.append(f"  Named entities: {labels}")
@@ -433,7 +434,7 @@ def _build_html_subgroups(category: dict[str, Any], category_name: str = "") -> 
         is_redundant_single = (len(subgroups) == 1)
         
         items_html = ""
-        if not is_light_only and not is_redundant_single:
+        if not is_light_only:
             developments = subgroup.get("key_developments") or []
             if is_property and developments:
                 items_html = _build_html_property_table(developments)

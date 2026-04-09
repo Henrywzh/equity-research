@@ -158,6 +158,8 @@ class NotifierTests(unittest.TestCase):
         self.assertIn("Models used", body)
         self.assertIn("fallback model was activated", body)
         self.assertIn("queued for retry", body)
+        self.assertIn("Failed videos", body)
+        self.assertIn("meitou-news / retry-me", body)
 
     def test_retry_only_summary_still_sends(self) -> None:
         retry_summary = {
@@ -184,6 +186,16 @@ class NotifierTests(unittest.TestCase):
         server = mock_smtp.return_value.__enter__.return_value
         sent_message = server.sendmail.call_args.args[2]
         self.assertIn("retry scheduled", sent_message)
+        parsed = message_from_string(sent_message)
+        decoded_parts = []
+        for part in parsed.walk():
+            if part.get_content_maintype() == "multipart":
+                continue
+            payload = part.get_payload(decode=True)
+            if payload is not None:
+                decoded_parts.append(payload.decode(part.get_content_charset() or "utf-8"))
+        body = "\n".join(decoded_parts)
+        self.assertIn("meitou-news / retry-me", body)
 
     def test_missing_credentials_raises_when_send_needed(self) -> None:
         with patch.dict("os.environ", {}, clear=True):
