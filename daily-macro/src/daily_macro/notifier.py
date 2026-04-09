@@ -349,6 +349,11 @@ def _build_html_body(summary: dict[str, Any]) -> str:
           </p>
           {market_coverage_html}
           {executive_summary_html}
+          {notes_html}
+          <p style="margin:6px 0 16px;color:#4b5563;">
+            Articles: {int((summary.get("totals") or {}).get("article_count") or 0)} |
+            Categories: {int((summary.get("input") or {}).get("category_count") or 0)}
+          </p>
           {market_html}
           {unresolved_html}
           {"".join(category_blocks)}
