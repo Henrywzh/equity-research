@@ -279,25 +279,21 @@ def _render_report_page(report: dict[str, Any], *, page_title: str, nav_prefix: 
     unresolved_articles = list(report.get("unresolved_articles") or [])
     unresolved_section = _render_unresolved_section(unresolved_articles)
     
-    # Handle sectioned executive summary
-    new_alerts = report.get("executive_summary") or []
-    legacy_alerts = report.get("legacy_executive_summary") or []
-    
     # Combined Summary for the First Tab
-    all_summary_items = []
+    summary_html_blocks = []
     if new_alerts:
-        all_summary_items.extend(f'<div class="glass-card alert-box"><strong>Top Alert</strong>{escape(item)}</div>' for item in new_alerts)
+        summary_html_blocks.append('<div style="margin-bottom: 20px;"><span class="badge badge-cio" style="padding: 4px 12px; font-size: 13px;">CIO BRIEFING</span></div>')
+        summary_html_blocks.extend(f'<div class="glass-card alert-box"><strong>Top Alert</strong>{escape(item)}</div>' for item in new_alerts)
+    
     if legacy_alerts:
-        all_summary_items.extend(f'<div class="glass-card alert-box alert-box-legacy"><strong>Previous Alert</strong>{escape(item)}</div>' for item in legacy_alerts)
+        summary_html_blocks.append('<div style="margin: 32px 0 16px; font-size: 11px; font-weight: 800; color: #94a3b8; letter-spacing: 0.1em; text-transform: uppercase; border-bottom: 1px solid #f1f5f9; padding-bottom: 8px;">PREVIOUSLY TODAY</div>')
+        summary_html_blocks.extend(f'<div class="glass-card alert-box alert-box-legacy" style="background: #f8fafc; border-left-color: #cbd5e1; color: #64748b; opacity: 0.8;"><strong>Previous Alert</strong>{escape(item)}</div>' for item in legacy_alerts)
     
     summary_tab_content = ""
-    if all_summary_items:
+    if summary_html_blocks:
         summary_tab_content = f"""
         <div class="category-tab-content" id="cat-tab-summary">
-          <div style="margin-bottom: 24px;">
-            <span class="badge badge-cio" style="padding: 4px 12px; font-size: 13px;">CIO BRIEFING</span>
-          </div>
-          {''.join(all_summary_items)}
+          {''.join(summary_html_blocks)}
         </div>
         """
 
@@ -819,8 +815,9 @@ a:hover { text-decoration: underline; }
 .panel h2 { margin-top: 0; font-size: 18px; font-weight: 700; color: var(--ink); margin-bottom: 16px; display: flex; align-items: center; gap: 10px; }
 .alert-box { margin-bottom: 12px; border-left: 4px solid #ef4444; border-radius: 0 12px 12px 0; font-size: 15px; color: #111827; }
 .alert-box strong { color: #991b1b; display: block; font-size: 12px; margin-bottom: 4px; text-transform: uppercase; }
-.alert-box-legacy { border-left-color: #d1d5db; color: #4b5563; }
-.alert-box-legacy strong { color: #6b7280; }
+.alert-box-legacy { border-left-color: #cbd5e1; color: #64748b; background: #f8fafc; }
+.alert-box-legacy strong { color: #94a3b8; }
+.category-tab-content.hidden { display: none; }
 .warning-panel { border-color: #fecaca; background: #fff7f7; }
 .muted { color: var(--muted); }
 .compact-list, .bullet-list, .article-list, .unresolved-list { margin: 0; padding-left: 20px; }
