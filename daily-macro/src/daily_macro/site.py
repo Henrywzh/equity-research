@@ -280,8 +280,9 @@ def _render_report_page(report: dict[str, Any], *, page_title: str, nav_prefix: 
     unresolved_section = _render_unresolved_section(unresolved_articles)
     
     # Handle sectioned executive summary
-    new_alerts = report.get("executive_summary") or []
-    legacy_alerts = report.get("legacy_executive_summary") or []
+    # Handle sectioned executive summary with robust fallbacks
+    new_alerts = report.get("executive_summary") or report.get("top_alerts") or report.get("synthesis_alerts") or []
+    legacy_alerts = report.get("legacy_executive_summary") or report.get("previous_top_alerts") or []
     
     # Combined Summary (Always visible outside of tabs)
     summary_html_blocks = []
@@ -378,6 +379,7 @@ def _render_report_page(report: dict[str, Any], *, page_title: str, nav_prefix: 
     return f"""<!DOCTYPE html>
 <html lang="en">
 <head>
+  <!-- PREMIUM_UI_V4 -->
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>{site_title}</title>
