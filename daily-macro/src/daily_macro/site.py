@@ -279,6 +279,10 @@ def _render_report_page(report: dict[str, Any], *, page_title: str, nav_prefix: 
     unresolved_articles = list(report.get("unresolved_articles") or [])
     unresolved_section = _render_unresolved_section(unresolved_articles)
     
+    # Handle sectioned executive summary
+    new_alerts = report.get("executive_summary") or []
+    legacy_alerts = report.get("legacy_executive_summary") or []
+    
     # Combined Summary for the First Tab
     summary_html_blocks = []
     if new_alerts:
