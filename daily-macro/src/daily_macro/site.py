@@ -333,6 +333,7 @@ def _render_report_page(report: dict[str, Any], *, page_title: str, nav_prefix: 
 
     notes = _build_run_notes(report)
     main_note = notes[0] if notes else "Run completed successfully."
+    status_val = str(report.get("status") or "unknown").upper()
     
     # Style 1: Status Banner
     status_variant = "banner-success" if status_val == "SUCCESS" else "banner-warn"
@@ -345,7 +346,6 @@ def _render_report_page(report: dict[str, Any], *, page_title: str, nav_prefix: 
       </div>
     </div>
     """
-    status_val = str(report.get("status") or "unknown").upper()
     cards = [
         ("Status", f"<span class='status-{status_val}'>{status_val}</span>"),
         ("Articles", str(totals.get("article_count", 0))),
