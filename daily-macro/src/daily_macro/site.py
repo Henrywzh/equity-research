@@ -434,14 +434,14 @@ def _render_archive_page(entries: list[dict[str, Any]]) -> str:
         summary = _render_bullet_list(entry.get("executive_summary") or [], fallback="No executive summary.")
         cards.append(
             f"""
-            <article class="archive-card">
+            <div class="glass-card archive-card">
               <div class="archive-card-header">
                 <h2><a href="../{escape(str(entry.get('relative_url') or ''))}">{escape(str(entry.get('report_date') or 'Unknown date'))}</a></h2>
                 <span class="status-badge status-{escape(str(entry.get('status') or 'unknown').lower())}">{escape(str(entry.get('status') or 'unknown').upper())}</span>
               </div>
               <p class="muted">{escape(str(entry.get('article_count', 0)))} articles • {escape(str(entry.get('unresolved_count', 0)))} unresolved</p>
               {summary}
-            </article>
+            </div>
             """
         )
     return f"""<!DOCTYPE html>
@@ -942,12 +942,28 @@ details[open] .fold-trigger { transform: rotate(0deg); }
 .pill-unresolved { background: var(--warn-soft); color: var(--warn); }
 .archive-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-  gap: 16px;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 20px;
+  margin-top: 24px;
 }
-.archive-card { padding: 18px; }
+.archive-card { 
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+.archive-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+}
+.archive-card h2 { margin: 0; font-size: 20px; }
+.archive-card h2 a { color: var(--ink); text-decoration: none; }
+.archive-card h2 a:hover { color: var(--accent); }
+.archive-card ul { margin: 12px 0 0; padding-left: 18px; color: var(--muted); font-size: 13px; line-height: 1.5; }
 @media (max-width: 720px) {
   .page-shell { padding: 18px 14px 40px; }
   .hero { padding: 22px; border-radius: 18px; }
+  .archive-grid { grid-template-columns: 1fr; }
 }
 """.strip() + "\n"
