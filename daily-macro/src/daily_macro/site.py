@@ -114,6 +114,10 @@ def _sanitize_report(report: dict[str, Any]) -> dict[str, Any]:
         "source_site": report.get("source_site"),
         "report_schema_version": report.get("report_schema_version"),
         "executive_summary": _string_list(report.get("executive_summary")),
+        "legacy_executive_summary": _string_list(report.get("legacy_executive_summary")),
+        "top_alerts": _string_list(report.get("top_alerts")),
+        "synthesis_alerts": _string_list(report.get("synthesis_alerts")),
+        "previous_top_alerts": _string_list(report.get("previous_top_alerts")),
         "market_context": _string_list(report.get("market_context")),
         "daily_stats": {
             "total_scraped": (report.get("daily_stats") or {}).get("total_scraped", 0),
