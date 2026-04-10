@@ -844,9 +844,8 @@ a:hover { text-decoration: underline; }
 .subgroup-card h4 { margin: 0 0 12px; font-size: 18px; font-weight: 700; color: var(--ink); }
 .theme-box { font-size: 13px; color: var(--muted); margin-bottom: 16px; padding-bottom: 12px; border-bottom: 1px dotted var(--border); }
 .article-list { margin: 0; padding: 0; list-style: none; }
-.article-item { border-bottom: 1px solid #f1f5f9; padding: 8px 0; }
+.article-item { border-bottom: 1px solid #f1f5f9; padding: 4px 0; }
 .article-item:last-child { border-bottom: none; }
-.article-item:hover { background-color: #f8fafc; }
 details { display: block; width: 100%; }
 summary {
   display: flex !important;
@@ -857,9 +856,13 @@ summary {
   outline: none;
   transition: background 0.2s;
   border-radius: 12px;
+  -webkit-tap-highlight-color: transparent;
+  user-select: none;
 }
 summary::-webkit-details-marker { display: none; }
-summary:hover { background: rgba(255, 255, 255, 0.5); }
+summary:focus { outline: none; }
+summary:hover { background: rgba(255, 255, 255, 0.4); }
+details[open] summary:hover { background: transparent; }
 details[open] {
   background: rgba(255, 255, 255, 0.7);
   backdrop-filter: blur(10px);
