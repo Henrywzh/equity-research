@@ -331,9 +331,15 @@ def _render_report_page(report: dict[str, Any], *, page_title: str, nav_prefix: 
     tab_bar_html = f"<div class='tab-bar'>{''.join(tab_btns)}</div>" if tab_btns else ""
     category_sections_html = "".join(tab_contents)
 
+    # Model and Status Context
+    model_chain = [str((report.get("model") or {}).get("primary_model") or "")]
+    model_chain.extend(str(item) for item in (report.get("model") or {}).get("fallback_models") or [])
+    model_chain = [item for item in model_chain if item]
+    model_html = " → ".join(escape(item) for item in model_chain) if model_chain else "Unavailable"
+    status_val = str(report.get("status") or "unknown").upper()
+
     notes = _build_run_notes(report)
     main_note = notes[0] if notes else "Run completed successfully."
-    status_val = str(report.get("status") or "unknown").upper()
     
     # Style 1: Status Banner
     status_variant = "banner-success" if status_val == "SUCCESS" else "banner-warn"
@@ -358,10 +364,6 @@ def _render_report_page(report: dict[str, Any], *, page_title: str, nav_prefix: 
         f"<div class='metric-card'><div class='metric-label'>{label}</div><div class='metric-value'>{value}</div></div>"
         for label, value in cards
     )
-    model_chain = [str((report.get("model") or {}).get("primary_model") or "")]
-    model_chain.extend(str(item) for item in (report.get("model") or {}).get("fallback_models") or [])
-    model_chain = [item for item in model_chain if item]
-    model_html = " → ".join(escape(item) for item in model_chain) if model_chain else "Unavailable"
     site_title = escape(page_title)
     nav = _render_nav(nav_prefix)
     
