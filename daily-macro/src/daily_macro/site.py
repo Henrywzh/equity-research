@@ -393,18 +393,19 @@ def _render_report_page(report: dict[str, Any], *, page_title: str, nav_prefix: 
     </section>
   </div>
   <script>
-    function switchTab(idx) {
+    function switchTab(idx) {{
       // Hide all contents
       document.querySelectorAll('.category-tab-content').forEach(c => c.classList.add('hidden'));
       // Deactivate all buttons
       document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
       
       // Show target
-      document.getElementById('cat-tab-' + idx).classList.remove('hidden');
+      const target = document.getElementById('cat-tab-' + idx);
+      if (target) target.classList.remove('hidden');
       // Activate button
       const btns = document.querySelectorAll('.tab-btn');
       if (btns[idx]) btns[idx].classList.add('active');
-    }
+    }}
   </script>
 </body>
 </html>
