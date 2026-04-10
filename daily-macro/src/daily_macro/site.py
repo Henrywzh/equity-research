@@ -283,7 +283,7 @@ def _render_report_page(report: dict[str, Any], *, page_title: str, nav_prefix: 
     new_alerts = report.get("executive_summary") or []
     legacy_alerts = report.get("legacy_executive_summary") or []
     
-    # Combined Summary for the First Tab
+    # Combined Summary (Always visible outside of tabs)
     summary_html_blocks = []
     if new_alerts:
         summary_html_blocks.append('<div style="margin-bottom: 20px;"><span class="badge badge-cio" style="padding: 4px 12px; font-size: 13px;">CIO BRIEFING</span></div>')
@@ -293,34 +293,25 @@ def _render_report_page(report: dict[str, Any], *, page_title: str, nav_prefix: 
         summary_html_blocks.append('<div style="margin: 32px 0 16px; font-size: 11px; font-weight: 800; color: #94a3b8; letter-spacing: 0.1em; text-transform: uppercase; border-bottom: 1px solid #f1f5f9; padding-bottom: 8px;">PREVIOUSLY TODAY</div>')
         summary_html_blocks.extend(f'<div class="glass-card alert-box alert-box-legacy" style="background: #f8fafc; border-left-color: #cbd5e1; color: #64748b; opacity: 0.8;"><strong>Previous Alert</strong>{escape(item)}</div>' for item in legacy_alerts)
     
-    summary_tab_content = ""
+    summary_section_html = ""
     if summary_html_blocks:
-        summary_tab_content = f"""
-        <div class="category-tab-content" id="cat-tab-summary">
+        summary_section_html = f"""
+        <section class="panel">
           {''.join(summary_html_blocks)}
-        </div>
+        </section>
         """
 
     # Tabbed Interface Generation
     tab_btns = []
     tab_contents = []
     
-    # Add CIO Summary as the absolute first tab if it exists
-    if summary_tab_content:
-        tab_btns.append(f"""
-        <button class="tab-btn active" onclick="switchTab('summary')">
-          <span style="margin-right: 6px;">★</span> Summary
-        </button>
-        """)
-        tab_contents.append(summary_tab_content)
-
     for i, category in enumerate(categories):
         cat_title = str(category.get("category") or f"Section {i+1}")
         art_count = sum(len(sg.get("articles") or []) for sg in (category.get("subgroups") or []))
         if not art_count: art_count = category.get("article_count", 0) # Fallback for old schema
         
-        # Default to active only if NO summary tab exists
-        is_active = (i == 0 and not summary_tab_content)
+        # Default to active
+        is_active = (i == 0)
         active_class = "active" if is_active else ""
         hidden_class = "" if is_active else "hidden"
         
@@ -403,6 +394,7 @@ def _render_report_page(report: dict[str, Any], *, page_title: str, nav_prefix: 
     {status_banner}
     {market_context_html}
     <section class="metrics-grid">{cards_html}</section>
+    {summary_section_html}
     {unresolved_section}
     <section class="panel">
       <h2>Briefing Items</h2>
