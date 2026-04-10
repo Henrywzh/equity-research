@@ -536,11 +536,15 @@ def _render_subgroup_block(subgroup: dict[str, Any], *, force_plain_title: bool)
     
     # Sort articles: Importance (HIGH > MEDIUM > LIGHT), then Recency (Newest first)
     articles_to_sort = list(articles)
-    # Sort by time first (descending)
-    articles_to_sort.sort(key=lambda x: str(x.get("published_at") or ""), reverse=True)
-    # Sort by priority (stable sort preserves time order)
-    prio_map = {"HIGH": 0, "MEDIUM": 1, "LIGHT": 2}
-    articles_to_sort.sort(key=lambda x: prio_map.get(str(x.get("attention_tier") or "LIGHT").upper(), 3))
+    # High Importance (2) > Medium (1) > Light (0)
+    prio_map = {"HIGH": 2, "MEDIUM": 1, "LIGHT": 0}
+    articles_to_sort.sort(
+        key=lambda x: (
+            prio_map.get(str(x.get("attention_tier") or "medium").upper(), -1),
+            str(x.get("published_at") or "")
+        ),
+        reverse=True
+    )
     
     articles_html = "".join(_render_article_line(art, is_expanded=False) for art in articles_to_sort)
     
