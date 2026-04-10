@@ -304,7 +304,33 @@ def _render_report_page(report: dict[str, Any], *, page_title: str, nav_prefix: 
         # Hide section entirely if empty per user preference for high-signal UI
         summary_html = ""
 
-    category_sections = "".join(_render_category_block(category) for category in categories)
+    # Tabbed Interface Generation
+    tab_btns = []
+    tab_contents = []
+    
+    for i, category in enumerate(categories):
+        cat_title = str(category.get("category") or f"Section {i+1}")
+        art_count = sum(len(sg.get("articles") or []) for sg in (category.get("subgroups") or []))
+        if not art_count: art_count = category.get("article_count", 0) # Fallback for old schema
+        
+        active_class = "active" if i == 0 else ""
+        hidden_class = "" if i == 0 else "hidden"
+        
+        tab_btns.append(f"""
+        <button class="tab-btn {active_class}" onclick="switchTab('{i}')">
+          {escape(cat_title)} <span class="tab-count">({art_count})</span>
+        </button>
+        """)
+        
+        tab_contents.append(f"""
+        <div id="cat-tab-{i}" class="category-tab-content {hidden_class}">
+          {_render_category_block(category)}
+        </div>
+        """)
+
+    tab_bar_html = f"<div class='tab-bar'>{''.join(tab_btns)}</div>" if tab_btns else ""
+    category_sections_html = "".join(tab_contents)
+
     notes = _build_run_notes(report)
     status_val = str(report.get("status") or "unknown").upper()
     cards = [
@@ -361,10 +387,25 @@ def _render_report_page(report: dict[str, Any], *, page_title: str, nav_prefix: 
     {summary_html}
     {market_context_html}
     <section class="panel">
-      <h2>Sections</h2>
-      {category_sections}
+      <h2>Briefing Items</h2>
+      {tab_bar_html}
+      {category_sections_html}
     </section>
   </div>
+  <script>
+    function switchTab(idx) {
+      // Hide all contents
+      document.querySelectorAll('.category-tab-content').forEach(c => c.classList.add('hidden'));
+      // Deactivate all buttons
+      document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+      
+      // Show target
+      document.getElementById('cat-tab-' + idx).classList.remove('hidden');
+      // Activate button
+      const btns = document.querySelectorAll('.tab-btn');
+      if (btns[idx]) btns[idx].classList.add('active');
+    }
+  </script>
 </body>
 </html>
 """
@@ -808,6 +849,48 @@ summary::-webkit-details-marker { display: none; }
 }
 details .fold-trigger { transform: rotate(90deg); }
 details[open] .fold-trigger { transform: rotate(0deg); }
+.tab-bar {
+  display: flex;
+  overflow-x: auto;
+  border-bottom: 2px solid var(--border);
+  margin-bottom: 24px;
+  gap: 8px;
+  scrollbar-width: none;
+}
+.tab-bar::-webkit-scrollbar { display: none; }
+.tab-btn {
+  background: none;
+  border: none;
+  padding: 12px 16px;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--muted);
+  cursor: pointer;
+  white-space: nowrap;
+  border-bottom: 3px solid transparent;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.tab-btn:hover { color: var(--ink); background: #f1f5f9; }
+.tab-btn.active {
+  color: var(--accent);
+  border-bottom-color: var(--accent);
+}
+.tab-count {
+  font-size: 11px;
+  background: #f1f5f9;
+  color: var(--muted);
+  padding: 2px 6px;
+  border-radius: 10px;
+  font-weight: 700;
+}
+.tab-btn.active .tab-count {
+  background: var(--accent-soft);
+  color: var(--accent);
+}
+.category-tab-content.hidden { display: none; }
 .article-details { padding: 0 20px 16px 52px; font-size: 14px; background: #ffffff; }
 .pill, .status-badge {
   display: inline-flex;
