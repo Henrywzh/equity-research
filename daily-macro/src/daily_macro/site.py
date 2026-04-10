@@ -546,6 +546,8 @@ def _render_subgroup_block(subgroup: dict[str, Any], *, force_plain_title: bool)
     
     articles_html = "".join(_render_article_line(art, is_expanded=False) for art in articles_to_sort)
     
+    developments_html = _render_bullet_list(subgroup.get("key_developments") or [], fallback="", compact=True)
+    
     return f"""
     <div class="subgroup-card">
       <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 12px;">
@@ -553,6 +555,7 @@ def _render_subgroup_block(subgroup: dict[str, Any], *, force_plain_title: bool)
         <span class="badge badge-info" style="background: #f1f5f9; color: #64748b;">{len(articles)} articles</span>
       </div>
       {theme_line}
+      <div style="margin-bottom: 16px;">{developments_html}</div>
       <div class="article-list">{articles_html}</div>
     </div>
     """
