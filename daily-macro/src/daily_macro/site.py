@@ -286,18 +286,18 @@ def _render_report_page(report: dict[str, Any], *, page_title: str, nav_prefix: 
     summary_html = ""
     if new_alerts:
         title = "NEW IN THIS UPDATE" if legacy_alerts else "Executive summary"
-        badge = '<span class="cio-badge">CIO BRIEFING</span>' if not legacy_alerts else ""
+        badge = '<span class="badge badge-cio">CIO BRIEFING</span>' if not legacy_alerts else ""
         summary_html += f"""
         <section class="panel">
           <h2>{badge}{escape(title)}</h2>
-          {''.join(f'<div class="alert-box"><strong>Top Alert</strong>{escape(item)}</div>' for item in new_alerts)}
+          {''.join(f'<div class="glass-card alert-box"><strong>Top Alert</strong>{escape(item)}</div>' for item in new_alerts)}
         </section>
         """
     if legacy_alerts:
         summary_html += f"""
         <section class="panel">
           <h2>PREVIOUSLY TODAY</h2>
-          {''.join(f'<div class="alert-box alert-box-legacy"><strong>Previous Alert</strong>{escape(item)}</div>' for item in legacy_alerts)}
+          {''.join(f'<div class="glass-card alert-box alert-box-legacy"><strong>Previous Alert</strong>{escape(item)}</div>' for item in legacy_alerts)}
         </section>
         """
     if not summary_html:
@@ -332,6 +332,19 @@ def _render_report_page(report: dict[str, Any], *, page_title: str, nav_prefix: 
     category_sections_html = "".join(tab_contents)
 
     notes = _build_run_notes(report)
+    main_note = notes[0] if notes else "Run completed successfully."
+    
+    # Style 1: Status Banner
+    status_variant = "banner-success" if status_val == "SUCCESS" else "banner-warn"
+    status_banner = f"""
+    <div class="banner-status {status_variant}">
+      <span class="banner-icon">{"✓" if status_val == "SUCCESS" else "⚠"}</span>
+      <span class="banner-msg">{escape(main_note)}</span>
+      <div class="metadata-row" style="margin-left: auto; opacity: 0.8;">
+        {model_html}
+      </div>
+    </div>
+    """
     status_val = str(report.get("status") or "unknown").upper()
     cards = [
         ("Status", f"<span class='status-{status_val}'>{status_val}</span>"),
@@ -378,11 +391,7 @@ def _render_report_page(report: dict[str, Any], *, page_title: str, nav_prefix: 
       <p class="hero-meta">Report date {report_date} • Source <a href="https://www.hkej.com/" target="_blank">hkej.com</a></p>
     </header>
     <section class="metrics-grid">{cards_html}</section>
-    <section class="panel">
-      <h2>Run notes</h2>
-      <ul class="compact-list">{''.join(f'<li>{escape(item)}</li>' for item in notes)}</ul>
-      <p class="muted"><strong>Models:</strong> {model_html}</p>
-    </section>
+    {status_banner}
     {unresolved_section}
     {summary_html}
     {market_context_html}
@@ -492,23 +501,22 @@ def _render_category_block(category: dict[str, Any]) -> str:
         f"sub-batches {escape(str(diagnostics.get('sub_batch_count', 0)))}, "
         f"partial articles {escape(str(diagnostics.get('partial_article_count', 0)))}, "
         f"splits {escape(', '.join(diagnostics.get('split_reasons') or []) or 'none')}"
-        "</p>"
-    )
     article_count = category.get("article_count", 0)
     return f"""
     <section class="category-card">
-      <div class="section-header">
-        <div>
-          <h3>{category_name} ({article_count} article(s))</h3>
-          <p class="muted">Profile: {profile}</p>
+      <div class="section-header" style="margin-bottom: 20px;">
+        <h3 style="font-size: 24px;">{category_name}</h3>
+        <div style="display: flex; gap: 8px;">
+          <span class="badge badge-info">{article_count} article(s)</span>
+          <span class="badge badge-success">{status.upper()}</span>
         </div>
-        <span class="status-badge status-{status}">{status.upper()}</span>
       </div>
-      {key_developments}
+      <div class="glass-card" style="margin-bottom: 20px;">{key_developments}</div>
       {entity_line}
-      {diagnostics_line}
-      <div class="subgroup-stack">
-        {subgroup_html}
+      {subgroup_html}
+      <div class="metadata-row" style="margin-top: 24px; border-top: 1px solid var(--border); padding-top: 12px;">
+        <span>Profile: {profile}</span>
+        <span>{escape(str(diagnostics.get('sub_batch_count', 0)))} batches • {escape(', '.join(diagnostics.get('split_reasons') or []) or 'no splits')}</span>
       </div>
     </section>
     """
@@ -516,62 +524,30 @@ def _render_category_block(category: dict[str, Any]) -> str:
 
 def _render_subgroup_block(subgroup: dict[str, Any], *, force_plain_title: bool) -> str:
     title = escape(str(subgroup.get("title") or "Subgroup"))
-    rationale = escape(str(subgroup.get("theme_rationale") or ""))
-    count = subgroup.get("article_count", 0)
-    key_developments = _render_bullet_list(subgroup.get("key_developments") or [], fallback="No subgroup summary was produced.")
-    
-    # Sorting & Visibility Logic
+    title_html = title if force_plain_title else f"<strong>{title}</strong>"
+    theme = str(subgroup.get("theme_rationale") or "")
     articles = subgroup.get("articles") or []
     
-    # Priority Mapping: HIGH=0, MEDIUM=1, LIGHT=2, DEFAULT=3
-    priority_map = {"high": 0, "medium": 1, "light": 2}
+    theme_line = f"<div class='glass-card' style='margin-bottom: 16px;'><p class='theme-text'><strong>Theme:</strong> {escape(theme)}</p></div>" if theme else ""
     
-    # Sort: Priority ASC (0 before 1), then Time DESC
-    sorted_articles = sorted(
-        articles, 
-        key=lambda x: (
-            priority_map.get(str(x.get("attention_tier")).lower(), 3),
-            -len(str(x.get("published_at") or ""))  # Dummy for descending if time is string, better to actually parse or string compare
-        )
-    )
-    # Correct secondary sort for ISO strings DESC: reverse the whole list if same priority?
-    # Actually, a better key for secondary: reverse time string
-    sorted_articles = sorted(
-        articles,
-        key=lambda x: (
-            priority_map.get(str(x.get("attention_tier")).lower(), 3),
-            str(x.get("published_at") or "")
-        )
-    )
-    # Wait, the above is Priority ASC, Time ASC. I want Priority ASC, Time DESC.
-    # Let's do it in two steps for clarity:
-    # 1. Sort by Time DESC
-    # 2. Sort by Priority ASC (stable sort preserves Time DESC)
-    sorted_articles.sort(key=lambda x: str(x.get("published_at") or ""), reverse=True)
-    sorted_articles.sort(key=lambda x: priority_map.get(str(x.get("attention_tier")).lower(), 3))
-    
-    articles_html = ""
-    for article in sorted_articles:
-        # All articles folded by default per user request
-        articles_html += _render_article_line(article, is_expanded=False)
-        
-    theme_html = f"<div class='theme-box'><strong>Theme:</strong> {rationale}</div>" if rationale else ""
-    
-    named_entities = ", ".join(
-        escape(str(entity.get("name") or ""))
-        for entity in subgroup.get("named_entities") or []
-        if str(entity.get("name") or "").strip()
-    )
-    entity_html = f"<div class='theme-box' style='border-top:none;background:#fafafa'><strong>Entities:</strong> {named_entities}</div>" if named_entities else ""
+    # Sort articles: Priority HIGH > MEDIUM > LIGHT, then Time DESC
+    def article_sort_key(art):
+        prio = str(art.get("priority") or "LIGHT").upper()
+        prio_order = {"HIGH": 0, "MEDIUM": 1, "LIGHT": 2}
+        return (prio_order.get(prio, 3), art.get("published_at", ""), art.get("title", ""))
+
+    sorted_articles = sorted(articles, key=article_sort_key)
+    articles_html = "".join(_render_article_line(art, is_expanded=False) for art in sorted_articles)
     
     return f"""
-    <article class="subgroup-card">
-      <h4>{title} ({count} article(s))</h4>
-      {theme_html}
-      {entity_html}
-      {key_developments}
+    <div class="subgroup-card">
+      <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 12px;">
+        <h4>{title_html}</h4>
+        <span class="badge badge-info" style="background: #f1f5f9; color: #64748b;">{len(articles)} articles</span>
+      </div>
+      {theme_line}
       <div class="article-list">{articles_html}</div>
-    </article>
+    </div>
     """
 
 
@@ -786,12 +762,55 @@ a:hover { text-decoration: underline; }
 .status-SUCCESS { color: #059669; }
 .status-PARTIAL { color: #d97706; }
 .status-FAILED { color: #dc2626; }
+
+.banner-status {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 20px;
+  border-radius: 12px;
+  margin-bottom: 24px;
+  font-size: 14px;
+}
+.banner-success { background: #ecfdf5; border: 1px solid #10b981; color: #065f46; }
+.banner-warn { background: #fffbeb; border: 1px solid #f59e0b; color: #92400e; }
+.banner-icon { font-size: 18px; font-weight: bold; }
+
+.glass-card {
+  background: rgba(255, 255, 255, 0.6);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border: 1px solid rgba(0, 0, 0, 0.05);
+  border-radius: 12px;
+  padding: 16px;
+}
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 2px 10px;
+  border-radius: 20px;
+  font-size: 11px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+.badge-success { background: #d1fae5; color: #065f46; }
+.badge-info { background: #e0f2fe; color: #0369a1; }
+.badge-cio { background: #fee2e2; color: #991b1b; }
+
+.metadata-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  font-size: 12px;
+  color: var(--muted);
+}
+
 .panel { padding: 20px; margin-bottom: 24px; }
-.panel h2 { margin-top: 0; font-size: 18px; font-weight: 700; color: var(--ink); margin-bottom: 16px; display: flex; align-items: center; }
-.cio-badge { background: #ef4444; color: white; padding: 2px 8px; border-radius: 4px; font-size: 11px; margin-right: 10px; font-weight: 800; }
-.alert-box { margin-bottom: 12px; padding: 12px 16px; border-left: 4px solid #ef4444; background: #fee2e2; border-radius: 0 8px 8px 0; font-size: 15px; color: #111827; }
+.panel h2 { margin-top: 0; font-size: 18px; font-weight: 700; color: var(--ink); margin-bottom: 16px; display: flex; align-items: center; gap: 10px; }
+.alert-box { margin-bottom: 12px; border-left: 4px solid #ef4444; border-radius: 0 12px 12px 0; font-size: 15px; color: #111827; }
 .alert-box strong { color: #991b1b; display: block; font-size: 12px; margin-bottom: 4px; text-transform: uppercase; }
-.alert-box-legacy { border-left-color: #d1d5db; background: #f9fafb; color: #4b5563; }
+.alert-box-legacy { border-left-color: #d1d5db; color: #4b5563; }
 .alert-box-legacy strong { color: #6b7280; }
 .warning-panel { border-color: #fecaca; background: #fff7f7; }
 .muted { color: var(--muted); }
