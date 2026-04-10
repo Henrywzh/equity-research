@@ -283,38 +283,46 @@ def _render_report_page(report: dict[str, Any], *, page_title: str, nav_prefix: 
     new_alerts = report.get("executive_summary") or []
     legacy_alerts = report.get("legacy_executive_summary") or []
     
-    summary_html = ""
+    # Combined Summary for the First Tab
+    all_summary_items = []
     if new_alerts:
-        title = "NEW IN THIS UPDATE" if legacy_alerts else "Executive summary"
-        badge = '<span class="badge badge-cio">CIO BRIEFING</span>' if not legacy_alerts else ""
-        summary_html += f"""
-        <section class="panel">
-          <h2>{badge}{escape(title)}</h2>
-          {''.join(f'<div class="glass-card alert-box"><strong>Top Alert</strong>{escape(item)}</div>' for item in new_alerts)}
-        </section>
-        """
+        all_summary_items.extend(f'<div class="glass-card alert-box"><strong>Top Alert</strong>{escape(item)}</div>' for item in new_alerts)
     if legacy_alerts:
-        summary_html += f"""
-        <section class="panel">
-          <h2>PREVIOUSLY TODAY</h2>
-          {''.join(f'<div class="glass-card alert-box alert-box-legacy"><strong>Previous Alert</strong>{escape(item)}</div>' for item in legacy_alerts)}
-        </section>
+        all_summary_items.extend(f'<div class="glass-card alert-box alert-box-legacy"><strong>Previous Alert</strong>{escape(item)}</div>' for item in legacy_alerts)
+    
+    summary_tab_content = ""
+    if all_summary_items:
+        summary_tab_content = f"""
+        <div class="category-tab-content" id="cat-tab-summary">
+          <div style="margin-bottom: 24px;">
+            <span class="badge badge-cio" style="padding: 4px 12px; font-size: 13px;">CIO BRIEFING</span>
+          </div>
+          {''.join(all_summary_items)}
+        </div>
         """
-    if not summary_html:
-        # Hide section entirely if empty per user preference for high-signal UI
-        summary_html = ""
 
     # Tabbed Interface Generation
     tab_btns = []
     tab_contents = []
     
+    # Add CIO Summary as the absolute first tab if it exists
+    if summary_tab_content:
+        tab_btns.append(f"""
+        <button class="tab-btn active" onclick="switchTab('summary')">
+          <span style="margin-right: 6px;">★</span> Summary
+        </button>
+        """)
+        tab_contents.append(summary_tab_content)
+
     for i, category in enumerate(categories):
         cat_title = str(category.get("category") or f"Section {i+1}")
         art_count = sum(len(sg.get("articles") or []) for sg in (category.get("subgroups") or []))
         if not art_count: art_count = category.get("article_count", 0) # Fallback for old schema
         
-        active_class = "active" if i == 0 else ""
-        hidden_class = "" if i == 0 else "hidden"
+        # Default to active only if NO summary tab exists
+        is_active = (i == 0 and not summary_tab_content)
+        active_class = "active" if is_active else ""
+        hidden_class = "" if is_active else "hidden"
         
         tab_btns.append(f"""
         <button class="tab-btn {active_class}" onclick="switchTab('{i}')">
@@ -392,11 +400,10 @@ def _render_report_page(report: dict[str, Any], *, page_title: str, nav_prefix: 
       <h1>{site_title}</h1>
       <p class="hero-meta">Report date {report_date} • Source <a href="https://www.hkej.com/" target="_blank">hkej.com</a></p>
     </header>
-    <section class="metrics-grid">{cards_html}</section>
     {status_banner}
-    {unresolved_section}
-    {summary_html}
     {market_context_html}
+    <section class="metrics-grid">{cards_html}</section>
+    {unresolved_section}
     <section class="panel">
       <h2>Briefing Items</h2>
       {tab_bar_html}
@@ -527,14 +534,15 @@ def _render_subgroup_block(subgroup: dict[str, Any], *, force_plain_title: bool)
     
     theme_line = f"<div class='glass-card' style='margin-bottom: 16px;'><p class='theme-text'><strong>Theme:</strong> {escape(theme)}</p></div>" if theme else ""
     
-    # Sort articles: Priority HIGH > MEDIUM > LIGHT, then Time DESC
-    def article_sort_key(art):
-        prio = str(art.get("priority") or "LIGHT").upper()
-        prio_order = {"HIGH": 0, "MEDIUM": 1, "LIGHT": 2}
-        return (prio_order.get(prio, 3), art.get("published_at", ""), art.get("title", ""))
-
-    sorted_articles = sorted(articles, key=article_sort_key)
-    articles_html = "".join(_render_article_line(art, is_expanded=False) for art in sorted_articles)
+    # Sort articles: Importance (HIGH > MEDIUM > LIGHT), then Recency (Newest first)
+    articles_to_sort = list(articles)
+    # Sort by time first (descending)
+    articles_to_sort.sort(key=lambda x: str(x.get("published_at") or ""), reverse=True)
+    # Sort by priority (stable sort preserves time order)
+    prio_map = {"HIGH": 0, "MEDIUM": 1, "LIGHT": 2}
+    articles_to_sort.sort(key=lambda x: prio_map.get(str(x.get("attention_tier") or "LIGHT").upper(), 3))
+    
+    articles_html = "".join(_render_article_line(art, is_expanded=False) for art in articles_to_sort)
     
     return f"""
     <div class="subgroup-card">
