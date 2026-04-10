@@ -496,11 +496,6 @@ def _render_category_block(category: dict[str, Any]) -> str:
     subgroup_html = "".join(_render_subgroup_block(subgroup, force_plain_title=(len(subgroups) == 1)) for subgroup in subgroups)
     entity_line = f"<p class='muted'><strong>Named entities:</strong> {named_entities}</p>" if named_entities else ""
     diagnostics = category.get("diagnostics") or {}
-    diagnostics_line = (
-        "<p class='muted'><strong>Diagnostics:</strong> "
-        f"sub-batches {escape(str(diagnostics.get('sub_batch_count', 0)))}, "
-        f"partial articles {escape(str(diagnostics.get('partial_article_count', 0)))}, "
-        f"splits {escape(', '.join(diagnostics.get('split_reasons') or []) or 'none')}"
     article_count = category.get("article_count", 0)
     return f"""
     <section class="category-card">
