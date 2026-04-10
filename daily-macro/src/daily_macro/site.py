@@ -723,19 +723,23 @@ a:hover { text-decoration: underline; }
 .hero-meta { margin: 0; color: var(--muted); font-size: 14px; font-weight: 500; }
 .hero-meta a { color: var(--accent); font-weight: 600; }
 .metrics-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
-  gap: 12px;
-  margin-bottom: 20px;
-}
-.metric-card, .panel, .category-card, .archive-card, .subgroup-card {
-  background: var(--panel);
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  margin-bottom: 32px;
+  padding: 16px 20px;
+  background: white;
   border: 1px solid var(--border);
   border-radius: 12px;
 }
-.metric-card { padding: 14px; }
-.metric-label { color: var(--muted); font-size: 11px; text-transform: uppercase; font-weight: 600; letter-spacing: 0.05em; }
-.metric-value { font-size: 24px; font-weight: 700; margin-top: 4px; color: var(--ink); }
+.metric-card {
+  flex: 1;
+  min-width: 100px;
+  border: none;
+  padding: 0;
+}
+.metric-label { color: var(--muted); font-size: 10px; text-transform: uppercase; font-weight: 700; letter-spacing: 0.1em; margin-bottom: 4px; }
+.metric-value { font-size: 18px; font-weight: 800; color: var(--ink); }
 
 .status-SUCCESS { color: #059669; }
 .status-PARTIAL { color: #d97706; }
