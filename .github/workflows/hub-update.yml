@@ -1,0 +1,43 @@
+name: Unified Hub Update
+
+on:
+  schedule:
+    - cron: "0 */4 * * *"
+  workflow_dispatch:
+  workflow_run:
+    workflows: ["Marine Monitor API", "Daily Macro Analysis", "Youtube Run"]
+    types:
+      - completed
+
+jobs:
+  aggregate:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v5
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          fetch-depth: 0
+
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v6
+        with:
+          python-version: "3.11"
+
+      - name: Run Aggregator
+        run: |
+          python hub/aggregator.py
+
+      - name: Commit updated signals
+        run: |
+          git config user.name "hub-bot[bot]"
+          git config user.email "hub-bot[bot]@users.noreply.github.com"
+          git add hub/data/signals.json
+          if ! git diff --staged --quiet; then
+            git commit -m "data: refresh unified intelligence hub $(date -u +%Y-%m-%dT%H:%M:%SZ)"
+            git pull --rebase origin main
+            git push origin main
+          fi
