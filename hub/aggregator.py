@@ -79,13 +79,8 @@ def get_latest_macro():
                         alerts.extend(developments)
                 data["alerts"] = alerts[:8] # Top 8 developments as alerts
 
-                # Heuristic Sentiment (simple logic for now)
-                # If executive summary contains words like "新高" (new high) or "漲" (up)
-                all_text = " ".join(data["summary"])
-                if any(x in all_text for x in ["漲", "新高", "揚", "升"]):
-                    data["sentiment"] = "Positive"
-                elif any(x in all_text for x in ["跌", "挫", "低"]):
-                    data["sentiment"] = "Negative"
+                # Sentiment is now 'Pending' until LLM scoring is integrated to avoid brittle regex matching
+                data["sentiment"] = "Pending LLM"
     except Exception as e:
         print(f"Macro parse error: {e}")
     return data

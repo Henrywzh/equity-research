@@ -140,6 +140,13 @@
                 } else if (macro.sentiment === 'Negative') {
                     macroBadge.textContent = 'BEARISH';
                     macroBadge.className = 'badge badge-danger';
+                } else if (macro.sentiment === 'Pending LLM') {
+                    document.querySelector('#kpi-macro .metric-value').textContent = 'SCORING...';
+                    macroBadge.textContent = 'LLM PENDING';
+                    macroBadge.className = 'badge';
+                    macroBadge.style.background = 'var(--bg-tertiary)';
+                    macroBadge.style.color = 'var(--text-muted)';
+                    document.getElementById('macro-category').textContent = 'AI Sentiment Scoring: Queued';
                 } else {
                     macroBadge.textContent = 'NEUTRAL';
                     macroBadge.className = 'badge badge-warning';
