@@ -1,15 +1,15 @@
 {
   "report_schema_version": 6,
   "report_date": "2026-04-11",
-  "generated_at": "2026-04-11T08:32:40.440089+00:00",
+  "generated_at": "2026-04-11T21:28:31.604688+00:00",
   "source_site": "hkej",
-  "status": "success",
-  "executive_summary": [
+  "status": "partial",
+  "executive_summary": [],
+  "legacy_executive_summary": [
     "美國3月份通脹升3.3%，創近兩年新高。",
     "道指收市跌269點，報47871點，跌314點或0.65%。",
     "費城半導體指數續創新高，收市漲2.31%，報8889點。"
   ],
-  "legacy_executive_summary": [],
   "model": {
     "provider": "groq",
     "primary_model": "meta-llama/llama-4-scout-17b-16e-instruct",
@@ -20,18 +20,18 @@
   },
   "model_switches": [],
   "input": {
-    "article_count": 36,
+    "article_count": 45,
     "category_count": 5
   },
   "diagnostics": {
-    "rate_limit_wait_count": 2,
-    "rate_limit_wait_seconds_total": 2419.199,
+    "rate_limit_wait_count": 1,
+    "rate_limit_wait_seconds_total": 1814.4,
     "fallback_switch_count": 0,
     "key_rotation_count": 0,
-    "pre_send_split_count": 12,
+    "pre_send_split_count": 25,
     "response_413_split_count": 0,
     "json_repair_retry_count": 0,
-    "batch_count": 39,
+    "batch_count": 25,
     "failed_batch_count": 0,
     "delayed_retry_candidate_count": 0,
     "delayed_retry_attempted_count": 0,
@@ -40,48 +40,44 @@
     "high_medium_unresolved_count": 0,
     "light_unresolved_count": 0,
     "delayed_retry_skipped_final_model_count": 0,
-    "synthesis_budget_exhausted_count": 0,
+    "synthesis_budget_exhausted_count": 1,
     "degraded_merge_count": 0
   },
   "incremental": {
-    "reused_successful_articles": 0,
-    "new_articles_analyzed": 36,
+    "reused_successful_articles": 36,
+    "new_articles_analyzed": 9,
     "retried_previous_day_articles": 0,
     "previous_day_retry_successes": 0
   },
   "daily_stats": {
-    "total_scraped": 36,
-    "analyzed": 36,
+    "total_scraped": 45,
+    "analyzed": 45,
     "success_rate": 100.0
   },
   "unresolved_articles": [],
   "totals": {
-    "article_count": 36,
-    "successful_article_analyses": 36,
+    "article_count": 45,
+    "successful_article_analyses": 45,
     "failed_article_analyses": 0,
-    "full_text_article_count": 36,
+    "full_text_article_count": 45,
     "truncated_article_count": 0,
-    "successful_categories": 5,
-    "partial_categories": 0,
+    "successful_categories": 4,
+    "partial_categories": 1,
     "failed_categories": 0
   },
   "market_context": [],
   "categories": [
     {
       "category": "國際財經",
-      "article_count": 9,
+      "article_count": 10,
       "status": "success",
       "key_developments": [
-        "美國3月份通脹升3.3%，創近兩年新高。",
         "道指收市跌269點，報47871點，跌314點或0.65%。",
         "費城半導體指數續創新高，收市漲2.31%，報8889點。",
-        "聯儲局要求美國大型銀行提供私募信貸敞口詳情，以評估行業壓力。"
+        "輝達抽高2.6%，亞馬遜續揚2%，英特爾攀升1.1%。",
+        "私募信貸行業規模已膨脹至1.8萬億美元。"
       ],
       "named_entities": [
-        {
-          "name": "美國",
-          "type": "country"
-        },
         {
           "name": "道指",
           "type": "index"
@@ -91,11 +87,69 @@
           "type": "index"
         },
         {
-          "name": "聯儲局",
-          "type": "institution"
+          "name": "輝達",
+          "type": "company"
+        },
+        {
+          "name": "亞馬遜",
+          "type": "company"
         }
       ],
       "articles": [
+        {
+          "source_article_id": "4369655",
+          "title": "意大利據報限制中國中化在倍耐力董事會席位數量",
+          "canonical_url": "https://www.hkej.com/instantnews/international/article/4369655/%E6%84%8F%E5%A4%A7%E5%88%A9%E6%93%9A%E5%A0%B1%E9%99%90%E5%88%B6%E4%B8%AD%E5%9C%8B%E4%B8%AD%E5%8C%96%E5%9C%A8%E5%80%8D%E8%80%90%E5%8A%9B%E8%91%A3%E4%BA%8B%E6%9C%83%E5%B8%AD%E4%BD%8D%E6%95%B8%E9%87%8F",
+          "published_at": "2026-04-11T17:38:00+08:00",
+          "section": "國際財經",
+          "novelty_score": 6,
+          "relevance_score": 8,
+          "urgency_score": 7,
+          "named_entities": [
+            {
+              "name": "意大利",
+              "type": "country"
+            },
+            {
+              "name": "中國中化",
+              "type": "company"
+            },
+            {
+              "name": "倍耐力(Pirelli)",
+              "type": "company"
+            },
+            {
+              "name": "梅洛尼",
+              "type": "person"
+            },
+            {
+              "name": "Antonio Tajani",
+              "type": "person"
+            }
+          ],
+          "key_points": [
+            "意大利政府限制中國中化在倍耐力董事會中可任命的董事人數至多3名，且不得擔任董事長或CEO。",
+            "中國中化目前在倍耐力15人董事會中佔有8個席位。",
+            "美國市場佔倍耐力收入的20%以上，意大利此舉或與美國收緊針對中國技術監管有關。"
+          ],
+          "content_truncated": false,
+          "original_content_length_chars": 372,
+          "analyzed_content_length_chars": 372,
+          "original_content_token_estimate": 93,
+          "analyzed_content_token_estimate": 93,
+          "truncation_reason": null,
+          "analysis_method": "full_text",
+          "attention_tier": "medium",
+          "theme": "geopolitics",
+          "attention_reason": "Article mentions geopolitical tensions between Italy and China",
+          "must_keep": true,
+          "model_used": "meta-llama/llama-4-scout-17b-16e-instruct",
+          "delayed_retry_attempted": false,
+          "delayed_retry_model_chain": [],
+          "delayed_retry_final_model": null,
+          "error_classification": null,
+          "error": null
+        },
         {
           "source_article_id": "4369648",
           "title": "私募信貸丨聯儲局據報要求美國大型銀行提供敞口詳情",
@@ -564,19 +618,15 @@
       "subgroups": [
         {
           "title": "股市動態 & Other News",
-          "theme_rationale": "關注全球股市走勢和股票市場動態",
-          "article_count": 9,
+          "theme_rationale": "關注全球股市走勢與股票市場動態",
+          "article_count": 10,
           "key_developments": [
-            "美國3月份通脹升3.3%，創近兩年新高。",
             "道指收市跌269點，報47871點，跌314點或0.65%。",
             "費城半導體指數續創新高，收市漲2.31%，報8889點。",
-            "聯儲局要求美國大型銀行提供私募信貸敞口詳情，以評估行業壓力。"
+            "輝達抽高2.6%，亞馬遜續揚2%，英特爾攀升1.1%。",
+            "私募信貸行業規模已膨脹至1.8萬億美元。"
           ],
           "named_entities": [
-            {
-              "name": "美國",
-              "type": "country"
-            },
             {
               "name": "道指",
               "type": "index"
@@ -586,8 +636,12 @@
               "type": "index"
             },
             {
-              "name": "聯儲局",
-              "type": "institution"
+              "name": "輝達",
+              "type": "company"
+            },
+            {
+              "name": "亞馬遜",
+              "type": "company"
             }
           ],
           "articles": [
@@ -808,6 +862,115 @@
               "error": null
             },
             {
+              "source_article_id": "4369655",
+              "title": "意大利據報限制中國中化在倍耐力董事會席位數量",
+              "canonical_url": "https://www.hkej.com/instantnews/international/article/4369655/%E6%84%8F%E5%A4%A7%E5%88%A9%E6%93%9A%E5%A0%B1%E9%99%90%E5%88%B6%E4%B8%AD%E5%9C%8B%E4%B8%AD%E5%8C%96%E5%9C%A8%E5%80%8D%E8%80%90%E5%8A%9B%E8%91%A3%E4%BA%8B%E6%9C%83%E5%B8%AD%E4%BD%8D%E6%95%B8%E9%87%8F",
+              "published_at": "2026-04-11T17:38:00+08:00",
+              "section": "國際財經",
+              "novelty_score": 6,
+              "relevance_score": 8,
+              "urgency_score": 7,
+              "named_entities": [
+                {
+                  "name": "意大利",
+                  "type": "country"
+                },
+                {
+                  "name": "中國中化",
+                  "type": "company"
+                },
+                {
+                  "name": "倍耐力(Pirelli)",
+                  "type": "company"
+                },
+                {
+                  "name": "梅洛尼",
+                  "type": "person"
+                },
+                {
+                  "name": "Antonio Tajani",
+                  "type": "person"
+                }
+              ],
+              "key_points": [
+                "意大利政府限制中國中化在倍耐力董事會中可任命的董事人數至多3名，且不得擔任董事長或CEO。",
+                "中國中化目前在倍耐力15人董事會中佔有8個席位。",
+                "美國市場佔倍耐力收入的20%以上，意大利此舉或與美國收緊針對中國技術監管有關。"
+              ],
+              "content_truncated": false,
+              "original_content_length_chars": 372,
+              "analyzed_content_length_chars": 372,
+              "original_content_token_estimate": 93,
+              "analyzed_content_token_estimate": 93,
+              "truncation_reason": null,
+              "analysis_method": "full_text",
+              "attention_tier": "medium",
+              "theme": "geopolitics",
+              "attention_reason": "Article mentions geopolitical tensions between Italy and China",
+              "must_keep": true,
+              "model_used": "meta-llama/llama-4-scout-17b-16e-instruct",
+              "delayed_retry_attempted": false,
+              "delayed_retry_model_chain": [],
+              "delayed_retry_final_model": null,
+              "error_classification": null,
+              "error": null
+            },
+            {
+              "source_article_id": "4369632",
+              "title": "國際早班車丨巴基斯坦確認 伊朗議長率談判團抵達伊斯蘭堡下塌飯店",
+              "canonical_url": "https://www.hkej.com/instantnews/international/article/4369632/%E5%9C%8B%E9%9A%9B%E6%97%A9%E7%8F%AD%E8%BB%8A%E4%B8%A8%E5%B7%B4%E5%9F%BA%E6%96%AF%E5%9D%A6%E7%A2%BA%E8%AA%8D+%E4%BC%8A%E6%9C%97%E8%AD%B0%E9%95%B7%E7%8E%87%E8%AB%87%E5%88%A4%E5%9C%98%E6%8A%B5%E9%81%94%E4%BC%8A%E6%96%AF%E8%98%AD%E5%A0%A1%E4%B8%8B%E5%A1%8C%E9%A3%AF%E5%BA%97",
+              "published_at": "2026-04-11T07:59:00+08:00",
+              "section": "國際財經",
+              "novelty_score": 6,
+              "relevance_score": 8,
+              "urgency_score": 7,
+              "named_entities": [
+                {
+                  "name": "伊朗",
+                  "type": "country"
+                },
+                {
+                  "name": "巴基斯坦",
+                  "type": "country"
+                },
+                {
+                  "name": "美國",
+                  "type": "country"
+                },
+                {
+                  "name": "卡利巴夫",
+                  "type": "person"
+                },
+                {
+                  "name": "特朗普",
+                  "type": "person"
+                }
+              ],
+              "key_points": [
+                "伊朗議長卡利巴夫率領代表團抵達巴基斯坦首都伊斯蘭堡下塌飯店，預料將與美國舉行停火談判。",
+                "美國副總統萬斯在啟程前往巴基斯坦時對談判表示樂觀，警告德黑蘭不要試圖耍弄美國。",
+                "美國貿易代表格里爾表示，如果中國對伊朗事務的參與損害了美國利益，美中關係可能變得更加複雜。",
+                "三藩市聯儲總裁戴利表示，伊朗戰爭引發的石油衝擊延長了通脹回歸聯儲局2%目標所需時間。"
+              ],
+              "content_truncated": false,
+              "original_content_length_chars": 3341,
+              "analyzed_content_length_chars": 3341,
+              "original_content_token_estimate": 836,
+              "analyzed_content_token_estimate": 836,
+              "truncation_reason": null,
+              "analysis_method": "full_text",
+              "attention_tier": "medium",
+              "theme": "geopolitics",
+              "attention_reason": "Article mentions geopolitics-related event",
+              "must_keep": true,
+              "model_used": "meta-llama/llama-4-scout-17b-16e-instruct",
+              "delayed_retry_attempted": false,
+              "delayed_retry_model_chain": [],
+              "delayed_retry_final_model": null,
+              "error_classification": null,
+              "error": null
+            },
+            {
               "source_article_id": "4369648",
               "title": "私募信貸丨聯儲局據報要求美國大型銀行提供敞口詳情",
               "canonical_url": "https://www.hkej.com/instantnews/international/article/4369648/%E7%A7%81%E5%8B%9F%E4%BF%A1%E8%B2%B8%E4%B8%A8%E8%81%AF%E5%84%B2%E5%B1%80%E6%93%9A%E5%A0%B1%E8%A6%81%E6%B1%82%E7%BE%8E%E5%9C%8B%E5%A4%A7%E5%9E%8B%E9%8A%80%E8%A1%8C%E6%8F%90%E4%BE%9B%E6%95%9E%E5%8F%A3%E8%A9%B3%E6%83%85",
@@ -946,61 +1109,6 @@
               "error": null
             },
             {
-              "source_article_id": "4369632",
-              "title": "國際早班車丨巴基斯坦確認 伊朗議長率談判團抵達伊斯蘭堡下塌飯店",
-              "canonical_url": "https://www.hkej.com/instantnews/international/article/4369632/%E5%9C%8B%E9%9A%9B%E6%97%A9%E7%8F%AD%E8%BB%8A%E4%B8%A8%E5%B7%B4%E5%9F%BA%E6%96%AF%E5%9D%A6%E7%A2%BA%E8%AA%8D+%E4%BC%8A%E6%9C%97%E8%AD%B0%E9%95%B7%E7%8E%87%E8%AB%87%E5%88%A4%E5%9C%98%E6%8A%B5%E9%81%94%E4%BC%8A%E6%96%AF%E8%98%AD%E5%A0%A1%E4%B8%8B%E5%A1%8C%E9%A3%AF%E5%BA%97",
-              "published_at": "2026-04-11T07:59:00+08:00",
-              "section": "國際財經",
-              "novelty_score": 6,
-              "relevance_score": 8,
-              "urgency_score": 7,
-              "named_entities": [
-                {
-                  "name": "伊朗",
-                  "type": "country"
-                },
-                {
-                  "name": "巴基斯坦",
-                  "type": "country"
-                },
-                {
-                  "name": "美國",
-                  "type": "country"
-                },
-                {
-                  "name": "卡利巴夫",
-                  "type": "person"
-                },
-                {
-                  "name": "特朗普",
-                  "type": "person"
-                }
-              ],
-              "key_points": [
-                "伊朗議長卡利巴夫率領代表團抵達巴基斯坦首都伊斯蘭堡下塌飯店，預料將與美國舉行停火談判。",
-                "美國副總統萬斯在啟程前往巴基斯坦時對談判表示樂觀，警告德黑蘭不要試圖耍弄美國。",
-                "美國貿易代表格里爾表示，如果中國對伊朗事務的參與損害了美國利益，美中關係可能變得更加複雜。",
-                "三藩市聯儲總裁戴利表示，伊朗戰爭引發的石油衝擊延長了通脹回歸聯儲局2%目標所需時間。"
-              ],
-              "content_truncated": false,
-              "original_content_length_chars": 3341,
-              "analyzed_content_length_chars": 3341,
-              "original_content_token_estimate": 836,
-              "analyzed_content_token_estimate": 836,
-              "truncation_reason": null,
-              "analysis_method": "full_text",
-              "attention_tier": "medium",
-              "theme": "geopolitics",
-              "attention_reason": "Article mentions geopolitics-related event",
-              "must_keep": true,
-              "model_used": "meta-llama/llama-4-scout-17b-16e-instruct",
-              "delayed_retry_attempted": false,
-              "delayed_retry_model_chain": [],
-              "delayed_retry_final_model": null,
-              "error_classification": null,
-              "error": null
-            },
-            {
               "source_article_id": "4369618",
               "title": "伊朗局勢丨霍爾木茲海峽過去一天僅4艘船通過",
               "canonical_url": "https://www.hkej.com/instantnews/international/article/4369618/%E4%BC%8A%E6%9C%97%E5%B1%80%E5%8B%A2%E4%B8%A8%E9%9C%8D%E7%88%BE%E6%9C%A8%E8%8C%B2%E6%B5%B7%E5%B3%BD%E9%81%8E%E5%8E%BB%E4%B8%80%E5%A4%A9%E5%83%854%E8%89%98%E8%88%B9%E9%80%9A%E9%81%8E",
@@ -1061,34 +1169,32 @@
       ],
       "analysis_profile": "standard",
       "model_used": "meta-llama/llama-4-scout-17b-16e-instruct",
-      "sub_batch_count": 9,
+      "sub_batch_count": 5,
       "diagnostics": {
-        "sub_batch_count": 6,
-        "split_reasons": [
-          "pre_send_budget"
-        ],
+        "sub_batch_count": 5,
+        "split_reasons": [],
         "models_attempted": [
           "meta-llama/llama-4-scout-17b-16e-instruct"
         ],
-        "estimated_input_tokens_max": 1735,
-        "serialized_request_bytes_max": 12364,
-        "rate_limit_waits": 1,
+        "estimated_input_tokens_max": 713,
+        "serialized_request_bytes_max": 3899,
+        "rate_limit_waits": 0,
         "partial_article_count": 0,
-        "synthesis_wait_seconds_total": 1296.0,
+        "synthesis_wait_seconds_total": 0.0,
         "synthesis_retry_count": 0,
         "synthesis_retry_skipped_count": 0,
         "synthesis_budget_exhausted": false,
         "degraded_merge_used": false,
         "degraded_merge_reason": "",
-        "synthesis_merge_depth_max": 1,
+        "synthesis_merge_depth_max": 0,
         "model_switches": []
       },
       "error": null
     },
     {
       "category": "時事脈搏",
-      "article_count": 22,
-      "status": "success",
+      "article_count": 28,
+      "status": "partial",
       "key_developments": [],
       "named_entities": [
         {
@@ -1109,6 +1215,202 @@
         }
       ],
       "articles": [
+        {
+          "source_article_id": "4369657",
+          "title": "美伊談判丨美國傳同意解凍伊朗海外被凍結資產",
+          "canonical_url": "https://www.hkej.com/instantnews/current/article/4369657/%E7%BE%8E%E4%BC%8A%E8%AB%87%E5%88%A4%E4%B8%A8%E7%BE%8E%E5%9C%8B%E5%82%B3%E5%90%8C%E6%84%8F%E8%A7%A3%E5%87%8D%E4%BC%8A%E6%9C%97%E6%B5%B7%E5%A4%96%E8%A2%AB%E5%87%8D%E7%B5%90%E8%B3%87%E7%94%A2",
+          "published_at": "2026-04-11T18:00:00+08:00",
+          "section": "時事脈搏",
+          "novelty_score": 6,
+          "relevance_score": 8,
+          "urgency_score": 9,
+          "named_entities": [
+            {
+              "name": "伊朗",
+              "type": "country"
+            },
+            {
+              "name": "美國",
+              "type": "country"
+            },
+            {
+              "name": "卡塔爾",
+              "type": "country"
+            }
+          ],
+          "key_points": [
+            "美國同意解凍伊朗在卡塔爾及其他外國銀行資產。",
+            "解凍資產與確保霍爾木茲海峽航行安全直接相關。"
+          ],
+          "content_truncated": false,
+          "original_content_length_chars": 156,
+          "analyzed_content_length_chars": 156,
+          "original_content_token_estimate": 39,
+          "analyzed_content_token_estimate": 39,
+          "truncation_reason": null,
+          "analysis_method": "full_text",
+          "attention_tier": "high",
+          "theme": "geopolitics",
+          "attention_reason": "High-signal geopolitics headline based on title/summary keywords.",
+          "must_keep": true,
+          "model_used": "meta-llama/llama-4-scout-17b-16e-instruct",
+          "delayed_retry_attempted": false,
+          "delayed_retry_model_chain": [],
+          "delayed_retry_final_model": null,
+          "error_classification": null,
+          "error": null
+        },
+        {
+          "source_article_id": "4369653",
+          "title": "中東局勢丨伊朗新任最高領袖據報毀容及至少一條腿重傷",
+          "canonical_url": "https://www.hkej.com/instantnews/current/article/4369653/%E4%B8%AD%E6%9D%B1%E5%B1%80%E5%8B%A2%E4%B8%A8%E4%BC%8A%E6%9C%97%E6%96%B0%E4%BB%BB%E6%9C%80%E9%AB%98%E9%A0%98%E8%A2%96%E6%93%9A%E5%A0%B1%E6%AF%80%E5%AE%B9%E5%8F%8A%E8%87%B3%E5%B0%91%E4%B8%80%E6%A2%9D%E8%85%BF%E9%87%8D%E5%82%B7",
+          "published_at": "2026-04-11T17:13:00+08:00",
+          "section": "時事脈搏",
+          "novelty_score": 7,
+          "relevance_score": 8,
+          "urgency_score": 8,
+          "named_entities": [
+            {
+              "name": "伊朗",
+              "type": "country"
+            },
+            {
+              "name": "穆傑塔巴",
+              "type": "person"
+            },
+            {
+              "name": "哈梅內伊",
+              "type": "person"
+            }
+          ],
+          "key_points": [
+            "伊朗新任最高領袖穆傑塔巴在戰爭初期空襲中受重傷。",
+            "穆傑塔巴面部嚴重毀容，至少一條腿傷勢嚴重。"
+          ],
+          "content_truncated": false,
+          "original_content_length_chars": 642,
+          "analyzed_content_length_chars": 642,
+          "original_content_token_estimate": 161,
+          "analyzed_content_token_estimate": 161,
+          "truncation_reason": null,
+          "analysis_method": "full_text",
+          "attention_tier": "high",
+          "theme": "geopolitics",
+          "attention_reason": "High-signal geopolitics headline based on title/summary keywords.",
+          "must_keep": true,
+          "model_used": "meta-llama/llama-4-scout-17b-16e-instruct",
+          "delayed_retry_attempted": false,
+          "delayed_retry_model_chain": [],
+          "delayed_retry_final_model": null,
+          "error_classification": null,
+          "error": null
+        },
+        {
+          "source_article_id": "4369654",
+          "title": "油價飆升丨國泰及香港快運削5至6月部分客運航班運力",
+          "canonical_url": "https://www.hkej.com/instantnews/current/article/4369654/%E6%B2%B9%E5%83%B9%E9%A3%86%E5%8D%87%E4%B8%A8%E5%9C%8B%E6%B3%B0%E5%8F%8A%E9%A6%99%E6%B8%AF%E5%BF%AB%E9%81%8B%E5%89%8A5%E8%87%B36%E6%9C%88%E9%83%A8%E5%88%86%E5%AE%A2%E9%81%8B%E8%88%AA%E7%8F%AD%E9%81%8B%E5%8A%9B",
+          "published_at": "2026-04-11T16:47:00+08:00",
+          "section": "時事脈搏",
+          "novelty_score": 5,
+          "relevance_score": 6,
+          "urgency_score": 7,
+          "named_entities": [
+            {
+              "name": "國泰航空",
+              "type": "company"
+            },
+            {
+              "name": "香港快運",
+              "type": "company"
+            }
+          ],
+          "key_points": [
+            "國泰航空和香港快運將削減5至6月部分客運航班運力。",
+            "油價飆升導致成本上升是削減航班的主要原因。"
+          ],
+          "content_truncated": false,
+          "original_content_length_chars": 647,
+          "analyzed_content_length_chars": 647,
+          "original_content_token_estimate": 162,
+          "analyzed_content_token_estimate": 162,
+          "truncation_reason": null,
+          "analysis_method": "full_text",
+          "attention_tier": "high",
+          "theme": "macro",
+          "attention_reason": "High-signal macro headline based on title/summary keywords.",
+          "must_keep": true,
+          "model_used": "meta-llama/llama-4-scout-17b-16e-instruct",
+          "delayed_retry_attempted": false,
+          "delayed_retry_model_chain": [],
+          "delayed_retry_final_model": null,
+          "error_classification": null,
+          "error": null
+        },
+        {
+          "source_article_id": "4369652",
+          "canonical_url": "https://www.hkej.com/instantnews/current/article/4369652/%E5%95%9F%E5%BE%B7%E9%AB%94%E8%82%B2%E5%9C%92%E7%8D%B2%E7%92%B0%E4%BF%9D%E5%BB%BA%E7%AF%89%E5%A4%A7%E7%8D%8E",
+          "title": "啟德體育園獲環保建築大獎",
+          "section": "時事脈搏",
+          "published_at": "2026-04-11T16:17:00+08:00",
+          "attention_tier": "light",
+          "novelty_score": 5,
+          "relevance_score": 5,
+          "urgency_score": 5,
+          "named_entities": [],
+          "key_points": [],
+          "content_truncated": false,
+          "analysis_method": "bypassed",
+          "model_used": "direct"
+        },
+        {
+          "source_article_id": "4369650",
+          "title": "美伊談判丨美伊代表團分別現身 議程涉伊朗鈾庫存等",
+          "canonical_url": "https://www.hkej.com/instantnews/current/article/4369650/%E7%BE%8E%E4%BC%8A%E8%AB%87%E5%88%A4%E4%B8%A8%E7%BE%8E%E4%BC%8A%E4%BB%A3%E8%A1%A8%E5%9C%98%E5%88%86%E5%88%A5%E7%8F%BE%E8%BA%AB+%E8%AD%B0%E7%A8%8B%E6%B6%89%E4%BC%8A%E6%9C%97%E9%88%BE%E5%BA%AB%E5%AD%98%E7%AD%89",
+          "published_at": "2026-04-11T15:47:00+08:00",
+          "section": "時事脈搏",
+          "novelty_score": 8,
+          "relevance_score": 9,
+          "urgency_score": 9,
+          "named_entities": [
+            {
+              "name": "萬斯",
+              "type": "person"
+            },
+            {
+              "name": "伊朗",
+              "type": "country"
+            },
+            {
+              "name": "美國",
+              "type": "country"
+            },
+            {
+              "name": "伊斯蘭堡",
+              "type": "other"
+            }
+          ],
+          "key_points": [
+            "美國副總統萬斯率領的代表團抵達伊斯蘭堡，與伊朗進行談判，涉及伊朗鈾庫存和飛彈生產問題。",
+            "伊斯蘭堡進入管制狀態，警方設檢查站和路障，軍隊巡邏隊隨處可見。"
+          ],
+          "content_truncated": false,
+          "original_content_length_chars": 1015,
+          "analyzed_content_length_chars": 1015,
+          "original_content_token_estimate": 254,
+          "analyzed_content_token_estimate": 254,
+          "truncation_reason": null,
+          "analysis_method": "full_text",
+          "attention_tier": "high",
+          "theme": "geopolitics",
+          "attention_reason": "High-signal geopolitics headline based on title/summary keywords.",
+          "must_keep": true,
+          "model_used": "meta-llama/llama-4-scout-17b-16e-instruct",
+          "delayed_retry_attempted": false,
+          "delayed_retry_model_chain": [],
+          "delayed_retry_final_model": null,
+          "error_classification": null,
+          "error": null
+        },
         {
           "source_article_id": "4369650",
           "title": "伊朗局勢丨萬斯率美代表團抵伊斯蘭堡 伊朗代表團有71人",
@@ -1217,7 +1519,10 @@
           "key_points": [],
           "content_truncated": false,
           "analysis_method": "bypassed",
-          "model_used": "direct"
+          "model_used": "direct",
+          "theme": "general",
+          "attention_reason": "Lighter treatment because this story sits in the 時事脈搏 section without strong market-moving signals.",
+          "must_keep": false
         },
         {
           "source_article_id": "4369645",
@@ -1233,7 +1538,10 @@
           "key_points": [],
           "content_truncated": false,
           "analysis_method": "bypassed",
-          "model_used": "direct"
+          "model_used": "direct",
+          "theme": "general",
+          "attention_reason": "Lighter treatment because this story sits in the 時事脈搏 section without strong market-moving signals.",
+          "must_keep": false
         },
         {
           "source_article_id": "4369644",
@@ -1249,7 +1557,10 @@
           "key_points": [],
           "content_truncated": false,
           "analysis_method": "bypassed",
-          "model_used": "direct"
+          "model_used": "direct",
+          "theme": "general",
+          "attention_reason": "Lighter treatment because this story sits in the 時事脈搏 section without strong market-moving signals.",
+          "must_keep": false
         },
         {
           "source_article_id": "4369643",
@@ -1265,7 +1576,10 @@
           "key_points": [],
           "content_truncated": false,
           "analysis_method": "bypassed",
-          "model_used": "direct"
+          "model_used": "direct",
+          "theme": "general",
+          "attention_reason": "Lighter treatment because this story sits in the 時事脈搏 section without strong market-moving signals.",
+          "must_keep": false
         },
         {
           "source_article_id": "4369642",
@@ -1281,7 +1595,10 @@
           "key_points": [],
           "content_truncated": false,
           "analysis_method": "bypassed",
-          "model_used": "direct"
+          "model_used": "direct",
+          "theme": "general",
+          "attention_reason": "Lighter treatment because this story sits in the 時事脈搏 section without strong market-moving signals.",
+          "must_keep": false
         },
         {
           "source_article_id": "4369639",
@@ -1297,7 +1614,10 @@
           "key_points": [],
           "content_truncated": false,
           "analysis_method": "bypassed",
-          "model_used": "direct"
+          "model_used": "direct",
+          "theme": "general",
+          "attention_reason": "Lighter treatment because this story sits in the 時事脈搏 section without strong market-moving signals.",
+          "must_keep": false
         },
         {
           "source_article_id": "4369636",
@@ -1313,7 +1633,10 @@
           "key_points": [],
           "content_truncated": false,
           "analysis_method": "bypassed",
-          "model_used": "direct"
+          "model_used": "direct",
+          "theme": "general",
+          "attention_reason": "Lighter treatment because this story sits in the 時事脈搏 section without strong market-moving signals.",
+          "must_keep": false
         },
         {
           "source_article_id": "4369637",
@@ -1329,7 +1652,59 @@
           "key_points": [],
           "content_truncated": false,
           "analysis_method": "bypassed",
-          "model_used": "direct"
+          "model_used": "direct",
+          "theme": "general",
+          "attention_reason": "Lighter treatment because this story sits in the 時事脈搏 section without strong market-moving signals.",
+          "must_keep": false
+        },
+        {
+          "source_article_id": "4369638",
+          "title": "美伊談判丨美伊會晤在即 白宮內部據報期待不高",
+          "canonical_url": "https://www.hkej.com/instantnews/current/article/4369638/%E7%BE%8E%E4%BC%8A%E8%AB%87%E5%88%A4%E4%B8%A8%E7%BE%8E%E4%BC%8A%E6%9C%83%E6%99%A4%E5%9C%A8%E5%8D%B3+%E7%99%BD%E5%AE%AE%E5%85%A7%E9%83%A8%E6%93%9A%E5%A0%B1%E6%9C%9F%E5%BE%85%E4%B8%8D%E9%AB%98",
+          "published_at": "2026-04-11T10:09:00+08:00",
+          "section": "時事脈搏",
+          "novelty_score": 7,
+          "relevance_score": 8,
+          "urgency_score": 8,
+          "named_entities": [
+            {
+              "name": "萬斯",
+              "type": "person"
+            },
+            {
+              "name": "伊朗",
+              "type": "country"
+            },
+            {
+              "name": "美國",
+              "type": "country"
+            },
+            {
+              "name": "伊斯蘭堡",
+              "type": "other"
+            }
+          ],
+          "key_points": [
+            "白宮官員對會談能否迅速促成霍爾木茲海峽重新開放持懷疑態度。",
+            "伊朗首席談判代表表示，若沒有關於黎巴嫩問題及制裁問題的承諾，談判甚至無法開始。"
+          ],
+          "content_truncated": false,
+          "original_content_length_chars": 638,
+          "analyzed_content_length_chars": 638,
+          "original_content_token_estimate": 160,
+          "analyzed_content_token_estimate": 160,
+          "truncation_reason": null,
+          "analysis_method": "full_text",
+          "attention_tier": "high",
+          "theme": "geopolitics",
+          "attention_reason": "High-signal geopolitics headline based on title/summary keywords.",
+          "must_keep": true,
+          "model_used": "meta-llama/llama-4-scout-17b-16e-instruct",
+          "delayed_retry_attempted": false,
+          "delayed_retry_model_chain": [],
+          "delayed_retry_final_model": null,
+          "error_classification": null,
+          "error": null
         },
         {
           "source_article_id": "4369638",
@@ -1394,7 +1769,10 @@
           "key_points": [],
           "content_truncated": false,
           "analysis_method": "bypassed",
-          "model_used": "direct"
+          "model_used": "direct",
+          "theme": "general",
+          "attention_reason": "Lighter treatment because this story sits in the 時事脈搏 section without strong market-moving signals.",
+          "must_keep": false
         },
         {
           "source_article_id": "4369635",
@@ -1730,7 +2108,10 @@
           "key_points": [],
           "content_truncated": false,
           "analysis_method": "bypassed",
-          "model_used": "direct"
+          "model_used": "direct",
+          "theme": "general",
+          "attention_reason": "Lighter treatment because this story sits in the 時事脈搏 section without strong market-moving signals.",
+          "must_keep": false
         },
         {
           "source_article_id": "4369614",
@@ -2703,20 +3084,20 @@
       ],
       "analysis_profile": "light",
       "model_used": "meta-llama/llama-4-scout-17b-16e-instruct",
-      "sub_batch_count": 11,
+      "sub_batch_count": 5,
       "diagnostics": {
-        "sub_batch_count": 4,
+        "sub_batch_count": 5,
         "split_reasons": [
           "pre_send_budget"
         ],
         "models_attempted": [
           "meta-llama/llama-4-scout-17b-16e-instruct"
         ],
-        "estimated_input_tokens_max": 1419,
-        "serialized_request_bytes_max": 9189,
-        "rate_limit_waits": 1,
+        "estimated_input_tokens_max": 1308,
+        "serialized_request_bytes_max": 8579,
+        "rate_limit_waits": 0,
         "partial_article_count": 0,
-        "synthesis_wait_seconds_total": 1123.2,
+        "synthesis_wait_seconds_total": 0.0,
         "synthesis_retry_count": 0,
         "synthesis_retry_skipped_count": 0,
         "synthesis_budget_exhausted": false,
@@ -2725,29 +3106,91 @@
         "synthesis_merge_depth_max": 1,
         "model_switches": []
       },
-      "error": null
+      "error": "Category 時事脈搏 exhausted synthesis wait budget after 1814.4 seconds."
     },
     {
       "category": "香港財經",
-      "article_count": 2,
+      "article_count": 3,
       "status": "success",
       "key_developments": [
-        "恒指夜市期指收報25964點，升41點",
-        "較昨日恒指收市25893點，高水70點",
-        "成交12136張",
-        "港股市場表現平穩，恒指夜期高水70點"
+        "香港當局已引進 102 間重點企業，預計帶來約 600 億元投資。",
+        "本月下旬將公布新一批約 20 間重點企業。",
+        "恒指夜期收報 25964 點，升 41 點，較昨日恒指收市 25893 點，高水 70 點。",
+        "成交 12136 張。"
       ],
       "named_entities": [
         {
-          "name": "恒指",
-          "type": "index"
+          "name": "許正宇",
+          "type": "person"
         },
         {
-          "name": "港股360",
+          "name": "蔡庫局",
+          "type": "institution"
+        },
+        {
+          "name": "立法會",
+          "type": "institution"
+        },
+        {
+          "name": "駕勒博居",
           "type": "organization"
+        },
+        {
+          "name": "恒指",
+          "type": "index"
         }
       ],
       "articles": [
+        {
+          "source_article_id": "4369656",
+          "title": "許正宇:本月下旬公布新一批約20間重點企業",
+          "canonical_url": "https://www.hkej.com/instantnews/hongkong/article/4369656/%E8%A8%B1%E6%AD%A3%E5%AE%87%3A%E6%9C%AC%E6%9C%88%E4%B8%8B%E6%97%AC%E5%85%AC%E5%B8%83%E6%96%B0%E4%B8%80%E6%89%B9%E7%B4%8420%E9%96%93%E9%87%8D%E9%BB%9E%E4%BC%81%E6%A5%AD",
+          "published_at": "2026-04-11T17:42:00+08:00",
+          "section": "香港財經",
+          "novelty_score": 6,
+          "relevance_score": 8,
+          "urgency_score": 5,
+          "named_entities": [
+            {
+              "name": "許櫓安",
+              "type": "person"
+            },
+            {
+              "name": "蔡庫局",
+              "type": "institution"
+            },
+            {
+              "name": "立法會",
+              "type": "institution"
+            },
+            {
+              "name": "駕勒博居",
+              "type": "organization"
+            }
+          ],
+          "key_points": [
+            "許櫓安推带下半年公布說優惠謬機優惠的目标產楧等給竻和執行方案",
+            "当局已引進 102 間重點䯆楧，預計未亞带了約 600 ⁵元兇克投资",
+            "本月下辟將公布新一批約 20 間重點䯆楧，彼及大觇樱的新资本及更多高章职位"
+          ],
+          "content_truncated": false,
+          "original_content_length_chars": 250,
+          "analyzed_content_length_chars": 250,
+          "original_content_token_estimate": 63,
+          "analyzed_content_token_estimate": 63,
+          "truncation_reason": null,
+          "analysis_method": "full_text",
+          "attention_tier": "medium",
+          "theme": "macro",
+          "attention_reason": "Involves government policy announcement with potential market impact",
+          "must_keep": true,
+          "model_used": "meta-llama/llama-4-scout-17b-16e-instruct",
+          "delayed_retry_attempted": false,
+          "delayed_retry_model_chain": [],
+          "delayed_retry_final_model": null,
+          "error_classification": null,
+          "error": null
+        },
         {
           "source_article_id": "4369624",
           "title": "恒指夜期丨收報25964 高水70點",
@@ -2837,24 +3280,86 @@
         {
           "title": "香港財經 overview",
           "theme_rationale": "Single subgroup because the category size did not require thematic splitting.",
-          "article_count": 2,
+          "article_count": 3,
           "key_developments": [
-            "恒指夜市期指收報25964點，升41點",
-            "較昨日恒指收市25893點，高水70點",
-            "成交12136張",
-            "港股市場表現平穩，恒指夜期高水70點"
+            "香港當局已引進 102 間重點企業，預計帶來約 600 億元投資。",
+            "本月下旬將公布新一批約 20 間重點企業。",
+            "恒指夜期收報 25964 點，升 41 點，較昨日恒指收市 25893 點，高水 70 點。",
+            "成交 12136 張。"
           ],
           "named_entities": [
             {
-              "name": "恒指",
-              "type": "index"
+              "name": "許正宇",
+              "type": "person"
             },
             {
-              "name": "港股360",
+              "name": "蔡庫局",
+              "type": "institution"
+            },
+            {
+              "name": "立法會",
+              "type": "institution"
+            },
+            {
+              "name": "駕勒博居",
               "type": "organization"
+            },
+            {
+              "name": "恒指",
+              "type": "index"
             }
           ],
           "articles": [
+            {
+              "source_article_id": "4369656",
+              "title": "許正宇:本月下旬公布新一批約20間重點企業",
+              "canonical_url": "https://www.hkej.com/instantnews/hongkong/article/4369656/%E8%A8%B1%E6%AD%A3%E5%AE%87%3A%E6%9C%AC%E6%9C%88%E4%B8%8B%E6%97%AC%E5%85%AC%E5%B8%83%E6%96%B0%E4%B8%80%E6%89%B9%E7%B4%8420%E9%96%93%E9%87%8D%E9%BB%9E%E4%BC%81%E6%A5%AD",
+              "published_at": "2026-04-11T17:42:00+08:00",
+              "section": "香港財經",
+              "novelty_score": 6,
+              "relevance_score": 8,
+              "urgency_score": 5,
+              "named_entities": [
+                {
+                  "name": "許櫓安",
+                  "type": "person"
+                },
+                {
+                  "name": "蔡庫局",
+                  "type": "institution"
+                },
+                {
+                  "name": "立法會",
+                  "type": "institution"
+                },
+                {
+                  "name": "駕勒博居",
+                  "type": "organization"
+                }
+              ],
+              "key_points": [
+                "許櫓安推带下半年公布說優惠謬機優惠的目标產楧等給竻和執行方案",
+                "当局已引進 102 間重點䯆楧，預計未亞带了約 600 ⁵元兇克投资",
+                "本月下辟將公布新一批約 20 間重點䯆楧，彼及大觇樱的新资本及更多高章职位"
+              ],
+              "content_truncated": false,
+              "original_content_length_chars": 250,
+              "analyzed_content_length_chars": 250,
+              "original_content_token_estimate": 63,
+              "analyzed_content_token_estimate": 63,
+              "truncation_reason": null,
+              "analysis_method": "full_text",
+              "attention_tier": "medium",
+              "theme": "macro",
+              "attention_reason": "Involves government policy announcement with potential market impact",
+              "must_keep": true,
+              "model_used": "meta-llama/llama-4-scout-17b-16e-instruct",
+              "delayed_retry_attempted": false,
+              "delayed_retry_model_chain": [],
+              "delayed_retry_final_model": null,
+              "error_classification": null,
+              "error": null
+            },
             {
               "source_article_id": "4369624",
               "title": "恒指夜期丨收報25964 高水70點",
@@ -2945,15 +3450,15 @@
       ],
       "analysis_profile": "standard",
       "model_used": "meta-llama/llama-4-scout-17b-16e-instruct",
-      "sub_batch_count": 2,
+      "sub_batch_count": 3,
       "diagnostics": {
-        "sub_batch_count": 1,
+        "sub_batch_count": 3,
         "split_reasons": [],
         "models_attempted": [
           "meta-llama/llama-4-scout-17b-16e-instruct"
         ],
-        "estimated_input_tokens_max": 784,
-        "serialized_request_bytes_max": 4382,
+        "estimated_input_tokens_max": 671,
+        "serialized_request_bytes_max": 3558,
         "rate_limit_waits": 0,
         "partial_article_count": 0,
         "synthesis_wait_seconds_total": 0.0,
@@ -2969,13 +3474,13 @@
     },
     {
       "category": "中國財經",
-      "article_count": 2,
+      "article_count": 3,
       "status": "success",
       "key_developments": [
-        "中國擬從5月起暫停出口硫酸，可能衝擊金屬和化肥行業。",
-        "硫酸價格因伊朗衝突爆發而持續上漲。",
+        "中國擬從5月起暫停硫酸出口，影響金屬和化肥行業。",
+        "硫酸價格因伊朗衝突上漲，中國此舉加劇市場緊張。",
         "京東汽車將於4月13日上線新項目，但未透露具體細節。",
-        "中國此舉可能持續到2026年底，進一步加劇市場緊張。"
+        "伊朗局勢升級，中國此舉可能持續到2026年底，進一步加劇市場緊張。"
       ],
       "named_entities": [
         {
@@ -2989,6 +3494,10 @@
         {
           "name": "京東汽車",
           "type": "company"
+        },
+        {
+          "name": "霍爾木茲海峽",
+          "type": "other"
         }
       ],
       "articles": [
@@ -3006,7 +3515,60 @@
           "key_points": [],
           "content_truncated": false,
           "analysis_method": "bypassed",
-          "model_used": "direct"
+          "model_used": "direct",
+          "theme": "general",
+          "attention_reason": "Default medium attention because the story is relevant but not an obvious top-priority market mover.",
+          "must_keep": false
+        },
+        {
+          "source_article_id": "4369646",
+          "title": "伊朗局勢丨中國傳下月起暫停硫酸出口 恐衝擊金屬及化肥業",
+          "canonical_url": "https://www.hkej.com/instantnews/china/article/4369646/%E4%BC%8A%E6%9C%97%E5%B1%80%E5%8B%A2%E4%B8%A8%E4%B8%AD%E5%9C%8B%E5%82%B3%E4%B8%8B%E6%9C%88%E8%B5%B7%E6%9A%AB%E5%81%9C%E7%A1%AB%E9%85%B8%E5%87%BA%E5%8F%A3+%E6%81%90%E8%A1%9D%E6%93%8A%E9%87%91%E5%B1%AC%E5%8F%8A%E5%8C%96%E8%82%A5%E6%A5%AD",
+          "published_at": "2026-04-11T12:56:00+08:00",
+          "section": "中國財經",
+          "novelty_score": 6,
+          "relevance_score": 8,
+          "urgency_score": 7,
+          "named_entities": [
+            {
+              "name": "伊朗",
+              "type": "country"
+            },
+            {
+              "name": "中國",
+              "type": "country"
+            },
+            {
+              "name": "霍爾木茲海峽",
+              "type": "other"
+            },
+            {
+              "name": "Acuity",
+              "type": "institution"
+            }
+          ],
+          "key_points": [
+            "中國擬從5月起暫停硫酸出口，影響金屬和化肥行業。",
+            "硫酸價格因伊朗衝突上漲，中國此舉加劇市場緊張。",
+            "禁令或持續至2026年底，市場擔憂供應短缺。"
+          ],
+          "content_truncated": false,
+          "original_content_length_chars": 238,
+          "analyzed_content_length_chars": 238,
+          "original_content_token_estimate": 60,
+          "analyzed_content_token_estimate": 60,
+          "truncation_reason": null,
+          "analysis_method": "full_text",
+          "attention_tier": "medium",
+          "theme": "macro",
+          "attention_reason": "Article discusses potential impact of Iran situation on Chinese exports and industries.",
+          "must_keep": true,
+          "model_used": "meta-llama/llama-4-scout-17b-16e-instruct",
+          "delayed_retry_attempted": false,
+          "delayed_retry_model_chain": [],
+          "delayed_retry_final_model": null,
+          "error_classification": null,
+          "error": null
         },
         {
           "source_article_id": "4369646",
@@ -3063,12 +3625,12 @@
         {
           "title": "中國財經 overview",
           "theme_rationale": "Single subgroup because the category size did not require thematic splitting.",
-          "article_count": 2,
+          "article_count": 3,
           "key_developments": [
-            "中國擬從5月起暫停出口硫酸，可能衝擊金屬和化肥行業。",
-            "硫酸價格因伊朗衝突爆發而持續上漲。",
+            "中國擬從5月起暫停硫酸出口，影響金屬和化肥行業。",
+            "硫酸價格因伊朗衝突上漲，中國此舉加劇市場緊張。",
             "京東汽車將於4月13日上線新項目，但未透露具體細節。",
-            "中國此舉可能持續到2026年底，進一步加劇市場緊張。"
+            "伊朗局勢升級，中國此舉可能持續到2026年底，進一步加劇市場緊張。"
           ],
           "named_entities": [
             {
@@ -3082,6 +3644,10 @@
             {
               "name": "京東汽車",
               "type": "company"
+            },
+            {
+              "name": "霍爾木茲海峽",
+              "type": "other"
             }
           ],
           "articles": [
@@ -3099,7 +3665,60 @@
               "key_points": [],
               "content_truncated": false,
               "analysis_method": "bypassed",
-              "model_used": "direct"
+              "model_used": "direct",
+              "theme": "general",
+              "attention_reason": "Default medium attention because the story is relevant but not an obvious top-priority market mover.",
+              "must_keep": false
+            },
+            {
+              "source_article_id": "4369646",
+              "title": "伊朗局勢丨中國傳下月起暫停硫酸出口 恐衝擊金屬及化肥業",
+              "canonical_url": "https://www.hkej.com/instantnews/china/article/4369646/%E4%BC%8A%E6%9C%97%E5%B1%80%E5%8B%A2%E4%B8%A8%E4%B8%AD%E5%9C%8B%E5%82%B3%E4%B8%8B%E6%9C%88%E8%B5%B7%E6%9A%AB%E5%81%9C%E7%A1%AB%E9%85%B8%E5%87%BA%E5%8F%A3+%E6%81%90%E8%A1%9D%E6%93%8A%E9%87%91%E5%B1%AC%E5%8F%8A%E5%8C%96%E8%82%A5%E6%A5%AD",
+              "published_at": "2026-04-11T12:56:00+08:00",
+              "section": "中國財經",
+              "novelty_score": 6,
+              "relevance_score": 8,
+              "urgency_score": 7,
+              "named_entities": [
+                {
+                  "name": "伊朗",
+                  "type": "country"
+                },
+                {
+                  "name": "中國",
+                  "type": "country"
+                },
+                {
+                  "name": "霍爾木茲海峽",
+                  "type": "other"
+                },
+                {
+                  "name": "Acuity",
+                  "type": "institution"
+                }
+              ],
+              "key_points": [
+                "中國擬從5月起暫停硫酸出口，影響金屬和化肥行業。",
+                "硫酸價格因伊朗衝突上漲，中國此舉加劇市場緊張。",
+                "禁令或持續至2026年底，市場擔憂供應短缺。"
+              ],
+              "content_truncated": false,
+              "original_content_length_chars": 238,
+              "analyzed_content_length_chars": 238,
+              "original_content_token_estimate": 60,
+              "analyzed_content_token_estimate": 60,
+              "truncation_reason": null,
+              "analysis_method": "full_text",
+              "attention_tier": "medium",
+              "theme": "macro",
+              "attention_reason": "Article discusses potential impact of Iran situation on Chinese exports and industries.",
+              "must_keep": true,
+              "model_used": "meta-llama/llama-4-scout-17b-16e-instruct",
+              "delayed_retry_attempted": false,
+              "delayed_retry_model_chain": [],
+              "delayed_retry_final_model": null,
+              "error_classification": null,
+              "error": null
             },
             {
               "source_article_id": "4369646",
@@ -3157,15 +3776,15 @@
       ],
       "analysis_profile": "standard",
       "model_used": "meta-llama/llama-4-scout-17b-16e-instruct",
-      "sub_batch_count": 2,
+      "sub_batch_count": 3,
       "diagnostics": {
-        "sub_batch_count": 1,
+        "sub_batch_count": 3,
         "split_reasons": [],
         "models_attempted": [
           "meta-llama/llama-4-scout-17b-16e-instruct"
         ],
-        "estimated_input_tokens_max": 751,
-        "serialized_request_bytes_max": 4163,
+        "estimated_input_tokens_max": 673,
+        "serialized_request_bytes_max": 3449,
         "rate_limit_waits": 0,
         "partial_article_count": 0,
         "synthesis_wait_seconds_total": 0.0,
@@ -3186,8 +3805,8 @@
       "key_developments": [
         "比特幣價格在6.6萬至7.5萬美元區間波動，美伊衝突期間未展現抗跌力。",
         "比特幣ETF自2025年第四季起錄得資金逐步流出，約4個月間「走資」差不多82億美元。",
-        "比特幣現報72930.20美元，漲幅1.62%。",
-        "分析師預計比特幣有機會於今年第三季末結束整固，重拾漲勢。"
+        "分析師預計比特幣有機會於今年第三季末結束整固，重拾漲勢。",
+        "比特幣現報價72853.50美元，微跌0.17%。"
       ],
       "named_entities": [
         {
@@ -3275,8 +3894,8 @@
           "key_developments": [
             "比特幣價格在6.6萬至7.5萬美元區間波動，美伊衝突期間未展現抗跌力。",
             "比特幣ETF自2025年第四季起錄得資金逐步流出，約4個月間「走資」差不多82億美元。",
-            "比特幣現報72930.20美元，漲幅1.62%。",
-            "分析師預計比特幣有機會於今年第三季末結束整固，重拾漲勢。"
+            "分析師預計比特幣有機會於今年第三季末結束整固，重拾漲勢。",
+            "比特幣現報價72853.50美元，微跌0.17%。"
           ],
           "named_entities": [
             {
@@ -3361,15 +3980,13 @@
       ],
       "analysis_profile": "standard",
       "model_used": "meta-llama/llama-4-scout-17b-16e-instruct",
-      "sub_batch_count": 2,
+      "sub_batch_count": 1,
       "diagnostics": {
         "sub_batch_count": 1,
         "split_reasons": [],
-        "models_attempted": [
-          "meta-llama/llama-4-scout-17b-16e-instruct"
-        ],
-        "estimated_input_tokens_max": 852,
-        "serialized_request_bytes_max": 6137,
+        "models_attempted": [],
+        "estimated_input_tokens_max": 0,
+        "serialized_request_bytes_max": 0,
         "rate_limit_waits": 0,
         "partial_article_count": 0,
         "synthesis_wait_seconds_total": 0.0,
@@ -3384,5 +4001,12 @@
       "error": null
     }
   ],
-  "errors": []
+  "errors": [
+    {
+      "type": "category",
+      "target": "時事脈搏",
+      "message": "Category 時事脈搏 exhausted synthesis wait budget after 1814.4 seconds.",
+      "classification": "unexpected_error"
+    }
+  ]
 }
