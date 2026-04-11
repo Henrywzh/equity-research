@@ -35,7 +35,7 @@
                 <span class="metric-label">Macro Sentiment</span>
                 <div class="flex items-center justify-between mt-2">
                     <span class="metric-value">...</span>
-                    <span class="badge badge-success">SENSITIVE</span>
+                    <span id="macro-badge" class="badge">SENSITIVE</span>
                 </div>
                 <div id="macro-category" class="metric-label" style="font-size: 0.65rem; margin-top: 1rem; display: block;">...</div>
             </div>
@@ -43,7 +43,7 @@
                 <span class="metric-label">Market Momentum</span>
                 <div class="flex items-center justify-between mt-2">
                     <span class="metric-value">...</span>
-                    <span class="badge badge-warning">MIXED</span>
+                    <span id="market-badge" class="badge">MIXED</span>
                 </div>
                 <div id="market-top" class="metric-label" style="font-size: 0.65rem; margin-top: 1rem; display: block;">Top Movers...</div>
             </div>
@@ -133,11 +133,36 @@
                 document.querySelector('#kpi-macro .metric-value').textContent = macro.sentiment || 'N/A';
                 document.getElementById('macro-category').textContent = `Latest Analysis: ${macro.updated}`;
                 
+                const macroBadge = document.getElementById('macro-badge');
+                if (macro.sentiment === 'Positive') {
+                    macroBadge.textContent = 'BULLISH';
+                    macroBadge.className = 'badge badge-success';
+                } else if (macro.sentiment === 'Negative') {
+                    macroBadge.textContent = 'BEARISH';
+                    macroBadge.className = 'badge badge-danger';
+                } else {
+                    macroBadge.textContent = 'NEUTRAL';
+                    macroBadge.className = 'badge badge-warning';
+                }
+                
                 // Market
                 const market = data.market;
                 const topMover = market.movers && market.movers.length > 0 ? market.movers[0] : null;
-                document.querySelector('#kpi-market .metric-value').textContent = topMover ? `${parseFloat(topMover.pct_change).toFixed(2)}%` : '0%';
+                const momentumVal = topMover ? parseFloat(topMover.pct_change) : 0;
+                document.querySelector('#kpi-market .metric-value').textContent = topMover ? `${momentumVal.toFixed(2)}%` : '0%';
                 if(topMover) document.getElementById('market-top').textContent = `Top: ${topMover.ticker}`;
+                
+                const marketBadge = document.getElementById('market-badge');
+                if (momentumVal > 0.5) {
+                    marketBadge.textContent = 'STRENGTH';
+                    marketBadge.className = 'badge badge-success';
+                } else if (momentumVal < -0.5) {
+                    marketBadge.textContent = 'WEAKNESS';
+                    marketBadge.className = 'badge badge-danger';
+                } else {
+                    marketBadge.textContent = 'MIXED';
+                    marketBadge.className = 'badge badge-warning';
+                }
                 
                 // YouTube
                 const youtube = data.youtube;
