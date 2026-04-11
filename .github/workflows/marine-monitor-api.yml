@@ -48,11 +48,19 @@ jobs:
 
       - name: Commit updated data
         run: |
+          set -euo pipefail
           git config user.name "marine-monitor[bot]"
           git config user.email "marine-monitor[bot]@users.noreply.github.com"
           git add marine-traffic-monitor/data/hormuz_traffic_log.csv
           if ! git diff --staged --quiet; then
             git commit -m "data: refresh hormuz traffic log via AISStream API $(date -u +%Y-%m-%dT%H:%M:%SZ)"
-            git pull --rebase origin main
-            git push origin main
+            for attempt in 1 2 3; do
+              if git push origin HEAD:main; then
+                exit 0
+              fi
+              git fetch origin main
+              git rebase origin/main
+            done
+            echo "Failed to push marine-monitor data after 3 attempts." >&2
+            exit 1
           fi
