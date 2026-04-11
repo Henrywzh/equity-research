@@ -1,0 +1,371 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Marine Watch</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=Space+Grotesk:wght@500;700&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      :root {
+        --bg: #eef4f5;
+        --surface: #fbfcfc;
+        --ink: #112128;
+        --muted: #5f7179;
+        --line: rgba(17, 33, 40, 0.12);
+        --accent: #155e75;
+        --accent-soft: rgba(21, 94, 117, 0.12);
+        --warn: #c2410c;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        font-family: "IBM Plex Sans", sans-serif;
+        color: var(--ink);
+        background:
+          radial-gradient(circle at right top, rgba(21, 94, 117, 0.15), transparent 24%),
+          linear-gradient(180deg, #f8fbfc 0%, var(--bg) 100%);
+      }
+
+      .page {
+        max-width: 1380px;
+        margin: 0 auto;
+        padding: 24px;
+      }
+
+      h1,
+      h2,
+      h3 {
+        margin: 0;
+        font-family: "Space Grotesk", sans-serif;
+      }
+
+      .eyebrow {
+        font-size: 12px;
+        letter-spacing: 0.14em;
+        text-transform: uppercase;
+        color: var(--muted);
+        font-weight: 700;
+      }
+
+      .header {
+        display: flex;
+        justify-content: space-between;
+        align-items: start;
+        gap: 24px;
+        margin-bottom: 18px;
+      }
+
+      .header-copy {
+        display: grid;
+        gap: 8px;
+        max-width: 760px;
+      }
+
+      .header-copy p {
+        margin: 0;
+        color: var(--muted);
+        line-height: 1.6;
+      }
+
+      .header-links {
+        display: flex;
+        gap: 10px;
+        flex-wrap: wrap;
+      }
+
+      .pill {
+        padding: 10px 14px;
+        border-radius: 999px;
+        border: 1px solid var(--line);
+        color: var(--muted);
+        font-size: 13px;
+        background: rgba(255, 255, 255, 0.84);
+        text-decoration: none;
+      }
+
+      .layout {
+        display: grid;
+        grid-template-columns: 1.25fr 0.75fr;
+        gap: 18px;
+      }
+
+      .surface {
+        background: rgba(255, 255, 255, 0.86);
+        border: 1px solid rgba(17, 33, 40, 0.09);
+        border-radius: 26px;
+        box-shadow: 0 18px 40px rgba(51, 74, 84, 0.08);
+      }
+
+      .map-panel {
+        padding: 24px;
+        display: grid;
+        gap: 18px;
+      }
+
+      .map-frame {
+        position: relative;
+        min-height: 460px;
+        border-radius: 24px;
+        overflow: hidden;
+        background:
+          linear-gradient(180deg, rgba(10, 43, 59, 0.92), rgba(14, 61, 82, 0.95)),
+          linear-gradient(135deg, rgba(255, 255, 255, 0.03), transparent);
+      }
+
+      .gridlines::before,
+      .gridlines::after {
+        content: "";
+        position: absolute;
+        inset: 0;
+        background-image:
+          linear-gradient(rgba(255, 255, 255, 0.06) 1px, transparent 1px),
+          linear-gradient(90deg, rgba(255, 255, 255, 0.06) 1px, transparent 1px);
+        background-size: 48px 48px;
+      }
+
+      .lane {
+        position: absolute;
+        inset: 16% 18%;
+        border: 2px solid rgba(255, 189, 89, 0.6);
+        border-radius: 120px;
+        transform: rotate(-15deg);
+      }
+
+      .ship {
+        position: absolute;
+        width: 12px;
+        height: 12px;
+        border-radius: 999px;
+        background: #8ef3da;
+        box-shadow: 0 0 0 8px rgba(142, 243, 218, 0.08);
+      }
+
+      .ship.a { top: 38%; left: 49%; }
+      .ship.b { top: 45%; left: 56%; }
+      .ship.c { top: 52%; left: 46%; opacity: 0.45; }
+
+      .map-legend {
+        position: absolute;
+        left: 18px;
+        bottom: 18px;
+        display: grid;
+        gap: 10px;
+        padding: 14px 16px;
+        border-radius: 18px;
+        background: rgba(6, 24, 33, 0.68);
+        color: #dcedf2;
+        border: 1px solid rgba(255, 255, 255, 0.08);
+      }
+
+      .legend-row {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        font-size: 13px;
+      }
+
+      .dot {
+        width: 10px;
+        height: 10px;
+        border-radius: 999px;
+      }
+
+      .dot.green { background: #8ef3da; }
+      .dot.gold { background: rgba(255, 189, 89, 0.95); }
+
+      .rail {
+        display: grid;
+        gap: 18px;
+      }
+
+      .stack {
+        padding: 22px;
+        display: grid;
+        gap: 16px;
+      }
+
+      .big-number {
+        font-family: "Space Grotesk", sans-serif;
+        font-size: 4rem;
+        line-height: 0.9;
+      }
+
+      .subtle {
+        margin: 0;
+        color: var(--muted);
+        line-height: 1.6;
+      }
+
+      .row {
+        display: flex;
+        justify-content: space-between;
+        gap: 16px;
+        padding-top: 12px;
+        border-top: 1px solid var(--line);
+      }
+
+      .tag {
+        border-radius: 999px;
+        padding: 7px 11px;
+        font-size: 12px;
+        font-weight: 700;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        color: var(--warn);
+        background: rgba(194, 65, 12, 0.11);
+      }
+
+      .timeline {
+        display: grid;
+        gap: 12px;
+      }
+
+      .timeline-item {
+        display: grid;
+        gap: 6px;
+        padding: 14px 0;
+        border-top: 1px solid var(--line);
+      }
+
+      .timeline-item:first-child {
+        border-top: 0;
+        padding-top: 0;
+      }
+
+      .timeline-top {
+        display: flex;
+        justify-content: space-between;
+        gap: 12px;
+        font-size: 13px;
+        color: var(--muted);
+      }
+
+      @media (max-width: 980px) {
+        .layout {
+          grid-template-columns: 1fr;
+        }
+      }
+
+      @media (max-width: 640px) {
+        .page {
+          padding: 18px;
+        }
+
+        .header {
+          flex-direction: column;
+        }
+
+        .map-frame {
+          min-height: 340px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="page">
+      <header class="header">
+        <div class="header-copy">
+          <div class="eyebrow">Dashboard Template 02</div>
+          <h1>Marine Watch</h1>
+          <p>
+            A single-purpose monitoring view for Hormuz traffic. The main visual stays quiet while the right rail carries
+            state, escalation history, and recent writes.
+          </p>
+        </div>
+        <div class="header-links">
+          <a class="pill" href="./01-operations-overview.html">Overview</a>
+          <a class="pill" href="./03-macro-briefing.html">Macro</a>
+          <a class="pill" href="./04-signal-triage.html">Triage</a>
+        </div>
+      </header>
+
+      <section class="layout">
+        <article class="surface map-panel">
+          <div>
+            <div class="eyebrow">Choke Point Surface</div>
+            <h2>Transit corridor snapshot</h2>
+          </div>
+
+          <div class="map-frame">
+            <div class="gridlines"></div>
+            <div class="lane"></div>
+            <div class="ship a"></div>
+            <div class="ship b"></div>
+            <div class="ship c"></div>
+            <div class="map-legend">
+              <div class="legend-row"><span class="dot green"></span> Detected ship icon</div>
+              <div class="legend-row"><span class="dot gold"></span> Monitored corridor</div>
+            </div>
+          </div>
+
+          <p class="subtle">
+            Latest saved row in the log shows zero ships at `2026-04-11 14:39:29`, but the historical panel still keeps
+            prior spikes visible for operator context.
+          </p>
+        </article>
+
+        <aside class="rail">
+          <section class="surface stack">
+            <div class="eyebrow">Current State</div>
+            <div class="big-number">0</div>
+            <p class="subtle">Ships inside the choke point on the most recent saved run.</p>
+            <div class="row">
+              <div>
+                <strong>Macro state</strong><br />
+                <span class="subtle">BLOCKADE_ACTIVE</span>
+              </div>
+              <span class="tag">Clear Zone</span>
+            </div>
+          </section>
+
+          <section class="surface stack">
+            <div>
+              <div class="eyebrow">Recent Writes</div>
+              <h3>Saved files</h3>
+            </div>
+            <div class="timeline">
+              <div class="timeline-item">
+                <div class="timeline-top"><span>Traffic log</span><span>2026-04-11 14:39</span></div>
+                <div>Latest CSV row recorded with `0` detected ships.</div>
+              </div>
+              <div class="timeline-item">
+                <div class="timeline-top"><span>Rate counters</span><span>2026-04-11</span></div>
+                <div>Groq call counter exists with one recorded call for the day.</div>
+              </div>
+              <div class="timeline-item">
+                <div class="timeline-top"><span>Last alert</span><span>2026-03-17</span></div>
+                <div>Alert timestamp is older than the latest traffic log and likely needs a refresh pass.</div>
+              </div>
+            </div>
+          </section>
+
+          <section class="surface stack">
+            <div>
+              <div class="eyebrow">Escalation Memory</div>
+              <h3>Notable recent history</h3>
+            </div>
+            <div class="timeline">
+              <div class="timeline-item">
+                <div class="timeline-top"><span>16:12 UTC</span><span>ESCALATED</span></div>
+                <div>Eight ships in corridor triggered a mailed alert in the saved analyst audit.</div>
+              </div>
+              <div class="timeline-item">
+                <div class="timeline-top"><span>16:39 UTC</span><span>WATCH</span></div>
+                <div>Traffic fell back to two ships and the decision returned to monitoring mode.</div>
+              </div>
+            </div>
+          </section>
+        </aside>
+      </section>
+    </div>
+  </body>
+</html>

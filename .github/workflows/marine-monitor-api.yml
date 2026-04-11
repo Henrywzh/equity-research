@@ -1,0 +1,66 @@
+name: Marine Monitor API
+
+on:
+  schedule:
+    - cron: "0 */2 * * *"
+  workflow_dispatch:
+
+jobs:
+  monitor:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v5
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          fetch-depth: 0
+
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v6
+        with:
+          python-version: "3.11"
+          cache: "pip"
+          # Explicitly pointing to the subfolder requirements
+          cache-dependency-path: marine-traffic-monitor/requirements-api.txt
+
+      - name: Install dependencies
+        run: |
+          python3 -m pip install --upgrade pip
+          python3 -m pip install -r marine-traffic-monitor/requirements-api.txt
+
+      - name: Diagnostic - Environment Check
+        run: |
+          python3 --version
+          python3 -m pip list
+
+      - name: Run AIS Snapshot & Analysis
+        env:
+          AIS_STREAM_API_KEY: ${{ secrets.AIS_STREAM_API_KEY }}
+          OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
+          GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
+          RESIDENTIAL_PROXY: "" 
+        run: |
+          # Running from root but pointing to the module script
+          python3 marine-traffic-monitor/run_api.py
+
+      - name: Commit updated data
+        run: |
+          set -euo pipefail
+          git config user.name "marine-monitor[bot]"
+          git config user.email "marine-monitor[bot]@users.noreply.github.com"
+          git add marine-traffic-monitor/data/hormuz_traffic_log.csv
+          if ! git diff --staged --quiet; then
+            git commit -m "data: refresh hormuz traffic log via AISStream API $(date -u +%Y-%m-%dT%H:%M:%SZ)"
+            for attempt in 1 2 3; do
+              if git push origin HEAD:main; then
+                exit 0
+              fi
+              git fetch origin main
+              git rebase origin/main
+            done
+            echo "Failed to push marine-monitor data after 3 attempts." >&2
+            exit 1
+          fi

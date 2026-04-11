@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Equity Terminal | Dark Monitor</title>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        .ticker {
+            background: #000;
+            padding: 0.5rem;
+            border-bottom: 2px solid var(--accent-primary);
+            overflow: hidden;
+            white-space: nowrap;
+        }
+        .ticker-item {
+            display: inline-block;
+            margin-right: 2rem;
+            font-family: 'Roboto Mono', monospace;
+            font-size: 0.75rem;
+        }
+        .sidebar-terminal {
+            width: 64px;
+            background: #020617;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 1.5rem 0;
+            border-right: 1px solid var(--border-color);
+        }
+        .nav-icon {
+            width: 32px;
+            height: 32px;
+            background: var(--bg-tertiary);
+            border-radius: 8px;
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            color: var(--text-muted);
+            font-size: 0.75rem;
+            font-weight: 700;
+        }
+        .nav-icon.active {
+            background: var(--accent-primary);
+            color: white;
+        }
+    </style>
+</head>
+<body style="height: 100vh; display: flex; flex-direction: column; overflow: hidden;">
+    <!-- Top Ticker -->
+    <div class="ticker">
+        <div class="ticker-item"><span style="color: var(--text-secondary)">HORMUZ:</span> <span style="color: var(--accent-success)">STABLE (0.12)</span></div>
+        <div class="ticker-item"><span style="color: var(--text-secondary)">TRAFFIC:</span> <span style="color: var(--text-primary)">14 ASSETS</span></div>
+        <div class="ticker-item"><span style="color: var(--text-secondary)">BULLISHNESS:</span> <span style="color: var(--accent-success)">76% ▲</span></div>
+        <div class="ticker-item"><span style="color: var(--text-secondary)">GPT-4O:</span> <span style="color: var(--accent-warning)">ANALYSIS PENDING...</span></div>
+        <div class="ticker-item"><span style="color: var(--text-secondary)">GROQ:</span> <span style="color: var(--accent-success)">SYNCED</span></div>
+    </div>
+
+    <div style="flex: 1; display: flex;">
+        <!-- Small Sidebar -->
+        <nav class="sidebar-terminal">
+            <div class="nav-icon active">M</div>
+            <div class="nav-icon">N</div>
+            <div class="nav-icon">S</div>
+            <div class="nav-icon" style="margin-top: auto;">?</div>
+        </nav>
+
+        <!-- Main Body -->
+        <div class="main-content" style="padding: 1rem; overflow-y: auto;">
+            <div class="grid grid-cols-3 gap-4 mb-4">
+                <div class="card" style="border-left: 4px solid var(--accent-primary);">
+                    <span class="metric-label" style="font-size: 0.65rem;">TELEMETRY LATENCY</span>
+                    <div class="metric-value mono" style="font-size: 1.5rem; margin-top: 0.5rem;">42ms</div>
+                </div>
+                <div class="card" style="border-left: 4px solid var(--accent-success);">
+                    <span class="metric-label" style="font-size: 0.65rem;">SIGINT INTEGRITY</span>
+                    <div class="metric-value mono" style="font-size: 1.5rem; margin-top: 0.5rem;">99.4%</div>
+                </div>
+                <div class="card" style="border-left: 4px solid var(--accent-danger);">
+                    <span class="metric-label" style="font-size: 0.65rem;">ACTIVE ANOMALIES</span>
+                    <div class="metric-value mono" style="font-size: 1.5rem; margin-top: 0.5rem;">00</div>
+                </div>
+            </div>
+
+            <div class="grid" style="grid-template-columns: 1.5fr 1fr; gap: 1rem;">
+                <!-- Live Console Output -->
+                <div class="card" style="background: #000; font-family: 'Roboto Mono', monospace; font-size: 0.75rem; color: #10b981; line-height: 1.4; border: 1px solid #1e293b;">
+                    <div style="color: #64748b; margin-bottom: 0.5rem;">// INITIALIZING MARITIME MONITOR STREAM...</div>
+                    <div>[2026-04-11 19:30:01] <span style="color: #fff">MT AL-HOSN</span> DETECTED [26.60N, 56.12E]</div>
+                    <div>[2026-04-11 19:30:15] AIS_V1 SNAPSHOT CAPTURED: 14 ASSETS IN BOUNDS</div>
+                    <div>[2026-04-11 19:30:42] CROSS-CHECKING WITH GDELT FEED...</div>
+                    <div style="color: #f59e0b;">[2026-04-11 19:31:05] WARNING: INCREASED NAVY CHATTER DETECTED IN NEWS FEED</div>
+                    <div>[2026-04-11 19:31:10] TRIGGERING LLM CONSENSUS ANALYST [LLAMA-4]</div>
+                    <div style="color: #64748b; margin-top: 1rem;">_ SYSTEM IDLE. WAITING FOR NEXT INTERVAL.</div>
+                </div>
+
+                <!-- Metrics & Gauges -->
+                <div class="flex flex-col gap-4">
+                    <div class="card">
+                        <h3 class="metric-label" style="margin-bottom: 1rem;">AIS PACKET FLOW</h3>
+                        <div style="display: flex; align-items: flex-end; gap: 4px; height: 100px;">
+                            <div style="flex: 1; background: var(--accent-primary); height: 40%;"></div>
+                            <div style="flex: 1; background: var(--accent-primary); height: 60%;"></div>
+                            <div style="flex: 1; background: var(--accent-primary); height: 30%;"></div>
+                            <div style="flex: 1; background: var(--accent-primary); height: 45%;"></div>
+                            <div style="flex: 1; background: var(--accent-primary); height: 90%;"></div>
+                            <div style="flex: 1; background: var(--accent-primary); height: 80%;"></div>
+                            <div style="flex: 1; background: var(--accent-primary); height: 50%;"></div>
+                        </div>
+                    </div>
+                    <div class="card">
+                        <h3 class="metric-label" style="margin-bottom: 1rem;">GEOSPATIAL COV.</h3>
+                        <div style="width: 100%; aspect-ratio: 1; border: 2px solid var(--border-color); border-radius: 50%; display: flex; items-center; justify-content: center; position: relative;">
+                            <div style="width: 4px; height: 4px; background: red; border-radius: 50%; position: absolute; top: 30%; left: 45%;"></div>
+                            <div style="width: 2px; height: 2px; background: white; border-radius: 50%; position: absolute; top: 40%; left: 60%;"></div>
+                            <div style="width: 60%; height: 60%; border: 1px dashed var(--text-muted); border-radius: 50%;"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

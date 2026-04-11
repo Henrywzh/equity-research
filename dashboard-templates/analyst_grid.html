@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Analyst Grid | Correlation Study</title>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        .grid-layout {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            grid-template-rows: repeat(2, 1fr);
+            gap: 1.5rem;
+            height: calc(100vh - 150px);
+        }
+        .small-chart {
+            flex: 1;
+            margin-top: 1rem;
+            background: var(--bg-tertiary);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-muted);
+            font-size: 0.75rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="container" style="max-width: 1600px;">
+        <header class="flex justify-between items-center mb-6">
+            <div>
+                <h1>Data Correlation Matrix</h1>
+                <p style="color: var(--text-secondary); font-size: 0.875rem;">Asset: <strong>STRAIT OF HORMUZ TRAFFIC</strong> vs <strong>BLL MACRO INDEX</strong></p>
+            </div>
+            <div class="flex gap-2">
+                <button style="padding: 0.5rem 1rem; background: var(--accent-primary); color: white; border: none; border-radius: 6px; font-weight: 500;">EXPORT CSV</button>
+                <button style="padding: 0.5rem 1rem; background: var(--bg-tertiary); color: var(--text-primary); border: 1px solid var(--border-color); border-radius: 6px; font-weight: 500;">EDIT LAYOUT</button>
+            </div>
+        </header>
+
+        <div class="grid-layout">
+            <!-- Quadrant 1 -->
+            <div class="card flex flex-col">
+                <div class="flex justify-between items-center">
+                    <h2 class="metric-label" style="font-size: 0.75rem;">Daily Ship Count (30D)</h2>
+                    <span class="badge badge-success">+12.4%</span>
+                </div>
+                <div class="small-chart">
+                    [TimeSeries: Detected_Ships]
+                </div>
+            </div>
+
+            <!-- Quadrant 2 -->
+            <div class="card flex flex-col">
+                <div class="flex justify-between items-center">
+                    <h2 class="metric-label" style="font-size: 0.75rem;">Risk Engine Confidence</h2>
+                    <span class="badge" style="background: var(--bg-tertiary);">92.1%</span>
+                </div>
+                <div class="small-chart">
+                    [Confidence_Interval_Plot]
+                </div>
+            </div>
+
+            <!-- Quadrant 3 -->
+            <div class="card flex flex-col">
+                <div class="flex justify-between items-center">
+                    <h2 class="metric-label" style="font-size: 0.75rem;">Geopolitical News Impact Score</h2>
+                    <span class="badge badge-danger">-5.2%</span>
+                </div>
+                <div class="small-chart">
+                    [Histogram: Sentiment_Vaders]
+                </div>
+            </div>
+
+            <!-- Quadrant 4 -->
+            <div class="card flex flex-col">
+                <div class="flex justify-between items-center">
+                    <h2 class="metric-label" style="font-size: 0.75rem;">Vessel Velocity Deviation</h2>
+                    <span class="badge badge-warning">OUTLIER</span>
+                </div>
+                <div class="small-chart">
+                    [Scatter: Speed_vs_Draft]
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

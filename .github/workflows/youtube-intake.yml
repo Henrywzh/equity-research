@@ -1,0 +1,92 @@
+name: YouTube Intake
+
+on:
+  schedule:
+    - cron: "0 */6 * * *"
+  workflow_dispatch:
+
+concurrency:
+  group: youtube-intake
+  cancel-in-progress: false
+
+jobs:
+  intake:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    defaults:
+      run:
+        working-directory: youtube-intake
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: "pip"
+          cache-dependency-path: youtube-intake/pyproject.toml
+
+      - name: Install system dependencies (ffmpeg + deno)
+        run: |
+          sudo apt-get update -qq && sudo apt-get install -y -qq ffmpeg
+          curl -fsSL https://deno.land/install.sh | sh
+          echo "$HOME/.deno/bin" >> "$GITHUB_PATH"
+
+      - name: Install package
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install .
+
+      - name: Run preflight checks
+        env:
+          GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
+          GMAIL_SENDER: ${{ secrets.GMAIL_SENDER }}
+          GMAIL_APP_PASSWORD: ${{ secrets.GMAIL_APP_PASSWORD }}
+          GMAIL_RECIPIENT: ${{ secrets.GMAIL_RECIPIENT }}
+          YOUTUBE_INTAKE_YT_COOKIES: ${{ secrets.YOUTUBE_INTAKE_YT_COOKIES }}
+        run: python -m youtube_intake preflight
+
+      - name: Run intake pipeline
+        env:
+          GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
+          YOUTUBE_INTAKE_YT_COOKIES: ${{ secrets.YOUTUBE_INTAKE_YT_COOKIES }}
+        run: python -m youtube_intake run --result-path run-result.json
+
+      - name: Analyze newly archived videos
+        env:
+          GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
+        run: python -m youtube_intake analyze --result-path run-result.json --analysis-result-path analysis-result.json
+
+      - name: Send Gmail analyst summary
+        env:
+          GMAIL_SENDER: ${{ secrets.GMAIL_SENDER }}
+          GMAIL_APP_PASSWORD: ${{ secrets.GMAIL_APP_PASSWORD }}
+          GMAIL_RECIPIENT: ${{ secrets.GMAIL_RECIPIENT }}
+        run: python -m youtube_intake notify --result-path analysis-result.json
+
+      - name: Commit updated state and archives
+        working-directory: .
+        run: |
+          set -euo pipefail
+          git config user.name "youtube-intake[bot]"
+          git config user.email "youtube-intake[bot]@users.noreply.github.com"
+          git add -A youtube-intake/data youtube-intake/state
+          if git diff --staged --quiet; then
+            exit 0
+          fi
+          git commit -m "data: refresh youtube intake $(date -u +%Y-%m-%dT%H:%M:%SZ) [skip ci]"
+          for attempt in 1 2 3; do
+            if git push origin HEAD:main; then
+              exit 0
+            fi
+            git fetch origin main
+            git rebase origin/main
+          done
+          echo "Failed to push youtube-intake updates after 3 attempts." >&2
+          exit 1
