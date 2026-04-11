@@ -1,0 +1,634 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Equity Research Automation — Architecture</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --cyan:   #06b6d4;
+    --green:  #10b981;
+    --amber:  #f59e0b;
+    --red:    #ef4444;
+    --purple: #8b5cf6;
+    --bg:     #080d1a;
+    --surface: rgba(255,255,255,0.04);
+    --border:  rgba(255,255,255,0.08);
+    --text:    #e2e8f0;
+    --muted:   #64748b;
+  }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    padding: 48px 32px 64px;
+    background-image:
+      radial-gradient(ellipse 80% 50% at 20% 0%, rgba(6,182,212,0.07) 0%, transparent 60%),
+      radial-gradient(ellipse 60% 40% at 80% 100%, rgba(139,92,246,0.07) 0%, transparent 60%);
+  }
+
+  .page { max-width: 1320px; margin: 0 auto; }
+
+  /* ── HERO ── */
+  .hero {
+    text-align: center;
+    margin-bottom: 56px;
+    animation: fadeUp 0.6s ease both;
+  }
+  .hero-eyebrow {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--cyan);
+    margin-bottom: 14px;
+  }
+  .hero h1 {
+    font-size: clamp(32px, 5vw, 54px);
+    font-weight: 800;
+    letter-spacing: -0.03em;
+    background: linear-gradient(135deg, #e2e8f0 30%, #94a3b8);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin-bottom: 14px;
+  }
+  .hero-sub {
+    font-size: 16px;
+    color: var(--muted);
+    margin-bottom: 24px;
+  }
+  .badge-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    justify-content: center;
+  }
+  .badge {
+    font-size: 11px;
+    font-weight: 600;
+    padding: 4px 12px;
+    border-radius: 999px;
+    background: rgba(255,255,255,0.06);
+    border: 1px solid var(--border);
+    color: #94a3b8;
+    letter-spacing: 0.04em;
+    transition: background 0.2s, color 0.2s;
+  }
+  .badge:hover { background: rgba(255,255,255,0.1); color: var(--text); }
+
+  /* ── FLOW DIAGRAM ── */
+  .flow-section {
+    margin-bottom: 56px;
+    animation: fadeUp 0.6s 0.1s ease both;
+  }
+  .section-label {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 20px;
+    text-align: center;
+  }
+  .flow-grid {
+    display: grid;
+    grid-template-columns: 1fr 48px 1fr 48px 1fr;
+    align-items: start;
+    gap: 0;
+  }
+  .flow-col { display: flex; flex-direction: column; gap: 10px; }
+  .flow-col-header {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--muted);
+    text-align: center;
+    margin-bottom: 4px;
+  }
+  .flow-item {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 9px 14px;
+    font-size: 13px;
+    color: #94a3b8;
+    text-align: center;
+    transition: border-color 0.2s, color 0.2s;
+  }
+  .flow-item:hover { color: var(--text); border-color: rgba(255,255,255,0.18); }
+  .flow-item.source-hkej    { border-left: 3px solid var(--cyan); }
+  .flow-item.source-market  { border-left: 3px solid var(--green); }
+  .flow-item.source-yt      { border-left: 3px solid var(--amber); }
+  .flow-item.source-marine  { border-left: 3px solid var(--red); }
+  .flow-item.source-shared  { border-left: 3px solid var(--muted); }
+
+  .flow-pipe { display: flex; flex-direction: column; gap: 10px; align-items: center; justify-content: flex-start; padding-top: 28px; }
+
+  /* pipeline color items */
+  .flow-item.pipe-cyan   { border-left: 3px solid var(--cyan);   color: var(--cyan); }
+  .flow-item.pipe-green  { border-left: 3px solid var(--green);  color: var(--green); }
+  .flow-item.pipe-amber  { border-left: 3px solid var(--amber);  color: var(--amber); }
+  .flow-item.pipe-red    { border-left: 3px solid var(--red);    color: var(--red); }
+  .flow-item.out-gmail   { border-left: 3px solid var(--purple); }
+  .flow-item.out-pages   { border-left: 3px solid var(--cyan); }
+  .flow-item.out-sqlite  { border-left: 3px solid var(--muted); }
+  .flow-item.out-audit   { border-left: 3px solid var(--red); }
+
+  /* Animated connector arrow */
+  .connector {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    padding-top: 28px;
+  }
+  .connector-line {
+    width: 2px;
+    height: 140px;
+    background: linear-gradient(to bottom, transparent, rgba(255,255,255,0.15), transparent);
+    position: relative;
+    overflow: hidden;
+  }
+  .connector-line::after {
+    content: '';
+    position: absolute;
+    top: -20px;
+    left: -3px;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--purple);
+    box-shadow: 0 0 8px var(--purple);
+    animation: travelDown 2s ease-in-out infinite;
+  }
+  .connector-line.c2::after { animation-delay: 0.5s; background: var(--cyan); box-shadow: 0 0 8px var(--cyan); }
+  .connector-arrow {
+    font-size: 16px;
+    color: rgba(255,255,255,0.2);
+  }
+  @keyframes travelDown {
+    0%   { top: -20px; opacity: 0; }
+    20%  { opacity: 1; }
+    80%  { opacity: 1; }
+    100% { top: 160px; opacity: 0; }
+  }
+
+  /* ── PIPELINE CARDS ── */
+  .cards-section { margin-bottom: 48px; }
+  .cards-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+  }
+  @media (max-width: 860px) { .cards-grid { grid-template-columns: 1fr; } }
+
+  .pipeline-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 24px;
+    position: relative;
+    overflow: hidden;
+    transition: transform 0.25s, box-shadow 0.25s, border-color 0.25s;
+    animation: fadeUp 0.5s ease both;
+  }
+  .pipeline-card:hover {
+    transform: translateY(-4px);
+  }
+  .pipeline-card::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: 16px;
+    opacity: 0;
+    transition: opacity 0.3s;
+  }
+  .pipeline-card:hover::before { opacity: 1; }
+
+  .card-cyan   { border-left: 4px solid var(--cyan); }
+  .card-cyan:hover { border-color: var(--cyan); box-shadow: 0 8px 40px rgba(6,182,212,0.18); }
+  .card-cyan::before { background: radial-gradient(ellipse at top left, rgba(6,182,212,0.06) 0%, transparent 60%); }
+
+  .card-green  { border-left: 4px solid var(--green); }
+  .card-green:hover { border-color: var(--green); box-shadow: 0 8px 40px rgba(16,185,129,0.18); }
+  .card-green::before { background: radial-gradient(ellipse at top left, rgba(16,185,129,0.06) 0%, transparent 60%); }
+
+  .card-amber  { border-left: 4px solid var(--amber); }
+  .card-amber:hover { border-color: var(--amber); box-shadow: 0 8px 40px rgba(245,158,11,0.18); }
+  .card-amber::before { background: radial-gradient(ellipse at top left, rgba(245,158,11,0.06) 0%, transparent 60%); }
+
+  .card-red    { border-left: 4px solid var(--red); }
+  .card-red:hover { border-color: var(--red); box-shadow: 0 8px 40px rgba(239,68,68,0.18); }
+  .card-red::before { background: radial-gradient(ellipse at top left, rgba(239,68,68,0.06) 0%, transparent 60%); }
+
+  .pipeline-card:nth-child(1) { animation-delay: 0.15s; }
+  .pipeline-card:nth-child(2) { animation-delay: 0.25s; }
+  .pipeline-card:nth-child(3) { animation-delay: 0.35s; }
+  .pipeline-card:nth-child(4) { animation-delay: 0.45s; }
+
+  .card-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 10px;
+  }
+  .card-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+  .dot-cyan   { background: var(--cyan); box-shadow: 0 0 8px var(--cyan); }
+  .dot-green  { background: var(--green); box-shadow: 0 0 8px var(--green); }
+  .dot-amber  { background: var(--amber); box-shadow: 0 0 8px var(--amber); }
+  .dot-red    { background: var(--red);   box-shadow: 0 0 8px var(--red); }
+
+  .card-name {
+    font-size: 16px;
+    font-weight: 700;
+    font-family: 'SF Mono', 'Fira Code', monospace;
+    color: var(--text);
+  }
+  .card-desc {
+    font-size: 13px;
+    color: var(--muted);
+    line-height: 1.6;
+    margin-bottom: 16px;
+  }
+
+  .chip-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-bottom: 14px;
+  }
+  .chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 11px;
+    font-weight: 600;
+    padding: 4px 10px;
+    border-radius: 6px;
+    background: rgba(255,255,255,0.05);
+    border: 1px solid var(--border);
+    color: #94a3b8;
+    white-space: nowrap;
+  }
+  .chip-icon { font-size: 10px; opacity: 0.7; }
+  .chip.chip-schedule { border-color: rgba(139,92,246,0.4); color: #c4b5fd; }
+  .chip.chip-source   { border-color: rgba(255,255,255,0.12); }
+  .chip.chip-llm      { border-color: rgba(251,191,36,0.3); color: #fde68a; }
+  .chip.chip-nollm    { border-color: rgba(100,116,139,0.4); color: var(--muted); }
+  .chip.chip-output   { border-color: rgba(139,92,246,0.4); color: #c4b5fd; }
+
+  .card-arch {
+    font-size: 12px;
+    color: var(--muted);
+    border-top: 1px solid var(--border);
+    padding-top: 12px;
+    line-height: 1.7;
+  }
+  .card-arch strong { color: #94a3b8; }
+
+  /* ── INFRA STRIP ── */
+  .infra-section {
+    margin-bottom: 48px;
+    animation: fadeUp 0.6s 0.5s ease both;
+  }
+  .infra-strip {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 24px 28px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+    align-items: flex-start;
+  }
+  .infra-item {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    flex: 1;
+    min-width: 140px;
+  }
+  .infra-title {
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--purple);
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+  }
+  .infra-detail {
+    font-size: 12px;
+    color: var(--muted);
+    line-height: 1.6;
+  }
+  .infra-divider {
+    width: 1px;
+    background: var(--border);
+    align-self: stretch;
+  }
+
+  /* ── FOOTER ── */
+  .footer {
+    text-align: center;
+    font-size: 12px;
+    color: var(--muted);
+    line-height: 1.8;
+    animation: fadeUp 0.6s 0.6s ease both;
+  }
+  .footer a { color: #475569; text-decoration: none; }
+
+  /* ── ANIMATIONS ── */
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  /* ── STAT BADGES in hero ── */
+  .stat-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 16px;
+    justify-content: center;
+    margin-bottom: 20px;
+  }
+  .stat {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+  .stat-num {
+    font-size: 26px;
+    font-weight: 800;
+    color: var(--text);
+    letter-spacing: -0.04em;
+  }
+  .stat-label {
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+
+  /* pipeline status dot pulse */
+  .pulse {
+    animation: pulse 2s ease-in-out infinite;
+  }
+  @keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50%       { opacity: 0.4; }
+  }
+</style>
+</head>
+<body>
+<div class="page">
+
+  <!-- ── HERO ── -->
+  <header class="hero">
+    <div class="hero-eyebrow">Open-Source · GitHub Actions · Self-Hosted</div>
+    <h1>Equity Research Automation</h1>
+    <p class="hero-sub">4 autonomous financial intelligence pipelines running 24/7 on free-tier infrastructure</p>
+
+    <div class="stat-row">
+      <div class="stat"><span class="stat-num">4</span><span class="stat-label">Pipelines</span></div>
+      <div class="stat"><span class="stat-num">6</span><span class="stat-label">Workflows</span></div>
+      <div class="stat"><span class="stat-num">3</span><span class="stat-label">LLM Models</span></div>
+      <div class="stat"><span class="stat-num">16</span><span class="stat-label">Macro Assets</span></div>
+      <div class="stat"><span class="stat-num">15<span style="font-size:14px">min</span></span><span class="stat-label">Fastest Run</span></div>
+    </div>
+
+    <div class="badge-row">
+      <span class="badge">Python 3.11</span>
+      <span class="badge">LangGraph</span>
+      <span class="badge">Groq API</span>
+      <span class="badge">yfinance</span>
+      <span class="badge">Playwright</span>
+      <span class="badge">yt-dlp</span>
+      <span class="badge">OpenCV</span>
+      <span class="badge">BeautifulSoup</span>
+      <span class="badge">SQLite</span>
+      <span class="badge">GitHub Actions</span>
+    </div>
+  </header>
+
+  <!-- ── FLOW DIAGRAM ── -->
+  <section class="flow-section">
+    <div class="section-label">System Data Flow</div>
+    <div class="flow-grid">
+
+      <!-- Sources -->
+      <div class="flow-col">
+        <div class="flow-col-header">Data Sources</div>
+        <div class="flow-item source-hkej">HKEJ Instant News</div>
+        <div class="flow-item source-market">Yahoo Finance (yfinance)</div>
+        <div class="flow-item source-yt">YouTube RSS + yt-dlp</div>
+        <div class="flow-item source-marine">MarineTraffic (Playwright)</div>
+        <div class="flow-item source-shared">Google News RSS</div>
+        <div class="flow-item source-shared">GDELT DOC 2.0</div>
+        <div class="flow-item source-shared">Groq Whisper STT</div>
+      </div>
+
+      <!-- Connector 1 -->
+      <div class="connector">
+        <div class="connector-line c2"></div>
+        <div class="connector-arrow">▼</div>
+      </div>
+
+      <!-- Pipelines -->
+      <div class="flow-col">
+        <div class="flow-col-header">Pipelines</div>
+        <div class="flow-item pipe-cyan">daily-macro</div>
+        <div class="flow-item pipe-cyan" style="opacity:0.5;font-size:11px;padding:5px 14px;">LangGraph · Attention Routing · Groq</div>
+        <div class="flow-item pipe-green">daily-market</div>
+        <div class="flow-item pipe-green" style="opacity:0.5;font-size:11px;padding:5px 14px;">OHLCV Snapshots · Bilingual</div>
+        <div class="flow-item pipe-amber">youtube-intake</div>
+        <div class="flow-item pipe-amber" style="opacity:0.5;font-size:11px;padding:5px 14px;">Transcript · Groq · Retry Manifest</div>
+        <div class="flow-item pipe-red">marine-traffic-monitor</div>
+        <div class="flow-item pipe-red" style="opacity:0.5;font-size:11px;padding:5px 14px;">OpenCV · Policy Engine · State Machine</div>
+      </div>
+
+      <!-- Connector 2 -->
+      <div class="connector">
+        <div class="connector-line"></div>
+        <div class="connector-arrow">▼</div>
+      </div>
+
+      <!-- Outputs -->
+      <div class="flow-col">
+        <div class="flow-col-header">Outputs</div>
+        <div class="flow-item out-gmail">Gmail HTML Digest ×4</div>
+        <div class="flow-item out-pages">GitHub Pages Static Site</div>
+        <div class="flow-item out-sqlite">SQLite + JSON Backups</div>
+        <div class="flow-item out-audit">JSONL Audit Trail</div>
+        <div class="flow-item out-audit" style="border-left-color:var(--red);">Alert Emails (state transitions)</div>
+        <div class="flow-item out-sqlite" style="border-left-color:var(--red);">CSV Traffic Log</div>
+        <div class="flow-item out-sqlite">Git History (auto-commit)</div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ── PIPELINE CARDS ── -->
+  <section class="cards-section">
+    <div class="section-label" style="margin-bottom:20px;">Pipeline Details</div>
+    <div class="cards-grid">
+
+      <!-- daily-macro -->
+      <div class="pipeline-card card-cyan">
+        <div class="card-header">
+          <div class="card-dot dot-cyan pulse"></div>
+          <div class="card-name">daily-macro</div>
+        </div>
+        <p class="card-desc">
+          Scrapes HKEJ instant news, normalises articles into SQLite, and runs a multi-stage LangGraph pipeline to produce categorised analyst digests with entity extraction, attention tiers, and incremental caching.
+        </p>
+        <div class="chip-row">
+          <span class="chip chip-schedule"><span class="chip-icon">🕐</span>07:00 UTC + 20:30 UTC</span>
+          <span class="chip chip-source"><span class="chip-icon">📰</span>HKEJ instantnews</span>
+          <span class="chip chip-llm"><span class="chip-icon">🤖</span>Llama 4 Scout → Qwen 3 32B → Llama 3.1 8B</span>
+          <span class="chip chip-output"><span class="chip-icon">📧</span>Gmail + GitHub Pages</span>
+        </div>
+        <div class="card-arch">
+          <strong>Pipeline:</strong> LangGraph state graph · attention routing (high/medium/light) · category batching · token budget pacing · rate-limit governor · JSON repair retries · fallback model chain · static site builder
+        </div>
+      </div>
+
+      <!-- daily-market -->
+      <div class="pipeline-card card-green">
+        <div class="card-header">
+          <div class="card-dot dot-green pulse" style="animation-delay:0.3s"></div>
+          <div class="card-name">daily-market</div>
+        </div>
+        <p class="card-desc">
+          Fetches live OHLCV snapshots for 16 macro assets (indices, commodities, FX, crypto) via yfinance, persists history in SQLite, and emails a bilingual EN/ZH % change summary twice daily.
+        </p>
+        <div class="chip-row">
+          <span class="chip chip-schedule"><span class="chip-icon">🕐</span>06:59 HKT + 18:00 HKT</span>
+          <span class="chip chip-source"><span class="chip-icon">📈</span>yfinance · 16 assets</span>
+          <span class="chip chip-nollm"><span class="chip-icon">⚙️</span>No LLM — signals engine planned</span>
+          <span class="chip chip-output"><span class="chip-icon">📧</span>Bilingual Gmail tables</span>
+        </div>
+        <div class="card-arch">
+          <strong>Assets:</strong> HSI · SSE · SPX · NDX · DJI · Nikkei · KOSPI · Stoxx50 · FTSE · Gold · WTI · USD/CNH · GBP/HKD · USD/JPY · DXY · BTC &nbsp;·&nbsp; partial-failure tolerant · latest-available data timestamping
+        </div>
+      </div>
+
+      <!-- youtube-intake -->
+      <div class="pipeline-card card-amber">
+        <div class="card-header">
+          <div class="card-dot dot-amber pulse" style="animation-delay:0.6s"></div>
+          <div class="card-name">youtube-intake</div>
+        </div>
+        <p class="card-desc">
+          Monitors finance YouTube channels for new videos and completed livestreams, archives transcripts, runs Groq LLM analysis per video, and emails a compact analyst digest only when new content appears.
+        </p>
+        <div class="chip-row">
+          <span class="chip chip-schedule"><span class="chip-icon">🕐</span>Every 6h + hourly retry</span>
+          <span class="chip chip-source"><span class="chip-icon">▶️</span>YouTube RSS · yt-dlp · Whisper STT</span>
+          <span class="chip chip-llm"><span class="chip-icon">🤖</span>Llama 4 Scout → Llama 3.3 70B</span>
+          <span class="chip chip-output"><span class="chip-icon">📧</span>Per-video analyst Gmail digest</span>
+        </div>
+        <div class="card-arch">
+          <strong>Pipeline:</strong> RSS discovery → transcript fetch → Groq analysis → retry manifest → multi-key rotation · chunked transcript analysis · Whisper STT fallback (≤60 min) · run-level synthesis
+        </div>
+      </div>
+
+      <!-- marine-traffic-monitor -->
+      <div class="pipeline-card card-red">
+        <div class="card-header">
+          <div class="card-dot dot-red pulse" style="animation-delay:0.9s"></div>
+          <div class="card-name">marine&#8209;traffic&#8209;monitor</div>
+        </div>
+        <p class="card-desc">
+          Monitors the Strait of Hormuz every 15 minutes via Playwright + OpenCV, gates LLM calls behind a count-threshold, produces dual-analyst evidence (visual + context), and routes through a deterministic policy engine to manage alert escalation.
+        </p>
+        <div class="chip-row">
+          <span class="chip chip-schedule"><span class="chip-icon">🕐</span>Every 15 min (daemon)</span>
+          <span class="chip chip-source"><span class="chip-icon">🚢</span>MarineTraffic · Google News · GDELT</span>
+          <span class="chip chip-llm"><span class="chip-icon">🤖</span>Scout (visual) + Llama 3.3 70B (context)</span>
+          <span class="chip chip-output"><span class="chip-icon">🚨</span>Alert emails + daily digest</span>
+        </div>
+        <div class="card-arch">
+          <strong>Pipeline:</strong> Playwright screenshot → OpenCV polygon ship-count → dual-LLM evidence (no verdicts) → 7-rule policy engine → state machine (NORMAL→WATCH→ESCALATED→CRITICAL) · consensus mode (6-model voting) · JSONL audit trail
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ── SHARED INFRA ── -->
+  <section class="infra-section">
+    <div class="section-label" style="margin-bottom:16px;">Shared Infrastructure</div>
+    <div class="infra-strip">
+      <div class="infra-item">
+        <div class="infra-title">🤖 Groq LLM API</div>
+        <div class="infra-detail">
+          Llama 4 Scout 17B (primary)<br>
+          Qwen 3 32B · Llama 3.3 70B<br>
+          Llama 3.1 8B (fallback)<br>
+          Whisper STT (speech-to-text)
+        </div>
+      </div>
+      <div class="infra-divider"></div>
+      <div class="infra-item">
+        <div class="infra-title">⚙️ GitHub Actions</div>
+        <div class="infra-detail">
+          6 automated workflows<br>
+          Cron + workflow_run triggers<br>
+          Auto-commit data to repo<br>
+          Secrets for all credentials
+        </div>
+      </div>
+      <div class="infra-divider"></div>
+      <div class="infra-item">
+        <div class="infra-title">📧 Gmail SMTP</div>
+        <div class="infra-detail">
+          Shared App Password credentials<br>
+          HTML + plain-text MIME<br>
+          Partial-success delivery<br>
+          All 4 pipelines → same inbox
+        </div>
+      </div>
+      <div class="infra-divider"></div>
+      <div class="infra-item">
+        <div class="infra-title">🗄️ Storage Layer</div>
+        <div class="infra-detail">
+          SQLite per pipeline<br>
+          JSON backups &amp; analyses<br>
+          CSV logs (marine monitor)<br>
+          Git history as audit trail
+        </div>
+      </div>
+      <div class="infra-divider"></div>
+      <div class="infra-item">
+        <div class="infra-title">🌐 GitHub Pages</div>
+        <div class="infra-detail">
+          daily-macro static site<br>
+          Auto-deployed on analysis<br>
+          Article archive + reports<br>
+          Zero hosting cost
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── FOOTER ── -->
+  <footer class="footer">
+    <p>Built with Python 3.11 · Groq · LangGraph · yfinance · Playwright · OpenCV · yt-dlp</p>
+    <p style="margin-top:4px; color:#334155;">All pipelines run autonomously via GitHub Actions · Free-tier infrastructure only</p>
+  </footer>
+
+</div>
+</body>
+</html>

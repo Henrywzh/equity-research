@@ -61,13 +61,13 @@ async def main():
     
     if should_call_llm:
         print(f"[ANALYST] Triggering context-only analysis...")
-        # We pass image_path="" to trigger the image-less mode we just added to analyst.py
+        # API mode has no screenshot input, so use non-vision models only.
         briefing = run_consensus_check(
             image_path="", 
             reported_count=ships_in_zone, 
             csv_path=CSV_FILENAME,
-            model_a="llama_4_scout", # This will abstain from vision but still provide meta
-            model_b="llama_3_3_70b"   # This is a context analyst anyway
+            model_a="llama_3_3_70b",
+            model_b="llama_3_1_8b"
         )
         
         # Format the manifest for the briefing

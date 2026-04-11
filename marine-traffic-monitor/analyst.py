@@ -557,7 +557,20 @@ def _run_evidence_analyst(image_path: str, reported_count: int, csv_path: str,
     if has_vision:
         if not image_path:
             print(f"[ANALYST] No image provided for vision model {model_key}. Abstaining from visual analysis.")
-            return {"abstain": True, "abstain_reason": "No image provided for vision model.", "overall_confidence": 0.0, "recommended_state": "NORMAL", "recommended_action": "monitor_only", "direct_observations": [], "hyotheses": [], "risk_signals": [], "uncertainties": [], "historical_context": [], "news_context": [], "model_role": "visual_analyst"}
+            return {
+                "model_role": "visual_analyst",
+                "direct_observations": [],
+                "historical_context": [],
+                "news_context": [],
+                "hypotheses": [],
+                "risk_signals": [],
+                "uncertainties": [],
+                "recommended_state": "NORMAL",
+                "recommended_action": "monitor_only",
+                "abstain": True,
+                "abstain_reason": "No image provided for vision model.",
+                "overall_confidence": 0.0,
+            }
             
         abs_image = os.path.join(_HERE, image_path) if not os.path.isabs(image_path) else image_path
         if not os.path.exists(abs_image):
