@@ -2,100 +2,131 @@ import os
 import json
 import csv
 import glob
-from datetime import datetime
 from pathlib import Path
+from datetime import datetime
 
-# Paths
-ROOT = Path(__file__).parent.parent
-HUB_DATA = ROOT / "hub" / "data" / "signals.json"
+ROOT = Path("/Users/henrywzh/Desktop/Quant/equity-research")
+OUTPUT_PATH = ROOT / "hub" / "data" / "signals.json"
 
 def get_latest_maritime():
-    csv_file = ROOT / "marine-traffic-monitor" / "data" / "hormuz_traffic_log.csv"
-    if not csv_file.exists():
-        return {"count": 0, "status": "Unknown", "updated": "N/A"}
+    log_path = ROOT / "marine-traffic-monitor" / "data" / "hormuz_traffic_log.csv"
+    data = {"count": "0", "status": "No Recent Data", "updated": "N/A"}
     try:
-        with open(csv_file, 'r') as f:
-            lines = list(csv.reader(f))
-            if len(lines) < 2:
-                return {"count": 0, "status": "Empty Log", "updated": "N/A"}
-            last_row = lines[-1]
-            return {
-                "count": last_row[1],
-                "status": last_row[2],
-                "updated": last_row[0]
-            }
+        if log_path.exists():
+            with open(log_path, 'r') as f:
+                reader = csv.DictReader(f)
+                rows = list(reader)
+                if rows:
+                    latest = rows[-1]
+                    data = {
+                        "count": latest.get("Detected_Ships", "0"),
+                        "status": latest.get("Status_Note", "Normal Activity"),
+                        "updated": latest.get("Timestamp", "N/A")
+                    }
     except Exception as e:
-        return {"error": str(e)}
+        print(f"Maritime parse error: {e}")
+    return data
 
 def get_latest_market():
-    # Looks for highest date folder, then latest json
-    summary_glob = str(ROOT / "daily-market" / "data" / "summaries" / "*" / "*.json")
-    files = glob.glob(summary_glob)
-    if not files:
-        return {"movers": [], "updated": "N/A"}
-    
-    files.sort(reverse=True) # Sort lexicographically (date folders work well here)
-    latest_file = Path(files[0])
-    
+    data = {"movers": [], "snapshots": [], "updated": "N/A"}
     try:
-        with open(latest_file, 'r') as f:
-            data = json.load(f)
-            # Assuming standard summary format with 'top_movers'
-            return {
-                "movers": data.get("top_movers", [])[:5],
-                "snapshot": data.get("snapshots", [])[:5],
-                "updated": latest_file.parent.name
-            }
+        summary_glob = str(ROOT / "daily-market" / "data" / "summaries" / "*" / "*.json")
+        files = glob.glob(summary_glob)
+        if files:
+            files.sort(key=os.path.getmtime, reverse=True)
+            with open(files[0], 'r') as f:
+                raw_data = json.load(f)
+                
+                # Extract all rows from all sections
+                all_rows = []
+                indices = []
+                for section in raw_data.get("sections", []):
+                    asset_class = section.get("asset_class", "unknown")
+                    for row in section.get("rows", []):
+                        row["asset_class"] = asset_class
+                        all_rows.append(row)
+                        if asset_class == "index":
+                            indices.append(row)
+
+                # Top Movers: Sort by absolute percentage change
+                sorted_movers = sorted(all_rows, key=lambda x: abs(float(x.get("pct_change", 0))), reverse=True)
+                data["movers"] = sorted_movers[:5]
+                
+                # Snapshot: Use Indices
+                data["snapshots"] = indices[:5]
+                data["updated"] = raw_data.get("date", "N/A")
     except Exception as e:
-        return {"error": str(e)}
+        print(f"Market parse error: {e}")
+    return data
 
 def get_latest_macro():
-    analysis_glob = str(ROOT / "daily-macro" / "data" / "analyses" / "*" / "hkej-news-analysis.json")
-    files = glob.glob(analysis_glob)
-    if not files:
-        return {"alerts": [], "sentiment": "Neutral", "updated": "N/A"}
-    
-    files.sort(reverse=True)
-    latest_file = Path(files[0])
-    
+    data = {"alerts": [], "sentiment": "Neutral", "summary": [], "updated": "N/A"}
     try:
-        with open(latest_file, 'r') as f:
-            data = json.load(f)
-            return {
-                "alerts": data.get("top_alerts", [])[:5],
-                "sentiment": data.get("overall_sentiment", "Neutral"),
-                "summary": data.get("executive_summary", [])[:3],
-                "updated": latest_file.parent.name
-            }
+        analysis_glob = str(ROOT / "daily-macro" / "data" / "analyses" / "*" / "*.json")
+        files = glob.glob(analysis_glob)
+        if files:
+            files.sort(key=os.path.getmtime, reverse=True)
+            with open(files[0], 'r') as f:
+                raw_data = json.load(f)
+                data["summary"] = raw_data.get("executive_summary", [])
+                data["updated"] = raw_data.get("report_date", "N/A")
+                
+                # Extract alerts from key developments in categories
+                alerts = []
+                for cat in raw_data.get("categories", []):
+                    developments = cat.get("key_developments", [])
+                    if developments:
+                        alerts.extend(developments)
+                data["alerts"] = alerts[:8] # Top 8 developments as alerts
+
+                # Heuristic Sentiment (simple logic for now)
+                # If executive summary contains words like "新高" (new high) or "漲" (up)
+                all_text = " ".join(data["summary"])
+                if any(x in all_text for x in ["漲", "新高", "揚", "升"]):
+                    data["sentiment"] = "Positive"
+                elif any(x in all_text for x in ["跌", "挫", "低"]):
+                    data["sentiment"] = "Negative"
     except Exception as e:
-        return {"error": str(e)}
+        print(f"Macro parse error: {e}")
+    return data
 
 def get_latest_youtube():
-    run_glob = str(ROOT / "youtube-intake" / "data" / "analysis" / "*" / "run-summary.json")
-    files = glob.glob(run_glob)
-    if not files:
-        return {"signals": [], "updated": "N/A"}
-    
-    files.sort(reverse=True)
-    latest_file = Path(files[0])
-    
+    data = {"signals": [], "total_analyzed": 0, "updated": "N/A"}
     try:
-        with open(latest_file, 'r') as f:
-            data = json.load(f)
-            # Get high attention videos
-            videos = data.get("videos", [])
-            signals = [v for v in videos if v.get("attention_tier") == "high"]
-            return {
-                "signals": signals[:5],
-                "total_analyzed": data.get("totals", {}).get("analyzed", 0),
-                "updated": latest_file.parent.name
-            }
+        run_glob = str(ROOT / "youtube-intake" / "data" / "analysis" / "*")
+        runs = [Path(p) for p in glob.glob(run_glob) if os.path.isdir(p)]
+        if runs:
+            runs.sort(key=os.path.getmtime, reverse=True)
+            latest_run = runs[0]
+            summary_path = latest_run / "run-summary.json"
+            if summary_path.exists():
+                with open(summary_path, 'r') as f:
+                    raw_data = json.load(f)
+                    run_info = raw_data.get("run_summary", {})
+                    
+                    # Map top claims to signals
+                    claims = run_info.get("top_claims_worth_watching", [])
+                    signals = []
+                    for claim in claims:
+                        signals.append({
+                            "title": claim,
+                            "channel_name": "Multi-Source Alpha"
+                        })
+                    data["signals"] = signals
+                    
+                    # Count total videos analyzed
+                    total = 0
+                    for ch in raw_data.get("channels", {}).values():
+                        total += ch.get("video_count", 0)
+                    data["total_analyzed"] = total
+                    data["updated"] = latest_run.name # Timestamp in folder name
     except Exception as e:
-        return {"error": str(e)}
+        print(f"YouTube parse error: {e}")
+    return data
 
-def main():
+def bake_cake():
     print("Aggregation started...")
-    payload = {
+    hub_data = {
         "maritime": get_latest_maritime(),
         "market": get_latest_market(),
         "macro": get_latest_macro(),
@@ -103,11 +134,10 @@ def main():
         "last_baked": datetime.now().isoformat()
     }
     
-    os.makedirs(HUB_DATA.parent, exist_ok=True)
-    with open(HUB_DATA, 'w') as f:
-        json.dump(payload, f, indent=2)
-    
-    print(f"Aggregated signal cake baked at {HUB_DATA}")
+    os.makedirs(os.path.dirname(OUTPUT_PATH), exist_ok=True)
+    with open(OUTPUT_PATH, 'w') as f:
+        json.dump(hub_data, f, indent=2)
+    print(f"Aggregated signal cake baked at {OUTPUT_PATH}")
 
 if __name__ == "__main__":
-    main()
+    bake_cake()
