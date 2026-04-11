@@ -12,7 +12,7 @@ From the repository root:
 ```bash
 python -m venv venv
 source venv/bin/activate
-pip install playwright opencv-python groq anthropic openai feedparser python-dotenv requests
+pip install playwright opencv-python groq openai feedparser python-dotenv requests
 playwright install chromium
 ```
 
@@ -22,7 +22,6 @@ Create a `.config` file in the repository root:
 
 ```bash
 GROQ_API_KEY=your_groq_api_key
-ANTHROPIC_API_KEY=your_anthropic_api_key
 OPENROUTER_API_KEY=your_openrouter_api_key
 
 GMAIL_SENDER=yourname@gmail.com
@@ -187,11 +186,8 @@ Hallucination can still occur in the evidence layer, but it cannot alone trigger
 
 ### 4b. Two Model Roles
 
-| Model | Key | Role | Input | Vision? |
-|---|---|---|---|---|
 | Llama 4 Scout 17B | `llama_4_scout` | `visual_analyst` | Screenshot + CSV + news | ✅ Yes |
 | Llama 3.3 70B Versatile | `llama_3_3_70b` | `context_analyst` | CSV + news only | ❌ No |
-| Anthropic Claude | `anthropic` | `visual_analyst` | Screenshot + CSV + news | ✅ Yes |
 | GPT-4o (OpenRouter) | `openrouter_gpt4o` | `visual_analyst` | Screenshot + CSV + news | ✅ Yes |
 
 The visual analyst sees the screenshot and is responsible for `direct_observations` — bounding box positions, icon shapes, zone geometry. The context analyst has no image access and focuses on CSV trends and news correlation.

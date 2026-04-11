@@ -32,7 +32,6 @@ import json
 import base64
 import csv
 import time
-import anthropic
 from datetime import datetime
 from dotenv import load_dotenv
 from notifier       import send_alert
@@ -508,37 +507,7 @@ def _run_openrouter(model_id: str, image_data: str | None, user_text: str,
     return response.choices[0].message.content
 
 
-def _run_anthropic(model_id: str, image_data: str, user_text: str,
-                   current_state: str = "NORMAL", news: str = "") -> str:
-    """Call Anthropic Claude with vision + adaptive thinking."""
-    api_key = os.getenv("ANTHROPIC_API_KEY")
-    if not api_key or api_key == "your-anthropic-api-key-here":
-        raise RuntimeError(
-            "ANTHROPIC_API_KEY is not configured.\n"
-            "  1. Get your key at https://console.anthropic.com\n"
-            "  2. Open .config and replace 'your-anthropic-api-key-here' with your key."
-        )
-    system = _augment_system_prompt(SYSTEM_PROMPT_VISUAL_ANALYST, current_state, news)
-    client = anthropic.Anthropic(api_key=api_key)
-    with client.messages.stream(
-        model=model_id,
-        max_tokens=4096,
-        thinking={"type": "adaptive"},
-        system=system,
-        messages=[{
-            "role": "user",
-            "content": [
-                {"type": "image",
-                 "source": {"type": "base64", "media_type": "image/png", "data": image_data}},
-                {"type": "text", "text": user_text}
-            ]
-        }]
-    ) as stream:
-        final_message = stream.get_final_message()
-    raw = next((b.text for b in final_message.content if b.type == "text"), None)
-    if raw is None:
-        raise RuntimeError("Anthropic returned no text block in the response.")
-    return raw
+    # Anthropic removal placeholder
 
 
 def _retry_with_correction(cfg: dict, image_data: str | None, user_text: str,
@@ -560,7 +529,7 @@ def _retry_with_correction(cfg: dict, image_data: str | None, user_text: str,
     elif provider == "openrouter":
         return _run_openrouter(model_id, image_data, correction_text, has_vision, current_state, news)
     else:
-        return _run_anthropic(model_id, image_data, correction_text, current_state, news)
+        raise ValueError(f"Provider {provider} not supported for correction.")
 
 
 # ------------------------------------------------------------------
@@ -583,9 +552,13 @@ def _run_evidence_analyst(image_path: str, reported_count: int, csv_path: str,
         cfg        = get_analyst_model(effective_key)
         has_vision = cfg.get("supports_vision", False)
 
-    # Load image (only if vision model)
+    # Load image (only if vision model and image provided)
     image_data: str | None = None
     if has_vision:
+        if not image_path:
+            print(f"[ANALYST] No image provided for vision model {model_key}. Abstaining from visual analysis.")
+            return {"abstain": True, "abstain_reason": "No image provided for vision model.", "overall_confidence": 0.0, "recommended_state": "NORMAL", "recommended_action": "monitor_only", "direct_observations": [], "hyotheses": [], "risk_signals": [], "uncertainties": [], "historical_context": [], "news_context": [], "model_role": "visual_analyst"}
+            
         abs_image = os.path.join(_HERE, image_path) if not os.path.isabs(image_path) else image_path
         if not os.path.exists(abs_image):
             print(f"[ANALYST ERROR] Image not found: {abs_image}")
@@ -609,9 +582,6 @@ def _run_evidence_analyst(image_path: str, reported_count: int, csv_path: str,
         if provider == "groq":
             raw_json = _run_groq(cfg["model_id"], image_data, user_text,
                                  has_vision, current_state, news)
-        elif provider == "anthropic":
-            raw_json = _run_anthropic(cfg["model_id"], image_data, user_text,
-                                      current_state, news)
         elif provider == "openrouter":
             raw_json = _run_openrouter(cfg["model_id"], image_data, user_text,
                                        has_vision, current_state, news)
@@ -794,6 +764,10 @@ def run_consensus_check(image_path: str, reported_count: int, csv_path: str,
     current_state = get_current_state()
     news          = get_latest_news()
     news_lines    = [l for l in news.splitlines() if l.strip()]
+    
+    # If no image, we downgrade the consensus check to a single model (context) or dual context models
+    # but for simplicity, we keep the signature and just pass image_path=None
+    
     print(f"[CONSENSUS] Current macro state : {current_state}")
     print(f"[CONSENSUS] News headlines fetched: {len(news_lines)}")
     if news_lines:

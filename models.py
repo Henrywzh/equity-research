@@ -148,20 +148,6 @@ MARITIME_ANALYST_MODELS = {
     # High-volume fallback: auto-selected when Groq RPD quota is near exhaustion
     "llama_3_1_8b":  MODELS["llama_3_1_8b"],
 
-    # ── Anthropic (premium, via ANTHROPIC_API_KEY) ────────────────────────
-    "anthropic": {
-        "model_id": "claude-opus-4-6",
-        "provider": "anthropic",
-        "name": "Claude Opus 4.6 (Adaptive Thinking)",
-        "rpd": None,   # Pay-per-token — no hard daily limit
-        "rpm": None,
-        "tpm": None,
-        "supports_vision": True,
-        "supports_thinking": True,
-        "description": "Premium model with adaptive thinking. Highest-quality threat assessment.",
-        "suggested_sleep": 0
-    },
-
     # ── OpenRouter (via OPENROUTER_API_KEY — already in .config) ─────────
     # Cross-architecture consensus: different training data = different failure modes
     "openrouter_gpt4o": {
@@ -197,7 +183,6 @@ def get_analyst_model(key: str = "llama_4_scout") -> dict:
 
     Available keys:
       Groq (free):     'llama_4_scout' (vision), 'llama_3_3_70b', 'llama_3_1_8b'
-      Anthropic:       'anthropic'
       OpenRouter:      'openrouter_gpt4o', 'openrouter_gemini'
     """
     return MARITIME_ANALYST_MODELS.get(key, MARITIME_ANALYST_MODELS["llama_4_scout"])

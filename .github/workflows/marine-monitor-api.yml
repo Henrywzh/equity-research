@@ -1,0 +1,52 @@
+name: Marine Monitor API
+
+on:
+  schedule:
+    - cron: "0 */2 * * *"
+  workflow_dispatch:
+
+jobs:
+  monitor:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    defaults:
+      run:
+        working-directory: marine-traffic-monitor
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v5
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v6
+        with:
+          python-version: "3.11"
+          cache: "pip"
+          cache-dependency-path: marine-traffic-monitor/requirements-api.txt
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -r requirements-api.txt
+
+      - name: Run AIS Snapshot & Analysis
+        env:
+          AIS_STREAM_API_KEY: ${{ secrets.AIS_STREAM_API_KEY }}
+          OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
+          GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
+          RESIDENTIAL_PROXY: "" # Explicitly empty for GHA
+        run: |
+          python run_api.py
+
+      - name: Commit updated data
+        working-directory: .
+        run: |
+          git config user.name "marine-monitor[bot]"
+          git config user.email "marine-monitor[bot]@users.noreply.github.com"
+          git add marine-traffic-monitor/data/hormuz_traffic_log.csv
+          git diff --staged --quiet || git commit -m "data: refresh hormuz traffic log via AISStream API $(date -u +%Y-%m-%dT%H:%M:%SZ)"
+          git push
