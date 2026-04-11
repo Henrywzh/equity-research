@@ -5,7 +5,9 @@ import glob
 from pathlib import Path
 from datetime import datetime
 
-ROOT = Path("/Users/henrywzh/Desktop/Quant/equity-research")
+ROOT = Path(
+    os.environ.get("EQUITY_RESEARCH_ROOT", Path(__file__).resolve().parents[1])
+).resolve()
 OUTPUT_PATH = ROOT / "hub" / "data" / "signals.json"
 
 def get_latest_maritime():
@@ -124,8 +126,8 @@ def bake_cake():
         "last_baked": datetime.now().isoformat()
     }
     
-    os.makedirs(os.path.dirname(OUTPUT_PATH), exist_ok=True)
-    with open(OUTPUT_PATH, 'w') as f:
+    OUTPUT_PATH.parent.mkdir(parents=True, exist_ok=True)
+    with OUTPUT_PATH.open('w') as f:
         json.dump(hub_data, f, indent=2)
     print(f"Aggregated signal cake baked at {OUTPUT_PATH}")
 

@@ -33,11 +33,19 @@ jobs:
 
       - name: Commit updated signals
         run: |
+          set -euo pipefail
           git config user.name "hub-bot[bot]"
           git config user.email "hub-bot[bot]@users.noreply.github.com"
           git add hub/data/signals.json
           if ! git diff --staged --quiet; then
             git commit -m "data: refresh unified intelligence hub $(date -u +%Y-%m-%dT%H:%M:%SZ)"
-            git pull --rebase origin main
-            git push origin main
+            for attempt in 1 2 3; do
+              if git push origin HEAD:main; then
+                exit 0
+              fi
+              git fetch origin main
+              git rebase origin/main
+            done
+            echo "Failed to push hub signals after 3 attempts." >&2
+            exit 1
           fi
