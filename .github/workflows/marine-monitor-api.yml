@@ -11,10 +11,6 @@ jobs:
     permissions:
       contents: write
 
-    defaults:
-      run:
-        working-directory: marine-traffic-monitor
-
     steps:
       - name: Checkout repository
         uses: actions/checkout@v5
@@ -26,24 +22,30 @@ jobs:
         with:
           python-version: "3.11"
           cache: "pip"
+          # Explicitly pointing to the subfolder requirements
           cache-dependency-path: marine-traffic-monitor/requirements-api.txt
 
       - name: Install dependencies
         run: |
-          python -m pip install --upgrade pip
-          python -m pip install -r requirements-api.txt
+          python3 -m pip install --upgrade pip
+          python3 -m pip install -r marine-traffic-monitor/requirements-api.txt
+
+      - name: Diagnostic - Environment Check
+        run: |
+          python3 --version
+          python3 -m pip list
 
       - name: Run AIS Snapshot & Analysis
         env:
           AIS_STREAM_API_KEY: ${{ secrets.AIS_STREAM_API_KEY }}
           OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
           GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
-          RESIDENTIAL_PROXY: "" # Explicitly empty for GHA
+          RESIDENTIAL_PROXY: "" 
         run: |
-          python run_api.py
+          # Running from root but pointing to the module script
+          python3 marine-traffic-monitor/run_api.py
 
       - name: Commit updated data
-        working-directory: .
         run: |
           git config user.name "marine-monitor[bot]"
           git config user.email "marine-monitor[bot]@users.noreply.github.com"
