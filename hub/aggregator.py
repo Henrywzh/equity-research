@@ -28,7 +28,7 @@ def get_latest_maritime():
     return data
 
 def get_latest_market():
-    data = {"movers": [], "snapshots": [], "updated": "N/A"}
+    data = {"sections": [], "updated": "N/A", "top_mover_val": 0, "top_mover_ticker": "N/A"}
     try:
         summary_glob = str(ROOT / "daily-market" / "data" / "summaries" / "*" / "*.json")
         files = glob.glob(summary_glob)
@@ -36,31 +36,26 @@ def get_latest_market():
             files.sort(key=os.path.getmtime, reverse=True)
             with open(files[0], 'r') as f:
                 raw_data = json.load(f)
-                
-                # Extract all rows from all sections
-                all_rows = []
-                indices = []
-                for section in raw_data.get("sections", []):
-                    asset_class = section.get("asset_class", "unknown")
-                    for row in section.get("rows", []):
-                        row["asset_class"] = asset_class
-                        all_rows.append(row)
-                        if asset_class == "index":
-                            indices.append(row)
-
-                # Top Movers: Sort by absolute percentage change
-                sorted_movers = sorted(all_rows, key=lambda x: abs(float(x.get("pct_change", 0))), reverse=True)
-                data["movers"] = sorted_movers[:5]
-                
-                # Snapshot: Use Indices
-                data["snapshots"] = indices[:5]
+                data["sections"] = raw_data.get("sections", [])
                 data["updated"] = raw_data.get("date", "N/A")
+                
+                # Still find the top mover for the KPI card
+                max_change = 0
+                max_ticker = "N/A"
+                for section in data["sections"]:
+                    for row in section.get("rows", []):
+                        val = abs(float(row.get("pct_change", 0)))
+                        if val > max_change:
+                            max_change = val
+                            max_ticker = row.get("ticker", "N/A")
+                            data["top_mover_val"] = row.get("pct_change", 0)
+                            data["top_mover_ticker"] = max_ticker
     except Exception as e:
         print(f"Market parse error: {e}")
     return data
 
 def get_latest_macro():
-    data = {"alerts": [], "sentiment": "Neutral", "summary": [], "updated": "N/A"}
+    data = {"alerts": [], "sentiment": "Pending LLM", "summary": [], "updated": "N/A"}
     try:
         analysis_glob = str(ROOT / "daily-macro" / "data" / "analyses" / "*" / "*.json")
         files = glob.glob(analysis_glob)
@@ -77,9 +72,9 @@ def get_latest_macro():
                     developments = cat.get("key_developments", [])
                     if developments:
                         alerts.extend(developments)
-                data["alerts"] = alerts[:8] # Top 8 developments as alerts
-
-                # Sentiment is now 'Pending' until LLM scoring is integrated to avoid brittle regex matching
+                data["alerts"] = alerts # Frontend will slice for 'top 5'
+                
+                # Sentiment is now 'Pending' until LLM scoring is integrated
                 data["sentiment"] = "Pending LLM"
     except Exception as e:
         print(f"Macro parse error: {e}")
@@ -114,7 +109,7 @@ def get_latest_youtube():
                     for ch in raw_data.get("channels", {}).values():
                         total += ch.get("video_count", 0)
                     data["total_analyzed"] = total
-                    data["updated"] = latest_run.name # Timestamp in folder name
+                    data["updated"] = latest_run.name
     except Exception as e:
         print(f"YouTube parse error: {e}")
     return data

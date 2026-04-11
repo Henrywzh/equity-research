@@ -5,6 +5,44 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Equity Intelligence Hub | Command Center</title>
     <link rel="stylesheet" href="css/styles.css">
+    <style>
+        .market-section-header {
+            background: var(--bg-tertiary);
+            padding: 0.5rem 1rem;
+            font-size: 0.75rem;
+            font-weight: 700;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            border-radius: var(--radius-sm);
+            margin: 1.5rem 0 0.5rem 0;
+            display: flex;
+            justify-content: space-between;
+        }
+        .market-section-header:first-child {
+            margin-top: 0;
+        }
+        .clickable-card {
+            cursor: pointer;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+        .clickable-card:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-md);
+        }
+        .alert-item {
+            padding: 1rem;
+            border-radius: var(--radius-md);
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            margin-bottom: 0.75rem;
+            transition: all 0.2s ease;
+        }
+        .alert-item:hover {
+            border-color: var(--accent-primary);
+            background: rgba(99, 102, 241, 0.05);
+        }
+    </style>
 </head>
 <body>
     <div class="container" style="max-width: 1400px;">
@@ -58,35 +96,30 @@
         </div>
 
         <div class="mb-6">
-            <h2 class="metric-label" style="color: var(--text-muted); opacity: 0.6;">Detailed Analysis</h2>
+            <h2 class="metric-label" style="color: var(--text-muted); opacity: 0.6;">Intelligence Briefing</h2>
         </div>
 
         <!-- Main Content Area -->
         <div class="grid gap-12" style="grid-template-columns: 1.5fr 1fr;">
             <!-- Main Intelligence Flow -->
             <div class="flex flex-col gap-6">
-                <div class="card">
-                    <h2 class="mb-4">Unified Alert Feed</h2>
-                    <div id="alert-list" class="flex flex-col gap-4">
+                <!-- Macro Intelligence Card -->
+                <div class="card clickable-card" onclick="window.open('https://henrywzh.github.io/equity-research/', '_blank')">
+                    <div class="flex justify-between items-center mb-6">
+                        <h2 style="margin: 0;">Macro News Intelligence</h2>
+                        <span class="metric-label" style="font-size: 0.75rem;">Click for Full Analysis →</span>
+                    </div>
+                    <div id="alert-list" class="flex flex-col">
                         <p style="color: var(--text-muted);">Fetching latest signals...</p>
                     </div>
                 </div>
                 
+                <!-- Market Analysis Card -->
                 <div class="card">
-                    <h2 class="mb-4">Market Movers Detail</h2>
-                    <table class="data-table" id="market-table">
-                        <thead>
-                            <tr>
-                                <th>Ticker</th>
-                                <th>Price</th>
-                                <th>Change</th>
-                                <th>Status</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <!-- Populated by JS -->
-                        </tbody>
-                    </table>
+                    <h2 class="mb-4">Market Analysis</h2>
+                    <div id="market-sections-container">
+                        <!-- Categorized tables populated by JS -->
+                    </div>
                 </div>
             </div>
 
@@ -114,7 +147,6 @@
     <script>
         async function loadData() {
             try {
-                // In production, this fetches repo-hosted signals.json
                 const response = await fetch('data/signals.json');
                 const data = await response.json();
                 
@@ -123,16 +155,12 @@
                 document.getElementById('last-update').textContent = lastDate.toLocaleString();
                 
                 // 2. Update KPIs
-                // Maritime
                 const marine = data.maritime;
                 document.querySelector('#kpi-maritime .metric-value').textContent = marine.count || '0';
                 document.getElementById('maritime-status').textContent = `Status: ${marine.status}`;
                 
-                // Macro
                 const macro = data.macro;
-                document.querySelector('#kpi-macro .metric-value').textContent = macro.sentiment || 'N/A';
                 document.getElementById('macro-category').textContent = `Latest Analysis: ${macro.updated}`;
-                
                 const macroBadge = document.getElementById('macro-badge');
                 if (macro.sentiment === 'Positive') {
                     macroBadge.textContent = 'BULLISH';
@@ -152,13 +180,10 @@
                     macroBadge.className = 'badge badge-warning';
                 }
                 
-                // Market
                 const market = data.market;
-                const topMover = market.movers && market.movers.length > 0 ? market.movers[0] : null;
-                const momentumVal = topMover ? parseFloat(topMover.pct_change) : 0;
-                document.querySelector('#kpi-market .metric-value').textContent = topMover ? `${momentumVal.toFixed(2)}%` : '0%';
-                if(topMover) document.getElementById('market-top').textContent = `Top: ${topMover.ticker}`;
-                
+                const momentumVal = parseFloat(market.top_mover_val || 0);
+                document.querySelector('#kpi-market .metric-value').textContent = `${momentumVal.toFixed(2)}%`;
+                document.getElementById('market-top').textContent = `Top: ${market.top_mover_ticker}`;
                 const marketBadge = document.getElementById('market-badge');
                 if (momentumVal > 0.5) {
                     marketBadge.textContent = 'STRENGTH';
@@ -171,19 +196,18 @@
                     marketBadge.className = 'badge badge-warning';
                 }
                 
-                // YouTube
                 const youtube = data.youtube;
                 document.querySelector('#kpi-youtube .metric-value').textContent = youtube.signals ? youtube.signals.length : '0';
                 document.getElementById('youtube-stats').textContent = `High Confidence Signals: ${youtube.total_analyzed} scanned`;
 
-                // 3. Populate Alert List (Macro Alerts)
+                // 3. Populate Alert List (Top 5 Macro Alerts)
                 const alertList = document.getElementById('alert-list');
                 alertList.innerHTML = '';
                 if (macro.alerts && macro.alerts.length > 0) {
-                    macro.alerts.forEach(alert => {
+                    // Show only top 5 alerts
+                    macro.alerts.slice(0, 5).forEach(alert => {
                         const div = document.createElement('div');
-                        div.style.paddingBottom = '0.75rem';
-                        div.style.borderBottom = '1px solid var(--border-color)';
+                        div.className = 'alert-item';
                         div.innerHTML = `
                             <div class="flex justify-between mb-1">
                                 <span class="tag" style="background: rgba(239, 68, 68, 0.1); color: var(--accent-danger);">SIGNAL</span>
@@ -197,21 +221,51 @@
                     alertList.innerHTML = '<p style="color: var(--text-muted);">No active macro alerts.</p>';
                 }
 
-                // 4. Populate Market Table
-                const marketTable = document.querySelector('#market-table tbody');
-                marketTable.innerHTML = '';
-                const snapshots = market.snapshots || [];
-                snapshots.forEach(s => {
-                    const tr = document.createElement('tr');
-                    const pct = parseFloat(s.pct_change || 0);
-                    const color = pct > 0 ? 'var(--accent-success)' : 'var(--accent-danger)';
-                    tr.innerHTML = `
-                        <td class="mono" style="font-weight: 600;">${s.ticker}</td>
-                        <td class="mono">${s.price}</td>
-                        <td class="mono" style="color: ${color}; font-weight: 600;">${pct.toFixed(2)}%</td>
-                        <td><span class="badge ${pct > 0 ? 'badge-success' : 'badge-danger'}">${s.asset_class}</span></td>
+                // 4. Populate Categorized Market Sections
+                const container = document.getElementById('market-sections-container');
+                container.innerHTML = '';
+                const sections = market.sections || [];
+                
+                sections.forEach(section => {
+                    const sectionWrapper = document.createElement('div');
+                    sectionWrapper.innerHTML = `
+                        <div class="market-section-header">
+                            <span>${section.label_en}</span>
+                            <span>${section.label_zh}</span>
+                        </div>
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th style="width: 40%">Asset</th>
+                                    <th style="text-align: right">Price</th>
+                                    <th style="text-align: right">Change</th>
+                                    <th style="text-align: right">Date</th>
+                                </tr>
+                            </thead>
+                            <tbody></tbody>
+                        </table>
                     `;
-                    marketTable.appendChild(tr);
+                    const tbody = sectionWrapper.querySelector('tbody');
+                    section.rows.forEach(row => {
+                        const tr = document.createElement('tr');
+                        const pct = parseFloat(row.pct_change || 0);
+                        const color = pct > 0 ? 'var(--accent-success)' : pct < 0 ? 'var(--accent-danger)' : 'var(--text-muted)';
+                        tr.innerHTML = `
+                            <td>
+                                <strong style="display: block;">${row.label_en}</strong>
+                                <span style="font-size: 0.65rem; color: var(--text-muted);">${row.ticker}</span>
+                            </td>
+                            <td class="mono" style="text-align: right; font-weight: 600;">${row.price_fmt}</td>
+                            <td class="mono" style="text-align: right; color: ${color}; font-weight: 700;">
+                                ${row.arrow} ${Math.abs(pct).toFixed(2)}%
+                            </td>
+                            <td class="mono" style="text-align: right; font-size: 0.65rem; color: var(--text-muted);">
+                                ${row.data_timestamp}
+                            </td>
+                        `;
+                        tbody.appendChild(tr);
+                    });
+                    container.appendChild(sectionWrapper);
                 });
 
                 // 5. Populate YouTube Signals
@@ -241,6 +295,8 @@
         }
         
         loadData();
+        // Auto-refresh every 5 minutes
+        setInterval(loadData, 300000);
     </script>
 </body>
 </html>
