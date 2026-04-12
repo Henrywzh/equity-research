@@ -1,120 +1,104 @@
 # PROJECT_MAP
 
 ## 📅 Daily Progress
-- `marine-traffic-monitor` moved to an AISStream-driven path: `ais_client.py` streams live vessel updates for the Hormuz bounding box, `run_api.py` snapshots counts into `data/hormuz_traffic_log.csv`, and `.github/workflows/marine-monitor-api.yml` runs the flow on a two-hour cadence in GitHub Actions.
-- `daily-macro` kept shipping intraday improvements: `src/daily_macro/site.py` still acts as the schema-tolerant renderer for archived analysis JSON, while the scraper and analysis workflows now commit refreshed scrape/analysis artifacts without `[skip ci]`, keeping downstream automation and Pages deployment live.
-- `daily-market` and `youtube-intake` both advanced their daily state: new `2026-04-10` market snapshots/summaries landed in `daily-market/data/*`, and YouTube intake refreshed archived channel/video analysis plus `state/channels.json`, preserving feed continuity for the next run.
+- Added the `hub/` surface: `hub/aggregator.py` now pulls the latest outputs from `marine-traffic-monitor`, `daily-market`, `daily-macro`, and `youtube-intake` into `hub/data/signals.json`, while `hub/index.html` renders the combined command-center view.
+- Hardened hub deployment after the initial landing: `hub/css/styles.css` made the page self-contained, and `.github/workflows/hub-update.yml` plus `hub/aggregator.py` were fixed to use repo-relative paths and a retrying push flow that survives concurrent bot commits.
+- The rest of the repo kept feeding the new layer: Hormuz traffic logs, macro scrape and analysis artifacts, and YouTube channel state all refreshed today, and the repo-tracking restore commit brought the key Markdown docs back under version control.
 
 ## 🏗️ System Architecture
 ```mermaid
 graph TD
-    Docs["AGENTS.md / README.md / PROJECT_MAP.md"]
-    Shared["models.py"]
-    Workflows[".github/workflows/*.yml"]
-
-    subgraph DM["daily-macro"]
-        DMCLI["src/daily_macro/cli.py"]
-        DMPipe["src/daily_macro/pipeline.py"]
-        DMAnalysis["src/daily_macro/analysis.py"]
-        DMSite["src/daily_macro/site.py"]
-        DMNotify["src/daily_macro/notifier.py"]
-        DMStore["src/daily_macro/storage.py"]
-        DMDB["data/news.sqlite"]
-        DMData["data/analyses/YYYY-MM-DD/hkej-news-analysis.json"]
-        DMBackups["data/article_backups/YYYY/MM/DD/run_*/article-*.json"]
-        DMSiteOut["site/index.html + site/archive + site/reports/*"]
+    subgraph GH["GitHub Actions"]
+        WMarine["marine-monitor-api.yml / hormuz-monitor.yml"]
+        WMacro["daily-macro-scraper.yml / daily-macro-analysis.yml / daily-macro-pages.yml"]
+        WMarket["daily-market-fetch.yml"]
+        WYT["youtube-intake.yml / youtube-intake-retry.yml"]
+        WHub["hub-update.yml"]
     end
 
-    subgraph MK["daily-market"]
-        MKCLI["src/daily_market/cli.py"]
-        MKPipe["src/daily_market/pipeline.py"]
-        MKStorage["src/daily_market/storage.py"]
-        MKDB["data/market.sqlite"]
-        MKSnapshots["data/snapshots/YYYY-MM-DD/*.json"]
-        MKSumm["data/summaries/YYYY-MM-DD/*.json"]
+    subgraph Marine["marine-traffic-monitor"]
+        MRun["run_api.py / run.py"]
+        MAIS["ais_client.py"]
+        MAnalyst["analyst.py"]
+        MPolicy["policy_engine.py + state_manager.py"]
+        MCSV["data/hormuz_traffic_log.csv"]
+        MState["state/*.json"]
+    end
+
+    subgraph Macro["daily-macro"]
+        DMCLI["src/daily_macro/cli.py"]
+        DMPipe["pipeline.py + storage.py"]
+        DMAnalysis["analysis.py"]
+        DMSite["site.py + site_adapters/hkej.py"]
+        DMOut["data/analyses/* + site/*"]
+    end
+
+    subgraph Market["daily-market"]
+        DKCLI["src/daily_market/cli.py"]
+        DKPipe["pipeline.py + fetcher.py + formatter.py"]
+        DKStore["storage.py"]
+        DKOut["data/summaries/* + data/market.sqlite"]
     end
 
     subgraph YT["youtube-intake"]
-        YTCLI["src/youtube_intake/cli.py"]
-        YTPipe["src/youtube_intake/pipeline.py"]
-        YTAnalyst["src/youtube_intake/analyst.py"]
-        YTClient["src/youtube_intake/youtube_client.py"]
-        YTStorage["src/youtube_intake/storage.py"]
-        YTRuntime["src/youtube_intake/runtime_env.py + preflight.py"]
-        YTState["state/channels.json + state/analysis-retries.json"]
-        YTArchive["data/youtube/<channel>/videos/*.json"]
-        YTAnalysis["data/analysis/<run>/*.json"]
+        YCLI["src/youtube_intake/cli.py"]
+        YPipe["pipeline.py + youtube_client.py"]
+        YAnalyst["analyst.py"]
+        YStore["storage.py + runtime_env.py"]
+        YOut["data/analysis/* + state/channels.json"]
     end
 
-    subgraph MTM["marine-traffic-monitor"]
-        MTMRunner["run_api.py / run.py"]
-        MTMAIS["ais_client.py"]
-        MTMAnalyst["analyst.py"]
-        MTMPolicy["policy_engine.py + state_manager.py"]
-        MTMNews["news_fetcher.py"]
-        MTMNotify["notifier.py"]
-        MTMCSV["data/hormuz_traffic_log.csv"]
-        MTMState["state/current_state.json + state/rate_counters.json"]
+    subgraph Hub["hub"]
+        HAgg["aggregator.py"]
+        HData["data/signals.json"]
+        HUI["index.html + css/styles.css"]
     end
 
-    Docs --> DMCLI
-    Docs --> MKCLI
-    Docs --> YTCLI
-    Docs --> MTMRunner
-    Shared --> MTMAnalyst
-    Workflows --> DMCLI
-    Workflows --> MKCLI
-    Workflows --> YTCLI
-    Workflows --> MTMRunner
-    Shared --> DMAnalysis
+    WMarine --> MRun
+    WMacro --> DMCLI
+    WMarket --> DKCLI
+    WYT --> YCLI
+    WHub --> HAgg
+
+    MRun --> MAIS
+    MRun --> MAnalyst
+    MAnalyst --> MPolicy
+    MPolicy --> MState
+    MRun --> MCSV
 
     DMCLI --> DMPipe
     DMCLI --> DMAnalysis
     DMCLI --> DMSite
-    DMCLI --> DMNotify
-    DMPipe --> DMStore
-    DMStore --> DMDB
-    DMPipe --> DMBackups
-    DMAnalysis --> DMStore
-    DMAnalysis --> DMNotify
-    DMAnalysis --> DMData
-    DMSite --> DMData
-    DMSite --> DMSiteOut
+    DMPipe --> DMOut
+    DMAnalysis --> DMOut
+    DMSite --> DMOut
 
-    MKCLI --> MKPipe
-    MKPipe --> MKStorage
-    MKStorage --> MKDB
-    MKStorage --> MKSnapshots
-    MKStorage --> MKSumm
+    DKCLI --> DKPipe
+    DKPipe --> DKStore
+    DKStore --> DKOut
 
-    YTCLI --> YTPipe
-    YTCLI --> YTAnalyst
-    YTCLI --> YTRuntime
-    YTPipe --> YTClient
-    YTPipe --> YTStorage
-    YTPipe --> YTArchive
-    YTAnalyst --> YTArchive
-    YTAnalyst --> YTAnalysis
-    YTAnalyst --> YTState
-    YTStorage --> YTState
+    YCLI --> YPipe
+    YCLI --> YAnalyst
+    YPipe --> YStore
+    YAnalyst --> YOut
+    YStore --> YOut
 
-    MTMRunner --> MTMAIS
-    MTMRunner --> MTMAnalyst
-    MTMRunner --> MTMCSV
-    MTMAnalyst --> MTMPolicy
-    MTMAnalyst --> MTMNews
-    MTMAnalyst --> MTMNotify
-    MTMAnalyst --> MTMState
-    MTMPolicy --> MTMState
-    MTMPolicy --> MTMCSV
+    MCSV --> HAgg
+    DMOut --> HAgg
+    DKOut --> HAgg
+    YOut --> HAgg
+    HAgg --> HData
+    HData --> HUI
 ```
 
 ## 🧠 Context Memo
-- `marine-traffic-monitor/run_api.py` now uses AISStream snapshots instead of the older browser/screenshot path for the scheduled GitHub Action. The point is operational reliability: a websocket feed is easier to run headlessly, cheaper than browser automation, and gives vessel manifests that can be logged directly into the traffic history CSV.
-- The uncommitted follow-up in `marine-traffic-monitor/analyst.py` fixes the empty-image abstain payload so API-only runs can safely skip visual evidence without returning malformed fields. Paired with the `run_api.py` model swap to non-vision models, that keeps the consensus checker compatible with a screenshot-free execution mode instead of pretending a vision model saw evidence it never received.
-- `daily-macro/src/daily_macro/site.py` remains deliberately defensive because report JSON evolves faster than the archive ages out. Sanitizing optional summary, diagnostics, subgroup, and model-switch fields prevents one older or partially generated analysis artifact from breaking the static site build.
-- The workflow edits in `.github/workflows/daily-macro-scraper.yml` and `.github/workflows/daily-macro-analysis.yml` remove the previous CI-skip behavior so data commits still trigger the rest of the automation chain. That matters because the repo increasingly treats generated data as pipeline inputs, not just terminal artifacts.
+- `hub/aggregator.py` now resolves the repository root from `EQUITY_RESEARCH_ROOT` or the script location instead of a hard-coded laptop path. The reason is simple: the hub has to run both locally and inside GitHub Actions, and absolute workstation paths would make the workflow non-portable and silently stale.
+- `.github/workflows/hub-update.yml` now commits with `set -euo pipefail`, pushes `HEAD:main`, and retries after `fetch`/`rebase`. That logic exists because the hub is downstream of several other automations, so race conditions are expected; the workflow needs to tolerate another bot landing a commit between checkout and push.
+- The hub intentionally reads generated artifacts rather than importing the other packages directly. That keeps each pipeline independently runnable, treats JSON/CSV outputs as the contract boundary, and lets the dashboard aggregate data even when upstream code lives in separate CLI packages and schedules.
 
 ## 🔗 Obsidian Links
-- No new `.md` files were created in the last 24 hours.
-- `PROJECT_MAP.md` remains the root note for repo memory; this refresh ties today's code changes in `marine-traffic-monitor/*.py`, `.github/workflows/marine-monitor-api.yml`, `daily-macro/src/daily_macro/site.py`, and the fresh `daily-market` / `youtube-intake` data artifacts back to one technical overview.
+- `AGENTS.md`, `CLAUDE.md`, and `README.md` were restored to git tracking at the repo root. They act as operator notes for the code in `.github/workflows/`, `hub/`, and the pipeline directories.
+- `daily-macro/README.md` maps to `daily-macro/src/daily_macro/*.py` and the generated `daily-macro/data/` plus `daily-macro/site/` outputs.
+- `daily-market/README.md` maps to `daily-market/src/daily_market/*.py`, especially the fetch, format, storage, and watchlist flow that now feeds the hub market card.
+- `marine-traffic-monitor/PROJECT_README.md` maps to `marine-traffic-monitor/run_api.py`, `ais_client.py`, `analyst.py`, and policy/state handling around the Hormuz log.
+- `youtube-intake/README.md` maps to `youtube-intake/src/youtube_intake/*.py`, the run summaries in `youtube-intake/data/analysis/`, and the state tracked in `youtube-intake/state/channels.json`.
