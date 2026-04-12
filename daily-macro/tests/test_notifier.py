@@ -13,6 +13,7 @@ from daily_macro.notifier import (
     _build_html_articles,
     load_analysis_result,
     send_analysis_summary_email,
+    send_release_warning_email,
     send_test_email,
 )
 
@@ -77,6 +78,35 @@ def _success_report() -> dict[str, object]:
         "totals": {
             "article_count": 3,
             "truncated_article_count": 1,
+        },
+        "macro_release_digest": {
+            "generated_at": "2026-04-04T06:58:00+00:00",
+            "window_start": "2026-04-04",
+            "window_end": "2026-04-10",
+            "fetch_status": "success",
+            "source": "FRED",
+            "items": [
+                {
+                    "release_id": 10,
+                    "name": "Consumer Price Index",
+                    "date": "2026-04-04",
+                    "impact": "high",
+                    "series_id": "CPIAUCSL",
+                    "display_unit": "%",
+                    "prior_value": None,
+                    "source": "FRED",
+                },
+                {
+                    "release_id": 36,
+                    "name": "Producer Price Index",
+                    "date": "2026-04-05",
+                    "impact": "medium",
+                    "series_id": "PPIACO",
+                    "display_unit": "%",
+                    "prior_value": None,
+                    "source": "FRED",
+                },
+            ],
         },
         "categories": [
             {
@@ -222,6 +252,9 @@ class NotifierTests(unittest.TestCase):
         self.assertIn("https://example.com/iran", rendered_text)
         self.assertIn("Oracle pulse headline", rendered_text)
         self.assertIn("[HIGH]", rendered_text)
+        self.assertIn("UPCOMING MACRO RELEASES", rendered_text)
+        self.assertIn("Today: Consumer Price Index [HIGH]", rendered_text)
+        self.assertIn("Tomorrow: Producer Price Index [MEDIUM]", rendered_text)
 
     def test_send_analysis_summary_email_sends_partial_with_warning(self) -> None:
         report = _success_report()
@@ -335,10 +368,27 @@ class NotifierTests(unittest.TestCase):
 
         rendered = _build_html_body(report)
 
+        self.assertIn("Upcoming Macro Releases", rendered)
+        self.assertLess(rendered.index("Upcoming Macro Releases"), rendered.index("Market Coverage"))
         self.assertIn("Market Coverage:</b> 3 analyzed / 10 scraped (30.0% success)", rendered)
         self.assertIn("Run notes", rendered)
         self.assertIn("Stored analysis report: /tmp/hkej-news-analysis.json", rendered)
         self.assertIn("Articles: 3 |", rendered)
+
+    def test_build_html_body_omits_release_digest_when_empty(self) -> None:
+        report = _success_report()
+        report["macro_release_digest"] = {
+            "generated_at": "2026-04-04T06:58:00+00:00",
+            "window_start": "2026-04-04",
+            "window_end": "2026-04-10",
+            "fetch_status": "failed",
+            "items": [],
+            "source": "FRED",
+        }
+
+        rendered = _build_html_body(report)
+
+        self.assertNotIn("Upcoming Macro Releases", rendered)
 
     def test_send_analysis_summary_email_skips_empty_categories(self) -> None:
         report = _success_report()
@@ -370,6 +420,59 @@ class NotifierTests(unittest.TestCase):
         self.assertTrue(sent)
         self.assertIn("Sent daily macro Gmail summary", message)
         self.assertEqual(len(_FakeSMTP.sent_messages), 1)
+
+    def test_send_release_warning_email_renders_prior_values(self) -> None:
+        releases = [
+            {
+                "release_id": 10,
+                "name": "Consumer Price Index",
+                "date": "2026-04-05",
+                "impact": "high",
+                "series_id": "CPIAUCSL",
+                "display_unit": "%",
+                "prior_value": "3.2%",
+                "source": "FRED",
+            },
+            {
+                "release_id": 36,
+                "name": "Producer Price Index",
+                "date": "2026-04-05",
+                "impact": "medium",
+                "series_id": "PPIACO",
+                "display_unit": "%",
+                "prior_value": None,
+                "source": "FRED",
+            },
+        ]
+
+        with patch.dict(
+            os.environ,
+            {
+                "DAILY_MACRO_GMAIL_SENDER": "sender@example.com",
+                "DAILY_MACRO_GMAIL_APP_PASSWORD": "app-password",
+                "DAILY_MACRO_GMAIL_RECIPIENT": "recipient@example.com",
+            },
+            clear=False,
+        ), patch("daily_macro.notifier._load_local_config", return_value={}), patch(
+            "daily_macro.notifier.smtplib.SMTP_SSL", _FakeSMTP
+        ):
+            sent, message = send_release_warning_email(releases)
+
+        self.assertTrue(sent)
+        self.assertIn("pre-release warning", message.lower())
+        rendered = message_from_string(_FakeSMTP.sent_messages[0]["payload"])
+        decoded_parts = []
+        for part in rendered.walk():
+            if part.get_content_maintype() == "multipart":
+                continue
+            payload = part.get_payload(decode=True)
+            if payload is None:
+                continue
+            decoded_parts.append(payload.decode(part.get_content_charset() or "utf-8"))
+        rendered_text = "\n".join(decoded_parts)
+        self.assertIn("Consumer Price Index", rendered_text)
+        self.assertIn("3.2% vs prior", rendered_text)
+        self.assertIn("n/a vs prior", rendered_text)
 
     def test_build_html_articles_sorts_iso_timestamps_newest_first_within_tier(self) -> None:
         html = _build_html_articles(

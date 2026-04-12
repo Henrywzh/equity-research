@@ -2,12 +2,14 @@ from __future__ import annotations
 
 import json
 import smtplib
+from datetime import date, timedelta
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 from pathlib import Path
 from typing import Any
 
 from .config import get_project_root
+from .release_calendar import summarize_release_intensity
 
 ATTENTION_TIER_RANK = {"high": 0, "medium": 1, "light": 2}
 
@@ -42,18 +44,40 @@ def send_analysis_summary_email(summary: dict[str, Any]) -> tuple[bool, str]:
             "or local .config equivalents."
         )
 
-    message = MIMEMultipart("alternative")
-    message["From"] = sender
-    message["To"] = recipient
-    message["Subject"] = _build_subject(summary)
-    message.attach(MIMEText(_build_plain_body(summary), "plain", "utf-8"))
-    message.attach(MIMEText(_build_html_body(summary), "html", "utf-8"))
-
-    with smtplib.SMTP_SSL("smtp.gmail.com", 465) as server:
-        server.login(sender, app_password)
-        server.sendmail(sender, recipient, message.as_string())
+    _send_email(
+        sender=sender,
+        app_password=app_password,
+        recipient=recipient,
+        subject=_build_subject(summary),
+        plain_body=_build_plain_body(summary),
+        html_body=_build_html_body(summary),
+    )
 
     return True, f"Sent daily macro Gmail summary to {recipient}."
+
+
+def send_release_warning_email(releases: list[dict[str, Any]]) -> tuple[bool, str]:
+    if not releases:
+        return False, "Skipped warning email because no qualifying releases are scheduled for tomorrow."
+
+    sender, app_password, recipient = _get_gmail_credentials()
+    if not sender or not app_password or not recipient:
+        raise RuntimeError(
+            "Gmail credentials not set. Expected either "
+            f"{GMAIL_SENDER_ENV}, {GMAIL_APP_PASSWORD_ENV}, and {GMAIL_RECIPIENT_ENV} "
+            "or local .config equivalents."
+        )
+
+    subject = _build_warning_subject(releases)
+    _send_email(
+        sender=sender,
+        app_password=app_password,
+        recipient=recipient,
+        subject=subject,
+        plain_body=_build_warning_plain_body(releases),
+        html_body=_build_warning_html_body(releases),
+    )
+    return True, f"Sent pre-release warning email to {recipient}."
 
 
 def send_test_email() -> tuple[bool, str]:
@@ -196,6 +220,27 @@ def send_test_email() -> tuple[bool, str]:
     )
 
 
+def _send_email(
+    *,
+    sender: str,
+    app_password: str,
+    recipient: str,
+    subject: str,
+    plain_body: str,
+    html_body: str,
+) -> None:
+    message = MIMEMultipart("alternative")
+    message["From"] = sender
+    message["To"] = recipient
+    message["Subject"] = subject
+    message.attach(MIMEText(plain_body, "plain", "utf-8"))
+    message.attach(MIMEText(html_body, "html", "utf-8"))
+
+    with smtplib.SMTP_SSL("smtp.gmail.com", 465) as server:
+        server.login(sender, app_password)
+        server.sendmail(sender, recipient, message.as_string())
+
+
 def _build_subject(summary: dict[str, Any]) -> str:
     report_date = summary.get("report_date") or "Unknown date"
     category_count = int((summary.get("input") or {}).get("category_count") or 0)
@@ -203,6 +248,14 @@ def _build_subject(summary: dict[str, Any]) -> str:
     status = str(summary.get("status") or "unknown").upper()
     suffix = f"[{status}] " if status != "SUCCESS" else ""
     return f"[DAILY MACRO] {suffix}{report_date} | {article_count} article(s), {category_count} categorie(s)"
+
+
+def _build_warning_subject(releases: list[dict[str, Any]]) -> str:
+    release_names = ", ".join(str(item.get("name") or "Unnamed release") for item in releases[:3])
+    if len(releases) > 3:
+        release_names += f" +{len(releases) - 3} more"
+    release_date = releases[0].get("date") or "Unknown date"
+    return f"[DAILY MACRO] Pre-release alert | {release_date} | {release_names}"
 
 
 def _build_plain_body(summary: dict[str, Any]) -> str:
@@ -218,6 +271,11 @@ def _build_plain_body(summary: dict[str, Any]) -> str:
         f"Category count: {(summary.get('input') or {}).get('category_count') or 0}",
         "",
     ]
+
+    release_digest_lines = _build_plain_release_digest(summary)
+    if release_digest_lines:
+        lines.extend(release_digest_lines)
+        lines.append("")
 
     notes = _build_run_notes(summary)
     if notes:
@@ -326,6 +384,7 @@ def _build_html_body(summary: dict[str, Any]) -> str:
     unresolved_html = _build_html_unresolved_section(summary)
     market_html = _build_html_market_section(summary)
     executive_summary_html = _build_html_executive_summary(summary)
+    release_digest_html = _build_html_release_digest(summary)
 
     daily_stats = summary.get("daily_stats") or {}
     scraped = daily_stats.get("total_scraped") or 0
@@ -347,6 +406,7 @@ def _build_html_body(summary: dict[str, Any]) -> str:
           <p style="margin:8px 0 20px;color:#4b5563;">
             Report date: {_escape_html(str(summary.get("report_date") or "Unknown"))}
           </p>
+          {release_digest_html}
           {market_coverage_html}
           {executive_summary_html}
           {notes_html}
@@ -361,6 +421,108 @@ def _build_html_body(summary: dict[str, Any]) -> str:
       </body>
     </html>
     """
+
+
+def _build_plain_release_digest(summary: dict[str, Any]) -> list[str]:
+    digest = summary.get("macro_release_digest") or {}
+    items = list(digest.get("items") or [])
+    if not items:
+        return []
+
+    report_date = _coerce_report_date(summary.get("report_date"))
+    lines = ["UPCOMING MACRO RELEASES:"]
+    for item in items:
+        label = _release_day_label(str(item.get("date") or ""), report_date)
+        lines.append(f"- {label}: {item.get('name')} [{str(item.get('impact') or '').upper()}]")
+
+    footnote = summarize_release_intensity(items)
+    if footnote:
+        lines.append(f"Note: {footnote}")
+    return lines
+
+
+def _build_html_release_digest(summary: dict[str, Any]) -> str:
+    digest = summary.get("macro_release_digest") or {}
+    items = list(digest.get("items") or [])
+    if not items:
+        return ""
+
+    report_date = _coerce_report_date(summary.get("report_date"))
+    rows = []
+    for item in items:
+        impact = str(item.get("impact") or "medium").lower()
+        color = {"high": "#dc2626", "medium": "#d97706"}.get(impact, "#6b7280")
+        date_label = _release_day_label(str(item.get("date") or ""), report_date)
+        stripe = "background:#fff7ed;" if date_label in {"Today", "Tomorrow"} else ""
+        rows.append(
+            f"<tr style='{stripe}'>"
+            f"<td style='padding:8px 12px;color:#6b7280;font-size:12px;white-space:nowrap;'>{_escape_html(date_label)}</td>"
+            f"<td style='padding:8px 12px;font-size:13px;color:#111827;'>{_escape_html(str(item.get('name') or 'Unnamed release'))}</td>"
+            f"<td style='padding:8px 12px;text-align:right;'>"
+            f"<span style='display:inline-block;padding:2px 8px;border-radius:999px;background:{color}1a;color:{color};font-size:11px;font-weight:600;text-transform:uppercase;'>"
+            f"{_escape_html(impact)}"
+            f"</span></td></tr>"
+        )
+
+    footnote = summarize_release_intensity(items)
+    footnote_html = (
+        f"<div style='margin-top:8px;font-size:12px;color:#6b7280;'>{_escape_html(footnote)}</div>" if footnote else ""
+    )
+    return (
+        "<div style='margin:0 0 18px;padding:16px;border:1px solid #e5e7eb;border-radius:12px;background:#fffbeb;'>"
+        "<div style='font-size:17px;font-weight:700;color:#111827;margin-bottom:10px;'>Upcoming Macro Releases</div>"
+        "<table style='width:100%;border-collapse:collapse;'>"
+        + "".join(rows)
+        + "</table>"
+        + footnote_html
+        + "</div>"
+    )
+
+
+def _build_warning_plain_body(releases: list[dict[str, Any]]) -> str:
+    if not releases:
+        return "No qualifying releases are scheduled for tomorrow.\n"
+
+    lines = ["PRE-RELEASE ALERT", ""]
+    for release in releases:
+        lines.extend(
+            [
+                f"{release.get('name')}",
+                f"Date: {release.get('date')}",
+                f"Impact: {str(release.get('impact') or '').upper()}",
+                f"Series: {release.get('series_id') or 'n/a'}",
+                f"Prior print: {release.get('prior_value') or 'n/a'} vs prior",
+                "",
+            ]
+        )
+    return "\n".join(lines).rstrip() + "\n"
+
+
+def _build_warning_html_body(releases: list[dict[str, Any]]) -> str:
+    cards = []
+    for release in releases:
+        impact = str(release.get("impact") or "medium").lower()
+        color = {"high": "#dc2626", "medium": "#d97706"}.get(impact, "#6b7280")
+        cards.append(
+            "<div style='margin-bottom:12px;padding:14px;border:1px solid #e5e7eb;border-radius:12px;background:#ffffff;'>"
+            f"<div style='font-size:16px;font-weight:700;color:#111827;margin-bottom:6px;'>{_escape_html(str(release.get('name') or 'Unnamed release'))}</div>"
+            f"<div style='font-size:12px;color:#6b7280;margin-bottom:8px;'>Date: {_escape_html(str(release.get('date') or 'Unknown'))}</div>"
+            "<table style='width:100%;border-collapse:collapse;font-size:13px;'>"
+            f"<tr><td style='padding:4px 0;color:#6b7280;'>Impact</td><td style='padding:4px 0;text-align:right;color:{color};font-weight:600;text-transform:uppercase;'>{_escape_html(impact)}</td></tr>"
+            f"<tr><td style='padding:4px 0;color:#6b7280;'>Series</td><td style='padding:4px 0;text-align:right;color:#111827;font-family:ui-monospace, SFMono-Regular, monospace;'>{_escape_html(str(release.get('series_id') or 'n/a'))}</td></tr>"
+            f"<tr><td style='padding:4px 0;color:#6b7280;'>Prior print</td><td style='padding:4px 0;text-align:right;color:#111827;font-weight:600;'>{_escape_html(str(release.get('prior_value') or 'n/a'))} vs prior</td></tr>"
+            "</table></div>"
+        )
+
+    return (
+        "<html><body style='margin:0;padding:24px;background:#f3f4f6;font-family:-apple-system,BlinkMacSystemFont,\"Segoe UI\",sans-serif;'>"
+        "<div style='max-width:620px;margin:0 auto;background:#fff7ed;border:1px solid #fed7aa;border-radius:16px;padding:24px;'>"
+        "<div style='font-size:12px;font-weight:700;letter-spacing:0.08em;color:#9a3412;text-transform:uppercase;margin-bottom:6px;'>Pre-release alert</div>"
+        "<div style='font-size:24px;font-weight:800;color:#111827;margin-bottom:8px;'>Tomorrow's scheduled macro releases</div>"
+        "<div style='font-size:13px;color:#6b7280;margin-bottom:16px;'>Focused warning email for next-day high and medium impact releases.</div>"
+        + "".join(cards)
+        + "</div></body></html>"
+    )
 
 
 def _build_plain_subgroup_lines(category: dict[str, Any]) -> list[str]:
@@ -897,6 +1059,28 @@ def _build_html_executive_summary(summary: dict[str, Any]) -> str:
         )
         
     return "".join(html)
+
+
+def _coerce_report_date(value: Any) -> date | None:
+    if not value:
+        return None
+    try:
+        return date.fromisoformat(str(value)[:10])
+    except ValueError:
+        return None
+
+
+def _release_day_label(date_value: str, report_date: date | None) -> str:
+    try:
+        release_date = date.fromisoformat(date_value[:10])
+    except ValueError:
+        return date_value or "Unknown"
+    if report_date is not None:
+        if release_date == report_date:
+            return "Today"
+        if release_date == report_date + timedelta(days=1):
+            return "Tomorrow"
+    return release_date.isoformat()
 
 
 def _escape_html(value: str) -> str:

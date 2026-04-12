@@ -41,3 +41,84 @@ class WatchlistConfig:
 
     def asset_class_map(self) -> dict[str, str]:
         return {t: ac for t, ac in self.symbols}
+
+
+@dataclass
+class PolymarketWatchlistEntry:
+    key: str
+    group_key: str
+    asset: str
+    horizon: str  # daily | weekly | monthly | meeting | year_end
+    title: str
+    entry_type: str  # exact_market | rolling_market
+    market_slug: str | None = None
+    event_slug: str | None = None
+    market_slug_template: str | None = None
+    event_slug_template: str | None = None
+    date_rule: str | None = None
+    selected_strikes: list[str] = field(default_factory=list)
+    source_url: str | None = None
+
+
+@dataclass
+class PolymarketWatchlistConfig:
+    entries: list[PolymarketWatchlistEntry]
+
+
+@dataclass
+class PolymarketFetchRun:
+    id: str
+    started_at: str
+    finished_at: str | None = None
+    status: str = "running"  # running | success | partial | failed
+    market_count: int = 0
+    snapshot_count: int = 0
+    error_summary: str | None = None
+
+
+@dataclass
+class PolymarketMarket:
+    market_id: str
+    event_id: str | None
+    event_slug: str | None
+    event_title: str | None
+    market_slug: str
+    question: str
+    group_key: str
+    asset: str
+    horizon: str
+    end_date: str | None
+    active: bool
+    closed: bool
+    archived: bool
+    yes_label: str | None
+    no_label: str | None
+    outcomes_json: str | None
+    outcome_prices_json: str | None
+    clob_token_ids_json: str | None
+    source_url: str | None
+    last_metadata_refresh_at: str
+
+
+@dataclass
+class PolymarketSnapshot:
+    market_id: str
+    market_slug: str
+    group_key: str
+    asset: str
+    horizon: str
+    fetched_at: str
+    bucket_hour: str
+    implied_probability: float | None
+    best_bid: float | None
+    best_ask: float | None
+    midpoint: float | None
+    spread: float | None
+    last_trade_price: float | None
+    volume: float | None
+    volume_24h: float | None
+    liquidity: float | None
+    open_interest: float | None
+    expiry_timestamp: str | None
+    market_status: str
+    error: str | None = None

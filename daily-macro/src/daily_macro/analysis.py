@@ -156,6 +156,7 @@ class AnalysisGraphState(TypedDict):
     updated_previous_report: NotRequired[dict[str, Any] | None]
     incremental: dict[str, int]
     market_context_string: str
+    macro_release_digest: dict[str, Any]
     top_alerts: list[str]
     legacy_executive_summary: list[str]
     report: dict[str, Any]
@@ -407,6 +408,7 @@ class AnalysisRuntime:
     category_budgets: dict[str, CategoryBudgetState] = field(default_factory=dict)
     provider_sessions: dict[str, requests.Session] = field(default_factory=dict)
     market_context_string: str = ""
+    macro_release_digest: dict[str, Any] = field(default_factory=dict)
 
     def __post_init__(self) -> None:
         if self.session is not None:
@@ -672,6 +674,7 @@ def run_analysis(
         "previous_day_retry_successes": 0,
         "market_context_string": "",
         "market_snapshots": [],
+        "macro_release_digest": {},
         "top_alerts": [],
         "report": {},
         "total_scraped_articles": total_scraped_articles,
@@ -744,12 +747,15 @@ def _graph_initialize(state: AnalysisGraphState) -> AnalysisGraphState:
 
 def _graph_fetch_market_data(state: AnalysisGraphState) -> AnalysisGraphState:
     from .market import build_market_context_string, fetch_market_snapshot_for_date
+    from .release_calendar import build_release_digest
 
     snapshots = fetch_market_snapshot_for_date(state["target_date"])
     state["market_context_string"] = build_market_context_string(snapshots)
     state["market_snapshots"] = snapshots
+    state["macro_release_digest"] = build_release_digest(start_date=state["target_date"], days_ahead=7, require_api_key=False)
     if state["runtime"] is not None:
         state["runtime"].market_context_string = state["market_context_string"]
+        state["runtime"].macro_release_digest = state["macro_release_digest"]
     LOGGER.info(
         "Loaded market snapshot with %d ticker(s) for %s.",
         len(snapshots),
@@ -894,7 +900,11 @@ def _graph_summarize_top_alerts(state: AnalysisGraphState) -> AnalysisGraphState
 
 def _graph_finalize(state: AnalysisGraphState) -> AnalysisGraphState:
     if not state["articles"]:
-        report = _build_empty_report(state["target_date"], incremental=state["incremental"])
+        report = _build_empty_report(
+            state["target_date"],
+            incremental=state["incremental"],
+            macro_release_digest=state.get("macro_release_digest"),
+        )
         _write_report(state["report_path"], report)
         LOGGER.info("No published articles found for %s.", state["target_date"])
         state["report"] = report
@@ -910,6 +920,7 @@ def _graph_finalize(state: AnalysisGraphState) -> AnalysisGraphState:
         incremental=state["incremental"],
         total_scraped_count=state.get("total_scraped_articles") or 0,
         market_snapshots=state.get("market_snapshots"),
+        macro_release_digest=state.get("macro_release_digest"),
         legacy_executive_summary=state.get("legacy_executive_summary"),
         newly_analyzed_keys=state.get("newly_analyzed_keys"),
     )
@@ -1605,6 +1616,7 @@ def _finalize_report(
     incremental: dict[str, int],
     total_scraped_count: int,
     market_snapshots: list[dict[str, Any]] | None = None,
+    macro_release_digest: dict[str, Any] | None = None,
     legacy_executive_summary: list[str] | None = None,
     newly_analyzed_keys: set[tuple[str | None, str]] | None = None,
 ) -> dict[str, Any]:
@@ -1660,6 +1672,7 @@ def _finalize_report(
             "analyzed": input_article_count,
             "success_rate": round((input_article_count / max(total_scraped_count, 1)) * 100, 1) if total_scraped_count > 0 else 0,
         },
+        "macro_release_digest": macro_release_digest or {},
         "unresolved_articles": unresolved_articles,
         "totals": {
             "article_count": len(all_articles),
@@ -3801,7 +3814,12 @@ def _category_model_used(article_results: list[dict[str, Any]]) -> str:
     return ",".join(sorted(model_ids))
 
 
-def _build_empty_report(target_date: str, *, incremental: dict[str, int] | None = None) -> dict[str, Any]:
+def _build_empty_report(
+    target_date: str,
+    *,
+    incremental: dict[str, int] | None = None,
+    macro_release_digest: dict[str, Any] | None = None,
+) -> dict[str, Any]:
     return {
         "report_schema_version": REPORT_SCHEMA_VERSION,
         "report_date": target_date,
@@ -3826,6 +3844,7 @@ def _build_empty_report(target_date: str, *, incremental: dict[str, int] | None 
             "retried_previous_day_articles": 0,
             "previous_day_retry_successes": 0,
         },
+        "macro_release_digest": macro_release_digest or {},
         "totals": {
             "article_count": 0,
             "successful_article_analyses": 0,

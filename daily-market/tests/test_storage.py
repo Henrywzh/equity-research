@@ -4,7 +4,13 @@ import tempfile
 from datetime import datetime, timezone
 from pathlib import Path
 
-from daily_market.models import FetchRun, PriceSnapshot
+from daily_market.models import (
+    FetchRun,
+    PolymarketFetchRun,
+    PolymarketMarket,
+    PolymarketSnapshot,
+    PriceSnapshot,
+)
 from daily_market.storage import Storage
 
 
@@ -113,3 +119,101 @@ def test_write_snapshot_json(tmp_path: Path):
     assert data["run_id"] == run.id
     assert len(data["snapshots"]) == 1
     storage.close()
+
+
+def _make_polymarket_run() -> PolymarketFetchRun:
+    return PolymarketFetchRun(
+        id="poly-run-001",
+        started_at="2026-04-12T09:00:00+00:00",
+        market_count=2,
+    )
+
+
+def _make_polymarket_market() -> PolymarketMarket:
+    return PolymarketMarket(
+        market_id="616903",
+        event_id="evt-1",
+        event_slug="how-many-fed-rate-cuts-in-2026",
+        event_title="How many Fed rate cuts in 2026?",
+        market_slug="will-1-fed-rate-cut-happen-in-2026",
+        question="Will 1 Fed rate cut happen in 2026?",
+        group_key="fed_rates",
+        asset="fed",
+        horizon="year_end",
+        end_date="2026-12-31T00:00:00Z",
+        active=True,
+        closed=False,
+        archived=False,
+        yes_label="Yes",
+        no_label="No",
+        outcomes_json='["Yes","No"]',
+        outcome_prices_json='["0.52","0.48"]',
+        clob_token_ids_json='["1","2"]',
+        source_url="https://polymarket.com/event/how-many-fed-rate-cuts-in-2026/will-1-fed-rate-cut-happen-in-2026",
+        last_metadata_refresh_at="2026-04-12T09:00:00+00:00",
+    )
+
+
+def _make_polymarket_snapshot() -> PolymarketSnapshot:
+    return PolymarketSnapshot(
+        market_id="616903",
+        market_slug="will-1-fed-rate-cut-happen-in-2026",
+        group_key="fed_rates",
+        asset="fed",
+        horizon="year_end",
+        fetched_at="2026-04-12T09:05:00+00:00",
+        bucket_hour="2026-04-12T09:00:00+00:00",
+        implied_probability=0.52,
+        best_bid=0.51,
+        best_ask=0.53,
+        midpoint=0.52,
+        spread=0.02,
+        last_trade_price=0.52,
+        volume=1234.0,
+        volume_24h=345.0,
+        liquidity=4567.0,
+        open_interest=None,
+        expiry_timestamp="2026-12-31T00:00:00Z",
+        market_status="active",
+        error=None,
+    )
+
+
+def test_polymarket_storage_round_trip():
+    with tempfile.TemporaryDirectory() as tmp:
+        storage = Storage(Path(tmp) / "test.sqlite")
+        run = _make_polymarket_run()
+        market = _make_polymarket_market()
+        snapshot = _make_polymarket_snapshot()
+
+        storage.record_polymarket_run(run)
+        storage.upsert_polymarket_markets([market])
+        storage.insert_polymarket_snapshots(run.id, [snapshot])
+        storage.update_polymarket_run(run.id, status="success", snapshot_count=1)
+
+        latest = storage.fetch_latest_polymarket_run()
+        rows = storage.fetch_polymarket_snapshots_by_run(run.id)
+        history = storage.fetch_polymarket_market_history(market.market_slug, limit=5)
+        storage.close()
+
+        assert latest is not None
+        assert latest["status"] == "success"
+        assert len(rows) == 1
+        assert rows[0]["market_slug"] == market.market_slug
+        assert len(history) == 1
+
+
+def test_polymarket_snapshot_dedupes_same_hour():
+    with tempfile.TemporaryDirectory() as tmp:
+        storage = Storage(Path(tmp) / "test.sqlite")
+        run = _make_polymarket_run()
+        market = _make_polymarket_market()
+        snapshot = _make_polymarket_snapshot()
+
+        storage.record_polymarket_run(run)
+        storage.upsert_polymarket_markets([market])
+        storage.insert_polymarket_snapshots(run.id, [snapshot, snapshot])
+        rows = storage.fetch_polymarket_snapshots_by_run(run.id)
+        storage.close()
+
+        assert len(rows) == 1

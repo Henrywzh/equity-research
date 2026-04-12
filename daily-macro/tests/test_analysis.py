@@ -349,11 +349,35 @@ class AnalysisTests(unittest.TestCase):
         self.assertEqual(slept, [2.0])
 
     def test_run_analysis_returns_empty_report_for_missing_day(self) -> None:
-        report = run_analysis(date_string="2026-04-03", data_dir=self.data_dir, db_path=self.db_path)
+        with patch(
+            "daily_macro.release_calendar.build_release_digest",
+            return_value={
+                "generated_at": "2026-04-03T00:10:00+00:00",
+                "window_start": "2026-04-03",
+                "window_end": "2026-04-09",
+                "fetch_status": "success",
+                "source": "FRED",
+                "items": [
+                    {
+                        "release_id": 10,
+                        "name": "Consumer Price Index",
+                        "date": "2026-04-04",
+                        "impact": "high",
+                        "series_id": "CPIAUCSL",
+                        "display_unit": "%",
+                        "prior_value": None,
+                        "source": "FRED",
+                    }
+                ],
+            },
+        ):
+            report = run_analysis(date_string="2026-04-03", data_dir=self.data_dir, db_path=self.db_path)
         self.assertEqual(report["status"], "empty")
         self.assertEqual(report["totals"]["article_count"], 0)
         self.assertEqual(report["diagnostics"]["batch_count"], 0)
         self.assertEqual(report["incremental"]["new_articles_analyzed"], 0)
+        self.assertEqual(report["macro_release_digest"]["fetch_status"], "success")
+        self.assertEqual(report["macro_release_digest"]["items"][0]["name"], "Consumer Price Index")
         report_path = self.data_dir / "analyses" / "2026-04-03" / "hkej-news-analysis.json"
         self.assertTrue(report_path.exists())
 

@@ -45,9 +45,17 @@ def get_summaries_dir(custom_data_dir: str | Path | None = None) -> Path:
     return get_data_dir(custom_data_dir) / "summaries"
 
 
+def get_polymarket_runs_dir(custom_data_dir: str | Path | None = None) -> Path:
+    return get_data_dir(custom_data_dir) / "polymarket_runs"
+
+
 def get_config_dir() -> Path:
     return get_project_root() / "config"
 
 
 def get_watchlist_path() -> Path:
     return get_config_dir() / "watchlist.json"
+
+
+def get_polymarket_watchlist_path() -> Path:
+    return get_config_dir() / "polymarket_watchlist.json"

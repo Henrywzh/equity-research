@@ -6,7 +6,7 @@ import logging
 
 from .analysis import run_analysis
 from .config import DEFAULT_RETENTION_DAYS, get_db_path
-from .notifier import load_analysis_result, send_analysis_summary_email, send_test_email
+from .notifier import load_analysis_result, send_analysis_summary_email, send_release_warning_email, send_test_email
 from .pipeline import cleanup_old_snapshots, run_scrape, run_smoke
 from .site import build_site
 from .storage import Storage
@@ -58,6 +58,8 @@ def build_parser() -> argparse.ArgumentParser:
     notify_parser = subparsers.add_parser("notify", help="Send a Gmail summary for a prior analysis result.")
     notify_parser.add_argument("--result-path", required=True, help="Path to the JSON analysis result.")
     notify_parser.add_argument("--preview", action="store_true", help="Print the HTML summary to stdout instead of sending email.")
+
+    subparsers.add_parser("warn-tomorrow", help="Send a release warning email for next-day macro releases.")
 
     subparsers.add_parser("test-email", help="Send a Gmail connectivity test email.")
 
@@ -174,6 +176,14 @@ def main(argv: list[str] | None = None) -> int:
             return 0
         sent, message = send_analysis_summary_email(result_data)
         print(json.dumps({"sent": sent, "message": message}, ensure_ascii=False, indent=2))
+        return 0
+
+    if args.command == "warn-tomorrow":
+        from .release_calendar import fetch_warning_releases
+
+        releases = fetch_warning_releases()
+        sent, message = send_release_warning_email(releases)
+        print(json.dumps({"sent": sent, "message": message, "release_count": len(releases)}, ensure_ascii=False, indent=2))
         return 0
 
     if args.command == "test-email":

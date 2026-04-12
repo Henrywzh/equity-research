@@ -2,15 +2,28 @@ from __future__ import annotations
 
 import json
 import uuid
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
 from pathlib import Path
 from typing import Any
 
-from .config import get_data_dir, get_db_path, get_snapshots_dir, get_summaries_dir, get_watchlist_path
+from .config import (
+    get_data_dir,
+    get_db_path,
+    get_polymarket_runs_dir,
+    get_polymarket_watchlist_path,
+    get_snapshots_dir,
+    get_summaries_dir,
+    get_watchlist_path,
+)
 from .fetcher import fetch_snapshots
 from .formatter import format_summary
 from .models import FetchRun
 from .notifier import send_market_summary
+from .polymarket import (
+    fetch_polymarket_watchlist,
+    load_polymarket_watchlist,
+    serialise_polymarket_run_payload,
+)
 from .storage import Storage
 from .watchlist import load_watchlist
 
@@ -132,3 +145,144 @@ def run_fetch(
     }
 
     return result
+
+
+def run_fetch_polymarket(
+    *,
+    watchlist_path: str | Path | None = None,
+    data_dir: str | Path | None = None,
+    db_path: str | Path | None = None,
+) -> dict[str, Any]:
+    data_dir_path = get_data_dir(data_dir)
+    db_path_resolved = get_db_path(db_path, data_dir)
+    runs_dir = get_polymarket_runs_dir(data_dir)
+    wl_path = watchlist_path or get_polymarket_watchlist_path()
+
+    watchlist = load_polymarket_watchlist(wl_path)
+    run, markets, snapshots, errors = fetch_polymarket_watchlist(watchlist)
+
+    storage = Storage(db_path_resolved)
+    storage.record_polymarket_run(run)
+    storage.upsert_polymarket_markets(markets)
+    storage.insert_polymarket_snapshots(run.id, snapshots)
+    storage.update_polymarket_run(
+        run.id,
+        finished_at=run.finished_at,
+        status=run.status,
+        snapshot_count=run.snapshot_count,
+        error_summary=run.error_summary,
+    )
+
+    payload = serialise_polymarket_run_payload(run, markets, snapshots, errors)
+    output_path = storage.write_polymarket_run_json(payload, runs_dir, run.started_at)
+    storage.close()
+
+    return {
+        "run_id": run.id,
+        "status": run.status,
+        "date": run.started_at[:10],
+        "market_count": run.market_count,
+        "snapshot_count": run.snapshot_count,
+        "error_count": len(errors),
+        "errors": errors,
+        "output_path": str(output_path),
+        "db_path": str(db_path_resolved),
+        "data_dir": str(data_dir_path),
+    }
+
+
+def inspect_polymarket(
+    *,
+    data_dir: str | Path | None = None,
+    db_path: str | Path | None = None,
+) -> dict[str, Any]:
+    storage = Storage(get_db_path(db_path, data_dir))
+    run = storage.fetch_latest_polymarket_run()
+    if not run:
+        storage.close()
+        return {"run": None, "snapshots": []}
+
+    snapshots = storage.fetch_polymarket_snapshots_by_run(run["id"])
+    storage.close()
+    return {"run": run, "snapshots": _add_probability_deltas(snapshots)}
+
+
+def query_polymarket_date(
+    date_str: str,
+    *,
+    data_dir: str | Path | None = None,
+    db_path: str | Path | None = None,
+) -> list[dict[str, Any]]:
+    storage = Storage(get_db_path(db_path, data_dir))
+    rows = storage.fetch_polymarket_snapshots_by_date(date_str)
+    storage.close()
+    return _add_probability_deltas(rows)
+
+
+def query_polymarket_group(
+    group_key: str,
+    *,
+    limit: int = 50,
+    data_dir: str | Path | None = None,
+    db_path: str | Path | None = None,
+) -> list[dict[str, Any]]:
+    storage = Storage(get_db_path(db_path, data_dir))
+    rows = storage.fetch_polymarket_group_history(group_key, limit=limit)
+    storage.close()
+    return _add_probability_deltas(rows)
+
+
+def query_polymarket_market(
+    market_ref: str,
+    *,
+    limit: int = 50,
+    data_dir: str | Path | None = None,
+    db_path: str | Path | None = None,
+) -> list[dict[str, Any]]:
+    storage = Storage(get_db_path(db_path, data_dir))
+    rows = storage.fetch_polymarket_market_history(market_ref, limit=limit)
+    storage.close()
+    return _add_probability_deltas(rows)
+
+
+def _add_probability_deltas(rows: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    if not rows:
+        return rows
+
+    enriched: list[dict[str, Any]] = []
+    for row in rows:
+        row = dict(row)
+        row["delta_1d"] = None
+        row["delta_7d"] = None
+        enriched.append(row)
+
+    by_market: dict[str, list[dict[str, Any]]] = {}
+    for row in enriched:
+        by_market.setdefault(str(row["market_id"]), []).append(row)
+
+    for market_rows in by_market.values():
+        ordered = sorted(market_rows, key=lambda item: item["fetched_at"])
+        for idx, current in enumerate(ordered):
+            current_dt = datetime.fromisoformat(current["fetched_at"])
+            current_prob = current.get("implied_probability")
+            if current_prob is None:
+                continue
+            current["delta_1d"] = _find_prior_delta(ordered[:idx], current_dt, current_prob, timedelta(days=1))
+            current["delta_7d"] = _find_prior_delta(ordered[:idx], current_dt, current_prob, timedelta(days=7))
+    return enriched
+
+
+def _find_prior_delta(
+    prior_rows: list[dict[str, Any]],
+    current_dt: datetime,
+    current_prob: float,
+    minimum_age: timedelta,
+) -> float | None:
+    for prior in reversed(prior_rows):
+        prior_prob = prior.get("implied_probability")
+        if prior_prob is None:
+            continue
+        prior_dt = datetime.fromisoformat(prior["fetched_at"])
+        if current_dt - prior_dt >= minimum_age:
+            return current_prob - prior_prob
+    return None

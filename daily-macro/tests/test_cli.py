@@ -231,6 +231,34 @@ class CliTests(unittest.TestCase):
         payload = json.loads(buffer.getvalue())
         self.assertTrue(payload["sent"])
 
+    def test_warn_tomorrow_command_outputs_json(self) -> None:
+        with patch(
+            "daily_macro.release_calendar.fetch_warning_releases",
+            return_value=[
+                {
+                    "release_id": 10,
+                    "name": "Consumer Price Index",
+                    "date": "2026-04-05",
+                    "impact": "high",
+                    "series_id": "CPIAUCSL",
+                    "prior_value": "3.2%",
+                    "display_unit": "%",
+                    "source": "FRED",
+                }
+            ],
+        ), patch(
+            "daily_macro.cli.send_release_warning_email",
+            return_value=(True, "Sent pre-release warning email to me@example.com."),
+        ):
+            buffer = io.StringIO()
+            with redirect_stdout(buffer):
+                exit_code = main(["warn-tomorrow"])
+
+        self.assertEqual(exit_code, 0)
+        payload = json.loads(buffer.getvalue())
+        self.assertTrue(payload["sent"])
+        self.assertEqual(payload["release_count"], 1)
+
     def test_local_test_runs_scrape_analyze_and_notify(self) -> None:
         with patch(
             "daily_macro.cli.run_scrape",
