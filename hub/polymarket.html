@@ -93,8 +93,8 @@
             </div>
         </div>
         
-        <div class="flex items-center gap-3 mb-6">
-            <h2 style="margin: 0;">Prediction Market Pulse</h2>
+        <div class="flex items-center gap-3 mt-12 mb-6">
+            <h2 style="margin: 0;">Market Consensus Intelligence</h2>
             <div style="height: 1px; flex: 1; background: var(--border-color); opacity: 0.5;"></div>
         </div>
 
@@ -104,7 +104,7 @@
             </div>
         </div>
 
-        <div class="flex items-center gap-3 mt-12 mb-6">
+        <div class="flex items-center gap-3 mt-24 mb-6">
             <h2 style="margin: 0;">Largest Probability Movers</h2>
             <div style="height: 1px; flex: 1; background: var(--border-color); opacity: 0.5;"></div>
             <span class="metric-label">24H Shift</span>
@@ -158,7 +158,8 @@
                         data: values,
                         borderColor: '#3b82f6',
                         borderWidth: 3,
-                        pointRadius: 0,
+                        pointRadius: 4,
+                        pointBackgroundColor: '#3b82f6',
                         pointHoverRadius: 6,
                         tension: 0.4,
                         fill: true,
@@ -188,7 +189,16 @@
                         x: {
                             type: 'category',
                             ticks: {
-                                display: false
+                                display: true,
+                                color: '#9ca3af',
+                                font: { size: 10 },
+                                maxRotation: 0,
+                                autoSkip: true,
+                                maxTicksLimit: 5,
+                                callback: function(val, index) {
+                                    const date = new Date(this.getLabelForValue(val));
+                                    return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+                                }
                             },
                             grid: { display: false }
                         },
@@ -227,7 +237,7 @@
                 
                 if (mainChart == null) {
                     updateChart('qqq');
-                } else {
+                } else if (trendData.qqq || trendData.btc) {
                     // Refresh current view if needed
                     const current = document.getElementById('btn-qqq').classList.contains('badge-muted') ? 'btc' : 'qqq';
                     updateChart(current);
