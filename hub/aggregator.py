@@ -279,8 +279,8 @@ def _parse_iso(value: Optional[str]) -> Optional[datetime]:
 
 def _load_polymarket_runs() -> List[Dict[str, object]]:
     runs: List[Dict[str, object]] = []
-    # Use rglob to find all polymarket.json files in date-partitioned folders
-    run_paths = sorted(POLYMARKET_RUNS_DIR.rglob("polymarket.json"), key=os.path.getmtime, reverse=True)
+    # Use rglob to find all run_*.json files in date-partitioned folders
+    run_paths = sorted(POLYMARKET_RUNS_DIR.rglob("*.json"), key=os.path.getmtime, reverse=True)
     for path in run_paths:
         payload = _safe_load_json(path, None)
         if not isinstance(payload, dict):

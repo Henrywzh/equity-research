@@ -151,39 +151,7 @@
                     </div>
                 </div>
 
-                <div class="card polymarket-card clickable-card" onclick="window.location.href='polymarket.html'">
-                    <div class="flex justify-between items-center mb-4">
-                        <div>
-                            <h2 style="margin: 0;">Polymarket Signals</h2>
-                            <p id="polymarket-subtitle" style="font-size: 0.82rem; color: var(--text-secondary); margin-top: 0.35rem;">Loading curated probability watchlist...</p>
-                        </div>
-                        <span id="polymarket-status-badge" class="badge">LOADING</span>
-                    </div>
 
-                    <div id="polymarket-compact">
-                        <p style="color: var(--text-muted);">Fetching latest Polymarket signals...</p>
-                    </div>
-
-                    <div class="flex justify-between items-center mt-4 pt-4 border-top" style="border-top: 1px solid var(--border-color);">
-                        <span class="metric-label" id="polymarket-updated" style="font-size: 0.7rem;">Updated: ...</span>
-                        <span class="metric-label" style="font-size: 0.72rem;">Open full Polymarket board →</span>
-                    </div>
-                </div>
-
-                <!-- Macro Calendar (FRED) Card -->
-                <div class="card">
-                    <div class="flex justify-between items-center mb-6">
-                        <div>
-                            <h2 style="margin: 0;">Macro Calendar (via FRED)</h2>
-                            <p id="fred-subtitle" style="font-size: 0.82rem; color: var(--text-secondary); margin-top: 0.35rem;">High-impact economic releases for the upcoming week</p>
-                        </div>
-                        <span id="fred-status" class="badge">LIVE</span>
-                    </div>
-                    <div id="fred-list" class="flex flex-col gap-4">
-                        <p style="color: var(--text-muted);">Fetching economic releases...</p>
-                    </div>
-                </div>
-                
                 <!-- Market Analysis Card -->
                 <div class="card">
                     <h2 class="mb-4">Market Analysis</h2>
@@ -193,8 +161,41 @@
                 </div>
             </div>
 
-            <!-- Sidebar: SIGINT Detail -->
+            <!-- Sidebar: Pulse & Intelligence Detail -->
             <div class="flex flex-col gap-6">
+                <!-- Polymarket Signals -->
+                <div class="card polymarket-card clickable-card" onclick="window.location.href='polymarket.html'">
+                    <div class="flex justify-between items-center mb-4">
+                        <div>
+                            <h2 style="margin: 0;">Polymarket Signals</h2>
+                            <p id="polymarket-subtitle" style="font-size: 0.82rem; color: var(--text-secondary); margin-top: 0.35rem;">Loading probability watchlist...</p>
+                        </div>
+                        <span id="polymarket-status-badge" class="badge">LOADING</span>
+                    </div>
+
+                    <div id="polymarket-compact">
+                        <p style="color: var(--text-muted);">Syncing signals...</p>
+                    </div>
+
+                    <div class="flex justify-between items-center mt-4 pt-4 border-top" style="border-top: 1px solid var(--border-color);">
+                        <span class="metric-label" id="polymarket-updated" style="font-size: 0.7rem;">Updated: ...</span>
+                        <span class="metric-label" style="font-size: 0.72rem;">Full board →</span>
+                    </div>
+                </div>
+
+                <!-- Macro Calendar (FRED) Card -->
+                <div class="card">
+                    <div class="flex justify-between items-center mb-4">
+                        <div>
+                            <h2 style="margin: 0;">Macro Calendar</h2>
+                            <p id="fred-subtitle" style="font-size: 0.72rem; color: var(--text-secondary); margin-top: 0.25rem;">Upcoming high-impact events</p>
+                        </div>
+                        <span id="fred-status" class="badge">LIVE</span>
+                    </div>
+                    <div id="fred-list" class="flex flex-col gap-3">
+                        <p style="color: var(--text-muted);">Syncing releases...</p>
+                    </div>
+                </div>
                 <div class="card">
                     <h2 class="mb-4">YouTube Intelligence Highlights</h2>
                     <div id="youtube-list" class="flex flex-col gap-4">

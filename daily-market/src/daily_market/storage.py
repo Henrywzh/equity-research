@@ -470,10 +470,19 @@ class Storage:
         out_dir: Path,
         started_at: str,
     ) -> Path:
+        from datetime import datetime
+        
         date_str = started_at[:10]
+        try:
+            dt = datetime.fromisoformat(started_at)
+            time_str = dt.strftime("%H%M%S")
+        except ValueError:
+            time_str = "latest"
+            
         target_dir = out_dir / date_str
         target_dir.mkdir(parents=True, exist_ok=True)
-        out_path = target_dir / "polymarket.json"
+        out_path = target_dir / f"run_{time_str}.json"
+        
         out_path.write_text(json.dumps(payload, indent=2, ensure_ascii=False), encoding="utf-8")
         return out_path
 
