@@ -1,15 +1,15 @@
 {
   "report_schema_version": 6,
   "report_date": "2026-04-12",
-  "generated_at": "2026-04-12T08:04:20.866925+00:00",
+  "generated_at": "2026-04-12T22:24:04.039038+00:00",
   "source_site": "hkej",
-  "status": "success",
-  "executive_summary": [
+  "status": "partial",
+  "executive_summary": [],
+  "legacy_executive_summary": [
     "軟銀、NEC、本田及索尼合組新公司，發展人工智能(AI)，分別持有10%股權。",
     "新公司計劃招聘約100名AI開發人員，軟銀和NEC將專注於基礎AI模型開發。",
     "日本製鐵、三菱UFJ等企業亦將作為少數股東，所開發的AI模型將對日本企業開放。"
   ],
-  "legacy_executive_summary": [],
   "model": {
     "provider": "groq",
     "primary_model": "meta-llama/llama-4-scout-17b-16e-instruct",
@@ -20,18 +20,18 @@
   },
   "model_switches": [],
   "input": {
-    "article_count": 23,
-    "category_count": 3
+    "article_count": 39,
+    "category_count": 5
   },
   "diagnostics": {
-    "rate_limit_wait_count": 0,
-    "rate_limit_wait_seconds_total": 0.0,
+    "rate_limit_wait_count": 1,
+    "rate_limit_wait_seconds_total": 2246.4,
     "fallback_switch_count": 0,
     "key_rotation_count": 0,
-    "pre_send_split_count": 5,
+    "pre_send_split_count": 13,
     "response_413_split_count": 0,
     "json_repair_retry_count": 0,
-    "batch_count": 17,
+    "batch_count": 28,
     "failed_batch_count": 0,
     "delayed_retry_candidate_count": 0,
     "delayed_retry_attempted_count": 0,
@@ -40,65 +40,179 @@
     "high_medium_unresolved_count": 0,
     "light_unresolved_count": 0,
     "delayed_retry_skipped_final_model_count": 0,
-    "synthesis_budget_exhausted_count": 0,
+    "synthesis_budget_exhausted_count": 1,
     "degraded_merge_count": 0
   },
   "incremental": {
-    "reused_successful_articles": 0,
-    "new_articles_analyzed": 23,
+    "reused_successful_articles": 23,
+    "new_articles_analyzed": 16,
     "retried_previous_day_articles": 0,
     "previous_day_retry_successes": 0
   },
   "daily_stats": {
-    "total_scraped": 23,
-    "analyzed": 23,
+    "total_scraped": 39,
+    "analyzed": 39,
     "success_rate": 100.0
+  },
+  "macro_release_digest": {
+    "generated_at": "2026-04-12T21:45:08.071923+00:00",
+    "window_start": "2026-04-12",
+    "window_end": "2026-04-18",
+    "fetch_status": "failed",
+    "items": [],
+    "source": "FRED",
+    "error_message": "HTTPSConnectionPool(host='api.stlouisfed.org', port=443): Read timed out. (read timeout=10)"
   },
   "unresolved_articles": [],
   "totals": {
-    "article_count": 23,
-    "successful_article_analyses": 23,
+    "article_count": 39,
+    "successful_article_analyses": 39,
     "failed_article_analyses": 0,
-    "full_text_article_count": 23,
+    "full_text_article_count": 39,
     "truncated_article_count": 0,
-    "successful_categories": 3,
-    "partial_categories": 0,
+    "successful_categories": 4,
+    "partial_categories": 1,
     "failed_categories": 0
   },
   "market_context": [],
   "categories": [
     {
       "category": "國際財經",
-      "article_count": 1,
+      "article_count": 3,
       "status": "success",
       "key_developments": [
-        "軟銀、NEC、本田及索尼合組新公司，發展人工智能(AI)，分別持有10%股權。",
-        "新公司計劃招聘約100名AI開發人員，軟銀和NEC將專注於基礎AI模型開發。",
-        "日本製鐵、三菱UFJ等企業亦將作為少數股東，所開發的AI模型將對日本企業開放。"
+        "日本經濟產業大臣赤澤亮正表示央行貨幣政策可能有助於提振日圓，抑制通脹。",
+        "日本軟銀、NEC、本田及索尼合組新公司，發展人工智能(AI)，分別持有10%股權。",
+        "如果日圓升值約10%至15%，將有效抑制經濟領域的物價上漲。",
+        "XChat將於4月17日正式登陸蘋果App Store。"
       ],
       "named_entities": [
+        {
+          "name": "赤澤亮正",
+          "type": "person"
+        },
+        {
+          "name": "日本央行",
+          "type": "institution"
+        },
         {
           "name": "SoftBank",
           "type": "company"
         },
         {
-          "name": "NEC",
-          "type": "company"
+          "name": "馬斯克",
+          "type": "person"
         },
         {
-          "name": "Honda",
-          "type": "company"
-        },
-        {
-          "name": "Sony",
-          "type": "company"
-        },
-        {
-          "name": "Nippon Steel",
-          "type": "company"
+          "name": "日圓",
+          "type": "asset"
         }
       ],
       "articles": [
+        {
+          "source_article_id": "4369705",
+          "title": "日本經濟產業大臣:央行貨幣政策提振日圓或是遏制通脹選項",
+          "canonical_url": "https://www.hkej.com/instantnews/international/article/4369705/%E6%97%A5%E6%9C%AC%E7%B6%93%E6%BF%9F%E7%94%A2%E6%A5%AD%E5%A4%A7%E8%87%A3%3A%E5%A4%AE%E8%A1%8C%E8%B2%A8%E5%B9%A3%E6%94%BF%E7%AD%96%E6%8F%90%E6%8C%AF%E6%97%A5%E5%9C%93%E6%88%96%E6%98%AF%E9%81%8F%E5%88%B6%E9%80%9A%E8%84%B9%E9%81%B8%E9%A0%85",
+          "published_at": "2026-04-12T19:47:00+08:00",
+          "section": "國際財經",
+          "novelty_score": 6,
+          "relevance_score": 8,
+          "urgency_score": 7,
+          "named_entities": [
+            {
+              "name": "赤澤亮正",
+              "type": "person"
+            },
+            {
+              "name": "日本央行",
+              "type": "institution"
+            },
+            {
+              "name": "第一生命經濟研究所",
+              "type": "institution"
+            },
+            {
+              "name": "Hideo Kumano",
+              "type": "person"
+            },
+            {
+              "name": "日圓",
+              "type": "asset"
+            }
+          ],
+          "key_points": [
+            "日本經濟產業大臣赤澤亮正表示央行貨幣政策可能有助於提振日圓，抑制通脹。",
+            "日本央行考慮加息以應對伊朗戰爭引發的通脹壓力。",
+            "如果日圓升值約10%至15%，將有效抑制經濟領域的物價上漲。"
+          ],
+          "content_truncated": false,
+          "original_content_length_chars": 260,
+          "analyzed_content_length_chars": 260,
+          "original_content_token_estimate": 65,
+          "analyzed_content_token_estimate": 65,
+          "truncation_reason": null,
+          "analysis_method": "full_text",
+          "attention_tier": "high",
+          "theme": "macro",
+          "attention_reason": "High-signal macro headline based on title/summary keywords.",
+          "must_keep": true,
+          "model_used": "meta-llama/llama-4-scout-17b-16e-instruct",
+          "delayed_retry_attempted": false,
+          "delayed_retry_model_chain": [],
+          "delayed_retry_final_model": null,
+          "error_classification": null,
+          "error": null
+        },
+        {
+          "source_article_id": "4369685",
+          "title": "馬斯克XChat周五登陸App Store",
+          "canonical_url": "https://www.hkej.com/instantnews/international/article/4369685/%E9%A6%AC%E6%96%AF%E5%85%8BXChat%E5%91%A8%E4%BA%94%E7%99%BB%E9%99%B8App+Store",
+          "published_at": "2026-04-12T16:50:00+08:00",
+          "section": "國際財經",
+          "novelty_score": 6,
+          "relevance_score": 5,
+          "urgency_score": 4,
+          "named_entities": [
+            {
+              "name": "馬斯克",
+              "type": "person"
+            },
+            {
+              "name": "X公司",
+              "type": "company"
+            },
+            {
+              "name": "蘋果",
+              "type": "company"
+            },
+            {
+              "name": "App Store",
+              "type": "institution"
+            }
+          ],
+          "key_points": [
+            "XChat將於4月17日正式登陸蘋果App Store。",
+            "XChat承諾提供私密、專注的對話環境，不包含廣告且不追蹤用戶活動。",
+            "消息傳輸採用端到端加密技術。"
+          ],
+          "content_truncated": false,
+          "original_content_length_chars": 203,
+          "analyzed_content_length_chars": 203,
+          "original_content_token_estimate": 51,
+          "analyzed_content_token_estimate": 51,
+          "truncation_reason": null,
+          "analysis_method": "full_text",
+          "attention_tier": "medium",
+          "theme": "general",
+          "attention_reason": "Default medium attention because the story is relevant but not an obvious top-priority market mover.",
+          "must_keep": false,
+          "model_used": "meta-llama/llama-4-scout-17b-16e-instruct",
+          "delayed_retry_attempted": false,
+          "delayed_retry_model_chain": [],
+          "delayed_retry_final_model": null,
+          "error_classification": null,
+          "error": null
+        },
         {
           "source_article_id": "4369663",
           "title": "AI丨軟銀傳夥索尼等多間日企組新公司拓AI",
@@ -158,35 +272,140 @@
         {
           "title": "國際財經 overview",
           "theme_rationale": "Single subgroup because the category size did not require thematic splitting.",
-          "article_count": 1,
+          "article_count": 3,
           "key_developments": [
-            "軟銀、NEC、本田及索尼合組新公司，發展人工智能(AI)，分別持有10%股權。",
-            "新公司計劃招聘約100名AI開發人員，軟銀和NEC將專注於基礎AI模型開發。",
-            "日本製鐵、三菱UFJ等企業亦將作為少數股東，所開發的AI模型將對日本企業開放。"
+            "日本經濟產業大臣赤澤亮正表示央行貨幣政策可能有助於提振日圓，抑制通脹。",
+            "日本軟銀、NEC、本田及索尼合組新公司，發展人工智能(AI)，分別持有10%股權。",
+            "如果日圓升值約10%至15%，將有效抑制經濟領域的物價上漲。",
+            "XChat將於4月17日正式登陸蘋果App Store。"
           ],
           "named_entities": [
+            {
+              "name": "赤澤亮正",
+              "type": "person"
+            },
+            {
+              "name": "日本央行",
+              "type": "institution"
+            },
             {
               "name": "SoftBank",
               "type": "company"
             },
             {
-              "name": "NEC",
-              "type": "company"
+              "name": "馬斯克",
+              "type": "person"
             },
             {
-              "name": "Honda",
-              "type": "company"
-            },
-            {
-              "name": "Sony",
-              "type": "company"
-            },
-            {
-              "name": "Nippon Steel",
-              "type": "company"
+              "name": "日圓",
+              "type": "asset"
             }
           ],
           "articles": [
+            {
+              "source_article_id": "4369705",
+              "title": "日本經濟產業大臣:央行貨幣政策提振日圓或是遏制通脹選項",
+              "canonical_url": "https://www.hkej.com/instantnews/international/article/4369705/%E6%97%A5%E6%9C%AC%E7%B6%93%E6%BF%9F%E7%94%A2%E6%A5%AD%E5%A4%A7%E8%87%A3%3A%E5%A4%AE%E8%A1%8C%E8%B2%A8%E5%B9%A3%E6%94%BF%E7%AD%96%E6%8F%90%E6%8C%AF%E6%97%A5%E5%9C%93%E6%88%96%E6%98%AF%E9%81%8F%E5%88%B6%E9%80%9A%E8%84%B9%E9%81%B8%E9%A0%85",
+              "published_at": "2026-04-12T19:47:00+08:00",
+              "section": "國際財經",
+              "novelty_score": 6,
+              "relevance_score": 8,
+              "urgency_score": 7,
+              "named_entities": [
+                {
+                  "name": "赤澤亮正",
+                  "type": "person"
+                },
+                {
+                  "name": "日本央行",
+                  "type": "institution"
+                },
+                {
+                  "name": "第一生命經濟研究所",
+                  "type": "institution"
+                },
+                {
+                  "name": "Hideo Kumano",
+                  "type": "person"
+                },
+                {
+                  "name": "日圓",
+                  "type": "asset"
+                }
+              ],
+              "key_points": [
+                "日本經濟產業大臣赤澤亮正表示央行貨幣政策可能有助於提振日圓，抑制通脹。",
+                "日本央行考慮加息以應對伊朗戰爭引發的通脹壓力。",
+                "如果日圓升值約10%至15%，將有效抑制經濟領域的物價上漲。"
+              ],
+              "content_truncated": false,
+              "original_content_length_chars": 260,
+              "analyzed_content_length_chars": 260,
+              "original_content_token_estimate": 65,
+              "analyzed_content_token_estimate": 65,
+              "truncation_reason": null,
+              "analysis_method": "full_text",
+              "attention_tier": "high",
+              "theme": "macro",
+              "attention_reason": "High-signal macro headline based on title/summary keywords.",
+              "must_keep": true,
+              "model_used": "meta-llama/llama-4-scout-17b-16e-instruct",
+              "delayed_retry_attempted": false,
+              "delayed_retry_model_chain": [],
+              "delayed_retry_final_model": null,
+              "error_classification": null,
+              "error": null
+            },
+            {
+              "source_article_id": "4369685",
+              "title": "馬斯克XChat周五登陸App Store",
+              "canonical_url": "https://www.hkej.com/instantnews/international/article/4369685/%E9%A6%AC%E6%96%AF%E5%85%8BXChat%E5%91%A8%E4%BA%94%E7%99%BB%E9%99%B8App+Store",
+              "published_at": "2026-04-12T16:50:00+08:00",
+              "section": "國際財經",
+              "novelty_score": 6,
+              "relevance_score": 5,
+              "urgency_score": 4,
+              "named_entities": [
+                {
+                  "name": "馬斯克",
+                  "type": "person"
+                },
+                {
+                  "name": "X公司",
+                  "type": "company"
+                },
+                {
+                  "name": "蘋果",
+                  "type": "company"
+                },
+                {
+                  "name": "App Store",
+                  "type": "institution"
+                }
+              ],
+              "key_points": [
+                "XChat將於4月17日正式登陸蘋果App Store。",
+                "XChat承諾提供私密、專注的對話環境，不包含廣告且不追蹤用戶活動。",
+                "消息傳輸採用端到端加密技術。"
+              ],
+              "content_truncated": false,
+              "original_content_length_chars": 203,
+              "analyzed_content_length_chars": 203,
+              "original_content_token_estimate": 51,
+              "analyzed_content_token_estimate": 51,
+              "truncation_reason": null,
+              "analysis_method": "full_text",
+              "attention_tier": "medium",
+              "theme": "general",
+              "attention_reason": "Default medium attention because the story is relevant but not an obvious top-priority market mover.",
+              "must_keep": false,
+              "model_used": "meta-llama/llama-4-scout-17b-16e-instruct",
+              "delayed_retry_attempted": false,
+              "delayed_retry_model_chain": [],
+              "delayed_retry_final_model": null,
+              "error_classification": null,
+              "error": null
+            },
             {
               "source_article_id": "4369663",
               "title": "AI丨軟銀傳夥索尼等多間日企組新公司拓AI",
@@ -247,15 +466,15 @@
       ],
       "analysis_profile": "standard",
       "model_used": "meta-llama/llama-4-scout-17b-16e-instruct",
-      "sub_batch_count": 2,
+      "sub_batch_count": 4,
       "diagnostics": {
-        "sub_batch_count": 1,
+        "sub_batch_count": 4,
         "split_reasons": [],
         "models_attempted": [
           "meta-llama/llama-4-scout-17b-16e-instruct"
         ],
-        "estimated_input_tokens_max": 684,
-        "serialized_request_bytes_max": 4058,
+        "estimated_input_tokens_max": 693,
+        "serialized_request_bytes_max": 3635,
         "rate_limit_waits": 0,
         "partial_article_count": 0,
         "synthesis_wait_seconds_total": 0.0,
@@ -271,8 +490,8 @@
     },
     {
       "category": "時事脈搏",
-      "article_count": 21,
-      "status": "success",
+      "article_count": 28,
+      "status": "partial",
       "key_developments": [],
       "named_entities": [
         {
@@ -294,6 +513,205 @@
       ],
       "articles": [
         {
+          "source_article_id": "4369715",
+          "title": "伊朗局勢丨特朗普:美海軍即時封鎖所有進出霍爾木茲海峽船隻",
+          "canonical_url": "https://www.hkej.com/instantnews/current/article/4369715/%E4%BC%8A%E6%9C%97%E5%B1%80%E5%8B%A2%E4%B8%A8%E7%89%B9%E6%9C%97%E6%99%AE%3A%E7%BE%8E%E6%B5%B7%E8%BB%8D%E5%8D%B3%E6%99%82%E5%B0%81%E9%8E%96%E6%89%80%E6%9C%89%E9%80%B2%E5%87%BA%E9%9C%8D%E7%88%BE%E6%9C%A8%E8%8C%B2%E6%B5%B7%E5%B3%BD%E8%88%B9%E9%9A%BB",
+          "published_at": "2026-04-12T21:29:00+08:00",
+          "section": "時事脈搏",
+          "novelty_score": 8,
+          "relevance_score": 9,
+          "urgency_score": 9,
+          "named_entities": [
+            {
+              "name": "伊朗",
+              "type": "country"
+            },
+            {
+              "name": "特朗普",
+              "type": "person"
+            },
+            {
+              "name": "美國海軍",
+              "type": "organization"
+            },
+            {
+              "name": "霍爾木茲海峽",
+              "type": "other"
+            }
+          ],
+          "key_points": [
+            "美國總統特朗普指示美國海軍即時開始對所有試圖進出霍爾木茲海峽的船隻實施封鎖。",
+            "美方將會開始摧毀伊朗在霍爾木茲海峽布設的水雷，若伊朗向美方或和平船隻開火，都會被炸進地獄。"
+          ],
+          "content_truncated": false,
+          "original_content_length_chars": 209,
+          "analyzed_content_length_chars": 209,
+          "original_content_token_estimate": 53,
+          "analyzed_content_token_estimate": 53,
+          "truncation_reason": null,
+          "analysis_method": "full_text",
+          "attention_tier": "high",
+          "theme": "geopolitics",
+          "attention_reason": "High-signal geopolitics headline based on title/summary keywords.",
+          "must_keep": true,
+          "model_used": "meta-llama/llama-4-scout-17b-16e-instruct",
+          "delayed_retry_attempted": false,
+          "delayed_retry_model_chain": [],
+          "delayed_retry_final_model": null,
+          "error_classification": null,
+          "error": null
+        },
+        {
+          "source_article_id": "4369713",
+          "canonical_url": "https://www.hkej.com/instantnews/current/article/4369713/%E9%86%AB%E7%AE%A1%E5%B1%80%E5%B0%8D%E4%BD%95%E8%B6%85%E8%95%B8%E9%80%9D%E4%B8%96%E6%B7%B1%E8%A1%A8%E5%93%80%E6%82%BC",
+          "title": "醫管局對何超蕸逝世深表哀悼",
+          "section": "時事脈搏",
+          "published_at": "2026-04-12T21:12:00+08:00",
+          "attention_tier": "light",
+          "novelty_score": 5,
+          "relevance_score": 5,
+          "urgency_score": 5,
+          "named_entities": [],
+          "key_points": [],
+          "content_truncated": false,
+          "analysis_method": "bypassed",
+          "model_used": "direct"
+        },
+        {
+          "source_article_id": "4369706",
+          "canonical_url": "https://www.hkej.com/instantnews/current/article/4369706/%E7%B4%90%E7%B4%847%E6%AD%B2%E8%8F%AF%E8%A3%94%E5%A5%B3%E7%AB%A5%E7%8D%B2%E6%9F%AF%E8%92%82%E6%96%AF%E9%9F%B3%E6%A8%82%E5%AD%B8%E9%99%A2%E5%8F%96%E9%8C%84+%E6%88%90%E8%A9%B2%E6%A0%A1%E7%99%BE%E5%B9%B4%E6%9C%80%E5%B9%B4%E8%BC%95%E5%AD%B8%E7%94%9F",
+          "title": "紐約7歲華裔女童獲柯蒂斯音樂學院取錄 成該校百年最年輕學生",
+          "section": "時事脈搏",
+          "published_at": "2026-04-12T20:04:00+08:00",
+          "attention_tier": "light",
+          "novelty_score": 5,
+          "relevance_score": 5,
+          "urgency_score": 5,
+          "named_entities": [],
+          "key_points": [],
+          "content_truncated": false,
+          "analysis_method": "bypassed",
+          "model_used": "direct"
+        },
+        {
+          "source_article_id": "4369701",
+          "canonical_url": "https://www.hkej.com/instantnews/current/article/4369701/%E6%B5%B7%E5%9C%B0%E7%99%BC%E7%94%9F%E4%BA%BA%E8%B8%A9%E4%BA%BA%E4%BA%8B%E4%BB%B6+%E6%9C%80%E5%B0%9130%E6%AD%BB%E6%95%B8%E5%8D%81%E5%82%B7",
+          "title": "海地發生人踩人事件 最少30死數十傷",
+          "section": "時事脈搏",
+          "published_at": "2026-04-12T19:36:00+08:00",
+          "attention_tier": "light",
+          "novelty_score": 5,
+          "relevance_score": 5,
+          "urgency_score": 5,
+          "named_entities": [],
+          "key_points": [],
+          "content_truncated": false,
+          "analysis_method": "bypassed",
+          "model_used": "direct"
+        },
+        {
+          "source_article_id": "4369699",
+          "title": "美伊談判丨伊朗議長:美國未能贏得伊朗信任",
+          "canonical_url": "https://www.hkej.com/instantnews/current/article/4369699/%E7%BE%8E%E4%BC%8A%E8%AB%87%E5%88%A4%E4%B8%A8%E4%BC%8A%E6%9C%97%E8%AD%B0%E9%95%B7%3A%E7%BE%8E%E5%9C%8B%E6%9C%AA%E8%83%BD%E8%B4%8F%E5%BE%97%E4%BC%8A%E6%9C%97%E4%BF%A1%E4%BB%BB",
+          "published_at": "2026-04-12T18:43:00+08:00",
+          "section": "時事脈搏",
+          "novelty_score": 7,
+          "relevance_score": 8,
+          "urgency_score": 8,
+          "named_entities": [
+            {
+              "name": "伊朗",
+              "type": "country"
+            },
+            {
+              "name": "美國",
+              "type": "country"
+            },
+            {
+              "name": "卡利巴夫",
+              "type": "person"
+            }
+          ],
+          "key_points": [
+            "伊朗國會議長卡利巴夫表示，美方最終未能贏得伊朗的信任。",
+            "美伊在巴基斯坦的談判未能達成協議，雙方代表團均已回國。"
+          ],
+          "content_truncated": false,
+          "original_content_length_chars": 203,
+          "analyzed_content_length_chars": 203,
+          "original_content_token_estimate": 51,
+          "analyzed_content_token_estimate": 51,
+          "truncation_reason": null,
+          "analysis_method": "full_text",
+          "attention_tier": "high",
+          "theme": "geopolitics",
+          "attention_reason": "High-signal geopolitics headline based on title/summary keywords.",
+          "must_keep": true,
+          "model_used": "meta-llama/llama-4-scout-17b-16e-instruct",
+          "delayed_retry_attempted": false,
+          "delayed_retry_model_chain": [],
+          "delayed_retry_final_model": null,
+          "error_classification": null,
+          "error": null
+        },
+        {
+          "source_article_id": "4369688",
+          "title": "滬港數字合作工作組舉行首次年度會議",
+          "canonical_url": "https://www.hkej.com/instantnews/current/article/4369688/%E6%BB%AC%E6%B8%AF%E6%95%B8%E5%AD%97%E5%90%88%E4%BD%9C%E5%B7%A5%E4%BD%9C%E7%B5%84%E8%88%89%E8%A1%8C%E9%A6%96%E6%AC%A1%E5%B9%B4%E5%BA%A6%E6%9C%83%E8%AD%B0",
+          "published_at": "2026-04-12T17:55:00+08:00",
+          "section": "時事脈搏",
+          "novelty_score": 6,
+          "relevance_score": 7,
+          "urgency_score": 6,
+          "named_entities": [
+            {
+              "name": "滬港數字合作工作組",
+              "type": "organization"
+            },
+            {
+              "name": "張宜偉",
+              "type": "person"
+            }
+          ],
+          "key_points": [
+            "滬港數字合作工作組舉行首次年度會議，持續深化滬港兩地在數字政務、數據要素、企業服務、產學研協同等領域的合作。",
+            "雙方並檢視了滬港兩地數字經濟協同發展、數字身分認證及科創人才培養交流等6個工作領域。"
+          ],
+          "content_truncated": false,
+          "original_content_length_chars": 345,
+          "analyzed_content_length_chars": 345,
+          "original_content_token_estimate": 87,
+          "analyzed_content_token_estimate": 87,
+          "truncation_reason": null,
+          "analysis_method": "full_text",
+          "attention_tier": "high",
+          "theme": "macro",
+          "attention_reason": "High-signal macro headline based on title/summary keywords.",
+          "must_keep": true,
+          "model_used": "meta-llama/llama-4-scout-17b-16e-instruct",
+          "delayed_retry_attempted": false,
+          "delayed_retry_model_chain": [],
+          "delayed_retry_final_model": null,
+          "error_classification": null,
+          "error": null
+        },
+        {
+          "source_article_id": "4369686",
+          "canonical_url": "https://www.hkej.com/instantnews/current/article/4369686/%E7%BE%8E%E4%BC%8A%E8%AB%87%E5%88%A4%E4%B8%A8%E7%BE%8E%E5%AA%92%E6%8C%87%E8%AB%87%E5%88%A4%E6%9C%AA%E9%81%94%E5%8D%94%E8%AD%B0%E5%9B%A0%E4%B8%89%E5%A4%A7%E7%99%A5%E7%B5%90",
+          "title": "美伊談判丨美媒指談判未達協議因三大癥結",
+          "section": "時事脈搏",
+          "published_at": "2026-04-12T17:33:00+08:00",
+          "attention_tier": "light",
+          "novelty_score": 5,
+          "relevance_score": 5,
+          "urgency_score": 5,
+          "named_entities": [],
+          "key_points": [],
+          "content_truncated": false,
+          "analysis_method": "bypassed",
+          "model_used": "direct"
+        },
+        {
           "source_article_id": "4369683",
           "canonical_url": "https://www.hkej.com/instantnews/current/article/4369683/%E9%84%AD%E9%BA%97%E6%96%87%E7%B5%90%E6%9D%9F%E5%85%A7%E5%9C%B0%E5%8F%83%E8%A8%AA%E8%A1%8C%E7%A8%8B+%E8%BF%94%E5%9B%9E%E5%8F%B0%E7%81%A3",
           "title": "鄭麗文結束內地參訪行程 返回台灣",
@@ -307,7 +725,10 @@
           "key_points": [],
           "content_truncated": false,
           "analysis_method": "bypassed",
-          "model_used": "direct"
+          "model_used": "direct",
+          "theme": "general",
+          "attention_reason": "Lighter treatment because this story sits in the 時事脈搏 section without strong market-moving signals.",
+          "must_keep": false
         },
         {
           "source_article_id": "4369681",
@@ -323,7 +744,10 @@
           "key_points": [],
           "content_truncated": false,
           "analysis_method": "bypassed",
-          "model_used": "direct"
+          "model_used": "direct",
+          "theme": "general",
+          "attention_reason": "Lighter treatment because this story sits in the 時事脈搏 section without strong market-moving signals.",
+          "must_keep": false
         },
         {
           "source_article_id": "4369680",
@@ -339,7 +763,10 @@
           "key_points": [],
           "content_truncated": false,
           "analysis_method": "bypassed",
-          "model_used": "direct"
+          "model_used": "direct",
+          "theme": "general",
+          "attention_reason": "Lighter treatment because this story sits in the 時事脈搏 section without strong market-moving signals.",
+          "must_keep": false
         },
         {
           "source_article_id": "4369679",
@@ -404,7 +831,10 @@
           "key_points": [],
           "content_truncated": false,
           "analysis_method": "bypassed",
-          "model_used": "direct"
+          "model_used": "direct",
+          "theme": "general",
+          "attention_reason": "Lighter treatment because this story sits in the 時事脈搏 section without strong market-moving signals.",
+          "must_keep": false
         },
         {
           "source_article_id": "4369675",
@@ -420,7 +850,10 @@
           "key_points": [],
           "content_truncated": false,
           "analysis_method": "bypassed",
-          "model_used": "direct"
+          "model_used": "direct",
+          "theme": "general",
+          "attention_reason": "Lighter treatment because this story sits in the 時事脈搏 section without strong market-moving signals.",
+          "must_keep": false
         },
         {
           "source_article_id": "4369673",
@@ -436,7 +869,10 @@
           "key_points": [],
           "content_truncated": false,
           "analysis_method": "bypassed",
-          "model_used": "direct"
+          "model_used": "direct",
+          "theme": "general",
+          "attention_reason": "Lighter treatment because this story sits in the 時事脈搏 section without strong market-moving signals.",
+          "must_keep": false
         },
         {
           "source_article_id": "4369674",
@@ -452,7 +888,10 @@
           "key_points": [],
           "content_truncated": false,
           "analysis_method": "bypassed",
-          "model_used": "direct"
+          "model_used": "direct",
+          "theme": "general",
+          "attention_reason": "Lighter treatment because this story sits in the 時事脈搏 section without strong market-moving signals.",
+          "must_keep": false
         },
         {
           "source_article_id": "4369672",
@@ -513,7 +952,10 @@
           "key_points": [],
           "content_truncated": false,
           "analysis_method": "bypassed",
-          "model_used": "direct"
+          "model_used": "direct",
+          "theme": "general",
+          "attention_reason": "Lighter treatment because this story sits in the 時事脈搏 section without strong market-moving signals.",
+          "must_keep": false
         },
         {
           "source_article_id": "4369670",
@@ -529,7 +971,10 @@
           "key_points": [],
           "content_truncated": false,
           "analysis_method": "bypassed",
-          "model_used": "direct"
+          "model_used": "direct",
+          "theme": "general",
+          "attention_reason": "Lighter treatment because this story sits in the 時事脈搏 section without strong market-moving signals.",
+          "must_keep": false
         },
         {
           "source_article_id": "4369668",
@@ -545,7 +990,10 @@
           "key_points": [],
           "content_truncated": false,
           "analysis_method": "bypassed",
-          "model_used": "direct"
+          "model_used": "direct",
+          "theme": "general",
+          "attention_reason": "Lighter treatment because this story sits in the 時事脈搏 section without strong market-moving signals.",
+          "must_keep": false
         },
         {
           "source_article_id": "4369669",
@@ -561,7 +1009,10 @@
           "key_points": [],
           "content_truncated": false,
           "analysis_method": "bypassed",
-          "model_used": "direct"
+          "model_used": "direct",
+          "theme": "general",
+          "attention_reason": "Lighter treatment because this story sits in the 時事脈搏 section without strong market-moving signals.",
+          "must_keep": false
         },
         {
           "source_article_id": "4369667",
@@ -577,7 +1028,10 @@
           "key_points": [],
           "content_truncated": false,
           "analysis_method": "bypassed",
-          "model_used": "direct"
+          "model_used": "direct",
+          "theme": "general",
+          "attention_reason": "Lighter treatment because this story sits in the 時事脈搏 section without strong market-moving signals.",
+          "must_keep": false
         },
         {
           "source_article_id": "4369665",
@@ -638,7 +1092,10 @@
           "key_points": [],
           "content_truncated": false,
           "analysis_method": "bypassed",
-          "model_used": "direct"
+          "model_used": "direct",
+          "theme": "general",
+          "attention_reason": "Lighter treatment because this story sits in the 時事脈搏 section without strong market-moving signals.",
+          "must_keep": false
         },
         {
           "source_article_id": "4369662",
@@ -654,7 +1111,10 @@
           "key_points": [],
           "content_truncated": false,
           "analysis_method": "bypassed",
-          "model_used": "direct"
+          "model_used": "direct",
+          "theme": "general",
+          "attention_reason": "Lighter treatment because this story sits in the 時事脈搏 section without strong market-moving signals.",
+          "must_keep": false
         },
         {
           "source_article_id": "4369661",
@@ -670,7 +1130,10 @@
           "key_points": [],
           "content_truncated": false,
           "analysis_method": "bypassed",
-          "model_used": "direct"
+          "model_used": "direct",
+          "theme": "general",
+          "attention_reason": "Lighter treatment because this story sits in the 時事脈搏 section without strong market-moving signals.",
+          "must_keep": false
         },
         {
           "source_article_id": "4369660",
@@ -686,7 +1149,10 @@
           "key_points": [],
           "content_truncated": false,
           "analysis_method": "bypassed",
-          "model_used": "direct"
+          "model_used": "direct",
+          "theme": "general",
+          "attention_reason": "Lighter treatment because this story sits in the 時事脈搏 section without strong market-moving signals.",
+          "must_keep": false
         },
         {
           "source_article_id": "4369659",
@@ -702,7 +1168,10 @@
           "key_points": [],
           "content_truncated": false,
           "analysis_method": "bypassed",
-          "model_used": "direct"
+          "model_used": "direct",
+          "theme": "general",
+          "attention_reason": "Lighter treatment because this story sits in the 時事脈搏 section without strong market-moving signals.",
+          "must_keep": false
         },
         {
           "source_article_id": "4369658",
@@ -1289,17 +1758,17 @@
       ],
       "analysis_profile": "light",
       "model_used": "meta-llama/llama-4-scout-17b-16e-instruct",
-      "sub_batch_count": 7,
+      "sub_batch_count": 4,
       "diagnostics": {
-        "sub_batch_count": 1,
+        "sub_batch_count": 4,
         "split_reasons": [
           "pre_send_budget"
         ],
         "models_attempted": [
           "meta-llama/llama-4-scout-17b-16e-instruct"
         ],
-        "estimated_input_tokens_max": 1416,
-        "serialized_request_bytes_max": 9598,
+        "estimated_input_tokens_max": 1130,
+        "serialized_request_bytes_max": 6583,
         "rate_limit_waits": 0,
         "partial_article_count": 0,
         "synthesis_wait_seconds_total": 0.0,
@@ -1311,18 +1780,217 @@
         "synthesis_merge_depth_max": 1,
         "model_switches": []
       },
+      "error": "Category 時事脈搏 exhausted synthesis wait budget after 2246.4 seconds."
+    },
+    {
+      "category": "香港財經",
+      "article_count": 1,
+      "status": "success",
+      "key_developments": [
+        "奇瑞汽車計劃通過與其他汽車製造商合作擴大歐洲產能，借用現有工廠而非新建組裝廠。",
+        "奇瑞汽車董事長尹同躍稱希望未來幾個月有消息分享，法國在潛在選址名單之列。",
+        "公司法國首席商務官Lionel French Keogh表示正在歐洲尋求其他產能。"
+      ],
+      "named_entities": [
+        {
+          "name": "奇瑞汽車",
+          "type": "company"
+        },
+        {
+          "name": "Lionel French Keogh",
+          "type": "person"
+        },
+        {
+          "name": "尹同躍",
+          "type": "person"
+        },
+        {
+          "name": "法國",
+          "type": "country"
+        }
+      ],
+      "articles": [
+        {
+          "source_article_id": "4369700",
+          "title": "奇瑞計劃擴大歐洲汽車產能",
+          "canonical_url": "https://www.hkej.com/instantnews/hongkong/article/4369700/%E5%A5%87%E7%91%9E%E8%A8%88%E5%8A%83%E6%93%B4%E5%A4%A7%E6%AD%90%E6%B4%B2%E6%B1%BD%E8%BB%8A%E7%94%A2%E8%83%BD",
+          "published_at": "2026-04-12T19:15:00+08:00",
+          "section": "香港財經",
+          "novelty_score": 6,
+          "relevance_score": 7,
+          "urgency_score": 5,
+          "named_entities": [
+            {
+              "name": "奇瑞汽車",
+              "type": "company"
+            },
+            {
+              "name": "Lionel French Keogh",
+              "type": "person"
+            },
+            {
+              "name": "尹同躍",
+              "type": "person"
+            },
+            {
+              "name": "法國",
+              "type": "country"
+            }
+          ],
+          "key_points": [
+            "奇瑞汽車計劃通過與其他汽車製造商合作擴大歐洲產能，借用現有工廠而非新建組裝廠。",
+            "公司法國首席商務官Lionel French Keogh表示正在歐洲尋求其他產能。",
+            "奇瑞汽車董事長尹同躍稱希望未來幾個月有消息分享，法國在潛在選址名單之列。"
+          ],
+          "content_truncated": false,
+          "original_content_length_chars": 240,
+          "analyzed_content_length_chars": 240,
+          "original_content_token_estimate": 60,
+          "analyzed_content_token_estimate": 60,
+          "truncation_reason": null,
+          "analysis_method": "full_text",
+          "attention_tier": "medium",
+          "theme": "geopolitics",
+          "attention_reason": "Involves international trade and potential market expansion.",
+          "must_keep": true,
+          "model_used": "meta-llama/llama-4-scout-17b-16e-instruct",
+          "delayed_retry_attempted": false,
+          "delayed_retry_model_chain": [],
+          "delayed_retry_final_model": null,
+          "error_classification": null,
+          "error": null
+        }
+      ],
+      "subgroups": [
+        {
+          "title": "香港財經 overview",
+          "theme_rationale": "Single subgroup because the category size did not require thematic splitting.",
+          "article_count": 1,
+          "key_developments": [
+            "奇瑞汽車計劃通過與其他汽車製造商合作擴大歐洲產能，借用現有工廠而非新建組裝廠。",
+            "奇瑞汽車董事長尹同躍稱希望未來幾個月有消息分享，法國在潛在選址名單之列。",
+            "公司法國首席商務官Lionel French Keogh表示正在歐洲尋求其他產能。"
+          ],
+          "named_entities": [
+            {
+              "name": "奇瑞汽車",
+              "type": "company"
+            },
+            {
+              "name": "Lionel French Keogh",
+              "type": "person"
+            },
+            {
+              "name": "尹同躍",
+              "type": "person"
+            },
+            {
+              "name": "法國",
+              "type": "country"
+            }
+          ],
+          "articles": [
+            {
+              "source_article_id": "4369700",
+              "title": "奇瑞計劃擴大歐洲汽車產能",
+              "canonical_url": "https://www.hkej.com/instantnews/hongkong/article/4369700/%E5%A5%87%E7%91%9E%E8%A8%88%E5%8A%83%E6%93%B4%E5%A4%A7%E6%AD%90%E6%B4%B2%E6%B1%BD%E8%BB%8A%E7%94%A2%E8%83%BD",
+              "published_at": "2026-04-12T19:15:00+08:00",
+              "section": "香港財經",
+              "novelty_score": 6,
+              "relevance_score": 7,
+              "urgency_score": 5,
+              "named_entities": [
+                {
+                  "name": "奇瑞汽車",
+                  "type": "company"
+                },
+                {
+                  "name": "Lionel French Keogh",
+                  "type": "person"
+                },
+                {
+                  "name": "尹同躍",
+                  "type": "person"
+                },
+                {
+                  "name": "法國",
+                  "type": "country"
+                }
+              ],
+              "key_points": [
+                "奇瑞汽車計劃通過與其他汽車製造商合作擴大歐洲產能，借用現有工廠而非新建組裝廠。",
+                "公司法國首席商務官Lionel French Keogh表示正在歐洲尋求其他產能。",
+                "奇瑞汽車董事長尹同躍稱希望未來幾個月有消息分享，法國在潛在選址名單之列。"
+              ],
+              "content_truncated": false,
+              "original_content_length_chars": 240,
+              "analyzed_content_length_chars": 240,
+              "original_content_token_estimate": 60,
+              "analyzed_content_token_estimate": 60,
+              "truncation_reason": null,
+              "analysis_method": "full_text",
+              "attention_tier": "medium",
+              "theme": "geopolitics",
+              "attention_reason": "Involves international trade and potential market expansion.",
+              "must_keep": true,
+              "model_used": "meta-llama/llama-4-scout-17b-16e-instruct",
+              "delayed_retry_attempted": false,
+              "delayed_retry_model_chain": [],
+              "delayed_retry_final_model": null,
+              "error_classification": null,
+              "error": null
+            }
+          ],
+          "model_used": "meta-llama/llama-4-scout-17b-16e-instruct"
+        }
+      ],
+      "analysis_profile": "standard",
+      "model_used": "meta-llama/llama-4-scout-17b-16e-instruct",
+      "sub_batch_count": 2,
+      "diagnostics": {
+        "sub_batch_count": 1,
+        "split_reasons": [],
+        "models_attempted": [
+          "meta-llama/llama-4-scout-17b-16e-instruct"
+        ],
+        "estimated_input_tokens_max": 653,
+        "serialized_request_bytes_max": 3402,
+        "rate_limit_waits": 0,
+        "partial_article_count": 0,
+        "synthesis_wait_seconds_total": 0.0,
+        "synthesis_retry_count": 0,
+        "synthesis_retry_skipped_count": 0,
+        "synthesis_budget_exhausted": false,
+        "degraded_merge_used": false,
+        "degraded_merge_reason": "",
+        "synthesis_merge_depth_max": 0,
+        "model_switches": []
+      },
       "error": null
     },
     {
       "category": "中國財經",
-      "article_count": 1,
+      "article_count": 2,
       "status": "success",
       "key_developments": [
-        "蜜雪集團在巴西開設首家門店，推出約20款產品，包括招牌雪糕售價3雷亞爾(約4.69港元)。",
-        "集團計劃未來3至5年於巴西投資採購咖啡豆等農產品，總值不少於40億元人民幣。",
-        "新店價格在當地現製飲品市場中頗具競爭力。"
+        "萬科創始人王石回應被抓傳聞：一切安好，造謠者交給法律",
+        "蜜雪集團巴西首店開業，推出約20款產品，招牌雪糕售價3雷亞爾",
+        "集團計劃未來3至5年於巴西投資採購咖啡豆等農產品，總值不少於40億元人民幣",
+        "王石夫人田朴珺發文質疑造謠成本"
       ],
       "named_entities": [
+        {
+          "name": "王石",
+          "type": "person"
+        },
+        {
+          "name": "萬科",
+          "type": "company"
+        },
+        {
+          "name": "田朴珺",
+          "type": "person"
+        },
         {
           "name": "蜜雪集團",
           "type": "company"
@@ -1333,6 +2001,52 @@
         }
       ],
       "articles": [
+        {
+          "source_article_id": "4369710",
+          "title": "傳被抓 萬科王石:一切安好 造謠者交給法律",
+          "canonical_url": "https://www.hkej.com/instantnews/china/article/4369710/%E5%82%B3%E8%A2%AB%E6%8A%93+%E8%90%AC%E7%A7%91%E7%8E%8B%E7%9F%B3%3A%E4%B8%80%E5%88%87%E5%AE%89%E5%A5%BD+%E9%80%A0%E8%AC%A0%E8%80%85%E4%BA%A4%E7%B5%A6%E6%B3%95%E5%BE%8B",
+          "published_at": "2026-04-12T20:47:00+08:00",
+          "section": "中國財經",
+          "novelty_score": 6,
+          "relevance_score": 8,
+          "urgency_score": 5,
+          "named_entities": [
+            {
+              "name": "王石",
+              "type": "person"
+            },
+            {
+              "name": "萬科",
+              "type": "company"
+            },
+            {
+              "name": "田朴珺",
+              "type": "person"
+            }
+          ],
+          "key_points": [
+            "萬科創始人王石被微博賬號發布消息聲稱被抓",
+            "王石回應稱「一切安好，造謠者交給法律」",
+            "王石夫人田朴珺發文質疑造謠成本"
+          ],
+          "content_truncated": false,
+          "original_content_length_chars": 117,
+          "analyzed_content_length_chars": 117,
+          "original_content_token_estimate": 30,
+          "analyzed_content_token_estimate": 30,
+          "truncation_reason": null,
+          "analysis_method": "full_text",
+          "attention_tier": "medium",
+          "theme": "stocks",
+          "attention_reason": "Company founder's status affects stock",
+          "must_keep": true,
+          "model_used": "meta-llama/llama-4-scout-17b-16e-instruct",
+          "delayed_retry_attempted": false,
+          "delayed_retry_model_chain": [],
+          "delayed_retry_final_model": null,
+          "error_classification": null,
+          "error": null
+        },
         {
           "source_article_id": "4369666",
           "title": "蜜雪冰城巴西首店開業 招牌雪糕售3雷亞爾",
@@ -1380,13 +2094,26 @@
         {
           "title": "中國財經 overview",
           "theme_rationale": "Single subgroup because the category size did not require thematic splitting.",
-          "article_count": 1,
+          "article_count": 2,
           "key_developments": [
-            "蜜雪集團在巴西開設首家門店，推出約20款產品，包括招牌雪糕售價3雷亞爾(約4.69港元)。",
-            "集團計劃未來3至5年於巴西投資採購咖啡豆等農產品，總值不少於40億元人民幣。",
-            "新店價格在當地現製飲品市場中頗具競爭力。"
+            "萬科創始人王石回應被抓傳聞：一切安好，造謠者交給法律",
+            "蜜雪集團巴西首店開業，推出約20款產品，招牌雪糕售價3雷亞爾",
+            "集團計劃未來3至5年於巴西投資採購咖啡豆等農產品，總值不少於40億元人民幣",
+            "王石夫人田朴珺發文質疑造謠成本"
           ],
           "named_entities": [
+            {
+              "name": "王石",
+              "type": "person"
+            },
+            {
+              "name": "萬科",
+              "type": "company"
+            },
+            {
+              "name": "田朴珺",
+              "type": "person"
+            },
             {
               "name": "蜜雪集團",
               "type": "company"
@@ -1397,6 +2124,52 @@
             }
           ],
           "articles": [
+            {
+              "source_article_id": "4369710",
+              "title": "傳被抓 萬科王石:一切安好 造謠者交給法律",
+              "canonical_url": "https://www.hkej.com/instantnews/china/article/4369710/%E5%82%B3%E8%A2%AB%E6%8A%93+%E8%90%AC%E7%A7%91%E7%8E%8B%E7%9F%B3%3A%E4%B8%80%E5%88%87%E5%AE%89%E5%A5%BD+%E9%80%A0%E8%AC%A0%E8%80%85%E4%BA%A4%E7%B5%A6%E6%B3%95%E5%BE%8B",
+              "published_at": "2026-04-12T20:47:00+08:00",
+              "section": "中國財經",
+              "novelty_score": 6,
+              "relevance_score": 8,
+              "urgency_score": 5,
+              "named_entities": [
+                {
+                  "name": "王石",
+                  "type": "person"
+                },
+                {
+                  "name": "萬科",
+                  "type": "company"
+                },
+                {
+                  "name": "田朴珺",
+                  "type": "person"
+                }
+              ],
+              "key_points": [
+                "萬科創始人王石被微博賬號發布消息聲稱被抓",
+                "王石回應稱「一切安好，造謠者交給法律」",
+                "王石夫人田朴珺發文質疑造謠成本"
+              ],
+              "content_truncated": false,
+              "original_content_length_chars": 117,
+              "analyzed_content_length_chars": 117,
+              "original_content_token_estimate": 30,
+              "analyzed_content_token_estimate": 30,
+              "truncation_reason": null,
+              "analysis_method": "full_text",
+              "attention_tier": "medium",
+              "theme": "stocks",
+              "attention_reason": "Company founder's status affects stock",
+              "must_keep": true,
+              "model_used": "meta-llama/llama-4-scout-17b-16e-instruct",
+              "delayed_retry_attempted": false,
+              "delayed_retry_model_chain": [],
+              "delayed_retry_final_model": null,
+              "error_classification": null,
+              "error": null
+            },
             {
               "source_article_id": "4369666",
               "title": "蜜雪冰城巴西首店開業 招牌雪糕售3雷亞爾",
@@ -1445,15 +2218,15 @@
       ],
       "analysis_profile": "standard",
       "model_used": "meta-llama/llama-4-scout-17b-16e-instruct",
-      "sub_batch_count": 2,
+      "sub_batch_count": 3,
       "diagnostics": {
-        "sub_batch_count": 1,
+        "sub_batch_count": 3,
         "split_reasons": [],
         "models_attempted": [
           "meta-llama/llama-4-scout-17b-16e-instruct"
         ],
-        "estimated_input_tokens_max": 667,
-        "serialized_request_bytes_max": 4070,
+        "estimated_input_tokens_max": 638,
+        "serialized_request_bytes_max": 3149,
         "rate_limit_waits": 0,
         "partial_article_count": 0,
         "synthesis_wait_seconds_total": 0.0,
@@ -1466,7 +2239,552 @@
         "model_switches": []
       },
       "error": null
+    },
+    {
+      "category": "地產新聞",
+      "article_count": 5,
+      "status": "success",
+      "key_developments": [
+        "信置執行董事田兆源表示，海瑅灣I今日沽出70伙，單日套現逾5.6億元。",
+        "項目三周速沽595伙，套現逾52億元。",
+        "中環半山雅盈峰平台特色戶成交價4715.85萬元，呎價4.47萬元。"
+      ],
+      "named_entities": [
+        {
+          "name": "信置",
+          "type": "company"
+        },
+        {
+          "name": "田兆源",
+          "type": "person"
+        },
+        {
+          "name": "海瑅灣I",
+          "type": "institution"
+        },
+        {
+          "name": "中環半山雅盈峰",
+          "type": "institution"
+        }
+      ],
+      "articles": [
+        {
+          "source_article_id": "4369711",
+          "title": "新盤丨海瑅灣I即日沽71伙 三周沽595伙套現逾52億",
+          "canonical_url": "https://www.hkej.com/instantnews/property/article/4369711/%E6%96%B0%E7%9B%A4%E4%B8%A8%E6%B5%B7%E7%91%85%E7%81%A3I%E5%8D%B3%E6%97%A5%E6%B2%BD71%E4%BC%99+%E4%B8%89%E5%91%A8%E6%B2%BD595%E4%BC%99%E5%A5%97%E7%8F%BE%E9%80%BE52%E5%84%84",
+          "published_at": "2026-04-12T21:13:00+08:00",
+          "section": "新盤情報",
+          "novelty_score": 6,
+          "relevance_score": 8,
+          "urgency_score": 7,
+          "named_entities": [
+            {
+              "name": "信置",
+              "type": "company"
+            },
+            {
+              "name": "田兆源",
+              "type": "person"
+            },
+            {
+              "name": "將軍澳日出康城",
+              "type": "institution"
+            }
+          ],
+          "key_points": [
+            "信置執行董事田兆源表示，海瑅灣I今日沽出70伙，單日套現逾5.6億元。",
+            "項目三周速沽595伙，套現逾52億元。"
+          ],
+          "content_truncated": false,
+          "original_content_length_chars": 304,
+          "analyzed_content_length_chars": 304,
+          "original_content_token_estimate": 76,
+          "analyzed_content_token_estimate": 76,
+          "truncation_reason": null,
+          "analysis_method": "full_text",
+          "attention_tier": "medium",
+          "theme": "general",
+          "attention_reason": "Default medium attention because the story is relevant but not an obvious top-priority market mover.",
+          "must_keep": false,
+          "model_used": "meta-llama/llama-4-scout-17b-16e-instruct",
+          "delayed_retry_attempted": false,
+          "delayed_retry_model_chain": [],
+          "delayed_retry_final_model": null,
+          "error_classification": null,
+          "error": null
+        },
+        {
+          "source_article_id": "4369712",
+          "title": "新盤丨維港‧灣畔再沽兩伙 套現3814萬",
+          "canonical_url": "https://www.hkej.com/instantnews/property/article/4369712/%E6%96%B0%E7%9B%A4%E4%B8%A8%E7%B6%AD%E6%B8%AF%E2%80%A7%E7%81%A3%E7%95%94%E5%86%8D%E6%B2%BD%E5%85%A9%E4%BC%99+%E5%A5%97%E7%8F%BE3814%E8%90%AC",
+          "published_at": "2026-04-12T21:05:00+08:00",
+          "section": "新盤情報",
+          "novelty_score": 5,
+          "relevance_score": 7,
+          "urgency_score": 6,
+          "named_entities": [
+            {
+              "name": "中國海外",
+              "type": "company"
+            },
+            {
+              "name": "九龍倉",
+              "type": "company"
+            },
+            {
+              "name": "維港‧灣畔",
+              "type": "institution"
+            }
+          ],
+          "key_points": [
+            "中國海外、九龍倉等合作發展的啟德維港‧灣畔今日售出2個單位，套現3814.4萬元。",
+            "平均呎價約30345元。"
+          ],
+          "content_truncated": false,
+          "original_content_length_chars": 371,
+          "analyzed_content_length_chars": 371,
+          "original_content_token_estimate": 93,
+          "analyzed_content_token_estimate": 93,
+          "truncation_reason": null,
+          "analysis_method": "full_text",
+          "attention_tier": "medium",
+          "theme": "general",
+          "attention_reason": "Default medium attention because the story is relevant but not an obvious top-priority market mover.",
+          "must_keep": false,
+          "model_used": "meta-llama/llama-4-scout-17b-16e-instruct",
+          "delayed_retry_attempted": false,
+          "delayed_retry_model_chain": [],
+          "delayed_retry_final_model": null,
+          "error_classification": null,
+          "error": null
+        },
+        {
+          "source_article_id": "4369689",
+          "title": "新盤丨柏傲莊III兩日參觀人次近5000 研短期加推",
+          "canonical_url": "https://www.hkej.com/instantnews/property/article/4369689/%E6%96%B0%E7%9B%A4%E4%B8%A8%E6%9F%8F%E5%82%B2%E8%8E%8AIII%E5%85%A9%E6%97%A5%E5%8F%83%E8%A7%80%E4%BA%BA%E6%AC%A1%E8%BF%915000+%E7%A0%94%E7%9F%AD%E6%9C%9F%E5%8A%A0%E6%8E%A8",
+          "published_at": "2026-04-12T17:50:00+08:00",
+          "section": "新盤情報",
+          "novelty_score": 7,
+          "relevance_score": 8,
+          "urgency_score": 8,
+          "named_entities": [
+            {
+              "name": "新世界",
+              "type": "company"
+            },
+            {
+              "name": "港鐵",
+              "type": "company"
+            },
+            {
+              "name": "柏傲莊III",
+              "type": "institution"
+            }
+          ],
+          "key_points": [
+            "新世界與港鐵合作的沙田大圍站柏傲莊III，公布價單後首個周末，兩日累計錄近5000參觀人次。",
+            "發展商指，接獲大量查詢，為回應市場需求，研究短期內加推單位應市。"
+          ],
+          "content_truncated": false,
+          "original_content_length_chars": 399,
+          "analyzed_content_length_chars": 399,
+          "original_content_token_estimate": 100,
+          "analyzed_content_token_estimate": 100,
+          "truncation_reason": null,
+          "analysis_method": "full_text",
+          "attention_tier": "medium",
+          "theme": "general",
+          "attention_reason": "Default medium attention because the story is relevant but not an obvious top-priority market mover.",
+          "must_keep": false,
+          "model_used": "meta-llama/llama-4-scout-17b-16e-instruct",
+          "delayed_retry_attempted": false,
+          "delayed_retry_model_chain": [],
+          "delayed_retry_final_model": null,
+          "error_classification": null,
+          "error": null
+        },
+        {
+          "source_article_id": "4369687",
+          "title": "新盤丨DOUBLE COAST III加推32伙 折實450萬起",
+          "canonical_url": "https://www.hkej.com/instantnews/property/article/4369687/%E6%96%B0%E7%9B%A4%E4%B8%A8DOUBLE+COAST+III%E5%8A%A0%E6%8E%A832%E4%BC%99+%E6%8A%98%E5%AF%A6450%E8%90%AC%E8%B5%B7",
+          "published_at": "2026-04-12T17:28:00+08:00",
+          "section": "新盤情報",
+          "novelty_score": 6,
+          "relevance_score": 7,
+          "urgency_score": 7,
+          "named_entities": [
+            {
+              "name": "會德豐地產",
+              "type": "company"
+            },
+            {
+              "name": "DOUBLE COAST III",
+              "type": "institution"
+            }
+          ],
+          "key_points": [
+            "會德豐地產牽頭發展的九龍東啟德承豐道19號DOUBLE COAST III，今日上載新銷售安排，將於周四(16日)發售32伙。",
+            "折實售價由450萬元起，折實呎價由17514元起。"
+          ],
+          "content_truncated": false,
+          "original_content_length_chars": 404,
+          "analyzed_content_length_chars": 404,
+          "original_content_token_estimate": 101,
+          "analyzed_content_token_estimate": 101,
+          "truncation_reason": null,
+          "analysis_method": "full_text",
+          "attention_tier": "medium",
+          "theme": "property",
+          "attention_reason": "Default medium attention because the story is relevant but not an obvious top-priority market mover.",
+          "must_keep": false,
+          "model_used": "meta-llama/llama-4-scout-17b-16e-instruct",
+          "delayed_retry_attempted": false,
+          "delayed_retry_model_chain": [],
+          "delayed_retry_final_model": null,
+          "error_classification": null,
+          "error": null
+        },
+        {
+          "source_article_id": "4369684",
+          "title": "新盤丨雅盈峰平台特色戶逾4715萬沽出",
+          "canonical_url": "https://www.hkej.com/instantnews/property/article/4369684/%E6%96%B0%E7%9B%A4%E4%B8%A8%E9%9B%85%E7%9B%88%E5%B3%B0%E5%B9%B3%E5%8F%B0%E7%89%B9%E8%89%B2%E6%88%B6%E9%80%BE4715%E8%90%AC%E6%B2%BD%E5%87%BA",
+          "published_at": "2026-04-12T16:13:00+08:00",
+          "section": "新盤情報",
+          "novelty_score": 6,
+          "relevance_score": 8,
+          "urgency_score": 5,
+          "named_entities": [
+            {
+              "name": "盈大地產",
+              "type": "company"
+            },
+            {
+              "name": "資本策略",
+              "type": "company"
+            },
+            {
+              "name": "中環半山雅盈峰",
+              "type": "institution"
+            },
+            {
+              "name": "陳惠慈",
+              "type": "person"
+            }
+          ],
+          "key_points": [
+            "中環半山雅盈峰平台特色戶成交價4715.85萬元，呎價4.47萬元。",
+            "項目同類型單位僅餘最後一伙2樓D單位，將於明天以招標形式發售。"
+          ],
+          "content_truncated": false,
+          "original_content_length_chars": 205,
+          "analyzed_content_length_chars": 205,
+          "original_content_token_estimate": 52,
+          "analyzed_content_token_estimate": 52,
+          "truncation_reason": null,
+          "analysis_method": "full_text",
+          "attention_tier": "medium",
+          "theme": "property",
+          "attention_reason": "Default medium attention because the story is relevant but not an obvious top-priority market mover.",
+          "must_keep": false,
+          "model_used": "meta-llama/llama-4-scout-17b-16e-instruct",
+          "delayed_retry_attempted": false,
+          "delayed_retry_model_chain": [],
+          "delayed_retry_final_model": null,
+          "error_classification": null,
+          "error": null
+        }
+      ],
+      "subgroups": [
+        {
+          "title": "地產新聞 overview",
+          "theme_rationale": "Single subgroup because the category size did not require thematic splitting.",
+          "article_count": 5,
+          "key_developments": [
+            "信置執行董事田兆源表示，海瑅灣I今日沽出70伙，單日套現逾5.6億元。",
+            "項目三周速沽595伙，套現逾52億元。",
+            "中環半山雅盈峰平台特色戶成交價4715.85萬元，呎價4.47萬元。"
+          ],
+          "named_entities": [
+            {
+              "name": "信置",
+              "type": "company"
+            },
+            {
+              "name": "田兆源",
+              "type": "person"
+            },
+            {
+              "name": "海瑅灣I",
+              "type": "institution"
+            },
+            {
+              "name": "中環半山雅盈峰",
+              "type": "institution"
+            }
+          ],
+          "articles": [
+            {
+              "source_article_id": "4369711",
+              "title": "新盤丨海瑅灣I即日沽71伙 三周沽595伙套現逾52億",
+              "canonical_url": "https://www.hkej.com/instantnews/property/article/4369711/%E6%96%B0%E7%9B%A4%E4%B8%A8%E6%B5%B7%E7%91%85%E7%81%A3I%E5%8D%B3%E6%97%A5%E6%B2%BD71%E4%BC%99+%E4%B8%89%E5%91%A8%E6%B2%BD595%E4%BC%99%E5%A5%97%E7%8F%BE%E9%80%BE52%E5%84%84",
+              "published_at": "2026-04-12T21:13:00+08:00",
+              "section": "新盤情報",
+              "novelty_score": 6,
+              "relevance_score": 8,
+              "urgency_score": 7,
+              "named_entities": [
+                {
+                  "name": "信置",
+                  "type": "company"
+                },
+                {
+                  "name": "田兆源",
+                  "type": "person"
+                },
+                {
+                  "name": "將軍澳日出康城",
+                  "type": "institution"
+                }
+              ],
+              "key_points": [
+                "信置執行董事田兆源表示，海瑅灣I今日沽出70伙，單日套現逾5.6億元。",
+                "項目三周速沽595伙，套現逾52億元。"
+              ],
+              "content_truncated": false,
+              "original_content_length_chars": 304,
+              "analyzed_content_length_chars": 304,
+              "original_content_token_estimate": 76,
+              "analyzed_content_token_estimate": 76,
+              "truncation_reason": null,
+              "analysis_method": "full_text",
+              "attention_tier": "medium",
+              "theme": "general",
+              "attention_reason": "Default medium attention because the story is relevant but not an obvious top-priority market mover.",
+              "must_keep": false,
+              "model_used": "meta-llama/llama-4-scout-17b-16e-instruct",
+              "delayed_retry_attempted": false,
+              "delayed_retry_model_chain": [],
+              "delayed_retry_final_model": null,
+              "error_classification": null,
+              "error": null
+            },
+            {
+              "source_article_id": "4369712",
+              "title": "新盤丨維港‧灣畔再沽兩伙 套現3814萬",
+              "canonical_url": "https://www.hkej.com/instantnews/property/article/4369712/%E6%96%B0%E7%9B%A4%E4%B8%A8%E7%B6%AD%E6%B8%AF%E2%80%A7%E7%81%A3%E7%95%94%E5%86%8D%E6%B2%BD%E5%85%A9%E4%BC%99+%E5%A5%97%E7%8F%BE3814%E8%90%AC",
+              "published_at": "2026-04-12T21:05:00+08:00",
+              "section": "新盤情報",
+              "novelty_score": 5,
+              "relevance_score": 7,
+              "urgency_score": 6,
+              "named_entities": [
+                {
+                  "name": "中國海外",
+                  "type": "company"
+                },
+                {
+                  "name": "九龍倉",
+                  "type": "company"
+                },
+                {
+                  "name": "維港‧灣畔",
+                  "type": "institution"
+                }
+              ],
+              "key_points": [
+                "中國海外、九龍倉等合作發展的啟德維港‧灣畔今日售出2個單位，套現3814.4萬元。",
+                "平均呎價約30345元。"
+              ],
+              "content_truncated": false,
+              "original_content_length_chars": 371,
+              "analyzed_content_length_chars": 371,
+              "original_content_token_estimate": 93,
+              "analyzed_content_token_estimate": 93,
+              "truncation_reason": null,
+              "analysis_method": "full_text",
+              "attention_tier": "medium",
+              "theme": "general",
+              "attention_reason": "Default medium attention because the story is relevant but not an obvious top-priority market mover.",
+              "must_keep": false,
+              "model_used": "meta-llama/llama-4-scout-17b-16e-instruct",
+              "delayed_retry_attempted": false,
+              "delayed_retry_model_chain": [],
+              "delayed_retry_final_model": null,
+              "error_classification": null,
+              "error": null
+            },
+            {
+              "source_article_id": "4369689",
+              "title": "新盤丨柏傲莊III兩日參觀人次近5000 研短期加推",
+              "canonical_url": "https://www.hkej.com/instantnews/property/article/4369689/%E6%96%B0%E7%9B%A4%E4%B8%A8%E6%9F%8F%E5%82%B2%E8%8E%8AIII%E5%85%A9%E6%97%A5%E5%8F%83%E8%A7%80%E4%BA%BA%E6%AC%A1%E8%BF%915000+%E7%A0%94%E7%9F%AD%E6%9C%9F%E5%8A%A0%E6%8E%A8",
+              "published_at": "2026-04-12T17:50:00+08:00",
+              "section": "新盤情報",
+              "novelty_score": 7,
+              "relevance_score": 8,
+              "urgency_score": 8,
+              "named_entities": [
+                {
+                  "name": "新世界",
+                  "type": "company"
+                },
+                {
+                  "name": "港鐵",
+                  "type": "company"
+                },
+                {
+                  "name": "柏傲莊III",
+                  "type": "institution"
+                }
+              ],
+              "key_points": [
+                "新世界與港鐵合作的沙田大圍站柏傲莊III，公布價單後首個周末，兩日累計錄近5000參觀人次。",
+                "發展商指，接獲大量查詢，為回應市場需求，研究短期內加推單位應市。"
+              ],
+              "content_truncated": false,
+              "original_content_length_chars": 399,
+              "analyzed_content_length_chars": 399,
+              "original_content_token_estimate": 100,
+              "analyzed_content_token_estimate": 100,
+              "truncation_reason": null,
+              "analysis_method": "full_text",
+              "attention_tier": "medium",
+              "theme": "general",
+              "attention_reason": "Default medium attention because the story is relevant but not an obvious top-priority market mover.",
+              "must_keep": false,
+              "model_used": "meta-llama/llama-4-scout-17b-16e-instruct",
+              "delayed_retry_attempted": false,
+              "delayed_retry_model_chain": [],
+              "delayed_retry_final_model": null,
+              "error_classification": null,
+              "error": null
+            },
+            {
+              "source_article_id": "4369687",
+              "title": "新盤丨DOUBLE COAST III加推32伙 折實450萬起",
+              "canonical_url": "https://www.hkej.com/instantnews/property/article/4369687/%E6%96%B0%E7%9B%A4%E4%B8%A8DOUBLE+COAST+III%E5%8A%A0%E6%8E%A832%E4%BC%99+%E6%8A%98%E5%AF%A6450%E8%90%AC%E8%B5%B7",
+              "published_at": "2026-04-12T17:28:00+08:00",
+              "section": "新盤情報",
+              "novelty_score": 6,
+              "relevance_score": 7,
+              "urgency_score": 7,
+              "named_entities": [
+                {
+                  "name": "會德豐地產",
+                  "type": "company"
+                },
+                {
+                  "name": "DOUBLE COAST III",
+                  "type": "institution"
+                }
+              ],
+              "key_points": [
+                "會德豐地產牽頭發展的九龍東啟德承豐道19號DOUBLE COAST III，今日上載新銷售安排，將於周四(16日)發售32伙。",
+                "折實售價由450萬元起，折實呎價由17514元起。"
+              ],
+              "content_truncated": false,
+              "original_content_length_chars": 404,
+              "analyzed_content_length_chars": 404,
+              "original_content_token_estimate": 101,
+              "analyzed_content_token_estimate": 101,
+              "truncation_reason": null,
+              "analysis_method": "full_text",
+              "attention_tier": "medium",
+              "theme": "property",
+              "attention_reason": "Default medium attention because the story is relevant but not an obvious top-priority market mover.",
+              "must_keep": false,
+              "model_used": "meta-llama/llama-4-scout-17b-16e-instruct",
+              "delayed_retry_attempted": false,
+              "delayed_retry_model_chain": [],
+              "delayed_retry_final_model": null,
+              "error_classification": null,
+              "error": null
+            },
+            {
+              "source_article_id": "4369684",
+              "title": "新盤丨雅盈峰平台特色戶逾4715萬沽出",
+              "canonical_url": "https://www.hkej.com/instantnews/property/article/4369684/%E6%96%B0%E7%9B%A4%E4%B8%A8%E9%9B%85%E7%9B%88%E5%B3%B0%E5%B9%B3%E5%8F%B0%E7%89%B9%E8%89%B2%E6%88%B6%E9%80%BE4715%E8%90%AC%E6%B2%BD%E5%87%BA",
+              "published_at": "2026-04-12T16:13:00+08:00",
+              "section": "新盤情報",
+              "novelty_score": 6,
+              "relevance_score": 8,
+              "urgency_score": 5,
+              "named_entities": [
+                {
+                  "name": "盈大地產",
+                  "type": "company"
+                },
+                {
+                  "name": "資本策略",
+                  "type": "company"
+                },
+                {
+                  "name": "中環半山雅盈峰",
+                  "type": "institution"
+                },
+                {
+                  "name": "陳惠慈",
+                  "type": "person"
+                }
+              ],
+              "key_points": [
+                "中環半山雅盈峰平台特色戶成交價4715.85萬元，呎價4.47萬元。",
+                "項目同類型單位僅餘最後一伙2樓D單位，將於明天以招標形式發售。"
+              ],
+              "content_truncated": false,
+              "original_content_length_chars": 205,
+              "analyzed_content_length_chars": 205,
+              "original_content_token_estimate": 52,
+              "analyzed_content_token_estimate": 52,
+              "truncation_reason": null,
+              "analysis_method": "full_text",
+              "attention_tier": "medium",
+              "theme": "property",
+              "attention_reason": "Default medium attention because the story is relevant but not an obvious top-priority market mover.",
+              "must_keep": false,
+              "model_used": "meta-llama/llama-4-scout-17b-16e-instruct",
+              "delayed_retry_attempted": false,
+              "delayed_retry_model_chain": [],
+              "delayed_retry_final_model": null,
+              "error_classification": null,
+              "error": null
+            }
+          ],
+          "model_used": "meta-llama/llama-4-scout-17b-16e-instruct"
+        }
+      ],
+      "analysis_profile": "light",
+      "model_used": "meta-llama/llama-4-scout-17b-16e-instruct",
+      "sub_batch_count": 5,
+      "diagnostics": {
+        "sub_batch_count": 2,
+        "split_reasons": [
+          "pre_send_budget"
+        ],
+        "models_attempted": [
+          "meta-llama/llama-4-scout-17b-16e-instruct"
+        ],
+        "estimated_input_tokens_max": 1436,
+        "serialized_request_bytes_max": 8632,
+        "rate_limit_waits": 0,
+        "partial_article_count": 0,
+        "synthesis_wait_seconds_total": 0.0,
+        "synthesis_retry_count": 0,
+        "synthesis_retry_skipped_count": 0,
+        "synthesis_budget_exhausted": false,
+        "degraded_merge_used": false,
+        "degraded_merge_reason": "",
+        "synthesis_merge_depth_max": 1,
+        "model_switches": []
+      },
+      "error": null
     }
   ],
-  "errors": []
+  "errors": [
+    {
+      "type": "category",
+      "target": "時事脈搏",
+      "message": "Category 時事脈搏 exhausted synthesis wait budget after 2246.4 seconds.",
+      "classification": "unexpected_error"
+    }
+  ]
 }
