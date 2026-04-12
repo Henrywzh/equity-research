@@ -364,12 +364,23 @@ def _prepare_polymarket_rows(
 
         delta_1d = None
         delta_7d = None
+        pulse_history = []
         if probability is not None:
             history = history_by_market.get(slug, [])
             prior_1d = _find_prior_probability(history, fetched_at, timedelta(days=1))
             prior_7d = _find_prior_probability(history, fetched_at, timedelta(days=7))
             delta_1d = probability - prior_1d if prior_1d is not None else None
             delta_7d = probability - prior_7d if prior_7d is not None else None
+
+            # Extract full time-series for "Pulse" markets (QQQ/BTC daily)
+            if snap.get("group_key") in ("qqq_daily", "btc_daily"):
+                cutoff = fetched_at - timedelta(hours=48)
+                pulse_history = [
+                    {"t": ts.isoformat(), "v": round(v * 100, 1)}
+                    for ts, v in history
+                    if ts >= cutoff
+                ]
+                pulse_history.append({"t": fetched_at.isoformat(), "v": round(probability * 100, 1)})
 
         rows.append(
             {
@@ -395,6 +406,7 @@ def _prepare_polymarket_rows(
                 "delta_1d_pct": round(delta_1d * 100, 1) if delta_1d is not None else None,
                 "delta_7d": round(delta_7d, 4) if delta_7d is not None else None,
                 "delta_7d_pct": round(delta_7d * 100, 1) if delta_7d is not None else None,
+                "history": pulse_history,
             }
         )
     return rows

@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Polymarket Signals | Unified Intelligence Hub</title>
     <link rel="stylesheet" href="css/styles.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         .hero {
             display: flex;
@@ -77,6 +78,22 @@
         <div id="warning-host" class="mb-6"></div>
         
         <div class="flex items-center gap-3 mb-6">
+            <h2 style="margin: 0;">Sentiment Intelligence Trends</h2>
+            <div style="height: 1px; flex: 1; background: var(--border-color); opacity: 0.5;"></div>
+            <div class="flex gap-2">
+                <button class="badge" onclick="toggleTrend('qqq')" id="btn-qqq">QQQ Daily</button>
+                <button class="badge badge-muted" onclick="toggleTrend('btc')" id="btn-btc">BTC Daily</button>
+            </div>
+        </div>
+
+        <div class="card mb-12" style="padding: 1.5rem; height: 400px; position: relative;">
+            <canvas id="trendChart"></canvas>
+            <div id="chart-loading" style="position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; background: rgba(0,0,0,0.4); border-radius: inherit;">
+                <p style="color: var(--text-muted);">Syncing time-series data...</p>
+            </div>
+        </div>
+        
+        <div class="flex items-center gap-3 mb-6">
             <h2 style="margin: 0;">Prediction Market Pulse</h2>
             <div style="height: 1px; flex: 1; background: var(--border-color); opacity: 0.5;"></div>
         </div>
@@ -109,10 +126,112 @@
             return value == null ? 'N/A' : `${value > 0 ? '+' : ''}${value.toFixed(1)} pts`;
         }
 
+        let mainChart = null;
+        let trendData = { qqq: null, btc: null };
+
+        function updateChart(key) {
+            const ctx = document.getElementById('trendChart').getContext('2d');
+            const data = trendData[key];
+            
+            if (!data || !data.history || data.history.length === 0) {
+                document.getElementById('chart-loading').style.display = 'flex';
+                document.getElementById('chart-loading').firstChild.textContent = 'No historical data for this contract yet.';
+                return;
+            }
+            document.getElementById('chart-loading').style.display = 'none';
+
+            const labels = data.history.map(p => new Date(p.t));
+            const values = data.history.map(p => p.v);
+
+            if (mainChart) mainChart.destroy();
+
+            const gradient = ctx.createLinearGradient(0, 0, 0, 400);
+            gradient.addColorStop(0, 'rgba(59, 130, 246, 0.4)');
+            gradient.addColorStop(1, 'rgba(59, 130, 246, 0.0)');
+
+            mainChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: `${data.asset} ${data.horizon} Probability (%)`,
+                        data: values,
+                        borderColor: '#3b82f6',
+                        borderWidth: 3,
+                        pointRadius: 0,
+                        pointHoverRadius: 6,
+                        tension: 0.4,
+                        fill: true,
+                        backgroundColor: gradient
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: {
+                            mode: 'index',
+                            intersect: false,
+                            backgroundColor: '#1f2937',
+                            titleColor: '#9ca3af',
+                            bodyColor: '#fff',
+                            borderColor: '#374151',
+                            borderWidth: 1,
+                            padding: 12,
+                            callbacks: {
+                                label: (ctx) => `${ctx.raw.toFixed(1)}% probability`
+                            }
+                        }
+                    },
+                    scales: {
+                        x: {
+                            type: 'category',
+                            ticks: {
+                                display: false
+                            },
+                            grid: { display: false }
+                        },
+                        y: {
+                            beginAtZero: false,
+                            suggestedMin: Math.max(0, Math.min(...values) - 5),
+                            suggestedMax: Math.min(100, Math.max(...values) + 5),
+                            grid: {
+                                color: 'rgba(255, 255, 255, 0.05)'
+                            },
+                            ticks: {
+                                color: '#9ca3af',
+                                callback: (v) => `${v}%`
+                            }
+                        }
+                    }
+                }
+            });
+
+            document.getElementById('btn-qqq').className = `badge ${key === 'qqq' ? '' : 'badge-muted'}`;
+            document.getElementById('btn-btc').className = `badge ${key === 'btc' ? '' : 'badge-muted'}`;
+        }
+
+        function toggleTrend(key) {
+            updateChart(key);
+        }
+
         async function loadPolymarket() {
             try {
                 const response = await fetch('data/polymarket.json');
                 const data = await response.json();
+
+                // Extract trends
+                trendData.qqq = data.groups.find(g => g.group_key === 'qqq_daily')?.rows[0];
+                trendData.btc = data.groups.find(g => g.group_key === 'btc_daily')?.rows[0];
+                
+                if (mainChart == null) {
+                    updateChart('qqq');
+                } else {
+                    // Refresh current view if needed
+                    const current = document.getElementById('btn-qqq').classList.contains('badge-muted') ? 'btc' : 'qqq';
+                    updateChart(current);
+                }
 
                 document.getElementById('last-update').textContent = data.updated && data.updated !== 'N/A'
                     ? new Date(data.updated).toLocaleString()
