@@ -2,9 +2,11 @@ import csv
 import glob
 import json
 import os
+import shutil
 from collections import defaultdict
-from datetime import UTC, datetime
+from datetime import datetime, timedelta, timezone
 from pathlib import Path
+from typing import Dict, List, Optional, Union
 
 ROOT = Path(
     os.environ.get("EQUITY_RESEARCH_ROOT", Path(__file__).resolve().parents[1])
@@ -12,6 +14,7 @@ ROOT = Path(
 HUB_DATA_DIR = ROOT / "hub" / "data"
 SIGNALS_OUTPUT_PATH = HUB_DATA_DIR / "signals.json"
 HORMUZ_OUTPUT_PATH = HUB_DATA_DIR / "hormuz.json"
+POLYMARKET_OUTPUT_PATH = HUB_DATA_DIR / "polymarket.json"
 
 MARINE_ROOT = ROOT / "marine-traffic-monitor"
 TRAFFIC_LOG_PATH = MARINE_ROOT / "data" / "hormuz_traffic_log.csv"
@@ -20,6 +23,8 @@ CURRENT_STATE_PATH = MARINE_ROOT / "state" / "current_state.json"
 LAST_ALERT_PATH = MARINE_ROOT / "state" / "last_alert.json"
 RATE_COUNTERS_PATH = MARINE_ROOT / "state" / "rate_counters.json"
 SCREENSHOTS_DIR = MARINE_ROOT / "screenshots"
+HUB_SCREENSHOTS_DIR = ROOT / "hub" / "screenshots"
+POLYMARKET_RUNS_DIR = ROOT / "daily-market" / "data" / "polymarket_runs"
 
 
 def _safe_load_json(path: Path, default):
@@ -32,31 +37,31 @@ def _safe_load_json(path: Path, default):
     return default
 
 
-def _safe_mtime_iso(path: Path) -> str | None:
+def _safe_mtime_iso(path: Path) -> Optional[str]:
     if not path.exists():
         return None
-    return datetime.fromtimestamp(path.stat().st_mtime, tz=UTC).isoformat()
+    return datetime.fromtimestamp(path.stat().st_mtime, tz=timezone.utc).isoformat()
 
 
-def _parse_hormuz_timestamp(value: str | None) -> datetime | None:
+def _parse_hormuz_timestamp(value: Optional[str]) -> Optional[datetime]:
     if not value:
         return None
     for fmt in ("%Y-%m-%d_%H-%M-%S", "%Y-%m-%dT%H:%M:%S%z", "%Y-%m-%dT%H:%M:%S"):
         try:
             parsed = datetime.strptime(value, fmt)
             if parsed.tzinfo is None:
-                parsed = parsed.replace(tzinfo=UTC)
-            return parsed.astimezone(UTC)
+                parsed = parsed.replace(tzinfo=timezone.utc)
+            return parsed.astimezone(timezone.utc)
         except ValueError:
             continue
     return None
 
 
-def _read_traffic_rows() -> list[dict[str, object]]:
+def _read_traffic_rows() -> List[Dict[str, object]]:
     if not TRAFFIC_LOG_PATH.exists():
         return []
 
-    rows: list[dict[str, object]] = []
+    rows: List[Dict[str, object]] = []
     try:
         with TRAFFIC_LOG_PATH.open("r", encoding="utf-8") as handle:
             reader = csv.DictReader(handle)
@@ -78,7 +83,7 @@ def _read_traffic_rows() -> list[dict[str, object]]:
     return rows
 
 
-def _load_recent_alerts(limit: int = 8) -> list[dict[str, object]]:
+def _load_recent_alerts(limit: int = 8) -> List[Dict[str, object]]:
     if not AUDIT_LOG_PATH.exists():
         return []
 
@@ -88,7 +93,7 @@ def _load_recent_alerts(limit: int = 8) -> list[dict[str, object]]:
         print(f"Audit parse error: {exc}")
         return []
 
-    alerts: list[dict[str, object]] = []
+    alerts: List[Dict[str, object]] = []
     for raw in reversed(lines[-limit:]):
         try:
             payload = json.loads(raw)
@@ -114,7 +119,7 @@ def _load_recent_alerts(limit: int = 8) -> list[dict[str, object]]:
     return alerts
 
 
-def _load_screenshots(limit: int = 8) -> list[dict[str, str | None]]:
+def _load_screenshots(limit: int = 8) -> List[Dict[str, Union[str, None]]]:
     if not SCREENSHOTS_DIR.exists():
         return []
 
@@ -124,7 +129,7 @@ def _load_screenshots(limit: int = 8) -> list[dict[str, str | None]]:
         reverse=True,
     )
 
-    items: list[dict[str, str | None]] = []
+    items: List[Dict[str, Union[str, None]]] = []
     for path in screenshots[:limit]:
         stem = path.stem
         screenshot_type = "screenshot"
@@ -147,13 +152,13 @@ def _load_screenshots(limit: int = 8) -> list[dict[str, str | None]]:
                 "type": screenshot_type,
                 "timestamp": timestamp,
                 "timestamp_iso": timestamp_dt.isoformat() if timestamp_dt else None,
-                "relative_path": f"../marine-traffic-monitor/screenshots/{path.name}",
+                "relative_path": f"screenshots/{path.name}",
             }
         )
     return items
 
 
-def build_hormuz_payload() -> dict[str, object]:
+def build_hormuz_payload() -> Dict[str, object]:
     traffic_rows = _read_traffic_rows()
     latest_row = traffic_rows[-1] if traffic_rows else {}
 
@@ -163,11 +168,11 @@ def build_hormuz_payload() -> dict[str, object]:
     recent_alerts = _load_recent_alerts()
     screenshots = _load_screenshots()
 
-    daily_buckets: dict[str, list[dict[str, object]]] = defaultdict(list)
+    daily_buckets: Dict[str, List[Dict[str, object]]] = defaultdict(list)
     for row in traffic_rows:
         daily_buckets[str(row.get("date") or "unknown")].append(row)
 
-    daily_history: list[dict[str, object]] = []
+    daily_history: List[Dict[str, object]] = []
     for day in sorted(daily_buckets):
         rows = daily_buckets[day]
         counts = [int(row.get("detected_ships") or 0) for row in rows]
@@ -195,7 +200,7 @@ def build_hormuz_payload() -> dict[str, object]:
     }
 
     return {
-        "generated_at": datetime.now(tz=UTC).isoformat(),
+        "generated_at": datetime.now(tz=timezone.utc).isoformat(),
         "current": {
             "latest_ship_count": int(latest_row.get("detected_ships") or 0),
             "latest_status_note": latest_row.get("status_note") or "No Recent Data",
@@ -217,7 +222,7 @@ def build_hormuz_payload() -> dict[str, object]:
     }
 
 
-def get_latest_maritime() -> dict[str, object]:
+def get_latest_maritime() -> Dict[str, object]:
     hormuz = build_hormuz_payload()
     current = hormuz["current"]
     assert isinstance(current, dict)
@@ -317,10 +322,19 @@ def bake_cake():
         "market": get_latest_market(),
         "macro": get_latest_macro(),
         "youtube": get_latest_youtube(),
-        "last_baked": datetime.now(tz=UTC).isoformat(),
+        "last_baked": datetime.now(tz=timezone.utc).isoformat(),
     }
 
     HUB_DATA_DIR.mkdir(parents=True, exist_ok=True)
+    HUB_SCREENSHOTS_DIR.mkdir(parents=True, exist_ok=True)
+
+    # Copy latest screenshots to hub/screenshots/ for deployment
+    for shot in hormuz_data.get("screenshots", []):
+        src = SCREENSHOTS_DIR / shot["name"]
+        dst = HUB_SCREENSHOTS_DIR / shot["name"]
+        if src.exists():
+            shutil.copy2(src, dst)
+
     with SIGNALS_OUTPUT_PATH.open("w", encoding="utf-8") as handle:
         json.dump(hub_data, handle, indent=2)
     with HORMUZ_OUTPUT_PATH.open("w", encoding="utf-8") as handle:
