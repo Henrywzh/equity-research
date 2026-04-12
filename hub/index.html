@@ -30,6 +30,9 @@
             transform: translateY(-2px);
             box-shadow: var(--shadow-md);
         }
+        .marine-card:hover #maritime-status {
+            color: var(--accent-primary);
+        }
         .alert-item {
             padding: 1rem;
             border-radius: var(--radius-md);
@@ -61,13 +64,14 @@
 
         <!-- KPI Row -->
         <div class="grid grid-cols-4 gap-6 mb-16">
-            <div class="card" id="kpi-maritime">
+            <div class="card clickable-card marine-card" id="kpi-maritime" onclick="window.location.href='hormuz.html'">
                 <span class="metric-label">Maritime Activity</span>
                 <div class="flex items-center justify-between mt-2">
                     <span class="metric-value">...</span>
                     <span class="badge">HORMUZ</span>
                 </div>
                 <div id="maritime-status" class="metric-label" style="font-size: 0.65rem; margin-top: 1rem; display: block;">...</div>
+                <div class="metric-label" style="font-size: 0.65rem; margin-top: 0.5rem; display: block;">Click for historical vessel monitor →</div>
             </div>
             <div class="card" id="kpi-macro">
                 <span class="metric-label">Macro Sentiment</span>
@@ -157,7 +161,8 @@
                 // 2. Update KPIs
                 const marine = data.maritime;
                 document.querySelector('#kpi-maritime .metric-value').textContent = marine.count || '0';
-                document.getElementById('maritime-status').textContent = `Status: ${marine.status}`;
+                const maritimeTimestamp = marine.updated || 'N/A';
+                document.getElementById('maritime-status').textContent = `Status: ${marine.status} • ${maritimeTimestamp}`;
                 
                 const macro = data.macro;
                 document.getElementById('macro-category').textContent = `Latest Analysis: ${macro.updated}`;

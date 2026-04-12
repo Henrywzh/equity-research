@@ -36,7 +36,7 @@ jobs:
           set -euo pipefail
           git config user.name "hub-bot[bot]"
           git config user.email "hub-bot[bot]@users.noreply.github.com"
-          git add hub/data/signals.json
+          git add hub/data/signals.json hub/data/hormuz.json
           if ! git diff --staged --quiet; then
             git commit -m "data: refresh unified intelligence hub $(date -u +%Y-%m-%dT%H:%M:%SZ)"
             for attempt in 1 2 3; do

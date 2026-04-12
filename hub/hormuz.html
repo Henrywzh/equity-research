@@ -1,0 +1,470 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hormuz Dashboard | Marine Monitor</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.3/dist/chart.umd.min.js"></script>
+    <style>
+        .page-grid {
+            display: grid;
+            grid-template-columns: 1.45fr 1fr;
+            gap: 1.5rem;
+        }
+        .chart-grid {
+            display: grid;
+            grid-template-columns: minmax(0, 1fr);
+            gap: 1.5rem;
+        }
+        .subgrid {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 1.5rem;
+        }
+        .summary-table td,
+        .summary-table th {
+            padding: 0.75rem 0.9rem;
+            font-size: 0.8rem;
+        }
+        .hero-banner {
+            background: linear-gradient(135deg, rgba(99, 102, 241, 0.08), rgba(16, 185, 129, 0.08));
+        }
+        .alert-summary {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+            margin-top: 0.4rem;
+            line-height: 1.5;
+        }
+        .screenshot-card a {
+            color: inherit;
+            text-decoration: none;
+        }
+        .empty-state {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+        @media (max-width: 1100px) {
+            .page-grid,
+            .subgrid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container" style="max-width: 1440px;">
+        <header class="flex justify-between items-center mb-6">
+            <div>
+                <div class="metric-label" style="margin-bottom: 0.25rem;">Marine Traffic Monitor</div>
+                <h1>Hormuz Dashboard</h1>
+                <p class="text-secondary" style="margin-top: 0.75rem; max-width: 760px;">
+                    Historical vessel activity, recent analyst alerts, retained screenshots, and file freshness for the Strait of Hormuz monitoring pipeline.
+                </p>
+            </div>
+            <div class="flex gap-4">
+                <a class="button-link" href="index.html">← Back to Hub</a>
+                <div class="card" style="padding: 0.5rem 1rem; border-radius: 9999px;">
+                    <span class="metric-label" style="font-size: 0.65rem;">Last Aggregation:</span>
+                    <span id="last-update" class="mono" style="font-size: 0.75rem; font-weight: 500;">...</span>
+                </div>
+            </div>
+        </header>
+
+        <section class="card hero-banner mb-8">
+            <div class="section-heading">
+                <div>
+                    <div class="metric-label">Latest Operating Snapshot</div>
+                    <h2>Current corridor state</h2>
+                </div>
+                <span id="current-state-pill" class="status-pill">
+                    <span class="status-dot"></span>
+                    Loading
+                </span>
+            </div>
+            <div class="grid grid-cols-4 gap-6">
+                <div>
+                    <div class="metric-label">Current Ships</div>
+                    <div id="kpi-ships" class="metric-value">...</div>
+                    <div id="latest-timestamp" class="metric-label mt-2">...</div>
+                </div>
+                <div>
+                    <div class="metric-label">Macro State</div>
+                    <div id="kpi-state" class="metric-value">...</div>
+                    <div id="state-updated" class="metric-label mt-2">...</div>
+                </div>
+                <div>
+                    <div class="metric-label">Last Alert Age</div>
+                    <div id="kpi-alert-age" class="metric-value">...</div>
+                    <div id="last-alert-ts" class="metric-label mt-2">...</div>
+                </div>
+                <div>
+                    <div class="metric-label">Latest Audit</div>
+                    <div id="kpi-audit-level" class="metric-value">...</div>
+                    <div id="kpi-audit-confidence" class="metric-label mt-2">...</div>
+                </div>
+            </div>
+        </section>
+
+        <section class="page-grid">
+            <main class="chart-grid">
+                <div class="card">
+                    <div class="section-heading">
+                        <div>
+                            <div class="metric-label">Primary Trend</div>
+                            <h2>Daily vessel history</h2>
+                        </div>
+                        <span id="daily-summary" class="status-pill">
+                            <span class="status-dot good"></span>
+                            Loading
+                        </span>
+                    </div>
+                    <div class="chart-shell">
+                        <canvas id="daily-history-chart" aria-label="Daily vessel history chart"></canvas>
+                    </div>
+                    <div id="daily-fallback" class="chart-fallback">Preparing daily history chart…</div>
+                </div>
+
+                <div class="subgrid">
+                    <div class="card">
+                        <div class="section-heading">
+                            <div>
+                                <div class="metric-label">Recent Runs</div>
+                                <h2>Latest cycle trend</h2>
+                            </div>
+                        </div>
+                        <div class="chart-shell chart-compact">
+                            <canvas id="recent-cycles-chart" aria-label="Recent cycle ship trend chart"></canvas>
+                        </div>
+                        <div id="recent-fallback" class="chart-fallback">Preparing recent cycle chart…</div>
+                    </div>
+
+                    <div class="card">
+                        <div class="section-heading">
+                            <div>
+                                <div class="metric-label">Current Files</div>
+                                <h2>Freshness</h2>
+                            </div>
+                        </div>
+                        <div class="grid grid-cols-2 gap-4 mb-6">
+                            <div>
+                                <div class="metric-label">Latest Traffic Row</div>
+                                <div id="freshness-latest-traffic" class="mono" style="font-size: 0.85rem; margin-top: 0.35rem;">...</div>
+                            </div>
+                            <div>
+                                <div class="metric-label">Groq Calls Today</div>
+                                <div id="freshness-groq-calls" class="mono" style="font-size: 0.85rem; margin-top: 0.35rem;">...</div>
+                            </div>
+                            <div>
+                                <div class="metric-label">Last Alert Timestamp</div>
+                                <div id="freshness-last-alert" class="mono" style="font-size: 0.85rem; margin-top: 0.35rem;">...</div>
+                            </div>
+                            <div>
+                                <div class="metric-label">Macro State File</div>
+                                <div id="freshness-state" class="mono" style="font-size: 0.85rem; margin-top: 0.35rem;">...</div>
+                            </div>
+                        </div>
+                        <div id="freshness-list" class="timeline">
+                            <div class="empty-state">Loading freshness metadata…</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="section-heading">
+                        <div>
+                            <div class="metric-label">Raw Reference</div>
+                            <h2>Latest CSV cycles</h2>
+                        </div>
+                    </div>
+                    <div style="overflow-x: auto;">
+                        <table class="data-table summary-table">
+                            <thead>
+                                <tr>
+                                    <th>Timestamp</th>
+                                    <th style="text-align: right;">Ships</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody id="recent-cycles-table">
+                                <tr>
+                                    <td colspan="3" class="empty-state">Loading recent cycles…</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </main>
+
+            <aside class="flex flex-col gap-6">
+                <div class="card">
+                    <div class="section-heading">
+                        <div>
+                            <div class="metric-label">Analyst Audit</div>
+                            <h2>Recent alerts</h2>
+                        </div>
+                    </div>
+                    <div id="alert-timeline" class="timeline">
+                        <div class="empty-state">Loading recent marine alerts…</div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="section-heading">
+                        <div>
+                            <div class="metric-label">Retained Evidence</div>
+                            <h2>Latest screenshots</h2>
+                        </div>
+                    </div>
+                    <div id="screenshot-grid" class="screenshot-grid">
+                        <div class="empty-state">Loading retained screenshots…</div>
+                    </div>
+                </div>
+            </aside>
+        </section>
+    </div>
+
+    <script>
+        function formatDateLabel(value) {
+            if (!value) return "N/A";
+            const date = new Date(value);
+            if (Number.isNaN(date.getTime())) return value;
+            return date.toLocaleString();
+        }
+
+        function formatAge(value) {
+            if (!value) return "Never";
+            const now = new Date();
+            const then = new Date(value);
+            if (Number.isNaN(then.getTime())) return value;
+            const diffMs = now - then;
+            const diffHours = Math.floor(diffMs / (1000 * 60 * 60));
+            if (diffHours < 1) {
+                const diffMinutes = Math.max(1, Math.floor(diffMs / (1000 * 60)));
+                return `${diffMinutes}m`;
+            }
+            if (diffHours < 24) return `${diffHours}h`;
+            return `${Math.floor(diffHours / 24)}d`;
+        }
+
+        function levelBadgeClass(level) {
+            const normalized = String(level || "").toUpperCase();
+            if (normalized === "ESCALATED" || normalized === "CRITICAL") return "badge badge-danger";
+            if (normalized === "WATCH" || normalized === "REVIEW" || normalized === "DISPUTED") return "badge badge-warning";
+            return "badge badge-success";
+        }
+
+        function stateDotClass(state) {
+            const normalized = String(state || "").toUpperCase();
+            if (normalized.includes("BLOCKADE")) return "status-dot danger";
+            if (normalized.includes("SURGE") || normalized.includes("RECOVERY")) return "status-dot warn";
+            return "status-dot good";
+        }
+
+        function setChartFallback(elementId, message) {
+            const element = document.getElementById(elementId);
+            if (element) element.textContent = message;
+        }
+
+        function renderChart(canvasId, config, fallbackId, fallbackText) {
+            if (!window.Chart) {
+                setChartFallback(fallbackId, fallbackText);
+                return;
+            }
+            const canvas = document.getElementById(canvasId);
+            if (!canvas) return;
+            new Chart(canvas, config);
+            setChartFallback(fallbackId, "");
+        }
+
+        async function loadHormuzData() {
+            try {
+                const response = await fetch("data/hormuz.json");
+                const data = await response.json();
+                const current = data.current || {};
+                const recentAlerts = data.recent_alerts || [];
+                const latestAlert = recentAlerts[0] || {};
+                const dailyHistory = data.daily_history || [];
+                const recentCycles = data.recent_cycles || [];
+
+                document.getElementById("last-update").textContent = formatDateLabel(data.generated_at);
+                document.getElementById("kpi-ships").textContent = current.latest_ship_count ?? 0;
+                document.getElementById("latest-timestamp").textContent = `Latest row: ${current.latest_timestamp || "N/A"}`;
+                document.getElementById("kpi-state").textContent = current.macro_state || "UNKNOWN";
+                document.getElementById("state-updated").textContent = `State file: ${formatDateLabel(current.macro_state_updated_at)}`;
+                document.getElementById("kpi-alert-age").textContent = formatAge(current.last_alert_timestamp);
+                document.getElementById("last-alert-ts").textContent = `Last alert: ${formatDateLabel(current.last_alert_timestamp)}`;
+                document.getElementById("kpi-audit-level").textContent = latestAlert.alert_level || "NONE";
+                document.getElementById("kpi-audit-confidence").textContent = latestAlert.avg_confidence ? `Avg confidence: ${(latestAlert.avg_confidence * 100).toFixed(0)}%` : "No recent audit entry";
+                document.getElementById("freshness-latest-traffic").textContent = current.latest_timestamp || "N/A";
+                document.getElementById("freshness-groq-calls").textContent = `${current.groq_calls_today ?? 0} on ${current.rate_counter_date || "N/A"}`;
+                document.getElementById("freshness-last-alert").textContent = current.last_alert_timestamp ? formatDateLabel(current.last_alert_timestamp) : "No alert recorded";
+                document.getElementById("freshness-state").textContent = current.macro_state_updated_at ? formatDateLabel(current.macro_state_updated_at) : "State file missing";
+
+                const statePill = document.getElementById("current-state-pill");
+                statePill.innerHTML = `<span class="${stateDotClass(current.macro_state)}"></span>${current.latest_status_note || "No status"}`;
+
+                const dailyPeak = dailyHistory.reduce((maxValue, row) => Math.max(maxValue, Number(row.max_ships || 0)), 0);
+                document.getElementById("daily-summary").innerHTML = `<span class="status-dot ${dailyPeak > 0 ? "warn" : "good"}"></span>Peak daily count ${dailyPeak}`;
+
+                renderChart(
+                    "daily-history-chart",
+                    {
+                        type: "line",
+                        data: {
+                            labels: dailyHistory.map((row) => row.date),
+                            datasets: [
+                                {
+                                    label: "Max ships",
+                                    data: dailyHistory.map((row) => Number(row.max_ships || 0)),
+                                    borderColor: "#6366f1",
+                                    backgroundColor: "rgba(99, 102, 241, 0.12)",
+                                    fill: true,
+                                    tension: 0.3,
+                                    borderWidth: 2.5
+                                },
+                                {
+                                    label: "Average ships",
+                                    data: dailyHistory.map((row) => Number(row.avg_ships || 0)),
+                                    borderColor: "#10b981",
+                                    backgroundColor: "rgba(16, 185, 129, 0.08)",
+                                    fill: false,
+                                    tension: 0.25,
+                                    borderWidth: 2
+                                }
+                            ]
+                        },
+                        options: {
+                            maintainAspectRatio: false,
+                            interaction: { mode: "index", intersect: false },
+                            scales: {
+                                x: { ticks: { color: "#64748b" }, grid: { display: false } },
+                                y: { beginAtZero: true, ticks: { color: "#64748b", precision: 0 }, grid: { color: "#e2e8f0" } }
+                            },
+                            plugins: {
+                                legend: { labels: { color: "#0f172a" } }
+                            }
+                        }
+                    },
+                    "daily-fallback",
+                    dailyHistory.length ? `Daily history loaded with ${dailyHistory.length} days.` : "No daily history available."
+                );
+
+                renderChart(
+                    "recent-cycles-chart",
+                    {
+                        type: "bar",
+                        data: {
+                            labels: recentCycles.map((row) => String(row.timestamp || "").slice(11).replaceAll("-", ":") || row.date),
+                            datasets: [
+                                {
+                                    label: "Ships in zone",
+                                    data: recentCycles.map((row) => Number(row.detected_ships || 0)),
+                                    backgroundColor: recentCycles.map((row) => Number(row.detected_ships || 0) > 0 ? "rgba(245, 158, 11, 0.7)" : "rgba(16, 185, 129, 0.65)"),
+                                    borderRadius: 6
+                                }
+                            ]
+                        },
+                        options: {
+                            maintainAspectRatio: false,
+                            scales: {
+                                x: { ticks: { color: "#64748b", maxRotation: 0, autoSkip: true }, grid: { display: false } },
+                                y: { beginAtZero: true, ticks: { color: "#64748b", precision: 0 }, grid: { color: "#e2e8f0" } }
+                            },
+                            plugins: {
+                                legend: { display: false }
+                            }
+                        }
+                    },
+                    "recent-fallback",
+                    recentCycles.length ? `Recent trend loaded with ${recentCycles.length} cycles.` : "No recent cycle history available."
+                );
+
+                const freshnessList = document.getElementById("freshness-list");
+                freshnessList.innerHTML = "";
+                Object.entries(data.freshness || {}).forEach(([key, item]) => {
+                    const row = document.createElement("div");
+                    row.className = "timeline-item";
+                    row.innerHTML = `
+                        <div class="timeline-meta">
+                            <strong>${key.replaceAll("_", " ")}</strong>
+                            <span class="metric-label">${formatAge(item.modified_at)}</span>
+                        </div>
+                        <div class="timeline-copy">${item.path || ""}</div>
+                        <div class="timeline-copy">${formatDateLabel(item.modified_at)}</div>
+                    `;
+                    freshnessList.appendChild(row);
+                });
+
+                const cyclesTable = document.getElementById("recent-cycles-table");
+                cyclesTable.innerHTML = "";
+                if (recentCycles.length) {
+                    [...recentCycles].reverse().forEach((row) => {
+                        const tr = document.createElement("tr");
+                        tr.innerHTML = `
+                            <td class="mono">${row.timestamp || "N/A"}</td>
+                            <td class="mono" style="text-align: right; font-weight: 700;">${row.detected_ships ?? 0}</td>
+                            <td>${row.status_note || "No status note"}</td>
+                        `;
+                        cyclesTable.appendChild(tr);
+                    });
+                } else {
+                    cyclesTable.innerHTML = '<tr><td colspan="3" class="empty-state">No recent cycle rows available.</td></tr>';
+                }
+
+                const alertTimeline = document.getElementById("alert-timeline");
+                alertTimeline.innerHTML = "";
+                if (recentAlerts.length) {
+                    recentAlerts.forEach((alert) => {
+                        const item = document.createElement("div");
+                        item.className = "timeline-item";
+                        item.innerHTML = `
+                            <div class="timeline-meta">
+                                <strong>${formatDateLabel(alert.timestamp)}</strong>
+                                <span class="${levelBadgeClass(alert.alert_level)}">${alert.alert_level || "UNKNOWN"}</span>
+                            </div>
+                            <div class="timeline-copy">State: ${alert.applied_state || "UNKNOWN"} • Threat: ${alert.threat_level || "UNKNOWN"} • Ships: ${alert.ships_in_zone ?? 0}</div>
+                            <div class="alert-summary">${alert.summary || "No policy summary recorded."}</div>
+                        `;
+                        alertTimeline.appendChild(item);
+                    });
+                } else {
+                    alertTimeline.innerHTML = '<div class="empty-state">No recent audit alerts were found.</div>';
+                }
+
+                const screenshotGrid = document.getElementById("screenshot-grid");
+                screenshotGrid.innerHTML = "";
+                const screenshots = data.screenshots || [];
+                if (screenshots.length) {
+                    screenshots.forEach((shot) => {
+                        const card = document.createElement("div");
+                        card.className = "screenshot-card";
+                        card.innerHTML = `
+                            <a href="${shot.relative_path}" target="_blank" rel="noreferrer">
+                                <img src="${shot.relative_path}" alt="${shot.label || shot.name}" loading="lazy" />
+                                <div class="screenshot-body">
+                                    <div class="timeline-meta">
+                                        <strong>${shot.label || shot.name}</strong>
+                                        <span class="${levelBadgeClass(shot.type === "detected" ? "WATCH" : "NORMAL")}">${shot.type || "shot"}</span>
+                                    </div>
+                                    <div class="timeline-copy">${shot.timestamp || "Unknown timestamp"}</div>
+                                </div>
+                            </a>
+                        `;
+                        screenshotGrid.appendChild(card);
+                    });
+                } else {
+                    screenshotGrid.innerHTML = '<div class="empty-state">No retained screenshots were found.</div>';
+                }
+            } catch (error) {
+                console.error("Failed to load Hormuz dashboard data.", error);
+                setChartFallback("daily-fallback", "Failed to load the marine payload.");
+                setChartFallback("recent-fallback", "Failed to load the marine payload.");
+            }
+        }
+
+        loadHormuzData();
+        setInterval(loadHormuzData, 300000);
+    </script>
+</body>
+</html>
