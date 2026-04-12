@@ -27,9 +27,16 @@ jobs:
         with:
           python-version: "3.11"
 
-      - name: Run Aggregator
+      - name: Install dependencies
         run: |
-          python hub/aggregator.py
+          python -m pip install --upgrade pip
+          python -m pip install ./daily-macro ./daily-market
+
+      - name: Run Aggregator
+        env:
+          FRED_API_KEY: ${{ secrets.FRED_API_KEY }}
+        run: |
+          PYTHONPATH=$PYTHONPATH:$(pwd)/daily-macro/src python hub/aggregator.py
 
       - name: Commit updated signals
         run: |

@@ -3,10 +3,14 @@ import glob
 import json
 import os
 import shutil
+import sys
 from collections import defaultdict
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
 from typing import Dict, List, Optional, Union
+
+# Add internal package paths for direct imports
+sys.path.append(str(Path(__file__).resolve().parents[1] / "daily-macro" / "src"))
 
 ROOT = Path(
     os.environ.get("EQUITY_RESEARCH_ROOT", Path(__file__).resolve().parents[1])
@@ -274,10 +278,10 @@ def _parse_iso(value: Optional[str]) -> Optional[datetime]:
 
 
 def _load_polymarket_runs() -> List[Dict[str, object]]:
-    run_glob = str(POLYMARKET_RUNS_DIR / "*" / "polymarket.json")
     runs: List[Dict[str, object]] = []
-    for path_str in glob.glob(run_glob):
-        path = Path(path_str)
+    # Use rglob to find all polymarket.json files in date-partitioned folders
+    run_paths = sorted(POLYMARKET_RUNS_DIR.rglob("polymarket.json"), key=os.path.getmtime, reverse=True)
+    for path in run_paths:
         payload = _safe_load_json(path, None)
         if not isinstance(payload, dict):
             continue
@@ -523,6 +527,23 @@ def get_latest_macro():
     return data
 
 
+def get_latest_fred() -> Dict[str, object]:
+    data: Dict[str, object] = {"items": [], "updated": "N/A", "status": "missing"}
+    try:
+        from daily_macro.release_calendar import build_release_digest
+
+        # Get high-impact releases for the next 7 days
+        digest = build_release_digest(start_date=datetime.now(timezone.utc).date(), days_ahead=7)
+        data["items"] = [
+            item for item in digest.get("items") or [] if item.get("impact") == "high"
+        ][:5]
+        data["updated"] = digest.get("generated_at", "N/A")
+        data["status"] = digest.get("fetch_status", "success")
+    except Exception as exc:
+        print(f"FRED parse error: {exc}")
+    return data
+
+
 def get_latest_youtube():
     data = {"signals": [], "total_analyzed": 0, "updated": "N/A"}
     try:
@@ -561,6 +582,7 @@ def bake_cake():
         "market": get_latest_market(),
         "polymarket": polymarket_compact,
         "macro": get_latest_macro(),
+        "fred": get_latest_fred(),
         "youtube": get_latest_youtube(),
         "last_baked": datetime.now(tz=timezone.utc).isoformat(),
     }

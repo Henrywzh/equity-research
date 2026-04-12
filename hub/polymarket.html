@@ -75,9 +75,27 @@
         </div>
 
         <div id="warning-host" class="mb-6"></div>
+        
+        <div class="flex items-center gap-3 mb-6">
+            <h2 style="margin: 0;">Prediction Market Pulse</h2>
+            <div style="height: 1px; flex: 1; background: var(--border-color); opacity: 0.5;"></div>
+        </div>
+
         <div id="group-grid" class="group-grid">
             <div class="card">
                 <p style="color: var(--text-muted);">Waiting for Polymarket payload...</p>
+            </div>
+        </div>
+
+        <div class="flex items-center gap-3 mt-12 mb-6">
+            <h2 style="margin: 0;">Largest Probability Movers</h2>
+            <div style="height: 1px; flex: 1; background: var(--border-color); opacity: 0.5;"></div>
+            <span class="metric-label">24H Shift</span>
+        </div>
+
+        <div id="movers-grid" class="group-grid" style="grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));">
+            <div class="card">
+                <p style="color: var(--text-muted);">Calculating movers...</p>
             </div>
         </div>
     </div>
@@ -170,6 +188,40 @@
                     `;
                     grid.appendChild(card);
                 });
+
+                // 2. Populate Movers Grid
+                const moversGrid = document.getElementById('movers-grid');
+                moversGrid.innerHTML = '';
+                const movers = data.largest_movers || [];
+
+                if (movers.length === 0) {
+                    moversGrid.innerHTML = '<div class="card"><p style="color: var(--text-muted);">No significant sentiment shifts recorded in the last 24h.</p></div>';
+                } else {
+                    movers.forEach(row => {
+                        const card = document.createElement('div');
+                        card.className = 'card flex flex-col justify-between';
+                        const delta = row.delta_1d_pct;
+                        const deltaClass = delta > 1.5 ? 'badge-success' : (delta < -1.5 ? 'badge-error' : '');
+                        
+                        card.innerHTML = `
+                            <div>
+                                <div class="flex justify-between items-start mb-3">
+                                    <span class="metric-label" style="font-size: 0.65rem;">${row.group_key.replace('_', ' ').toUpperCase()}</span>
+                                    <span class="badge ${deltaClass}">${formatDelta(delta)}</span>
+                                </div>
+                                <strong style="display:block; font-size: 1.1rem; line-height: 1.3;">${row.question}</strong>
+                            </div>
+                            <div class="flex justify-between items-end mt-6">
+                                <div>
+                                    <div class="metric-label" style="font-size: 0.6rem;">Currently</div>
+                                    <div class="mono" style="font-weight: 700; font-size: 1.25rem;">${formatProbability(row.probability_pct)}</div>
+                                </div>
+                                <a class="source-link" style="font-size: 0.85rem;" href="${row.source_url || '#'}" target="_blank" rel="noopener noreferrer">Details →</a>
+                            </div>
+                        `;
+                        moversGrid.appendChild(card);
+                    });
+                }
             } catch (err) {
                 console.error('Failed to load polymarket dashboard payload.', err);
                 document.getElementById('group-grid').innerHTML = '<div class="card"><p style="color: var(--text-muted);">Unable to load Polymarket data right now.</p></div>';
