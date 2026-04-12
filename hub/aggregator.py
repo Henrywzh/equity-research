@@ -261,6 +261,244 @@ def get_latest_market():
     return data
 
 
+def _parse_iso(value: Optional[str]) -> Optional[datetime]:
+    if not value:
+        return None
+    try:
+        parsed = datetime.fromisoformat(value.replace("Z", "+00:00"))
+        if parsed.tzinfo is None:
+            parsed = parsed.replace(tzinfo=timezone.utc)
+        return parsed.astimezone(timezone.utc)
+    except ValueError:
+        return None
+
+
+def _load_polymarket_runs() -> List[Dict[str, object]]:
+    run_glob = str(POLYMARKET_RUNS_DIR / "*" / "polymarket.json")
+    runs: List[Dict[str, object]] = []
+    for path_str in glob.glob(run_glob):
+        path = Path(path_str)
+        payload = _safe_load_json(path, None)
+        if not isinstance(payload, dict):
+            continue
+        run = payload.get("run") or {}
+        if not isinstance(run, dict):
+            continue
+        started_at = _parse_iso(run.get("started_at"))
+        if started_at is None:
+            continue
+        payload["_started_at"] = started_at
+        try:
+            payload["_path"] = str(path.relative_to(ROOT))
+        except ValueError:
+            payload["_path"] = str(path)
+        runs.append(payload)
+    runs.sort(key=lambda item: item["_started_at"], reverse=True)
+    return runs
+
+
+def _find_prior_probability(
+    history: List[tuple[datetime, float]],
+    current_time: datetime,
+    minimum_age: timedelta,
+) -> Optional[float]:
+    for ts, value in reversed(history):
+        if current_time - ts >= minimum_age:
+            return value
+    return None
+
+
+def _prepare_polymarket_rows(
+    latest_payload: Dict[str, object],
+    prior_runs: List[Dict[str, object]],
+) -> List[Dict[str, object]]:
+    snapshots = latest_payload.get("snapshots") or []
+    markets = latest_payload.get("markets") or []
+    if not isinstance(snapshots, list):
+        return []
+    market_meta: Dict[str, Dict[str, object]] = {}
+    if isinstance(markets, list):
+        for market in markets:
+            if not isinstance(market, dict):
+                continue
+            slug = str(market.get("market_slug") or "")
+            if slug:
+                market_meta[slug] = market
+
+    history_by_market: Dict[str, List[tuple[datetime, float]]] = defaultdict(list)
+    for payload in prior_runs:
+        for snap in payload.get("snapshots") or []:
+            if not isinstance(snap, dict):
+                continue
+            slug = str(snap.get("market_slug") or "")
+            ts = _parse_iso(snap.get("fetched_at"))
+            prob = snap.get("implied_probability")
+            if not slug or ts is None or prob is None:
+                continue
+            try:
+                history_by_market[slug].append((ts, float(prob)))
+            except (TypeError, ValueError):
+                continue
+
+    for values in history_by_market.values():
+        values.sort(key=lambda item: item[0])
+
+    rows: List[Dict[str, object]] = []
+    for snap in snapshots:
+        if not isinstance(snap, dict):
+            continue
+        slug = str(snap.get("market_slug") or "")
+        fetched_at = _parse_iso(snap.get("fetched_at"))
+        if not slug or fetched_at is None:
+            continue
+
+        prob_raw = snap.get("implied_probability")
+        try:
+            probability = float(prob_raw) if prob_raw is not None else None
+        except (TypeError, ValueError):
+            probability = None
+
+        delta_1d = None
+        delta_7d = None
+        if probability is not None:
+            history = history_by_market.get(slug, [])
+            prior_1d = _find_prior_probability(history, fetched_at, timedelta(days=1))
+            prior_7d = _find_prior_probability(history, fetched_at, timedelta(days=7))
+            delta_1d = probability - prior_1d if prior_1d is not None else None
+            delta_7d = probability - prior_7d if prior_7d is not None else None
+
+        rows.append(
+            {
+                "market_id": snap.get("market_id"),
+                "market_slug": slug,
+                "group_key": snap.get("group_key"),
+                "asset": snap.get("asset"),
+                "horizon": snap.get("horizon"),
+                "question": snap.get("question") or market_meta.get(slug, {}).get("question"),
+                "probability": probability,
+                "probability_pct": round(probability * 100, 1) if probability is not None else None,
+                "best_bid": snap.get("best_bid"),
+                "best_ask": snap.get("best_ask"),
+                "spread": snap.get("spread"),
+                "last_trade_price": snap.get("last_trade_price"),
+                "liquidity": snap.get("liquidity"),
+                "volume": snap.get("volume"),
+                "volume_24h": snap.get("volume_24h"),
+                "expiry": snap.get("expiry_timestamp"),
+                "market_status": snap.get("market_status"),
+                "source_url": snap.get("source_url") or market_meta.get(slug, {}).get("source_url"),
+                "delta_1d": round(delta_1d, 4) if delta_1d is not None else None,
+                "delta_1d_pct": round(delta_1d * 100, 1) if delta_1d is not None else None,
+                "delta_7d": round(delta_7d, 4) if delta_7d is not None else None,
+                "delta_7d_pct": round(delta_7d * 100, 1) if delta_7d is not None else None,
+            }
+        )
+    return rows
+
+
+def _group_polymarket_rows(rows: List[Dict[str, object]]) -> List[Dict[str, object]]:
+    labels = {
+        "fed_rates": "Fed rates",
+        "qqq_daily": "QQQ daily",
+        "btc_daily": "BTC daily",
+        "spx_thresholds": "SPX thresholds",
+        "btc_thresholds": "BTC thresholds",
+        "gold_thresholds": "Gold thresholds",
+        "oil_thresholds": "Oil thresholds",
+    }
+    ordered_keys = [
+        "fed_rates",
+        "qqq_daily",
+        "btc_daily",
+        "spx_thresholds",
+        "btc_thresholds",
+        "gold_thresholds",
+        "oil_thresholds",
+    ]
+    grouped: List[Dict[str, object]] = []
+    for key in ordered_keys:
+        group_rows = [row for row in rows if row.get("group_key") == key]
+        if group_rows:
+            grouped.append({"group_key": key, "label": labels.get(key, key), "rows": group_rows})
+    return grouped
+
+
+def get_latest_polymarket() -> tuple[Dict[str, object], Dict[str, object]]:
+    compact: Dict[str, object] = {
+        "status": "missing",
+        "updated": "N/A",
+        "freshness_minutes": None,
+        "error_count": 0,
+        "errors": [],
+        "fed_rates": [],
+        "qqq_daily": None,
+        "btc_daily": None,
+        "largest_movers": [],
+    }
+    detailed: Dict[str, object] = {
+        "status": "missing",
+        "updated": "N/A",
+        "freshness_minutes": None,
+        "error_count": 0,
+        "errors": [],
+        "groups": [],
+        "source_run_path": None,
+    }
+
+    try:
+        runs = _load_polymarket_runs()
+        if not runs:
+            return compact, detailed
+
+        latest = runs[0]
+        run = latest.get("run") or {}
+        errors = latest.get("errors") or []
+        started_at = _parse_iso(run.get("started_at"))
+        freshness_minutes = (
+            round((datetime.now(tz=timezone.utc) - started_at).total_seconds() / 60)
+            if started_at is not None
+            else None
+        )
+        rows = _prepare_polymarket_rows(latest, runs[1:])
+
+        compact.update(
+            {
+                "status": run.get("status") or "missing",
+                "updated": run.get("started_at") or "N/A",
+                "freshness_minutes": freshness_minutes,
+                "error_count": len(errors),
+                "errors": list(errors)[:5],
+                "fed_rates": sorted(
+                    [row for row in rows if row.get("group_key") == "fed_rates"],
+                    key=lambda row: row.get("probability") or -1,
+                    reverse=True,
+                )[:4],
+                "qqq_daily": next((row for row in rows if row.get("group_key") == "qqq_daily"), None),
+                "btc_daily": next((row for row in rows if row.get("group_key") == "btc_daily"), None),
+            }
+        )
+
+        movers = [row for row in rows if row.get("delta_1d_pct") is not None]
+        movers.sort(key=lambda row: abs(row.get("delta_1d_pct") or 0), reverse=True)
+        compact["largest_movers"] = movers[:5]
+
+        detailed.update(
+            {
+                "status": run.get("status") or "missing",
+                "updated": run.get("started_at") or "N/A",
+                "freshness_minutes": freshness_minutes,
+                "error_count": len(errors),
+                "errors": list(errors),
+                "groups": _group_polymarket_rows(rows),
+                "source_run_path": latest.get("_path"),
+            }
+        )
+    except Exception as exc:
+        print(f"Polymarket parse error: {exc}")
+
+    return compact, detailed
+
+
 def get_latest_macro():
     data = {"alerts": [], "sentiment": "Pending LLM", "summary": [], "updated": "N/A"}
     try:
@@ -317,9 +555,11 @@ def get_latest_youtube():
 def bake_cake():
     print("Aggregation started...")
     hormuz_data = build_hormuz_payload()
+    polymarket_compact, polymarket_detail = get_latest_polymarket()
     hub_data = {
         "maritime": get_latest_maritime(),
         "market": get_latest_market(),
+        "polymarket": polymarket_compact,
         "macro": get_latest_macro(),
         "youtube": get_latest_youtube(),
         "last_baked": datetime.now(tz=timezone.utc).isoformat(),
@@ -339,9 +579,12 @@ def bake_cake():
         json.dump(hub_data, handle, indent=2)
     with HORMUZ_OUTPUT_PATH.open("w", encoding="utf-8") as handle:
         json.dump(hormuz_data, handle, indent=2)
+    with POLYMARKET_OUTPUT_PATH.open("w", encoding="utf-8") as handle:
+        json.dump(polymarket_detail, handle, indent=2)
 
     print(f"Aggregated signal cake baked at {SIGNALS_OUTPUT_PATH}")
     print(f"Hormuz dashboard payload baked at {HORMUZ_OUTPUT_PATH}")
+    print(f"Polymarket dashboard payload baked at {POLYMARKET_OUTPUT_PATH}")
 
 
 if __name__ == "__main__":

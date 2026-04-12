@@ -5,7 +5,7 @@ on:
     - cron: "0 */4 * * *"
   workflow_dispatch:
   workflow_run:
-    workflows: ["Marine Monitor API", "Daily Macro Analysis", "Youtube Run"]
+    workflows: ["Marine Monitor API", "Daily Macro Analysis", "Youtube Run", "Daily Market Polymarket"]
     types:
       - completed
 
@@ -36,7 +36,7 @@ jobs:
           set -euo pipefail
           git config user.name "hub-bot[bot]"
           git config user.email "hub-bot[bot]@users.noreply.github.com"
-          git add hub/data/signals.json hub/data/hormuz.json
+          git add hub/data/signals.json hub/data/hormuz.json hub/data/polymarket.json hub/index.html hub/polymarket.html hub/css/styles.css
           if ! git diff --staged --quiet; then
             git commit -m "data: refresh unified intelligence hub $(date -u +%Y-%m-%dT%H:%M:%SZ)"
             for attempt in 1 2 3; do

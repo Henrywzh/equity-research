@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Polymarket Signals | Unified Intelligence Hub</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <style>
+        .hero {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+        .warning-banner {
+            padding: 1rem 1.2rem;
+            border-radius: var(--radius-md);
+            border: 1px solid rgba(245, 158, 11, 0.25);
+            background: rgba(245, 158, 11, 0.08);
+            color: var(--text-primary);
+        }
+        .group-grid {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 1.5rem;
+        }
+        .probability-cell {
+            font-weight: 700;
+            text-align: right;
+        }
+        .source-link {
+            color: var(--accent-primary);
+            text-decoration: none;
+            font-weight: 600;
+        }
+        .source-link:hover {
+            text-decoration: underline;
+        }
+        .small-note {
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+        }
+        @media (max-width: 1100px) {
+            .group-grid {
+                grid-template-columns: 1fr;
+            }
+            .hero {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container" style="max-width: 1500px;">
+        <div class="hero">
+            <div>
+                <div class="metric-label" style="margin-bottom: 0.35rem;">Market-Implied Macro Dashboard</div>
+                <h1>Polymarket Watchlist</h1>
+                <p id="subtitle" style="margin-top: 0.75rem; color: var(--text-secondary); max-width: 780px;">
+                    Loading curated Fed, QQQ, BTC, SPX, gold, and oil contracts...
+                </p>
+            </div>
+            <div class="flex gap-4" style="flex-wrap: wrap;">
+                <a class="button-link" href="index.html">← Back to Hub</a>
+                <div class="card" style="padding: 0.65rem 1rem; border-radius: 9999px;">
+                    <span class="metric-label" style="font-size: 0.65rem;">Last update</span>
+                    <div id="last-update" class="mono" style="font-size: 0.8rem; margin-top: 0.2rem;">...</div>
+                </div>
+                <div class="card" style="padding: 0.65rem 1rem; border-radius: 9999px;">
+                    <span class="metric-label" style="font-size: 0.65rem;">Status</span>
+                    <div id="run-status" class="mono" style="font-size: 0.8rem; margin-top: 0.2rem;">...</div>
+                </div>
+            </div>
+        </div>
+
+        <div id="warning-host" class="mb-6"></div>
+        <div id="group-grid" class="group-grid">
+            <div class="card">
+                <p style="color: var(--text-muted);">Waiting for Polymarket payload...</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function formatProbability(value) {
+            return value == null ? 'N/A' : `${value.toFixed(1)}%`;
+        }
+
+        function formatDelta(value) {
+            return value == null ? 'N/A' : `${value > 0 ? '+' : ''}${value.toFixed(1)} pts`;
+        }
+
+        async function loadPolymarket() {
+            try {
+                const response = await fetch('data/polymarket.json');
+                const data = await response.json();
+
+                document.getElementById('last-update').textContent = data.updated && data.updated !== 'N/A'
+                    ? new Date(data.updated).toLocaleString()
+                    : 'Unavailable';
+                document.getElementById('run-status').textContent = `${String(data.status || 'missing').toUpperCase()}${data.freshness_minutes != null ? ` • ${data.freshness_minutes}m old` : ''}`;
+                document.getElementById('subtitle').textContent = data.source_run_path
+                    ? `Derived from ${data.source_run_path}. Click through to the source market for execution detail.`
+                    : 'No baked Polymarket payload yet.';
+
+                const warningHost = document.getElementById('warning-host');
+                warningHost.innerHTML = '';
+                if ((data.error_count || 0) > 0) {
+                    const banner = document.createElement('div');
+                    banner.className = 'warning-banner';
+                    banner.innerHTML = `
+                        <strong>Partial watchlist coverage.</strong>
+                        <div class="small-note" style="margin-top: 0.45rem;">
+                            ${data.error_count} configured contract(s) were unavailable on the latest fetch.
+                        </div>
+                        <ul style="margin: 0.55rem 0 0 1rem;">
+                            ${(data.errors || []).map(err => `<li>${err}</li>`).join('')}
+                        </ul>
+                    `;
+                    warningHost.appendChild(banner);
+                }
+
+                const grid = document.getElementById('group-grid');
+                grid.innerHTML = '';
+
+                const groups = data.groups || [];
+                if (!groups.length) {
+                    grid.innerHTML = '<div class="card"><p style="color: var(--text-muted);">No Polymarket groups available yet.</p></div>';
+                    return;
+                }
+
+                groups.forEach(group => {
+                    const card = document.createElement('div');
+                    card.className = 'card';
+                    card.innerHTML = `
+                        <div class="flex justify-between items-center mb-4">
+                            <h2 style="margin: 0;">${group.label}</h2>
+                            <span class="badge">${group.rows.length} contracts</span>
+                        </div>
+                        <div style="overflow-x:auto;">
+                            <table class="data-table">
+                                <thead>
+                                    <tr>
+                                        <th style="width: 42%">Contract</th>
+                                        <th style="text-align:right;">Prob.</th>
+                                        <th style="text-align:right;">1d</th>
+                                        <th style="text-align:right;">Spread</th>
+                                        <th style="text-align:right;">Expiry</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    ${group.rows.map(row => `
+                                        <tr>
+                                            <td>
+                                                <strong style="display:block;">${row.question}</strong>
+                                                <div class="small-note" style="margin-top: 0.25rem;">
+                                                    ${row.market_status || 'unknown'} • <a class="source-link" href="${row.source_url || '#'}" target="_blank" rel="noopener noreferrer">Open market</a>
+                                                </div>
+                                            </td>
+                                            <td class="mono probability-cell">${formatProbability(row.probability_pct)}</td>
+                                            <td class="mono" style="text-align:right;">${formatDelta(row.delta_1d_pct)}</td>
+                                            <td class="mono" style="text-align:right;">${row.spread != null ? row.spread.toFixed(3) : 'N/A'}</td>
+                                            <td class="mono" style="text-align:right; font-size: 0.75rem;">${row.expiry ? new Date(row.expiry).toLocaleDateString() : 'N/A'}</td>
+                                        </tr>
+                                    `).join('')}
+                                </tbody>
+                            </table>
+                        </div>
+                    `;
+                    grid.appendChild(card);
+                });
+            } catch (err) {
+                console.error('Failed to load polymarket dashboard payload.', err);
+                document.getElementById('group-grid').innerHTML = '<div class="card"><p style="color: var(--text-muted);">Unable to load Polymarket data right now.</p></div>';
+            }
+        }
+
+        loadPolymarket();
+        setInterval(loadPolymarket, 300000);
+    </script>
+</body>
+</html>

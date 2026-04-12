@@ -45,6 +45,38 @@
             border-color: var(--accent-primary);
             background: rgba(99, 102, 241, 0.05);
         }
+        .polymarket-pill {
+            padding: 0.45rem 0.65rem;
+            border-radius: 9999px;
+            background: var(--bg-tertiary);
+            font-size: 0.72rem;
+            font-weight: 600;
+            color: var(--text-secondary);
+            display: inline-flex;
+            align-items: center;
+            gap: 0.35rem;
+        }
+        .polymarket-card {
+            border: 1px solid rgba(99, 102, 241, 0.18);
+            background: linear-gradient(180deg, rgba(99, 102, 241, 0.04), transparent 65%);
+        }
+        .polymarket-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.85rem 0;
+            border-top: 1px solid var(--border-color);
+        }
+        .polymarket-row:first-child {
+            border-top: none;
+            padding-top: 0;
+        }
+        .polymarket-mover {
+            padding: 0.75rem 0.9rem;
+            border-radius: var(--radius-md);
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border-color);
+        }
     </style>
 </head>
 <body>
@@ -88,6 +120,7 @@
                     <span id="market-badge" class="badge">MIXED</span>
                 </div>
                 <div id="market-top" class="metric-label" style="font-size: 0.65rem; margin-top: 1rem; display: block;">Top Movers...</div>
+                <div id="market-polymarket-pulse" class="metric-label" style="font-size: 0.65rem; margin-top: 0.45rem; display: block;">Polymarket pulse...</div>
             </div>
             <div class="card" id="kpi-youtube">
                 <span class="metric-label">Alpha Intelligence</span>
@@ -115,6 +148,25 @@
                     </div>
                     <div id="alert-list" class="flex flex-col">
                         <p style="color: var(--text-muted);">Fetching latest signals...</p>
+                    </div>
+                </div>
+
+                <div class="card polymarket-card clickable-card" onclick="window.location.href='polymarket.html'">
+                    <div class="flex justify-between items-center mb-4">
+                        <div>
+                            <h2 style="margin: 0;">Polymarket Signals</h2>
+                            <p id="polymarket-subtitle" style="font-size: 0.82rem; color: var(--text-secondary); margin-top: 0.35rem;">Loading curated probability watchlist...</p>
+                        </div>
+                        <span id="polymarket-status-badge" class="badge">LOADING</span>
+                    </div>
+
+                    <div id="polymarket-compact">
+                        <p style="color: var(--text-muted);">Fetching latest Polymarket signals...</p>
+                    </div>
+
+                    <div class="flex justify-between items-center mt-4 pt-4 border-top" style="border-top: 1px solid var(--border-color);">
+                        <span class="metric-label" id="polymarket-updated" style="font-size: 0.7rem;">Updated: ...</span>
+                        <span class="metric-label" style="font-size: 0.72rem;">Open full Polymarket board →</span>
                     </div>
                 </div>
                 
@@ -200,6 +252,12 @@
                     marketBadge.textContent = 'MIXED';
                     marketBadge.className = 'badge badge-warning';
                 }
+
+                const polymarket = data.polymarket || {};
+                const qqqPulse = polymarket.qqq_daily && polymarket.qqq_daily.probability_pct != null
+                    ? `QQQ up/down: ${polymarket.qqq_daily.probability_pct.toFixed(1)}%`
+                    : 'Polymarket pulse unavailable';
+                document.getElementById('market-polymarket-pulse').textContent = qqqPulse;
                 
                 const youtube = data.youtube;
                 document.querySelector('#kpi-youtube .metric-value').textContent = youtube.signals ? youtube.signals.length : '0';
@@ -273,7 +331,101 @@
                     container.appendChild(sectionWrapper);
                 });
 
-                // 5. Populate YouTube Signals
+                // 5. Populate Polymarket compact card
+                const polyCompact = document.getElementById('polymarket-compact');
+                const polyStatus = document.getElementById('polymarket-status-badge');
+                const polyUpdated = document.getElementById('polymarket-updated');
+                const polySubtitle = document.getElementById('polymarket-subtitle');
+                polyCompact.innerHTML = '';
+
+                if (polymarket.status && polymarket.status !== 'missing') {
+                    polySubtitle.textContent = polymarket.error_count
+                        ? `Curated watchlist with ${polymarket.error_count} issue(s) on the latest run`
+                        : 'Fed rates plus required QQQ and BTC daily contracts';
+
+                    if (polymarket.status === 'success') {
+                        polyStatus.textContent = 'LIVE';
+                        polyStatus.className = 'badge badge-success';
+                    } else if (polymarket.status === 'partial') {
+                        polyStatus.textContent = 'PARTIAL';
+                        polyStatus.className = 'badge badge-warning';
+                    } else {
+                        polyStatus.textContent = String(polymarket.status).toUpperCase();
+                        polyStatus.className = 'badge';
+                    }
+
+                    polyUpdated.textContent = polymarket.updated && polymarket.updated !== 'N/A'
+                        ? `Updated: ${new Date(polymarket.updated).toLocaleString()}`
+                        : 'Updated: unavailable';
+
+                    const fedRates = (polymarket.fed_rates || []).slice(0, 3);
+                    fedRates.forEach(row => {
+                        const div = document.createElement('div');
+                        div.className = 'polymarket-row';
+                        div.innerHTML = `
+                            <div>
+                                <strong style="display:block;">${row.question}</strong>
+                                <span style="font-size:0.72rem; color: var(--text-muted);">Fed rates</span>
+                            </div>
+                            <span class="polymarket-pill">${row.probability_pct != null ? row.probability_pct.toFixed(1) + '%' : 'N/A'}</span>
+                        `;
+                        polyCompact.appendChild(div);
+                    });
+
+                    [polymarket.qqq_daily, polymarket.btc_daily].filter(Boolean).forEach(row => {
+                        const div = document.createElement('div');
+                        div.className = 'polymarket-row';
+                        div.innerHTML = `
+                            <div>
+                                <strong style="display:block;">${row.question}</strong>
+                                <span style="font-size:0.72rem; color: var(--text-muted);">${row.group_key.replace('_', ' ')}</span>
+                            </div>
+                            <span class="polymarket-pill">${row.probability_pct != null ? row.probability_pct.toFixed(1) + '%' : 'N/A'}</span>
+                        `;
+                        polyCompact.appendChild(div);
+                    });
+
+                    const movers = (polymarket.largest_movers || []).slice(0, 3);
+                    if (movers.length > 0) {
+                        const moverWrap = document.createElement('div');
+                        moverWrap.style.display = 'grid';
+                        moverWrap.style.gridTemplateColumns = 'repeat(auto-fit, minmax(180px, 1fr))';
+                        moverWrap.style.gap = '0.75rem';
+                        moverWrap.style.marginTop = '1rem';
+                        movers.forEach(row => {
+                            const delta = row.delta_1d_pct != null ? `${row.delta_1d_pct > 0 ? '+' : ''}${row.delta_1d_pct.toFixed(1)} pts` : 'No 1d delta';
+                            const div = document.createElement('div');
+                            div.className = 'polymarket-mover';
+                            div.innerHTML = `
+                                <span class="metric-label" style="font-size:0.62rem;">Mover</span>
+                                <strong style="display:block; margin-top:0.35rem;">${row.question}</strong>
+                                <div class="mono" style="margin-top:0.55rem; font-size:0.78rem;">${delta}</div>
+                            `;
+                            moverWrap.appendChild(div);
+                        });
+                        polyCompact.appendChild(moverWrap);
+                    }
+
+                    if (polymarket.error_count) {
+                        const issues = document.createElement('div');
+                        issues.style.marginTop = '1rem';
+                        issues.innerHTML = `
+                            <span class="metric-label" style="font-size:0.65rem;">Watchlist issues</span>
+                            <ul style="margin:0.45rem 0 0 1rem; color: var(--text-secondary); font-size: 0.8rem;">
+                                ${(polymarket.errors || []).map(err => `<li>${err}</li>`).join('')}
+                            </ul>
+                        `;
+                        polyCompact.appendChild(issues);
+                    }
+                } else {
+                    polyStatus.textContent = 'MISSING';
+                    polyStatus.className = 'badge';
+                    polyUpdated.textContent = 'Updated: unavailable';
+                    polySubtitle.textContent = 'No Polymarket payload baked yet';
+                    polyCompact.innerHTML = '<p style="color: var(--text-muted);">No Polymarket data found. The hourly collector may not have run yet.</p>';
+                }
+
+                // 6. Populate YouTube Signals
                 const youtubeList = document.getElementById('youtube-list');
                 youtubeList.innerHTML = '';
                 if (youtube.signals && youtube.signals.length > 0) {
