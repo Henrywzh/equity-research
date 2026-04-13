@@ -77,6 +77,82 @@
             background: var(--bg-tertiary);
             border: 1px solid var(--border-color);
         }
+
+        /* Premium FRED Calendar Styles */
+        .fred-calendar {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+            background: var(--bg-primary);
+            border-radius: var(--radius-md);
+            overflow: hidden;
+            border: 1px solid var(--border-color);
+        }
+        .fred-row {
+            display: grid;
+            grid-template-columns: 80px 1fr 80px;
+            align-items: center;
+            padding: 0.75rem 1rem;
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            transition: all 0.2s ease;
+            border-bottom: 1px solid rgba(0,0,0,0.03);
+        }
+        .fred-row:last-child {
+            border-bottom: none;
+        }
+        .fred-row.today {
+            background: #b45309; /* Deep orange/brown from mockup */
+            color: #fffb;
+            font-weight: 500;
+        }
+        .fred-row.today strong {
+            color: white;
+        }
+        .fred-row.today .fred-impact {
+            background: rgba(255,255,255,0.1);
+            color: #fcd34d;
+        }
+        .fred-date {
+            font-weight: 600;
+            font-size: 0.8rem;
+        }
+        .fred-name {
+            color: var(--text-primary);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            padding-right: 1rem;
+        }
+        .fred-row.today .fred-name {
+            color: white;
+        }
+        .fred-impact {
+            text-align: right;
+            font-size: 0.65rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            padding: 0.2rem 0.5rem;
+            border-radius: 4px;
+            width: fit-content;
+            margin-left: auto;
+        }
+        .fred-impact.high {
+            color: #f87171;
+            background: rgba(239, 68, 68, 0.1);
+        }
+        .fred-impact.medium {
+            color: #fbbf24;
+            background: rgba(245, 158, 11, 0.1);
+        }
+        .fred-summary-footer {
+            padding: 0.75rem 1rem;
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+            font-style: italic;
+            border-top: 1px solid var(--border-color);
+            background: var(--bg-tertiary);
+        }
     </style>
 </head>
 <body>
@@ -350,33 +426,55 @@
                 const fred = data.fred || {};
                 const fredList = document.getElementById('fred-list');
                 const fredStatus = document.getElementById('fred-status');
+                const fredSubtitle = document.getElementById('fred-subtitle');
                 fredList.innerHTML = '';
 
                 if (fred.items && fred.items.length > 0) {
                     fredStatus.textContent = 'LIVE';
                     fredStatus.className = 'badge badge-success';
+                    fredSubtitle.textContent = 'Upcoming releases · next 31 days';
+
+                    const calendarDiv = document.createElement('div');
+                    calendarDiv.className = 'fred-calendar';
+
+                    const todayStr = new Date().toISOString().split('T')[0];
+                    let highImpactCount = 0;
 
                     fred.items.forEach(item => {
+                        const isToday = item.date === todayStr;
+                        if (isToday && item.impact === 'high') highImpactCount++;
+                        
+                        // Parse date for weekday
+                        const dateObj = new Date(item.date);
+                        const weekday = dateObj.toLocaleDateString('en-US', { weekday: 'short', day: 'numeric' });
+                        const displayDate = isToday ? 'Today' : weekday;
+
                         const row = document.createElement('div');
-                        row.className = 'polymarket-row';
+                        row.className = `fred-row ${isToday ? 'today' : ''}`;
                         row.innerHTML = `
-                            <div>
-                                <strong style="display:block;">${item.name}</strong>
-                                <span style="font-size:0.72rem; color: var(--text-muted);">${item.series_units || 'Economic Release'}</span>
-                            </div>
-                            <div style="text-align:right;">
-                                <div class="mono" style="font-size: 0.85rem;">${item.date}</div>
-                                <span class="badge badge-danger" style="font-size: 0.55rem; padding: 0.1rem 0.3rem;">HIGH IMPACT</span>
-                            </div>
+                            <div class="fred-date">${displayDate}</div>
+                            <div class="fred-name"><strong>${item.name}</strong></div>
+                            <div class="fred-impact ${item.impact}">${item.impact}</div>
                         `;
-                        fredList.appendChild(row);
+                        calendarDiv.appendChild(row);
                     });
+
+                    fredList.appendChild(calendarDiv);
+
+                    // Add summary footer
+                    const weekItems = fred.items.slice(0, 7);
+                    const highImpactWeek = weekItems.filter(i => i.impact === 'high').length;
+                    const footer = document.createElement('div');
+                    footer.className = 'fred-summary-footer';
+                    footer.textContent = `${highImpactWeek} high-impact releases this week — consider market-sensitive positioning.`;
+                    fredList.appendChild(footer);
+
                 } else {
                     fredStatus.textContent = fred.status === 'success' ? 'CALM' : 'OFFLINE';
                     fredStatus.className = 'badge';
-                    fredList.innerHTML = '<p style="color: var(--text-muted);">No high-impact releases scheduled soon.</p>';
+                    fredList.innerHTML = '<p style="color: var(--text-muted); padding: 1rem;">No tracked releases scheduled for the next 30 days.</p>';
                     if (fred.status === 'skipped_missing_api_key') {
-                        document.getElementById('fred-subtitle').textContent = 'FRED API key missing (Skipped)';
+                        fredSubtitle.textContent = 'FRED API key missing (Skipped)';
                     }
                 }
 

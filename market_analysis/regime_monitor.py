@@ -1,0 +1,91 @@
+import pandas as pd
+import numpy as np
+import plotly.graph_objects as go
+from market_analysis.data_engine import DataEngine
+
+class RegimeMonitor:
+    def __init__(self, data_engine):
+        self.engine = data_engine
+        self.offensive = ['XLK', 'XLY', 'XLC']
+        self.defensive = ['XLP', 'XLU', 'XLV']
+        self.all_tickers = self.offensive + self.defensive
+
+    def analyze(self):
+        data = self.engine.fetch_data(self.all_tickers, period="2y")
+        prices = self.engine.get_close_prices(data)
+        
+        if prices is None: return None
+
+        # Calculate equal-weighted groups
+        off_bench = prices[self.offensive].pct_change().mean(axis=1).add(1).cumprod()
+        def_bench = prices[self.defensive].pct_change().mean(axis=1).add(1).cumprod()
+        
+        # Calculate Ratio
+        ratio = off_bench / def_bench
+        
+        # Calculate Trend (60-day MA)
+        ratio_ma = ratio.rolling(window=60).mean()
+        
+        # Calculate Z-Score relative to 1-year history
+        rolling_mean = ratio.rolling(window=252).mean()
+        rolling_std = ratio.rolling(window=252).std()
+        z_score = (ratio - rolling_mean) / rolling_std
+        
+        current_ratio = ratio.iloc[-1]
+        current_z = z_score.iloc[-1]
+        
+        # Determine Regime
+        if current_z > 1.0:
+            regime = "Aggressive Risk-On"
+            color = "#00ff00"
+        elif current_z > 0:
+            regime = "Moderate Risk-On"
+            color = "#aaffaa"
+        elif current_z > -1.0:
+            regime = "Cautious Risk-Off"
+            color = "#ffaaaa"
+        else:
+            regime = "Extreme Risk-Off"
+            color = "#ff0000"
+
+        return {
+            "regime": regime,
+            "color": color,
+            "z_score": round(current_z, 2),
+            "ratio_history": ratio,
+            "ma_history": ratio_ma,
+            "z_history": z_score
+        }
+
+    def create_plot(self, results):
+        fig = go.Figure()
+        
+        # Add Ratio line
+        fig.add_trace(go.Scatter(
+            x=results["ratio_history"].index, 
+            y=results["ratio_history"],
+            mode='lines',
+            name='Offensive/Defensive Ratio',
+            line=dict(color='#3b82f6', width=2)
+        ))
+        
+        # Add MA line
+        fig.add_trace(go.Scatter(
+            x=results["ma_history"].index, 
+            y=results["ma_history"],
+            mode='lines',
+            name='60d Moving Avg',
+            line=dict(color='#94a3b8', width=1, dash='dot')
+        ))
+        
+        fig.update_layout(
+            title="Market Regime Monitor (Risk-On / Risk-Off)",
+            template="plotly_dark",
+            paper_bgcolor='rgba(0,0,0,0)',
+            plot_bgcolor='rgba(0,0,0,0)',
+            margin=dict(l=20, r=20, t=40, b=20),
+            height=400,
+            legend=dict(orientation="h", yanchor="bottom", y=1.02, xanchor="right", x=1)
+        )
+        
+        return fig.to_html(full_html=False, include_plotlyjs='cdn')
