@@ -8,6 +8,7 @@ from collections import defaultdict
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
 from typing import Dict, List, Optional, Union
+import yfinance as yf
 
 # Add internal package paths for direct imports
 sys.path.append(str(Path(__file__).resolve().parents[1] / "daily-macro" / "src"))
@@ -439,6 +440,31 @@ def _group_polymarket_rows(rows: List[Dict[str, object]]) -> List[Dict[str, obje
     return grouped
 
 
+def get_equity_track_record(symbol: str, days: int = 7) -> List[Dict[str, object]]:
+    """Fetch last N trading days of Up/Down performance via yfinance."""
+    results = []
+    try:
+        ticker = yf.Ticker(symbol)
+        # Fetch 15 days to handle weekends/holidays and ensure we have enough for 7 day-over-day changes
+        hist = ticker.history(period="15d")
+        if hist.empty or len(hist) < 2:
+            return []
+
+        # Calculate daily returns (Close_t vs Close_{t-1})
+        hist["result"] = hist["Close"].pct_change().apply(lambda x: "up" if x > 0 else "down")
+        
+        # Get the most recent 'days' items with data (skip the first NaM pct_change)
+        recent = hist.tail(days).copy()
+        for idx, row in recent.iterrows():
+            results.append({
+                "date": idx.strftime("%Y-%m-%d"),
+                "result": row["result"]
+            })
+    except Exception as exc:
+        print(f"Error fetching track record for {symbol}: {exc}")
+    return results
+
+
 def get_latest_polymarket() -> tuple[Dict[str, object], Dict[str, object]]:
     compact: Dict[str, object] = {
         "status": "missing",
@@ -449,6 +475,8 @@ def get_latest_polymarket() -> tuple[Dict[str, object], Dict[str, object]]:
         "fed_rates": [],
         "qqq_daily": None,
         "btc_daily": None,
+        "qqq_track_record": get_equity_track_record("QQQ", 7),
+        "btc_track_record": get_equity_track_record("BTC-USD", 7),
         "largest_movers": [],
     }
     detailed: Dict[str, object] = {
@@ -459,6 +487,8 @@ def get_latest_polymarket() -> tuple[Dict[str, object], Dict[str, object]]:
         "errors": [],
         "groups": [],
         "source_run_path": None,
+        "qqq_track_record": compact["qqq_track_record"],
+        "btc_track_record": compact["btc_track_record"],
     }
 
     try:

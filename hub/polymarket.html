@@ -50,6 +50,22 @@
                 flex-direction: column;
             }
         }
+        .track-record {
+            display: flex;
+            align-items: center;
+            gap: 0.35rem;
+            margin-top: 0.45rem;
+            padding-top: 0.45rem;
+            border-top: 1px solid rgba(255,255,255,0.05);
+        }
+        .track-dot {
+            width: 0.6rem;
+            height: 0.6rem;
+            border-radius: 9999px;
+            cursor: help;
+        }
+        .track-dot.up { background: var(--accent-success); box-shadow: 0 0 6px rgba(16, 185, 129, 0.4); }
+        .track-dot.down { background: var(--accent-danger); box-shadow: 0 0 6px rgba(239, 68, 68, 0.4); }
     </style>
 </head>
 <body>
@@ -285,6 +301,16 @@
                             <h2 style="margin: 0;">${group.label}</h2>
                             <span class="badge">${group.rows.length} contracts</span>
                         </div>
+                        ${(group.group_key === 'qqq_daily' || group.group_key === 'btc_daily') && (data[group.group_key === 'qqq_daily' ? 'qqq_track_record' : 'btc_track_record']) ? `
+                            <div class="mb-4">
+                                <span class="metric-label" style="font-size: 0.6rem; display: block; margin-bottom: 0.35rem;">Recent Reality (Last 7 Days)</span>
+                                <div class="flex gap-2">
+                                    ${data[group.group_key === 'qqq_daily' ? 'qqq_track_record' : 'btc_track_record'].map(tr => `
+                                        <div class="track-dot ${tr.result}" title="${tr.date}: ${tr.result.toUpperCase()}"></div>
+                                    `).join('')}
+                                </div>
+                            </div>
+                        ` : ''}
                         <div style="overflow-x:auto;">
                             <table class="data-table">
                                 <thead>

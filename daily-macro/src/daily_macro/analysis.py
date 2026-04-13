@@ -7,18 +7,9 @@ import os
 import random
 import time
 from collections import defaultdict
-from dataclasses import dataclass, field
 from datetime import datetime, timedelta
 from pathlib import Path
-from typing import Any, TypedDict
-try:
-    from typing import NotRequired
-except ImportError:
-    try:
-        from typing_extensions import NotRequired
-    except ImportError:
-        # Fallback for Python < 3.11 without typing_extensions
-        from typing import Optional as NotRequired
+from typing import Any
 
 import requests
 from langgraph.graph import END, START, StateGraph
@@ -28,597 +19,113 @@ from .storage import Storage
 
 LOGGER = logging.getLogger(__name__)
 
-GROQ_CHAT_COMPLETIONS_URL = "https://api.groq.com/openai/v1/chat/completions"
-OPENAI_CHAT_COMPLETIONS_URL = "https://api.openai.com/v1/chat/completions"
-REPORT_FILE_NAME = "hkej-news-analysis.json"
-REPORT_SCHEMA_VERSION = 6
-DEFAULT_PROVIDER = "groq"
-PRIMARY_MODEL_ID = "meta-llama/llama-4-scout-17b-16e-instruct"
-FALLBACK_MODEL_IDS = ["qwen/qwen3-32b", "llama-3.1-8b-instant"]
-DELAYED_RETRY_FINAL_MODEL_ID = "openai/gpt-oss-20b"
-DELAYED_RETRY_WAIT_SECONDS = 60.0
-MAX_CATEGORY_SYNTHESIS_WAIT_SECONDS = 1800.0
-MAX_CATEGORY_SYNTHESIS_RETRIES = 24
-MAX_SYNTHESIS_MERGE_DEPTH = 3
-DEFAULT_OUTPUT_TOKENS = 1200
-DEFAULT_INPUT_BUDGET_TOKENS = 4500
-DEFAULT_SYNTHESIS_INPUT_BUDGET_TOKENS = 2400
-DEFAULT_PROMPT_OVERHEAD_TOKENS = 900
-SHORT_ARTICLE_FULL_TEXT_THRESHOLD = 1500
-DEFAULT_CHAT_RETRIES = 4
-RATE_LIMIT_REQUEST_FLOOR = 0
-RATE_LIMIT_TOKEN_FLOOR = 800
-DEFAULT_REQUEST_BYTE_BUDGET = 12000
-DEFAULT_SYNTHESIS_REQUEST_BYTE_BUDGET = 8000
-MIN_REQUEST_BYTE_BUDGET = 4000
-MIN_SYNTHESIS_REQUEST_BYTE_BUDGET = 3000
-MIN_INPUT_BUDGET_TOKENS = 1200
-MIN_SYNTHESIS_INPUT_BUDGET_TOKENS = 800
-CATEGORY_SHRINK_STEP_CHARS = 400
-CATEGORY_MIN_CONTENT_CHARS = 0
-CATEGORY_ORDER = [
-    "國際財經",
-    "時事脈搏",
-    "香港財經",
-    "港股直擊",
-    "中國財經",
-    "即巿股評",
-    "重要通告",
-    "港交所通告",
-    "地產新聞",
-]
-ENTITY_TYPES = {"person", "company", "country", "institution", "index", "organization", "asset", "other"}
-FAILURE_CLASSIFICATIONS = {
-    "payload_too_large",
-    "rate_limited",
-    "invalid_json",
-    "incomplete_model_output",
-    "http_error",
-    "unexpected_error",
-    "synthesis_budget_exhausted",
-}
-LIGHT_ANALYSIS_SECTIONS = {"時事脈搏", "地產新聞"}
-ATTENTION_TIERS = ("high", "medium", "light")
-ATTENTION_TIER_RANK = {"high": 0, "medium": 1, "light": 2}
-ROUTER_LLM_MIN_ARTICLES = 1
-HIGH_ATTENTION_THEME_KEYWORDS = {
-    "stocks": ("業績", "盈喜", "盈警", "回購", "配股", "供股", "新股", "上市", "股份", "股價", "股東", "盈利", "profit", "earnings", "guidance", "buyback", "placement", "ipo", "shares"),
-    "macro": ("聯儲", "聯儲局", "人行", "央行", "利率", "通脹", "經濟", "衰退", "增長", "國債", "收益率", "匯率", "美元", "人民幣", "油價", "gdp", "inflation", "rates", "yield", "fx", "oil", "economy"),
-    "geopolitics": ("戰爭", "制裁", "關稅", "貿易戰", "軍事", "衝突", "伊朗", "俄羅斯", "烏克蘭", "中東", "tariff", "sanction", "war", "trade", "conflict", "geopolit"),
-    "property": ("樓市", "地產", "樓價", "按揭", "租金", "土地", "property", "housing", "mortgage", "real estate"),
-}
-
-
-@dataclass(frozen=True, slots=True)
-class SectionProfile:
-    name: str
-    article_key_points_limit: int
-    article_key_points_instruction: str
-    entity_limit: int
-    category_bullet_limit: int
-    subgroup_bullet_limit: int
-    article_input_budget_tokens: int
-    article_request_byte_budget: int
-    synthesis_input_budget_tokens: int
-    synthesis_request_byte_budget: int
-    subgroup_threshold: int
-    subgroup_target_size: int
-    salvage_max_depth: int
-
-
-STANDARD_SECTION_PROFILE = SectionProfile(
-    name="standard",
-    article_key_points_limit=4,
-    article_key_points_instruction="2 to 4 strings — each must include at least one specific detail such as a figure, percentage, named actor, date, cause, or consequence; do not restate the article title",
-    entity_limit=5,
-    category_bullet_limit=5,
-    subgroup_bullet_limit=4,
-    article_input_budget_tokens=DEFAULT_INPUT_BUDGET_TOKENS,
-    article_request_byte_budget=DEFAULT_REQUEST_BYTE_BUDGET,
-    synthesis_input_budget_tokens=DEFAULT_SYNTHESIS_INPUT_BUDGET_TOKENS,
-    synthesis_request_byte_budget=DEFAULT_SYNTHESIS_REQUEST_BYTE_BUDGET,
-    subgroup_threshold=5,
-    subgroup_target_size=6,
-    salvage_max_depth=3,
+# ---------------------------------------------------------------------------
+# Re-export everything from types.py so existing callers / tests that import
+# from `daily_macro.analysis` continue to work without changes.
+# ---------------------------------------------------------------------------
+from .types import (  # noqa: E402
+    GROQ_CHAT_COMPLETIONS_URL,
+    OPENAI_CHAT_COMPLETIONS_URL,
+    REPORT_FILE_NAME,
+    REPORT_SCHEMA_VERSION,
+    DEFAULT_PROVIDER,
+    PRIMARY_MODEL_ID,
+    FALLBACK_MODEL_IDS,
+    DELAYED_RETRY_FINAL_MODEL_ID,
+    DELAYED_RETRY_WAIT_SECONDS,
+    MAX_CATEGORY_SYNTHESIS_WAIT_SECONDS,
+    MAX_CATEGORY_SYNTHESIS_RETRIES,
+    MAX_SYNTHESIS_MERGE_DEPTH,
+    DEFAULT_OUTPUT_TOKENS,
+    DEFAULT_INPUT_BUDGET_TOKENS,
+    DEFAULT_SYNTHESIS_INPUT_BUDGET_TOKENS,
+    DEFAULT_PROMPT_OVERHEAD_TOKENS,
+    SHORT_ARTICLE_FULL_TEXT_THRESHOLD,
+    DEFAULT_CHAT_RETRIES,
+    RATE_LIMIT_REQUEST_FLOOR,
+    RATE_LIMIT_TOKEN_FLOOR,
+    DEFAULT_REQUEST_BYTE_BUDGET,
+    DEFAULT_SYNTHESIS_REQUEST_BYTE_BUDGET,
+    MIN_REQUEST_BYTE_BUDGET,
+    MIN_SYNTHESIS_REQUEST_BYTE_BUDGET,
+    MIN_INPUT_BUDGET_TOKENS,
+    MIN_SYNTHESIS_INPUT_BUDGET_TOKENS,
+    CATEGORY_SHRINK_STEP_CHARS,
+    CATEGORY_MIN_CONTENT_CHARS,
+    CATEGORY_ORDER,
+    ENTITY_TYPES,
+    FAILURE_CLASSIFICATIONS,
+    LIGHT_ANALYSIS_SECTIONS,
+    ATTENTION_TIERS,
+    ATTENTION_TIER_RANK,
+    ROUTER_LLM_MIN_ARTICLES,
+    HIGH_ATTENTION_THEME_KEYWORDS,
+    SectionProfile,
+    STANDARD_SECTION_PROFILE,
+    LIGHT_SECTION_PROFILE,
+    AnalysisGraphState,
+    ModelConfig,
+    ModelRateLimitState,
+    CategoryBudgetState,
+    RuntimeDiagnostics,
+    CategoryDiagnostics,
+    SynthesisBudgetExceeded,
+    BatchContext,
+    _section_profile,
 )
 
-LIGHT_SECTION_PROFILE = SectionProfile(
-    name="light",
-    article_key_points_limit=2,
-    article_key_points_instruction="1 to 2 strings — each must include a specific detail such as a figure, named actor, cause, or consequence; do not restate the article title",
-    entity_limit=4,
-    category_bullet_limit=3,
-    subgroup_bullet_limit=3,
-    article_input_budget_tokens=3000,
-    article_request_byte_budget=9000,
-    synthesis_input_budget_tokens=1600,
-    synthesis_request_byte_budget=5600,
-    subgroup_threshold=7,
-    subgroup_target_size=8,
-    salvage_max_depth=2,
+from .llm_client import (  # noqa: E402
+    RateLimitGovernor,
+    AnalysisRuntime,
+    load_groq_api_keys,
+    load_groq_api_key,
+    _build_groq_session,
+    _build_provider_session,
+    _load_model_api_key,
+    _invoke_json_with_retry,
+    _chat_completion,
+    _estimate_messages_tokens,
+    _estimate_request_payload_bytes,
+    _parse_json_content,
+    _estimate_tokens,
+    _candidate_config_paths,
+    _parse_simple_env_file,
+    _retry_delay_seconds,
+    _parse_retry_after_seconds,
+    _parse_duration_seconds,
+    _parse_int,
+    _classify_exception,
 )
 
+# ---------------------------------------------------------------------------
+# Patch AnalysisRuntime methods to look up helpers through this module's
+# namespace so that unit tests can mock `daily_macro.analysis._build_groq_session`
+# (and similar names) and have the patches take effect even though the class
+# now lives in llm_client.
+# ---------------------------------------------------------------------------
+import sys as _sys
 
-class AnalysisGraphState(TypedDict):
-    target_date: str
-    source_site: str
-    report_path: Path
-    previous_report_path: Path
-    articles: list[dict[str, Any]]
-    previous_articles: list[dict[str, Any]]
-    existing_report: dict[str, Any] | None
-    previous_report: dict[str, Any] | None
-    today_plan: dict[str, Any]
-    previous_retry_plan: dict[str, Any]
-    runtime: AnalysisRuntime | None
-    category_reports: list[dict[str, Any]]
-    previous_day_retry_successes: int
-    updated_previous_report: NotRequired[dict[str, Any] | None]
-    incremental: dict[str, int]
-    market_context_string: str
-    macro_release_digest: dict[str, Any]
-    top_alerts: list[str]
-    legacy_executive_summary: list[str]
-    report: dict[str, Any]
-    total_scraped_articles: int
-    newly_analyzed_keys: set[str]
+def _analysis_get_groq_session(self, key_index=None):
+    ki = key_index if key_index is not None else self.current_key_index
+    if ki not in self.groq_sessions:
+        _mod = _sys.modules[__name__]
+        self.groq_sessions[ki] = _mod._build_groq_session(self.groq_api_keys[ki])
+    return self.groq_sessions[ki]
 
-
-@dataclass(frozen=True, slots=True)
-class ModelConfig:
-    model_id: str
-    provider: str = DEFAULT_PROVIDER
-    max_completion_tokens: int = DEFAULT_OUTPUT_TOKENS
-    api_url: str | None = None
-    api_key_env: str | None = None
-
-
-@dataclass(slots=True)
-class ModelRateLimitState:
-    remaining_requests: int | None = None
-    reset_requests_at: float | None = None
-    remaining_tokens: int | None = None
-    reset_tokens_at: float | None = None
-
-
-@dataclass(slots=True)
-class CategoryBudgetState:
-    article_input_budget_tokens: int = DEFAULT_INPUT_BUDGET_TOKENS
-    article_request_byte_budget: int = DEFAULT_REQUEST_BYTE_BUDGET
-    synthesis_input_budget_tokens: int = DEFAULT_SYNTHESIS_INPUT_BUDGET_TOKENS
-    synthesis_request_byte_budget: int = DEFAULT_SYNTHESIS_REQUEST_BYTE_BUDGET
-
-
-@dataclass(slots=True)
-class RuntimeDiagnostics:
-    rate_limit_wait_count: int = 0
-    rate_limit_wait_seconds_total: float = 0.0
-    fallback_switch_count: int = 0
-    pre_send_split_count: int = 0
-    response_413_split_count: int = 0
-    json_repair_retry_count: int = 0
-    batch_count: int = 0
-    failed_batch_count: int = 0
-    delayed_retry_candidate_count: int = 0
-    delayed_retry_attempted_count: int = 0
-    delayed_retry_recovered_count: int = 0
-    delayed_retry_failed_count: int = 0
-    high_medium_unresolved_count: int = 0
-    light_unresolved_count: int = 0
-    delayed_retry_skipped_final_model_count: int = 0
-    synthesis_budget_exhausted_count: int = 0
-    degraded_merge_count: int = 0
-    key_rotation_count: int = 0
-
-    def as_dict(self) -> dict[str, Any]:
-        return {
-            "rate_limit_wait_count": self.rate_limit_wait_count,
-            "rate_limit_wait_seconds_total": round(self.rate_limit_wait_seconds_total, 3),
-            "fallback_switch_count": self.fallback_switch_count,
-            "key_rotation_count": self.key_rotation_count,
-            "pre_send_split_count": self.pre_send_split_count,
-            "response_413_split_count": self.response_413_split_count,
-            "json_repair_retry_count": self.json_repair_retry_count,
-            "batch_count": self.batch_count,
-            "failed_batch_count": self.failed_batch_count,
-            "delayed_retry_candidate_count": self.delayed_retry_candidate_count,
-            "delayed_retry_attempted_count": self.delayed_retry_attempted_count,
-            "delayed_retry_recovered_count": self.delayed_retry_recovered_count,
-            "delayed_retry_failed_count": self.delayed_retry_failed_count,
-            "high_medium_unresolved_count": self.high_medium_unresolved_count,
-            "light_unresolved_count": self.light_unresolved_count,
-            "delayed_retry_skipped_final_model_count": self.delayed_retry_skipped_final_model_count,
-            "synthesis_budget_exhausted_count": self.synthesis_budget_exhausted_count,
-            "degraded_merge_count": self.degraded_merge_count,
-        }
-
-
-@dataclass(slots=True)
-class CategoryDiagnostics:
-    split_reasons: list[str] = field(default_factory=list)
-    models_attempted: list[str] = field(default_factory=list)
-    estimated_input_tokens_max: int = 0
-    serialized_request_bytes_max: int = 0
-    rate_limit_waits: int = 0
-    partial_article_count: int = 0
-    sub_batch_count: int = 0
-    synthesis_wait_seconds_total: float = 0.0
-    synthesis_retry_count: int = 0
-    synthesis_retry_skipped_count: int = 0
-    synthesis_budget_exhausted: bool = False
-    degraded_merge_used: bool = False
-    degraded_merge_reason: str = ""
-    synthesis_merge_depth_max: int = 0
-    model_switches: list[dict[str, Any]] = field(default_factory=list)
-
-    def as_dict(self) -> dict[str, Any]:
-        return {
-            "sub_batch_count": self.sub_batch_count,
-            "split_reasons": list(self.split_reasons),
-            "models_attempted": list(self.models_attempted),
-            "estimated_input_tokens_max": self.estimated_input_tokens_max,
-            "serialized_request_bytes_max": self.serialized_request_bytes_max,
-            "rate_limit_waits": self.rate_limit_waits,
-            "partial_article_count": self.partial_article_count,
-            "synthesis_wait_seconds_total": round(self.synthesis_wait_seconds_total, 3),
-            "synthesis_retry_count": self.synthesis_retry_count,
-            "synthesis_retry_skipped_count": self.synthesis_retry_skipped_count,
-            "synthesis_budget_exhausted": self.synthesis_budget_exhausted,
-            "degraded_merge_used": self.degraded_merge_used,
-            "degraded_merge_reason": self.degraded_merge_reason,
-            "synthesis_merge_depth_max": self.synthesis_merge_depth_max,
-            "model_switches": list(self.model_switches),
-        }
-
-
-class SynthesisBudgetExceeded(RuntimeError):
-    """Raised when a category has exhausted its allowed synthesis retry/wait budget."""
-
-
-@dataclass(frozen=True, slots=True)
-class BatchContext:
-    category_name: str
-    batch_kind: str
-    batch_label: str
-    article_count: int
-    estimated_input_tokens: int
-    serialized_request_bytes: int
-    content_shrunk: bool = False
-
-
-class RateLimitGovernor:
-    def __init__(self, *, time_fn=time.monotonic, sleep_fn=time.sleep):
-        self._time_fn = time_fn
-        self._sleep_fn = sleep_fn
-        # Keyed by (model_id, key_index) to track rate limits per API key independently.
-        self._states: dict[tuple[str, int], ModelRateLimitState] = {}
-
-    def _state(self, model_id: str, key_index: int) -> ModelRateLimitState:
-        return self._states.setdefault((model_id, key_index), ModelRateLimitState())
-
-    def select_key(
-        self,
-        model_id: str,
-        current_key: int,
-        num_keys: int,
-        estimated_input_tokens: int = 0,
-    ) -> tuple[int, float]:
-        """Return (best_key_index, seconds_slept).
-
-        Picks the key with the most remaining token capacity. If a better key
-        exists, rotates silently (0 sleep). Only sleeps when ALL keys are
-        exhausted, waiting until the soonest-resetting key unlocks.
-        """
-        now = self._time_fn()
-        best_key: int | None = None
-        best_remaining_tokens = -1
-        earliest_reset = float("inf")
-
-        for ki in range(num_keys):
-            state = self._state(model_id, ki)
-            is_observed_key = (
-                ki == current_key
-                or state.remaining_requests is not None
-                or state.remaining_tokens is not None
-            )
-            req_ok = (
-                state.remaining_requests is None
-                or state.remaining_requests > RATE_LIMIT_REQUEST_FLOOR
-            )
-            tok_ok = (
-                state.remaining_tokens is None
-                or state.remaining_tokens > estimated_input_tokens + RATE_LIMIT_TOKEN_FLOOR
-            )
-            if req_ok and tok_ok and is_observed_key:
-                remaining = state.remaining_tokens if state.remaining_tokens is not None else 9_999_999
-                if best_key is None or remaining > best_remaining_tokens:
-                    best_key = ki
-                    best_remaining_tokens = remaining
-            else:
-                reset_at = max(
-                    state.reset_requests_at or 0.0,
-                    state.reset_tokens_at or 0.0,
-                )
-                if reset_at > now:
-                    earliest_reset = min(earliest_reset, reset_at)
-
-        if best_key is not None:
-            return best_key, 0.0
-
-        # All keys exhausted — sleep until the soonest one resets.
-        sleep_secs = max(0.0, earliest_reset - now) if earliest_reset != float("inf") else 0.0
-        if sleep_secs > 0:
-            self._sleep_fn(sleep_secs)
-        return current_key, sleep_secs
-
-    def before_request(self, model_id: str, estimated_input_tokens: int = 0) -> float:
-        """Backward-compatible single-key check. Uses key_index=0."""
-        _key, waited = self.select_key(model_id, 0, 1, estimated_input_tokens)
-        return waited
-
-    def record_response(self, model_id: str, response: requests.Response, key_index: int = 0) -> None:
-        state = self._state(model_id, key_index)
-        now = self._time_fn()
-        headers = {key.lower(): value for key, value in response.headers.items()}
-
-        remaining_requests = _parse_int(headers.get("x-ratelimit-remaining-requests"))
-        if remaining_requests is not None:
-            state.remaining_requests = remaining_requests
-
-        remaining_tokens = _parse_int(headers.get("x-ratelimit-remaining-tokens"))
-        if remaining_tokens is not None:
-            state.remaining_tokens = remaining_tokens
-
-        reset_requests = _parse_duration_seconds(headers.get("x-ratelimit-reset-requests"))
-        if reset_requests is not None:
-            state.reset_requests_at = now + reset_requests
-
-        reset_tokens = _parse_duration_seconds(headers.get("x-ratelimit-reset-tokens"))
-        if reset_tokens is not None:
-            state.reset_tokens_at = now + reset_tokens
-
-        if response.status_code == 429:
-            retry_after = _parse_retry_after_seconds(headers.get("retry-after"))
-            if retry_after is not None:
-                state.remaining_requests = 0
-                state.remaining_tokens = 0
-                state.reset_requests_at = now + retry_after
-                state.reset_tokens_at = now + retry_after
-
-    def apply_backoff(self, model_id: str, response: requests.Response, attempt: int) -> float:
-        delay_seconds = _retry_delay_seconds(response, attempt)
-        self._sleep_fn(delay_seconds)
-        return delay_seconds
-
-
-@dataclass(slots=True)
-class AnalysisRuntime:
-    governor: RateLimitGovernor
-    model_chain: list[ModelConfig]
-    groq_api_keys: list[str] = field(default_factory=list)
-    session: requests.Session | None = None
-    delayed_retry_final_model: ModelConfig | None = None
-    current_model_index: int = 0
-    current_key_index: int = 0
-    groq_sessions: dict[int, requests.Session] = field(default_factory=dict)
-    model_switches: list[dict[str, Any]] = field(default_factory=list)
-    last_attempted_model: str | None = None
-    diagnostics: RuntimeDiagnostics = field(default_factory=RuntimeDiagnostics)
-    category_diagnostics: dict[str, CategoryDiagnostics] = field(default_factory=dict)
-    category_budgets: dict[str, CategoryBudgetState] = field(default_factory=dict)
-    provider_sessions: dict[str, requests.Session] = field(default_factory=dict)
-    market_context_string: str = ""
-    macro_release_digest: dict[str, Any] = field(default_factory=dict)
-
-    def __post_init__(self) -> None:
-        if self.session is not None:
-            if not self.groq_api_keys:
-                self.groq_api_keys = ["session-backed-groq-key"]
-            self.groq_sessions.setdefault(0, self.session)
-
-    @property
-    def primary_model(self) -> ModelConfig:
-        return self.model_chain[0]
-
-    @property
-    def fallback_models(self) -> list[ModelConfig]:
-        return self.model_chain[1:]
-
-    @property
-    def current_model(self) -> ModelConfig:
-        return self.model_chain[self.current_model_index]
-
-    def get_groq_session(self, key_index: int | None = None) -> requests.Session:
-        ki = key_index if key_index is not None else self.current_key_index
-        if ki not in self.groq_sessions:
-            self.groq_sessions[ki] = _build_groq_session(self.groq_api_keys[ki])
-        return self.groq_sessions[ki]
-
-    def get_session_for_model(self, model: ModelConfig) -> requests.Session:
-        if model.provider == DEFAULT_PROVIDER:
-            return self.get_groq_session(self.current_key_index)
-        session = self.provider_sessions.get(model.provider)
-        if session is not None:
-            return session
-        session = _build_provider_session(_load_model_api_key(model))
-        self.provider_sessions[model.provider] = session
+def _analysis_get_session_for_model(self, model):
+    from .types import DEFAULT_PROVIDER
+    _mod = _sys.modules[__name__]
+    if model.provider == DEFAULT_PROVIDER:
+        return self.get_groq_session(self.current_key_index)
+    session = self.provider_sessions.get(model.provider)
+    if session is not None:
         return session
+    session = _mod._build_provider_session(_mod._load_model_api_key(model))
+    self.provider_sessions[model.provider] = session
+    return session
 
-    def rotate_key(self, reason: str) -> bool:
-        """Rotate to the next API key. Returns False if only one key available."""
-        if len(self.groq_api_keys) <= 1:
-            return False
-        next_idx = (self.current_key_index + 1) % len(self.groq_api_keys)
-        LOGGER.info("Rotating Groq API key %d → %d: %s", self.current_key_index, next_idx, reason)
-        self.current_key_index = next_idx
-        self.diagnostics.key_rotation_count += 1
-        # Clear old sessions to force new authentication
-        for ki in list(self.groq_sessions.keys()):
-            self.groq_sessions[ki].close()
-            del self.groq_sessions[ki]
-        return True
-
-    def close_sessions(self) -> None:
-        for session in self.groq_sessions.values():
-            session.close()
-        self.groq_sessions.clear()
-        for session in self.provider_sessions.values():
-            session.close()
-        self.provider_sessions.clear()
-
-    def get_model_config(self, model_id: str) -> ModelConfig:
-        for model in self.model_chain:
-            if model.model_id == model_id:
-                return model
-        raise KeyError(model_id)
-
-    def next_model_after(self, model_id: str) -> ModelConfig | None:
-        for index, model in enumerate(self.model_chain):
-            if model.model_id == model_id:
-                next_index = index + 1
-                if next_index < len(self.model_chain):
-                    return self.model_chain[next_index]
-                return None
-        return None
-
-    def switch_to_next_model(self, reason: str) -> bool:
-        next_model = self.next_model_after(self.current_model.model_id)
-        if next_model is None:
-            return False
-        self.diagnostics.fallback_switch_count += 1
-        switch = {
-            "switched_at": datetime.now().astimezone().isoformat(),
-            "from_model": self.current_model.model_id,
-            "to_model": next_model.model_id,
-            "reason": reason,
-        }
-        self.model_switches.append(switch)
-        LOGGER.info(
-            "Switching Groq model from %s to %s: %s",
-            self.current_model.model_id,
-            next_model.model_id,
-            reason,
-        )
-        self.current_model_index += 1
-        return True
-
-    def reset_model_for_category(self) -> None:
-        self.current_model_index = 0
-
-    def get_category_diagnostics(self, category_name: str) -> CategoryDiagnostics:
-        return self.category_diagnostics.setdefault(category_name, CategoryDiagnostics())
-
-    def get_category_budget(self, category_name: str) -> CategoryBudgetState:
-        if category_name not in self.category_budgets:
-            profile = _section_profile(category_name)
-            self.category_budgets[category_name] = CategoryBudgetState(
-                article_input_budget_tokens=profile.article_input_budget_tokens,
-                article_request_byte_budget=profile.article_request_byte_budget,
-                synthesis_input_budget_tokens=profile.synthesis_input_budget_tokens,
-                synthesis_request_byte_budget=profile.synthesis_request_byte_budget,
-            )
-        return self.category_budgets[category_name]
-
-    def record_wait(self, category_name: str, delay_seconds: float, *, batch_kind: str = "") -> None:
-        if delay_seconds <= 0:
-            return
-        self.diagnostics.rate_limit_wait_count += 1
-        self.diagnostics.rate_limit_wait_seconds_total += delay_seconds
-        diagnostics = self.get_category_diagnostics(category_name)
-        diagnostics.rate_limit_waits += 1
-        if batch_kind.startswith("synthesis"):
-            diagnostics.synthesis_wait_seconds_total += delay_seconds
-
-    def record_retry(self, category_name: str, *, batch_kind: str = "") -> None:
-        if batch_kind.startswith("synthesis"):
-            self.get_category_diagnostics(category_name).synthesis_retry_count += 1
-
-    def record_model_switch(self, category_name: str, switch: dict[str, Any]) -> None:
-        self.get_category_diagnostics(category_name).model_switches.append(dict(switch))
-
-    def note_synthesis_merge_depth(self, category_name: str, depth: int) -> None:
-        diagnostics = self.get_category_diagnostics(category_name)
-        diagnostics.synthesis_merge_depth_max = max(diagnostics.synthesis_merge_depth_max, depth)
-
-    def mark_degraded_merge(self, category_name: str, reason: str) -> None:
-        diagnostics = self.get_category_diagnostics(category_name)
-        diagnostics.degraded_merge_used = True
-        diagnostics.degraded_merge_reason = reason
-        self.diagnostics.degraded_merge_count += 1
-
-    def ensure_synthesis_budget(self, category_name: str) -> None:
-        diagnostics = self.get_category_diagnostics(category_name)
-        if diagnostics.synthesis_wait_seconds_total >= MAX_CATEGORY_SYNTHESIS_WAIT_SECONDS:
-            if not diagnostics.synthesis_budget_exhausted:
-                self.diagnostics.synthesis_budget_exhausted_count += 1
-            diagnostics.synthesis_budget_exhausted = True
-            diagnostics.synthesis_retry_skipped_count += 1
-            raise SynthesisBudgetExceeded(
-                f"Category {category_name} exhausted synthesis wait budget after "
-                f"{diagnostics.synthesis_wait_seconds_total:.1f} seconds."
-            )
-        if diagnostics.synthesis_retry_count >= MAX_CATEGORY_SYNTHESIS_RETRIES:
-            if not diagnostics.synthesis_budget_exhausted:
-                self.diagnostics.synthesis_budget_exhausted_count += 1
-            diagnostics.synthesis_budget_exhausted = True
-            diagnostics.synthesis_retry_skipped_count += 1
-            raise SynthesisBudgetExceeded(
-                f"Category {category_name} exhausted synthesis retry budget after "
-                f"{diagnostics.synthesis_retry_count} retries."
-            )
-
-    def record_split(self, category_name: str, reason: str) -> None:
-        diagnostics = self.get_category_diagnostics(category_name)
-        if reason not in diagnostics.split_reasons:
-            diagnostics.split_reasons.append(reason)
-        if reason == "pre_send_budget":
-            self.diagnostics.pre_send_split_count += 1
-        elif reason == "response_413":
-            self.diagnostics.response_413_split_count += 1
-
-    def record_batch_attempt(self, context: BatchContext, model_id: str) -> None:
-        self.diagnostics.batch_count += 1
-        diagnostics = self.get_category_diagnostics(context.category_name)
-        if model_id not in diagnostics.models_attempted:
-            diagnostics.models_attempted.append(model_id)
-        diagnostics.estimated_input_tokens_max = max(
-            diagnostics.estimated_input_tokens_max,
-            context.estimated_input_tokens,
-        )
-        diagnostics.serialized_request_bytes_max = max(
-            diagnostics.serialized_request_bytes_max,
-            context.serialized_request_bytes,
-        )
-
-    def record_json_repair_retry(self) -> None:
-        self.diagnostics.json_repair_retry_count += 1
-
-    def record_failed_batch(self) -> None:
-        self.diagnostics.failed_batch_count += 1
-
-    def tighten_category_budget(self, category_name: str, classification: str, *, batch_kind: str = "article_batch") -> None:
-        state = self.get_category_budget(category_name)
-        if batch_kind == "synthesis":
-            token_attr = "synthesis_input_budget_tokens"
-            byte_attr = "synthesis_request_byte_budget"
-            min_tokens = MIN_SYNTHESIS_INPUT_BUDGET_TOKENS
-            min_bytes = MIN_SYNTHESIS_REQUEST_BYTE_BUDGET
-        else:
-            token_attr = "article_input_budget_tokens"
-            byte_attr = "article_request_byte_budget"
-            min_tokens = MIN_INPUT_BUDGET_TOKENS
-            min_bytes = MIN_REQUEST_BYTE_BUDGET
-
-        current_tokens = getattr(state, token_attr)
-        current_bytes = getattr(state, byte_attr)
-        if classification == "payload_too_large":
-            setattr(state, byte_attr, max(min_bytes, current_bytes // 2))
-        elif classification == "rate_limited":
-            setattr(state, token_attr, max(min_tokens, current_tokens // 2))
-            setattr(state, byte_attr, max(min_bytes, int(current_bytes * 0.75)))
-        else:
-            setattr(state, token_attr, max(min_tokens, int(current_tokens * 0.8)))
-            setattr(state, byte_attr, max(min_bytes, int(current_bytes * 0.8)))
+AnalysisRuntime.get_groq_session = _analysis_get_groq_session
+AnalysisRuntime.get_session_for_model = _analysis_get_session_for_model
 
 
 def run_analysis(
@@ -927,67 +434,6 @@ def _graph_finalize(state: AnalysisGraphState) -> AnalysisGraphState:
     _write_report(state["report_path"], report)
     state["report"] = report
     return state
-
-
-def load_groq_api_keys() -> list[str]:
-    """Load all Groq API keys from GROQ_API_KEY (comma-separated for multiple keys)."""
-    raw: str | None = os.environ.get("GROQ_API_KEY")
-    if not raw:
-        for config_path in _candidate_config_paths():
-            if not config_path.exists():
-                continue
-            parsed = _parse_simple_env_file(config_path)
-            raw = parsed.get("GROQ_API_KEY")
-            if raw:
-                break
-    if not raw:
-        raise RuntimeError(
-            "GROQ_API_KEY is not set. Export GROQ_API_KEY or add it to the repo-root .config file."
-        )
-    keys = [k.strip() for k in raw.split(",") if k.strip()]
-    if not keys:
-        raise RuntimeError("GROQ_API_KEY contains no valid keys.")
-    return keys
-
-
-def load_groq_api_key() -> str:
-    """Return the first Groq API key (backward-compat shim)."""
-    return load_groq_api_keys()[0]
-
-
-def _build_groq_session(api_key: str) -> requests.Session:
-    return _build_provider_session(api_key)
-
-
-def _build_provider_session(api_key: str) -> requests.Session:
-    session = requests.Session()
-    session.headers.update(
-        {
-            "Authorization": f"Bearer {api_key}",
-            "Content-Type": "application/json",
-        }
-    )
-    return session
-
-
-def _load_model_api_key(model: ModelConfig) -> str:
-    if model.provider == DEFAULT_PROVIDER:
-        return load_groq_api_key()
-
-    env_name = model.api_key_env or "OPENAI_API_KEY"
-    env_value = os.environ.get(env_name)
-    if env_value:
-        return env_value
-
-    for config_path in _candidate_config_paths():
-        if not config_path.exists():
-            continue
-        parsed = _parse_simple_env_file(config_path)
-        value = parsed.get(env_name)
-        if value:
-            return value
-
-    raise RuntimeError(f"{env_name} is not set for provider {model.provider}.")
 
 
 def select_content_for_analysis(content_text: str) -> dict[str, Any]:
@@ -2489,223 +1935,6 @@ def _invoke_article_batch(
     return _invoke_json_with_retry(runtime, messages, estimated_input_tokens, context, model_override=model_override)
 
 
-def _invoke_json_with_retry(
-    runtime: AnalysisRuntime,
-    messages: list[dict[str, Any]],
-    estimated_input_tokens: int,
-    context: BatchContext,
-    *,
-    model_override: ModelConfig | None = None,
-) -> tuple[dict[str, Any], str]:
-    raw_text, model_used = _chat_completion(
-        runtime,
-        messages,
-        estimated_input_tokens,
-        context,
-        model_override=model_override,
-    )
-    try:
-        return _parse_json_content(raw_text), model_used
-    except ValueError:
-        runtime.record_json_repair_retry()
-        LOGGER.info(
-            "Repairing invalid JSON for category %s %s %s.",
-            context.category_name,
-            context.batch_kind,
-            context.batch_label,
-        )
-        repair_messages = list(messages) + [
-            {"role": "assistant", "content": raw_text},
-            {
-                "role": "user",
-                "content": "Repair your previous reply into one valid JSON object only. Do not add markdown fences or commentary.",
-            },
-        ]
-        repaired_tokens = _estimate_messages_tokens(repair_messages)
-        repair_context = BatchContext(
-            category_name=context.category_name,
-            batch_kind=f"{context.batch_kind}_repair",
-            batch_label=context.batch_label,
-            article_count=context.article_count,
-            estimated_input_tokens=repaired_tokens,
-            serialized_request_bytes=_estimate_request_payload_bytes(
-                (model_override or runtime.current_model).model_id,
-                repair_messages,
-                (model_override or runtime.current_model).max_completion_tokens,
-            ),
-            content_shrunk=context.content_shrunk,
-        )
-        repaired_text, repaired_model = _chat_completion(
-            runtime,
-            repair_messages,
-            repaired_tokens,
-            repair_context,
-            model_override=model_override,
-        )
-        return _parse_json_content(repaired_text), repaired_model
-
-
-def _chat_completion(
-    runtime: AnalysisRuntime,
-    messages: list[dict[str, Any]],
-    estimated_input_tokens: int,
-    context: BatchContext,
-    *,
-    model_override: ModelConfig | None = None,
-) -> tuple[str, str]:
-    response: requests.Response | None = None
-    for attempt in range(DEFAULT_CHAT_RETRIES):
-        model = model_override or runtime.current_model
-        if context.batch_kind.startswith("synthesis"):
-            runtime.ensure_synthesis_budget(context.category_name)
-        api_url = model.api_url or GROQ_CHAT_COMPLETIONS_URL
-        session = runtime.get_session_for_model(model)
-        runtime.last_attempted_model = model.model_id
-        attempt_context = BatchContext(
-            category_name=context.category_name,
-            batch_kind=context.batch_kind,
-            batch_label=context.batch_label,
-            article_count=context.article_count,
-            estimated_input_tokens=estimated_input_tokens,
-            serialized_request_bytes=_estimate_request_payload_bytes(model.model_id, messages, model.max_completion_tokens),
-            content_shrunk=context.content_shrunk,
-        )
-        runtime.record_batch_attempt(attempt_context, model.model_id)
-        LOGGER.debug(
-            "Sending %s for %s batch=%s model=%s articles=%s estimated_tokens=%s serialized_bytes=%s shrunk=%s attempt=%s.",
-            attempt_context.batch_kind,
-            attempt_context.category_name,
-            attempt_context.batch_label,
-            model.model_id,
-            attempt_context.article_count,
-            attempt_context.estimated_input_tokens,
-            attempt_context.serialized_request_bytes,
-            attempt_context.content_shrunk,
-            attempt + 1,
-        )
-        # Select the API key with the most remaining capacity; rotate silently if a
-        # better key exists, sleep only when all keys are exhausted for this model.
-        best_key, wait_seconds = runtime.governor.select_key(
-            model.model_id,
-            runtime.current_key_index,
-            len(runtime.groq_api_keys),
-            estimated_input_tokens,
-        )
-        if best_key != runtime.current_key_index and model.provider == DEFAULT_PROVIDER:
-            LOGGER.info(
-                "Governor rotating key %d → %d for model %s (more capacity available).",
-                runtime.current_key_index,
-                best_key,
-                model.model_id,
-            )
-            runtime.current_key_index = best_key
-            runtime.diagnostics.key_rotation_count += 1
-            session = runtime.get_session_for_model(model)
-        runtime.record_wait(context.category_name, wait_seconds, batch_kind=context.batch_kind)
-        if wait_seconds > 0:
-            LOGGER.info(
-                "Waiting %.1f seconds before %s for category %s batch=%s on %s (key=%d).",
-                wait_seconds,
-                attempt_context.batch_kind,
-                attempt_context.category_name,
-                attempt_context.batch_label,
-                model.model_id,
-                runtime.current_key_index,
-            )
-        response = session.post(
-            api_url,
-            json={
-                "model": model.model_id,
-                "messages": messages,
-                "temperature": 0.1,
-                "max_completion_tokens": model.max_completion_tokens,
-                "response_format": {"type": "json_object"},
-            },
-            timeout=60,
-        )
-        runtime.governor.record_response(model.model_id, response, key_index=runtime.current_key_index)
-        LOGGER.debug(
-            "Received HTTP %s for %s category=%s batch=%s model=%s.",
-            response.status_code,
-            attempt_context.batch_kind,
-            attempt_context.category_name,
-            attempt_context.batch_label,
-            model.model_id,
-        )
-
-        if response.status_code == 413:
-            LOGGER.info(
-                "Groq returned HTTP 413 for category %s batch=%s on %s.",
-                attempt_context.category_name,
-                attempt_context.batch_label,
-                model.model_id,
-            )
-            response.raise_for_status()
-
-        if response.status_code == 429 and model_override is None:
-            LOGGER.info(
-                "Groq returned HTTP 429 for category %s batch=%s on %s (key=%d).",
-                attempt_context.category_name,
-                attempt_context.batch_label,
-                model.model_id,
-                runtime.current_key_index,
-            )
-            runtime.tighten_category_budget(
-                attempt_context.category_name,
-                "rate_limited",
-                batch_kind="synthesis" if attempt_context.batch_kind.startswith("synthesis") else "article_batch",
-            )
-            # Try rotating to another key before switching models.
-            if runtime.rotate_key(f"429 on key {runtime.current_key_index} / model {model.model_id}"):
-                session = runtime.get_session_for_model(model)
-                continue
-            # All keys exhausted for this model — switch model and reset key index.
-            if runtime.switch_to_next_model(f"All keys returned 429 on {model.model_id}."):
-                runtime.current_key_index = 0
-                session = runtime.get_session_for_model(runtime.current_model)
-                runtime.record_model_switch(context.category_name, runtime.model_switches[-1])
-                continue
-
-        if response.status_code in {429, 500, 502, 503, 504}:
-            if response.status_code == 429:
-                LOGGER.info(
-                    "Groq returned HTTP 429 for category %s batch=%s on %s.",
-                    attempt_context.category_name,
-                    attempt_context.batch_label,
-                    model.model_id,
-                )
-                runtime.tighten_category_budget(
-                    attempt_context.category_name,
-                    "rate_limited",
-                    batch_kind="synthesis" if attempt_context.batch_kind.startswith("synthesis") else "article_batch",
-                )
-            runtime.record_retry(attempt_context.category_name, batch_kind=attempt_context.batch_kind)
-            if attempt == DEFAULT_CHAT_RETRIES - 1:
-                response.raise_for_status()
-            delay_seconds = runtime.governor.apply_backoff(model.model_id, response, attempt)
-            runtime.record_wait(attempt_context.category_name, delay_seconds, batch_kind=attempt_context.batch_kind)
-            LOGGER.info(
-                "Retrying category %s batch=%s on %s after HTTP %s in %.1f seconds.",
-                attempt_context.category_name,
-                attempt_context.batch_label,
-                model.model_id,
-                response.status_code,
-                delay_seconds,
-            )
-            continue
-
-        response.raise_for_status()
-        payload = response.json()
-        content = payload["choices"][0]["message"]["content"]
-        if not isinstance(content, str):
-            raise ValueError("Groq response content was not a string.")
-        return content, model.model_id
-
-    if response is not None:
-        response.raise_for_status()
-    raise RuntimeError("Groq request retries exhausted.")
-
-
 def _build_article_batch_messages(category_name: str, batch_articles: list[dict[str, Any]], market_context: str = "") -> list[dict[str, Any]]:
     profile = _section_profile(category_name)
     batch_tier = _batch_attention_tier(batch_articles)
@@ -3611,21 +2840,6 @@ def _synthesis_within_budget(
     )
 
 
-def _estimate_messages_tokens(messages: list[dict[str, Any]]) -> int:
-    return _estimate_tokens(json.dumps(messages, ensure_ascii=False))
-
-
-def _estimate_request_payload_bytes(model_id: str, messages: list[dict[str, Any]], max_completion_tokens: int) -> int:
-    payload = {
-        "model": model_id,
-        "messages": messages,
-        "temperature": 0.1,
-        "max_completion_tokens": max_completion_tokens,
-        "response_format": {"type": "json_object"},
-    }
-    return len(json.dumps(payload, ensure_ascii=False).encode("utf-8"))
-
-
 def _largest_shrinkable_article(batch_articles: list[dict[str, Any]]) -> dict[str, Any] | None:
     shrinkable = [article for article in batch_articles if article["analyzed_content_length_chars"] > CATEGORY_MIN_CONTENT_CHARS]
     if not shrinkable:
@@ -3906,30 +3120,6 @@ def _clone_prepared_article(article: dict[str, Any]) -> dict[str, Any]:
     }
 
 
-def _parse_json_content(text: str) -> dict[str, Any]:
-    stripped = text.strip()
-    if stripped.startswith("```"):
-        stripped = stripped.strip("`")
-        if stripped.startswith("json"):
-            stripped = stripped[4:].lstrip()
-
-    try:
-        payload = json.loads(stripped)
-    except json.JSONDecodeError:
-        start = stripped.find("{")
-        end = stripped.rfind("}")
-        if start == -1 or end == -1 or end <= start:
-            raise ValueError("Response did not contain valid JSON.")
-        try:
-            payload = json.loads(stripped[start : end + 1])
-        except json.JSONDecodeError as exc:
-            raise ValueError("Response did not contain valid JSON.") from exc
-
-    if not isinstance(payload, dict):
-        raise ValueError("Expected a JSON object response.")
-    return payload
-
-
 def _normalize_entities(value: Any) -> list[dict[str, str]]:
     if not isinstance(value, list):
         return []
@@ -3989,117 +3179,8 @@ def _write_report(report_path: Path, payload: dict[str, Any]) -> None:
     report_path.write_text(json.dumps(payload, ensure_ascii=False, indent=2), encoding="utf-8")
 
 
-def _estimate_tokens(text: str) -> int:
-    if not text:
-        return 0
-    return math.ceil(len(text) / 4)
-
-
 def _normalize_whitespace(text: str) -> str:
     return " ".join(text.split())
-
-
-def _candidate_config_paths() -> list[Path]:
-    project_root = get_project_root()
-    return [project_root / ".config", project_root.parent / ".config"]
-
-
-def _parse_simple_env_file(path: Path) -> dict[str, str]:
-    values: dict[str, str] = {}
-    for line in path.read_text(encoding="utf-8").splitlines():
-        stripped = line.strip()
-        if not stripped or stripped.startswith("#") or "=" not in stripped:
-            continue
-        key, value = stripped.split("=", 1)
-        values[key.strip()] = value.strip().strip("'\"")
-    return values
-
-
-def _retry_delay_seconds(response: requests.Response, attempt: int) -> float:
-    retry_after = _parse_retry_after_seconds(response.headers.get("Retry-After"))
-    if retry_after is not None:
-        return max(1.0, retry_after)
-    base_delay = min(15.0, 2.0 * (2**attempt))
-    return base_delay + random.uniform(0.0, 0.5)
-
-
-def _parse_retry_after_seconds(value: str | None) -> float | None:
-    if not value:
-        return None
-    try:
-        return float(value)
-    except ValueError:
-        return _parse_duration_seconds(value)
-
-
-def _parse_duration_seconds(value: str | None) -> float | None:
-    if not value:
-        return None
-    stripped = value.strip().lower()
-    try:
-        return float(stripped)
-    except ValueError:
-        pass
-
-    total = 0.0
-    number = ""
-    unit_found = False
-    index = 0
-    while index < len(stripped):
-        char = stripped[index]
-        if char.isdigit() or char == ".":
-            number += char
-            index += 1
-            continue
-        if not number:
-            index += 1
-            continue
-
-        unit_found = True
-        if stripped.startswith("ms", index):
-            total += float(number) / 1000.0
-            index += 2
-        elif char == "s":
-            total += float(number)
-            index += 1
-        elif char == "m":
-            total += float(number) * 60.0
-            index += 1
-        elif char == "h":
-            total += float(number) * 3600.0
-            index += 1
-        else:
-            index += 1
-        number = ""
-
-    if number:
-        total += float(number)
-        unit_found = True
-    return total if unit_found else None
-
-
-def _parse_int(value: str | None) -> int | None:
-    if value is None:
-        return None
-    try:
-        return int(value)
-    except ValueError:
-        return None
-
-
-def _classify_exception(exc: Exception) -> str:
-    if isinstance(exc, SynthesisBudgetExceeded):
-        return "synthesis_budget_exhausted"
-    if isinstance(exc, ValueError):
-        return "invalid_json"
-    if isinstance(exc, requests.HTTPError):
-        status_code = exc.response.status_code if exc.response is not None else None
-        if status_code == 413:
-            return "payload_too_large"
-        if status_code == 429:
-            return "rate_limited"
-        return "http_error"
-    return "unexpected_error"
 
 
 def _article_key(source_article_id: Any, canonical_url: Any) -> tuple[str | None, str]:
@@ -4121,8 +3202,6 @@ def _build_market_context_for_report(snapshots: list[dict[str, Any]]) -> list[di
     return build_market_context_for_report(snapshots)
 
 
-def _section_profile(category_name: str) -> SectionProfile:
-    return LIGHT_SECTION_PROFILE if category_name in LIGHT_ANALYSIS_SECTIONS else STANDARD_SECTION_PROFILE
 def _generate_top_alerts(
     runtime: AnalysisRuntime,
     market_context: str,

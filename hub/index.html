@@ -153,6 +153,16 @@
             border-top: 1px solid var(--border-color);
             background: var(--bg-tertiary);
         }
+
+        /* Track dots for summary view */
+        .track-dot {
+            width: 0.5rem;
+            height: 0.5rem;
+            border-radius: 9999px;
+            display: inline-block;
+        }
+        .track-dot.up { background: var(--accent-success); }
+        .track-dot.down { background: var(--accent-danger); }
     </style>
 </head>
 <body>
@@ -551,6 +561,32 @@
                             moverWrap.appendChild(div);
                         });
                         polyCompact.appendChild(moverWrap);
+                    }
+                    
+                    if (polymarket.qqq_track_record || polymarket.btc_track_record) {
+                        const trWrap = document.createElement('div');
+                        trWrap.style.marginTop = '1rem';
+                        trWrap.innerHTML = `
+                            <div class="flex flex-col gap-2">
+                                ${polymarket.qqq_track_record ? `
+                                    <div class="flex items-center gap-2">
+                                        <span class="metric-label" style="font-size:0.55rem; width: 45px;">QQQ TR</span>
+                                        <div class="flex gap-1">
+                                            ${polymarket.qqq_track_record.slice(-5).map(tr => `<div class="track-dot ${tr.result}" title="${tr.date}"></div>`).join('')}
+                                        </div>
+                                    </div>
+                                ` : ''}
+                                ${polymarket.btc_track_record ? `
+                                    <div class="flex items-center gap-2">
+                                        <span class="metric-label" style="font-size:0.55rem; width: 45px;">BTC TR</span>
+                                        <div class="flex gap-1">
+                                            ${polymarket.btc_track_record.slice(-5).map(tr => `<div class="track-dot ${tr.result}" title="${tr.date}"></div>`).join('')}
+                                        </div>
+                                    </div>
+                                ` : ''}
+                            </div>
+                        `;
+                        polyCompact.appendChild(trWrap);
                     }
 
                     if (polymarket.error_count) {
