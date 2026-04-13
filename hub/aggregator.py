@@ -565,21 +565,40 @@ def get_latest_youtube():
             runs.sort(key=os.path.getmtime, reverse=True)
             latest_run = runs[0]
             summary_path = latest_run / "run-summary.json"
+            
+            # Map claims if we want to keep them, but better to just list videos with URLs
+            # or try to associate them. For now, let's provide signals that have URLs.
+            videos_dir = latest_run / "videos"
+            signals = []
+            if videos_dir.exists():
+                for video_file in videos_dir.glob("*.json"):
+                    with video_file.open("r", encoding="utf-8") as handle:
+                        vdata = json.load(handle)
+                        signals.append({
+                            "title": vdata.get("title", "Unknown Title"),
+                            "url": vdata.get("webpage_url", "#"),
+                            "channel_name": vdata.get("channel_name", "Unknown Channel"),
+                            "summary": vdata.get("executive_summary", "")[:120] + "..."
+                        })
+            
+            if not signals and summary_path.exists():
+                # Fallback to claims if no video files found
+                with summary_path.open("r", encoding="utf-8") as handle:
+                    raw_data = json.load(handle)
+                    for claim in raw_data.get("run_summary", {}).get("top_claims_worth_watching", []):
+                        signals.append({"title": claim, "channel_name": "Multi-Source Alpha", "url": "#"})
+
+            data["signals"] = signals[:5] # Keep top 5
+            
             if summary_path.exists():
                 with summary_path.open("r", encoding="utf-8") as handle:
                     raw_data = json.load(handle)
-                    run_info = raw_data.get("run_summary", {})
-
-                    signals = []
-                    for claim in run_info.get("top_claims_worth_watching", []):
-                        signals.append({"title": claim, "channel_name": "Multi-Source Alpha"})
-                    data["signals"] = signals
-
                     total = 0
                     for channel in raw_data.get("channels", {}).values():
                         total += channel.get("video_count", 0)
                     data["total_analyzed"] = total
-                    data["updated"] = latest_run.name
+            
+            data["updated"] = latest_run.name
     except Exception as exc:
         print(f"YouTube parse error: {exc}")
     return data
