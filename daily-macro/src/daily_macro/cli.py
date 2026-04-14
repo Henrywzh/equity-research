@@ -9,6 +9,7 @@ from .config import DEFAULT_RETENTION_DAYS, get_db_path
 from .notifier import load_analysis_result, send_analysis_summary_email, send_release_warning_email, send_test_email
 from .pipeline import cleanup_old_snapshots, run_scrape, run_smoke
 from .nowcasting import refresh_nowcasts
+from .fomc_documents import refresh_fomc_documents
 from .site import build_site
 from .storage import Storage
 
@@ -47,6 +48,11 @@ def build_parser() -> argparse.ArgumentParser:
 
     nowcasts_parser = subparsers.add_parser("nowcasts", help="Refresh macro nowcasts (Cleveland Fed & GDPNow).")
     nowcasts_parser.add_argument("--data-dir", default=None, help="Override the data directory.")
+
+    fomc_docs_parser = subparsers.add_parser("fomc-docs", help="Fetch FOMC statements, minutes, SEP tables from 2020 onward.")
+    fomc_docs_parser.add_argument("--data-dir", default=None, help="Override the data directory.")
+    fomc_docs_parser.add_argument("--start-year", type=int, default=2020, help="First year to fetch (default: 2020).")
+    fomc_docs_parser.add_argument("--force", action="store_true", help="Re-fetch documents already stored.")
 
     local_test_parser = subparsers.add_parser(
         "local-test",
@@ -163,6 +169,15 @@ def main(argv: list[str] | None = None) -> int:
         result = refresh_nowcasts(data_dir=args.data_dir)
         print(json.dumps(result, ensure_ascii=False, indent=2))
         return 0 if all(r["status"] != "failed" for r in result.values()) else 1
+
+    if args.command == "fomc-docs":
+        result = refresh_fomc_documents(
+            data_dir=args.data_dir,
+            start_year=args.start_year,
+            force=args.force,
+        )
+        print(json.dumps(result, ensure_ascii=False, indent=2))
+        return 0 if not result.get("errors") else 1
 
     if args.command == "local-test":
         result = run_local_test(

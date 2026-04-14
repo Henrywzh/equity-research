@@ -50,6 +50,10 @@ jobs:
         env:
           FRED_API_KEY: ${{ secrets.FRED_API_KEY }}
 
+      - name: Refresh FOMC documents (statements, minutes, SEP)
+        run: python -m daily_macro fomc-docs --start-year 2020
+        continue-on-error: true
+
       - name: Commit updated data
         working-directory: .
         run: |
