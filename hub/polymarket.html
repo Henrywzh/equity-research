@@ -121,15 +121,19 @@
         </div>
 
         <div class="flex items-center gap-3 mt-48 mb-10">
-            <h2 style="margin: 0;">Largest Probability Movers</h2>
+            <h2 style="margin: 0;">External Discovery</h2>
             <div style="height: 1px; flex: 1; background: var(--border-color); opacity: 0.5;"></div>
-            <span class="metric-label">24H Shift</span>
         </div>
 
-        <div id="movers-grid" class="group-grid" style="grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));">
-            <div class="card">
-                <p style="color: var(--text-muted);">Calculating movers...</p>
-            </div>
+        <div class="card mb-12" style="padding: 2.5rem; text-align: center; background: linear-gradient(135deg, rgba(99, 102, 241, 0.05) 0%, transparent 100%);">
+            <h3 style="margin-bottom: 0.75rem;">Explore all prediction markets on Polymarket</h3>
+            <p style="color: var(--text-secondary); margin-bottom: 1.5rem; max-width: 600px; margin-left: auto; margin-right: auto;">
+                View trending political events, niche macro probabilities, and culture-based contracts directly on the source platform.
+            </p>
+            <a href="https://polymarket.com/" target="_blank" rel="noopener noreferrer" class="button-link" style="display: inline-flex; align-items: center; gap: 0.5rem; padding: 0.75rem 1.5rem;">
+                Visit Polymarket.com
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5 a2 2 0 0 1-2-2V8 a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg>
+            </a>
         </div>
     </div>
 
@@ -340,43 +344,12 @@
                                 </tbody>
                             </table>
                         </div>
+                        <div style="margin-top: 1rem; text-align: right;">
+                            <a href="https://polymarket.com" target="_blank" style="color: var(--text-muted); font-size: 0.8rem; text-decoration: underline;">View on Polymarket</a>
+                        </div>
                     `;
                     grid.appendChild(card);
                 });
-
-                // 2. Populate Movers Grid
-                const moversGrid = document.getElementById('movers-grid');
-                moversGrid.innerHTML = '';
-                const movers = data.largest_movers || [];
-
-                if (movers.length === 0) {
-                    moversGrid.innerHTML = '<div class="card"><p style="color: var(--text-muted);">No significant sentiment shifts recorded in the last 24h.</p></div>';
-                } else {
-                    movers.forEach(row => {
-                        const card = document.createElement('div');
-                        card.className = 'card flex flex-col justify-between';
-                        const delta = row.delta_1d_pct;
-                        const deltaClass = delta > 1.5 ? 'badge-success' : (delta < -1.5 ? 'badge-danger' : '');
-                        
-                        card.innerHTML = `
-                            <div>
-                                <div class="flex justify-between items-start mb-3">
-                                    <span class="metric-label" style="font-size: 0.65rem;">${row.group_key.replace('_', ' ').toUpperCase()}</span>
-                                    <span class="badge ${deltaClass}">${formatDelta(delta)}</span>
-                                </div>
-                                <strong style="display:block; font-size: 1.1rem; line-height: 1.3;">${row.question}</strong>
-                            </div>
-                            <div class="flex justify-between items-end mt-6">
-                                <div>
-                                    <div class="metric-label" style="font-size: 0.6rem;">Currently</div>
-                                    <div class="mono" style="font-weight: 700; font-size: 1.25rem;">${formatProbability(row.probability_pct)}</div>
-                                </div>
-                                <a class="source-link" style="font-size: 0.85rem;" href="${row.source_url || '#'}" target="_blank" rel="noopener noreferrer">Details →</a>
-                            </div>
-                        `;
-                        moversGrid.appendChild(card);
-                    });
-                }
             } catch (err) {
                 console.error('Failed to load polymarket dashboard payload.', err);
                 document.getElementById('group-grid').innerHTML = '<div class="card"><p style="color: var(--text-muted);">Unable to load Polymarket data right now.</p></div>';
