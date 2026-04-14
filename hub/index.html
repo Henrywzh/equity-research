@@ -196,6 +196,16 @@
             font-size: 0.62rem;
             color: var(--text-muted);
             margin-top: 0.25rem;
+        .nowcast-section-title {
+            grid-column: 1 / -1;
+            font-size: 0.65rem;
+            font-weight: 700;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin: 0.5rem 0 0.25rem 0;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 0.2rem;
         }
     </style>
 </head>
@@ -233,7 +243,7 @@
                 </div>
                 <div id="macro-category" class="metric-label" style="font-size: 0.65rem; margin-top: 1rem; display: block;">...</div>
             </div>
-            <div class="card" id="kpi-market">
+            <div class="card clickable-card" id="kpi-market" onclick="window.location.href='market-analysis.html'">
                 <span class="metric-label">Market Momentum</span>
                 <div class="flex items-center justify-between mt-2">
                     <span class="metric-value">...</span>
@@ -241,6 +251,7 @@
                 </div>
                 <div id="market-top" class="metric-label" style="font-size: 0.65rem; margin-top: 1rem; display: block;">Top Movers...</div>
                 <div id="market-polymarket-pulse" class="metric-label" style="font-size: 0.65rem; margin-top: 0.45rem; display: block;">Polymarket pulse...</div>
+                <div class="metric-label" style="font-size: 0.65rem; margin-top: 0.5rem; display: block;">Click for interactive analysis →</div>
             </div>
             <div class="card" id="kpi-youtube">
                 <span class="metric-label">Alpha Intelligence</span>
@@ -273,8 +284,11 @@
 
 
                 <!-- Market Analysis Card -->
-                <div class="card">
-                    <h2 class="mb-4">Market Analysis</h2>
+                <div class="card clickable-card" onclick="window.location.href='market-analysis.html'">
+                    <div class="flex justify-between items-center mb-4">
+                        <h2 style="margin: 0;">Market Analysis</h2>
+                        <span class="metric-label" style="font-size: 0.75rem;">Full Interactive Report →</span>
+                    </div>
                     <div id="market-sections-container">
                         <!-- Categorized tables populated by JS -->
                     </div>
@@ -334,6 +348,32 @@
                     <h2 class="mb-4">YouTube Intelligence Highlights</h2>
                     <div id="youtube-list" class="flex flex-col gap-4">
                         <!-- Populated by JS -->
+                    </div>
+                </div>
+
+                <!-- Macro Research Terminal -->
+                <div class="card" style="background: linear-gradient(135deg, rgba(99, 102, 241, 0.05) 0%, transparent 100%); border: 1px solid rgba(99, 102, 241, 0.1);">
+                    <div class="flex items-center gap-2 mb-4">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="color: var(--accent-primary);"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg>
+                        <h2 style="margin: 0;">Macro Research Terminal</h2>
+                    </div>
+                    <div class="flex flex-col gap-2">
+                        <a href="https://www.clevelandfed.org/indicators-and-data/inflation-nowcasting" target="_blank" class="alert-item flex justify-between items-center" style="margin-bottom: 0; padding: 0.75rem 1rem; text-decoration: none;">
+                            <span style="font-size: 0.85rem; font-weight: 600; color: var(--text-primary);">Cleveland Fed Nowcasting</span>
+                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="opacity: 0.5;"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg>
+                        </a>
+                        <a href="https://www.forexfactory.com/calendar" target="_blank" class="alert-item flex justify-between items-center" style="margin-bottom: 0; padding: 0.75rem 1rem; text-decoration: none;">
+                            <span style="font-size: 0.85rem; font-weight: 600; color: var(--text-primary);">Forex Factory Calendar</span>
+                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="opacity: 0.5;"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg>
+                        </a>
+                        <a href="https://www.cmegroup.com/markets/interest-rates/cme-fedwatch-tool.html" target="_blank" class="alert-item flex justify-between items-center" style="margin-bottom: 0; padding: 0.75rem 1rem; text-decoration: none;">
+                            <span style="font-size: 0.85rem; font-weight: 600; color: var(--text-primary);">CME FedWatch Tool</span>
+                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="opacity: 0.5;"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg>
+                        </a>
+                        <a href="https://www.federalreserve.gov/monetarypolicy/fomccalendars.htm" target="_blank" class="alert-item flex justify-between items-center" style="margin-bottom: 0; padding: 0.75rem 1rem; text-decoration: none;">
+                            <span style="font-size: 0.85rem; font-weight: 600; color: var(--text-primary);">FOMC Meetings & Minutes</span>
+                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="opacity: 0.5;"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg>
+                        </a>
                     </div>
                 </div>
 
@@ -495,29 +535,53 @@
                         const grid = document.createElement('div');
                         grid.className = 'nowcast-grid';
 
-                        const priorities = ['atlanta_gdpnow', 'cleveland_cpi', 'cleveland_pce'];
-                        const spotlightItems = nowcasts.items.filter(i => priorities.includes(i.series_id));
+                        const priorities = [
+                            'atlanta_gdpnow',
+                            'cleveland_cpi_mom', 'cleveland_pce_mom',
+                            'cleveland_cpi_q', 'cleveland_pce_q',
+                            'cleveland_cpi_yoy', 'cleveland_pce_yoy'
+                        ];
                         
+                        // Pick the latest target_period for each series_id
                         const latestBySeries = {};
-                        spotlightItems.forEach(item => {
-                            if (!latestBySeries[item.series_id]) {
-                                latestBySeries[item.series_id] = item;
+                        nowcasts.items.forEach(item => {
+                            if (priorities.includes(item.series_id)) {
+                                if (!latestBySeries[item.series_id]) {
+                                    latestBySeries[item.series_id] = item;
+                                }
                             }
                         });
 
-                        Object.values(latestBySeries).forEach(item => {
-                            const mini = document.createElement('div');
-                            mini.className = 'nowcast-mini-card';
-                            
-                            let label = item.name.replace(' Nowcast', '').replace('Nowcast', '');
-                            if (item.series_id === 'atlanta_gdpnow') label = 'GDPNow Growth';
+                        const groups = [
+                            { label: 'Quarterly Horizons (Annualized)', ids: ['atlanta_gdpnow', 'cleveland_cpi_q', 'cleveland_pce_q'] },
+                            { label: 'Monthly Horizons (MoM Change)', ids: ['cleveland_cpi_mom', 'cleveland_pce_mom'] },
+                            { label: 'Annual Horizons (YoY Change)', ids: ['cleveland_cpi_yoy', 'cleveland_pce_yoy'] }
+                        ];
 
-                            mini.innerHTML = `
-                                <span class="nowcast-label">${label}</span>
-                                <span class="nowcast-value">${item.value.toFixed(2)}%</span>
-                                <span class="nowcast-period">${item.target_period}</span>
-                            `;
-                            grid.appendChild(mini);
+                        groups.forEach(group => {
+                            const groupItems = group.ids.map(id => latestBySeries[id]).filter(Boolean);
+                            if (groupItems.length > 0) {
+                                const title = document.createElement('div');
+                                title.className = 'nowcast-section-title';
+                                title.textContent = group.label;
+                                grid.appendChild(title);
+
+                                groupItems.forEach(item => {
+                                    const mini = document.createElement('div');
+                                    mini.className = 'nowcast-mini-card';
+                                    
+                                    let label = item.name.replace(' Nowcast', '').replace('Nowcast', '');
+                                    label = label.replace(' (MoM)', '').replace(' (Quarterly Ann.)', '').replace(' (YoY)', '');
+                                    if (item.series_id === 'atlanta_gdpnow') label = 'GDPNow Growth';
+
+                                    mini.innerHTML = `
+                                        <span class="nowcast-label">${label}</span>
+                                        <span class="nowcast-value">${item.value.toFixed(2)}%</span>
+                                        <span class="nowcast-period">${item.target_period}</span>
+                                    `;
+                                    grid.appendChild(mini);
+                                });
+                            }
                         });
 
                         nowcastList.appendChild(grid);
