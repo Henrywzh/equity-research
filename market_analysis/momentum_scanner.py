@@ -10,44 +10,49 @@ class MomentumScanner:
         self.mapping_df = pd.read_csv(mapping_file)
         
     def analyze(self):
-        # Extract unique tickers from mapping, handling multiple tickers per category
+        # Extract unique tickers from mapping
         all_tickers_raw = self.mapping_df['Tickers'].dropna().unique()
         tickers = []
         for t_str in all_tickers_raw:
-            # Tickers are comma-separated in the CSV
             for t in t_str.split(','):
                 t = t.strip()
                 if t and t not in tickers:
                     tickers.append(t)
         
-        # We need 1 year + extra for start-of-month calcs
         data = self.engine.fetch_data(tickers, period="2y")
         prices = self.engine.get_close_prices(data)
         
         if prices is None: return None
 
-        # Calculate returns for different periods
-        # Use simple end-to-end return
-        ret_1m = prices.pct_change(21).iloc[-1]  # ~1 month
-        ret_3m = prices.pct_change(63).iloc[-1]  # ~3 months
-        ret_12m = prices.pct_change(252).iloc[-1] # ~12 months
+        # Calculate returns
+        ret_1m = prices.pct_change(21).iloc[-1]
+        ret_3m = prices.pct_change(63).iloc[-1]
+        ret_12m = prices.pct_change(252).iloc[-1]
         
         # Combine into a results list
         scan_results = []
-        # We iterate over the mapping to keep sub-industry names
         for _, row in self.mapping_df.iterrows():
             sub_name = row['Name']
             primary_ticker = row['Tickers'].split(',')[0].strip()
             
             if primary_ticker in prices.columns:
+                p_series = prices[primary_ticker]
+                # Cumulative performance for charting
+                perf_series = (p_series / p_series.iloc[0]) - 1
+                
                 scan_results.append({
+                    "id": primary_ticker,
                     "sub_industry": sub_name,
                     "ticker": primary_ticker,
                     "parent_industry": row['Parent Industry'],
                     "m_1m": ret_1m[primary_ticker],
                     "m_3m": ret_3m[primary_ticker],
                     "m_12m": ret_12m[primary_ticker],
-                    "score": (ret_1m[primary_ticker] * 0.4 + ret_3m[primary_ticker] * 0.4 + ret_12m[primary_ticker] * 0.2)
+                    "score": (ret_1m[primary_ticker] * 0.4 + ret_3m[primary_ticker] * 0.4 + ret_12m[primary_ticker] * 0.2),
+                    "history": {
+                        "dates": perf_series.index.strftime('%Y-%m-%d').tolist(),
+                        "performance": perf_series.fillna(0).tolist()
+                    }
                 })
         
         # Sort by composite score

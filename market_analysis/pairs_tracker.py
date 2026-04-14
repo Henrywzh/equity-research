@@ -28,7 +28,7 @@ class PairsTracker:
                 
             ratio = prices[t1] / prices[t2]
             
-            # 1-year window for Z-Score (approx 252 trading days)
+            # 1-year window for Z-Score
             rolling_mean = ratio.rolling(window=252).mean()
             rolling_std = ratio.rolling(window=252).std()
             z_score = (ratio - rolling_mean) / rolling_std
@@ -38,17 +38,23 @@ class PairsTracker:
             
             # Mean reversion signal
             signal = "Neutral"
-            if curr_z > 2.0: signal = f"Short {t1} / Long {t2} (Overstretched)"
-            elif curr_z < -2.0: signal = f"Long {t1} / Short {t2} (Undervalued)"
+            if curr_z > 2.0: signal = f"Short {t1} / Long {t2}"
+            elif curr_z < -2.0: signal = f"Long {t1} / Short {t2}"
             
             results.append({
+                "id": f"{t1}_{t2}",
                 "ticker1": t1,
                 "ticker2": t2,
                 "description": desc,
                 "current_ratio": round(curr_ratio, 4),
                 "z_score": round(curr_z, 2),
                 "signal": signal,
-                "last_updated": ratio.index[-1].strftime('%Y-%m-%d')
+                "history": {
+                    "dates": ratio.index.strftime('%Y-%m-%d').tolist(),
+                    "ratio": ratio.fillna(0).tolist(),
+                    "mean": rolling_mean.fillna(0).tolist(),
+                    "zscore": z_score.fillna(0).tolist()
+                }
             })
             
         return results

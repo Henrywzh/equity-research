@@ -66,7 +66,8 @@ class RegimeMonitor:
             y=results["ratio_history"],
             mode='lines',
             name='Offensive/Defensive Ratio',
-            line=dict(color='#3b82f6', width=2)
+            line=dict(color='#3b82f6', width=2.5),
+            hovertemplate="Ratio: %{y:.4f}<extra></extra>"
         ))
         
         # Add MA line
@@ -75,17 +76,49 @@ class RegimeMonitor:
             y=results["ma_history"],
             mode='lines',
             name='60d Moving Avg',
-            line=dict(color='#94a3b8', width=1, dash='dot')
+            line=dict(color='#94a3b8', width=1.5, dash='dot'),
+            hovertemplate="MA: %{y:.4f}<extra></extra>"
         ))
         
+        # Update layout for "Trading 212" style
         fig.update_layout(
-            title="Market Regime Monitor (Risk-On / Risk-Off)",
+            title=dict(
+                text="Market Regime Monitor (Risk-On / Risk-Off)",
+                font=dict(size=20, color="#f8fafc")
+            ),
             template="plotly_dark",
             paper_bgcolor='rgba(0,0,0,0)',
             plot_bgcolor='rgba(0,0,0,0)',
-            margin=dict(l=20, r=20, t=40, b=20),
-            height=400,
-            legend=dict(orientation="h", yanchor="bottom", y=1.02, xanchor="right", x=1)
+            margin=dict(l=40, r=40, t=60, b=40),
+            height=500,
+            hovermode="x unified",
+            legend=dict(orientation="h", yanchor="bottom", y=1.02, xanchor="right", x=1),
+            xaxis=dict(
+                showspikes=True,
+                spikemode="across",
+                spikesnap="cursor",
+                showline=True,
+                showgrid=False,
+                rangeslider=dict(visible=True, thickness=0.08),
+                rangeselector=dict(
+                    buttons=list([
+                        dict(count=1, label="1M", step="month", stepmode="backward"),
+                        dict(count=6, label="6M", step="month", stepmode="backward"),
+                        dict(count=1, label="YTD", step="year", stepmode="todate"),
+                        dict(count=1, label="1Y", step="year", stepmode="backward"),
+                        dict(step="all", label="ALL")
+                    ]),
+                    bgcolor="#1e293b",
+                    activecolor="#3b82f6",
+                    font=dict(color="#f8fafc")
+                )
+            ),
+            yaxis=dict(
+                side="right",
+                showgrid=True,
+                gridcolor="#334155",
+                zeroline=False
+            )
         )
         
         return fig.to_html(full_html=False, include_plotlyjs='cdn')

@@ -598,16 +598,6 @@ def get_latest_fred() -> Dict[str, object]:
         data["updated"] = digest.get("generated_at", "N/A")
         data["status"] = digest.get("fetch_status", "success")
 
-        # TEMPORARY: Inject mock data for verification as requested by user
-        if not data["items"]:
-            print("No real FRED data found (likely missing API key). Injecting mock items for verification...")
-            today = datetime.now(timezone.utc).date()
-            data["items"] = [
-                {"name": "FOMC Minutes", "date": today.isoformat(), "impact": "medium", "release_id": 101},
-                {"name": "Consumer Price Index", "date": (today + timedelta(days=2)).isoformat(), "impact": "high", "release_id": 10},
-                {"name": "Retail Sales", "date": (today + timedelta(days=3)).isoformat(), "impact": "medium", "release_id": 9},
-                {"name": "GDP Advance Estimate", "date": (today + timedelta(days=10)).isoformat(), "impact": "high", "release_id": 53}
-            ]
     except Exception as exc:
         print(f"FRED parse error: {exc}")
     return data
