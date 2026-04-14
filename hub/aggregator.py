@@ -590,7 +590,7 @@ def get_latest_fred() -> Dict[str, object]:
             item
             for item in data["items"]
             if not (
-                item.get("release_id") == 101
+                str(item.get("release_id")) == "101"
                 or (
                     str(item.get("source") or "").lower() == "fred"
                     and str(item.get("name") or "").strip().lower() == "fomc press release"
@@ -599,6 +599,8 @@ def get_latest_fred() -> Dict[str, object]:
         ]
         data["updated"] = digest.get("generated_at", "N/A")
         data["status"] = digest.get("fetch_status", "success")
+        if digest.get("error_messages"):
+            data["error_messages"] = digest["error_messages"]
 
     except Exception as exc:
         print(f"FRED parse error: {exc}")

@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+import logging
 import os
 import re
 from calendar import month_abbr
@@ -47,6 +48,8 @@ MONTH_NAME_TO_NUMBER = {
     "dec": 12,
 }
 
+
+logger = logging.getLogger(__name__)
 
 @dataclass(frozen=True)
 class ReleaseWatchItem:
@@ -106,6 +109,7 @@ def build_release_digest(
     }
     if errors:
         payload["error_messages"] = list(errors)
+        logger.error(f"Digest partial success. Errors: {errors}")
     return payload
 
 
@@ -407,6 +411,11 @@ def _release_sort_key(item: dict[str, Any]) -> tuple[str, int, int, str]:
 def _get_fred_api_key(*, required: bool) -> str:
     config = _load_local_config()
     value = (os.environ.get(FRED_API_KEY_ENV) or config.get(FRED_API_KEY_ENV) or "").strip()
+    
+    # If still empty, check for case variations
+    if not value:
+        value = (os.environ.get(FRED_API_KEY_ENV.lower()) or config.get(FRED_API_KEY_ENV.lower()) or "").strip()
+        
     if required and not value:
         raise RuntimeError(
             f"FRED API key not set. Expected {FRED_API_KEY_ENV} in the environment or local .config."
