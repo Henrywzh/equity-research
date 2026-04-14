@@ -9,7 +9,7 @@ from pathlib import Path
 from typing import Any
 
 from .config import get_project_root
-from .release_calendar import summarize_release_intensity
+from .release_calendar import format_calendar_label, summarize_release_intensity
 
 ATTENTION_TIER_RANK = {"high": 0, "medium": 1, "light": 2}
 
@@ -432,7 +432,7 @@ def _build_plain_release_digest(summary: dict[str, Any]) -> list[str]:
     report_date = _coerce_report_date(summary.get("report_date"))
     lines = ["UPCOMING MACRO RELEASES:"]
     for item in items:
-        label = _release_day_label(str(item.get("date") or ""), report_date)
+        label = format_calendar_label(str(item.get("date") or ""), report_date)
         lines.append(f"- {label}: {item.get('name')} [{str(item.get('impact') or '').upper()}]")
 
     footnote = summarize_release_intensity(items)
@@ -452,12 +452,23 @@ def _build_html_release_digest(summary: dict[str, Any]) -> str:
     for item in items:
         impact = str(item.get("impact") or "medium").lower()
         color = {"high": "#dc2626", "medium": "#d97706"}.get(impact, "#6b7280")
-        date_label = _release_day_label(str(item.get("date") or ""), report_date)
-        stripe = "background:#fff7ed;" if date_label in {"Today", "Tomorrow"} else ""
+        date_label = format_calendar_label(str(item.get("date") or ""), report_date)
+        stripe = "background:#fff7ed;" if date_label.startswith("Today") or date_label.startswith("Tomorrow") else ""
+        event_badge = ""
+        if item.get("event_type") == "statement_day":
+            event_badge = (
+                "<span style='display:inline-block;margin-left:8px;padding:2px 7px;border-radius:999px;"
+                "background:#111827;color:#ffffff;font-size:10px;font-weight:700;letter-spacing:0.03em;'>STATEMENT</span>"
+            )
+        elif item.get("event_type") == "meeting_day_1":
+            event_badge = (
+                "<span style='display:inline-block;margin-left:8px;padding:2px 7px;border-radius:999px;"
+                "background:#e5e7eb;color:#374151;font-size:10px;font-weight:700;letter-spacing:0.03em;'>DAY 1</span>"
+            )
         rows.append(
             f"<tr style='{stripe}'>"
             f"<td style='padding:8px 12px;color:#6b7280;font-size:12px;white-space:nowrap;'>{_escape_html(date_label)}</td>"
-            f"<td style='padding:8px 12px;font-size:13px;color:#111827;'>{_escape_html(str(item.get('name') or 'Unnamed release'))}</td>"
+            f"<td style='padding:8px 12px;font-size:13px;color:#111827;'>{_escape_html(str(item.get('name') or 'Unnamed release'))}{event_badge}</td>"
             f"<td style='padding:8px 12px;text-align:right;'>"
             f"<span style='display:inline-block;padding:2px 8px;border-radius:999px;background:{color}1a;color:{color};font-size:11px;font-weight:600;text-transform:uppercase;'>"
             f"{_escape_html(impact)}"
@@ -484,34 +495,51 @@ def _build_warning_plain_body(releases: list[dict[str, Any]]) -> str:
         return "No qualifying releases are scheduled for tomorrow.\n"
 
     lines = ["PRE-RELEASE ALERT", ""]
+    reference_date = _warning_reference_date(releases)
     for release in releases:
         lines.extend(
             [
                 f"{release.get('name')}",
-                f"Date: {release.get('date')}",
+                f"Date: {format_calendar_label(str(release.get('date') or ''), reference_date)}",
                 f"Impact: {str(release.get('impact') or '').upper()}",
-                f"Series: {release.get('series_id') or 'n/a'}",
-                f"Prior print: {release.get('prior_value') or 'n/a'} vs prior",
-                "",
             ]
         )
+        if release.get("event_type"):
+            lines.append(f"Event type: {str(release.get('event_type') or '').replace('_', ' ')}")
+        if release.get("series_id"):
+            lines.append(f"Series: {release.get('series_id') or 'n/a'}")
+            lines.append(f"Prior print: {release.get('prior_value') or 'n/a'} vs prior")
+        lines.append("")
     return "\n".join(lines).rstrip() + "\n"
 
 
 def _build_warning_html_body(releases: list[dict[str, Any]]) -> str:
+    reference_date = _warning_reference_date(releases)
     cards = []
     for release in releases:
         impact = str(release.get("impact") or "medium").lower()
         color = {"high": "#dc2626", "medium": "#d97706"}.get(impact, "#6b7280")
+        rows = [
+            f"<tr><td style='padding:4px 0;color:#6b7280;'>Impact</td><td style='padding:4px 0;text-align:right;color:{color};font-weight:600;text-transform:uppercase;'>{_escape_html(impact)}</td></tr>",
+        ]
+        if release.get("event_type"):
+            rows.append(
+                f"<tr><td style='padding:4px 0;color:#6b7280;'>Event</td><td style='padding:4px 0;text-align:right;color:#111827;font-weight:600;'>{_escape_html(str(release.get('event_type') or '').replace('_', ' '))}</td></tr>"
+            )
+        if release.get("series_id"):
+            rows.append(
+                f"<tr><td style='padding:4px 0;color:#6b7280;'>Series</td><td style='padding:4px 0;text-align:right;color:#111827;font-family:ui-monospace, SFMono-Regular, monospace;'>{_escape_html(str(release.get('series_id') or 'n/a'))}</td></tr>"
+            )
+            rows.append(
+                f"<tr><td style='padding:4px 0;color:#6b7280;'>Prior print</td><td style='padding:4px 0;text-align:right;color:#111827;font-weight:600;'>{_escape_html(str(release.get('prior_value') or 'n/a'))} vs prior</td></tr>"
+            )
         cards.append(
             "<div style='margin-bottom:12px;padding:14px;border:1px solid #e5e7eb;border-radius:12px;background:#ffffff;'>"
             f"<div style='font-size:16px;font-weight:700;color:#111827;margin-bottom:6px;'>{_escape_html(str(release.get('name') or 'Unnamed release'))}</div>"
-            f"<div style='font-size:12px;color:#6b7280;margin-bottom:8px;'>Date: {_escape_html(str(release.get('date') or 'Unknown'))}</div>"
+            f"<div style='font-size:12px;color:#6b7280;margin-bottom:8px;'>Date: {_escape_html(format_calendar_label(str(release.get('date') or ''), reference_date))}</div>"
             "<table style='width:100%;border-collapse:collapse;font-size:13px;'>"
-            f"<tr><td style='padding:4px 0;color:#6b7280;'>Impact</td><td style='padding:4px 0;text-align:right;color:{color};font-weight:600;text-transform:uppercase;'>{_escape_html(impact)}</td></tr>"
-            f"<tr><td style='padding:4px 0;color:#6b7280;'>Series</td><td style='padding:4px 0;text-align:right;color:#111827;font-family:ui-monospace, SFMono-Regular, monospace;'>{_escape_html(str(release.get('series_id') or 'n/a'))}</td></tr>"
-            f"<tr><td style='padding:4px 0;color:#6b7280;'>Prior print</td><td style='padding:4px 0;text-align:right;color:#111827;font-weight:600;'>{_escape_html(str(release.get('prior_value') or 'n/a'))} vs prior</td></tr>"
-            "</table></div>"
+            + "".join(rows)
+            + "</table></div>"
         )
 
     return (
@@ -1070,17 +1098,14 @@ def _coerce_report_date(value: Any) -> date | None:
         return None
 
 
-def _release_day_label(date_value: str, report_date: date | None) -> str:
+def _warning_reference_date(releases: list[dict[str, Any]]) -> date | None:
+    if not releases:
+        return None
     try:
-        release_date = date.fromisoformat(date_value[:10])
+        first_release = date.fromisoformat(str(releases[0].get("date") or "")[:10])
     except ValueError:
-        return date_value or "Unknown"
-    if report_date is not None:
-        if release_date == report_date:
-            return "Today"
-        if release_date == report_date + timedelta(days=1):
-            return "Tomorrow"
-    return release_date.isoformat()
+        return None
+    return first_release - timedelta(days=1)
 
 
 def _escape_html(value: str) -> str:

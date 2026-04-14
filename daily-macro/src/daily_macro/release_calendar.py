@@ -2,19 +2,50 @@ from __future__ import annotations
 
 import json
 import os
+import re
+from calendar import month_abbr
 from dataclasses import dataclass
 from datetime import date, datetime, timedelta, timezone
 from pathlib import Path
 from typing import Any
 
 import requests
+from bs4 import BeautifulSoup
 
 from .config import get_project_root
 
 FRED_API_URL = "https://api.stlouisfed.org/fred"
 FRED_API_KEY_ENV = "FRED_API_KEY"
 WATCHLIST_PATH = Path("config") / "release_watchlist.json"
+FED_FOMC_URL = "https://www.federalreserve.gov/monetarypolicy/fomccalendars.htm"
 IMPACT_RANK = {"high": 0, "medium": 1, "low": 2}
+EVENT_TYPE_RANK = {"statement_day": 0, "meeting_day_1": 1}
+MONTH_NAME_TO_NUMBER = {
+    "january": 1,
+    "jan": 1,
+    "february": 2,
+    "feb": 2,
+    "march": 3,
+    "mar": 3,
+    "april": 4,
+    "apr": 4,
+    "may": 5,
+    "june": 6,
+    "jun": 6,
+    "july": 7,
+    "jul": 7,
+    "august": 8,
+    "aug": 8,
+    "september": 9,
+    "sep": 9,
+    "sept": 9,
+    "october": 10,
+    "oct": 10,
+    "november": 11,
+    "nov": 11,
+    "december": 12,
+    "dec": 12,
+}
 
 
 @dataclass(frozen=True, slots=True)
@@ -38,40 +69,44 @@ def build_release_digest(
 ) -> dict[str, Any]:
     start = _coerce_date(start_date)
     end = start + timedelta(days=max(days_ahead - 1, 0))
-    api_key = _get_fred_api_key(required=require_api_key)
-    if not api_key:
-        return {
-            "generated_at": datetime.now(timezone.utc).isoformat(),
-            "window_start": start.isoformat(),
-            "window_end": end.isoformat(),
-            "fetch_status": "skipped_missing_api_key",
-            "items": [],
-            "source": "FRED",
-        }
+    api_key = _get_fred_api_key(required=False)
+
+    items: list[dict[str, Any]] = []
+    errors: list[str] = []
+
+    if api_key:
+        try:
+            watchlist = load_release_watchlist()
+            items.extend(fetch_upcoming_releases(start=start, end=end, api_key=api_key, watchlist=watchlist))
+        except Exception as exc:
+            if require_api_key:
+                raise
+            errors.append(f"fred:{exc}")
+    else:
+        if require_api_key:
+            raise RuntimeError(
+                f"FRED API key not set. Expected {FRED_API_KEY_ENV} in the environment or local .config."
+            )
+        errors.append("fred:missing_api_key")
 
     try:
-        watchlist = load_release_watchlist()
-        releases = fetch_upcoming_releases(start=start, end=end, api_key=api_key, watchlist=watchlist)
-        return {
-            "generated_at": datetime.now(timezone.utc).isoformat(),
-            "window_start": start.isoformat(),
-            "window_end": end.isoformat(),
-            "fetch_status": "success",
-            "items": releases,
-            "source": "FRED",
-        }
+        items.extend(fetch_fomc_events(start=start, end=end))
     except Exception as exc:
-        if require_api_key:
-            raise
-        return {
-            "generated_at": datetime.now(timezone.utc).isoformat(),
-            "window_start": start.isoformat(),
-            "window_end": end.isoformat(),
-            "fetch_status": "failed",
-            "items": [],
-            "source": "FRED",
-            "error_message": str(exc),
-        }
+        errors.append(f"fomc:{exc}")
+
+    items.sort(key=_release_sort_key)
+    fetch_status = _digest_fetch_status(items=items, errors=errors)
+    payload: dict[str, Any] = {
+        "generated_at": datetime.now(timezone.utc).isoformat(),
+        "window_start": start.isoformat(),
+        "window_end": end.isoformat(),
+        "fetch_status": fetch_status,
+        "items": items,
+        "source": "mixed",
+    }
+    if errors:
+        payload["error_messages"] = list(errors)
+    return payload
 
 
 def fetch_warning_releases(
@@ -80,7 +115,7 @@ def fetch_warning_releases(
     require_api_key: bool = True,
 ) -> list[dict[str, Any]]:
     base_date = _coerce_date(today) if today is not None else datetime.now(timezone.utc).date()
-    digest = build_release_digest(start_date=base_date, days_ahead=2, require_api_key=require_api_key)
+    digest = build_release_digest(start_date=base_date, days_ahead=2, require_api_key=False)
     tomorrow = (base_date + timedelta(days=1)).isoformat()
     selected = [
         item
@@ -144,6 +179,7 @@ def fetch_upcoming_releases(
         releases.append(
             {
                 "release_id": watch_item.release_id,
+                "release_key": f"fred_{watch_item.release_id}_{item['date']}",
                 "name": watch_item.name,
                 "date": str(item["date"]),
                 "impact": watch_item.impact,
@@ -153,9 +189,23 @@ def fetch_upcoming_releases(
                 "source": watch_item.source,
             }
         )
-
-    releases.sort(key=lambda item: (str(item["date"]), IMPACT_RANK.get(str(item["impact"]), 99), str(item["name"])))
     return releases
+
+
+def fetch_fomc_events(*, start: date, end: date) -> list[dict[str, Any]]:
+    response = requests.get(FED_FOMC_URL, timeout=10)
+    response.raise_for_status()
+    parsed = parse_fomc_events_from_html(response.text, years=range(start.year, end.year + 1))
+    return [item for item in parsed if start <= _coerce_date(item["date"]) <= end]
+
+
+def parse_fomc_events_from_html(html: str, *, years: range | list[int]) -> list[dict[str, Any]]:
+    soup = BeautifulSoup(html, "html.parser")
+    lines = [line.strip() for line in soup.get_text("\n").splitlines() if line.strip()]
+    events: list[dict[str, Any]] = []
+    for year in years:
+        events.extend(_parse_fomc_year_lines(lines, year))
+    return events
 
 
 def enrich_releases_with_prior_values(
@@ -166,15 +216,27 @@ def enrich_releases_with_prior_values(
     if not releases:
         return []
 
-    api_key = _get_fred_api_key(required=require_api_key)
-    if not api_key:
-        return releases
-
-    watchlist = load_release_watchlist()
+    api_key = _get_fred_api_key(required=False)
     enriched: list[dict[str, Any]] = []
+    watchlist = load_release_watchlist()
+
     for release in releases:
         enriched_item = dict(release)
-        watch_item = watchlist.get(int(release["release_id"]))
+        if str(release.get("source") or "").lower() != "fred":
+            enriched.append(enriched_item)
+            continue
+        release_id = release.get("release_id")
+        if not isinstance(release_id, int):
+            enriched.append(enriched_item)
+            continue
+        if not api_key:
+            if require_api_key:
+                raise RuntimeError(
+                    f"FRED API key not set. Expected {FRED_API_KEY_ENV} in the environment or local .config."
+                )
+            enriched.append(enriched_item)
+            continue
+        watch_item = watchlist.get(release_id)
         if watch_item is None:
             enriched.append(enriched_item)
             continue
@@ -231,6 +293,115 @@ def summarize_release_intensity(items: list[dict[str, Any]]) -> str:
     if high_count >= 1:
         return f"{high_count} high-impact and {medium_count} medium-impact releases in the next 7 days."
     return f"{medium_count} medium-impact releases in the next 7 days."
+
+
+def format_calendar_label(date_value: str, reference_date: date | None) -> str:
+    try:
+        release_date = date.fromisoformat(date_value[:10])
+    except ValueError:
+        return date_value or "Unknown"
+    absolute = f"{month_abbr[release_date.month]} {release_date.day}"
+    if reference_date is not None:
+        if release_date == reference_date:
+            return f"Today ({absolute})"
+        if release_date == reference_date + timedelta(days=1):
+            return f"Tomorrow ({absolute})"
+    return absolute
+
+
+def _parse_fomc_year_lines(lines: list[str], year: int) -> list[dict[str, Any]]:
+    header = f"{year} FOMC Meetings"
+    try:
+        start_index = lines.index(header)
+    except ValueError:
+        return []
+
+    end_index = len(lines)
+    for idx in range(start_index + 1, len(lines)):
+        if re.fullmatch(r"\d{4} FOMC Meetings", lines[idx]):
+            end_index = idx
+            break
+
+    events: list[dict[str, Any]] = []
+    current_month_header: str | None = None
+    current_sep = False
+    for line in lines[start_index + 1 : end_index]:
+        if line in {"Statement:", "Minutes:", "Press Conference", "Implementation Note"}:
+            continue
+        normalized = line.lower().strip()
+        if normalized in MONTH_NAME_TO_NUMBER or "/" in line:
+            current_month_header = line
+            current_sep = False
+            continue
+        match = re.fullmatch(r"(\d{1,2})-(\d{1,2})(\*)?", line)
+        if not match or current_month_header is None:
+            continue
+        current_sep = bool(match.group(3))
+        day_one = int(match.group(1))
+        day_two = int(match.group(2))
+        month_one, month_two = _parse_month_header(current_month_header)
+        date_one = date(year, month_one, day_one)
+        second_year = year + 1 if month_two < month_one else year
+        date_two = date(second_year, month_two, day_two)
+        sep_suffix = " (SEP)" if current_sep else ""
+        events.extend(
+            [
+                {
+                    "release_id": f"fomc_{date_one.isoformat()}_day1",
+                    "release_key": f"fomc_{date_one.isoformat()}_day1",
+                    "name": f"FOMC Meeting (Day 1){sep_suffix}",
+                    "date": date_one.isoformat(),
+                    "impact": "high",
+                    "series_id": None,
+                    "display_unit": "",
+                    "prior_value": None,
+                    "source": "Federal Reserve",
+                    "event_type": "meeting_day_1",
+                    "is_sep_meeting": current_sep,
+                },
+                {
+                    "release_id": f"fomc_{date_two.isoformat()}_statement",
+                    "release_key": f"fomc_{date_two.isoformat()}_statement",
+                    "name": f"FOMC Statement Day{sep_suffix}",
+                    "date": date_two.isoformat(),
+                    "impact": "high",
+                    "series_id": None,
+                    "display_unit": "",
+                    "prior_value": None,
+                    "source": "Federal Reserve",
+                    "event_type": "statement_day",
+                    "is_sep_meeting": current_sep,
+                },
+            ]
+        )
+        current_month_header = None
+    return events
+
+
+def _parse_month_header(header: str) -> tuple[int, int]:
+    parts = [part.strip().lower() for part in header.split("/") if part.strip()]
+    if not parts:
+        raise ValueError(f"Invalid FOMC month header: {header}")
+    first = MONTH_NAME_TO_NUMBER[parts[0]]
+    second = MONTH_NAME_TO_NUMBER[parts[-1]]
+    return first, second
+
+
+def _digest_fetch_status(*, items: list[dict[str, Any]], errors: list[str]) -> str:
+    if not errors:
+        return "success"
+    if items:
+        return "partial"
+    if errors == ["fred:missing_api_key"]:
+        return "skipped_missing_api_key"
+    return "failed"
+
+
+def _release_sort_key(item: dict[str, Any]) -> tuple[str, int, int, str]:
+    impact = IMPACT_RANK.get(str(item.get("impact") or "").lower(), 99)
+    event_type = EVENT_TYPE_RANK.get(str(item.get("event_type") or ""), 99)
+    release_key = str(item.get("release_key") or item.get("release_id") or item.get("name") or "")
+    return (str(item.get("date") or ""), impact, event_type, release_key)
 
 
 def _get_fred_api_key(*, required: bool) -> str:

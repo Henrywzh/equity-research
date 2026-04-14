@@ -253,8 +253,8 @@ class NotifierTests(unittest.TestCase):
         self.assertIn("Oracle pulse headline", rendered_text)
         self.assertIn("[HIGH]", rendered_text)
         self.assertIn("UPCOMING MACRO RELEASES", rendered_text)
-        self.assertIn("Today: Consumer Price Index [HIGH]", rendered_text)
-        self.assertIn("Tomorrow: Producer Price Index [MEDIUM]", rendered_text)
+        self.assertIn("Today (Apr 4): Consumer Price Index [HIGH]", rendered_text)
+        self.assertIn("Tomorrow (Apr 5): Producer Price Index [MEDIUM]", rendered_text)
 
     def test_send_analysis_summary_email_sends_partial_with_warning(self) -> None:
         report = _success_report()
@@ -434,14 +434,17 @@ class NotifierTests(unittest.TestCase):
                 "source": "FRED",
             },
             {
-                "release_id": 36,
-                "name": "Producer Price Index",
+                "release_id": "fomc_2026-04-05_statement",
+                "release_key": "fomc_2026-04-05_statement",
+                "name": "FOMC Statement Day",
                 "date": "2026-04-05",
-                "impact": "medium",
-                "series_id": "PPIACO",
-                "display_unit": "%",
+                "impact": "high",
+                "series_id": None,
+                "display_unit": "",
                 "prior_value": None,
-                "source": "FRED",
+                "source": "Federal Reserve",
+                "event_type": "statement_day",
+                "is_sep_meeting": False,
             },
         ]
 
@@ -472,7 +475,10 @@ class NotifierTests(unittest.TestCase):
         rendered_text = "\n".join(decoded_parts)
         self.assertIn("Consumer Price Index", rendered_text)
         self.assertIn("3.2% vs prior", rendered_text)
-        self.assertIn("n/a vs prior", rendered_text)
+        self.assertIn("Tomorrow (Apr 5)", rendered_text)
+        self.assertIn("FOMC Statement Day", rendered_text)
+        self.assertIn("statement day", rendered_text.lower())
+        self.assertNotIn("n/a vs prior", rendered_text)
 
     def test_build_html_articles_sorts_iso_timestamps_newest_first_within_tier(self) -> None:
         html = _build_html_articles(

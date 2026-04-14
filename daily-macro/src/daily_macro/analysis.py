@@ -233,7 +233,11 @@ def _graph_initialize(state: AnalysisGraphState) -> AnalysisGraphState:
     previous_retry_plan = _build_previous_retry_plan(state["previous_articles"], state["previous_report"])
     runtime: AnalysisRuntime | None = None
     if today_plan["new_articles_analyzed"] > 0 or previous_retry_plan["retried_previous_day_articles"] > 0:
-        groq_keys = load_groq_api_keys()
+        try:
+            groq_keys = load_groq_api_keys()
+        except RuntimeError:
+            # Backward-compatible shim for tests and older single-key call sites.
+            groq_keys = [load_groq_api_key()]
         LOGGER.info("Loaded %d Groq API key(s).", len(groq_keys))
         runtime = AnalysisRuntime(
             groq_api_keys=groq_keys,
