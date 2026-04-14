@@ -3,6 +3,7 @@ import glob
 import json
 import os
 import shutil
+import sqlite3
 import sys
 from collections import defaultdict
 from datetime import datetime, timedelta, timezone
@@ -30,6 +31,7 @@ RATE_COUNTERS_PATH = MARINE_ROOT / "state" / "rate_counters.json"
 SCREENSHOTS_DIR = MARINE_ROOT / "screenshots"
 HUB_SCREENSHOTS_DIR = ROOT / "hub" / "screenshots"
 POLYMARKET_RUNS_DIR = ROOT / "daily-market" / "data" / "polymarket_runs"
+MACRO_DB_PATH = ROOT / "daily-macro" / "data" / "macro.sqlite"
 
 
 def _safe_load_json(path: Path, default):
@@ -651,6 +653,48 @@ def get_latest_youtube():
     return data
 
 
+def get_latest_nowcasts() -> Dict[str, object]:
+    data = {"items": [], "updated": "N/A", "status": "missing"}
+    if not MACRO_DB_PATH.exists():
+        return data
+
+    try:
+        conn = sqlite3.connect(MACRO_DB_PATH)
+        conn.row_factory = sqlite3.Row
+        cursor = conn.cursor()
+
+        # Fetch the latest available nowcast (by as_of_date) for every (series_id, target_period)
+        query = """
+        SELECT s.name, s.series_id, o.target_period, o.value, o.as_of_date
+        FROM indicator_observations o
+        JOIN indicator_series s ON o.series_id = s.series_id
+        WHERE (o.series_id, o.target_period, o.as_of_date) IN (
+            SELECT series_id, target_period, MAX(as_of_date)
+            FROM indicator_observations
+            GROUP BY series_id, target_period
+        )
+        ORDER BY s.series_id, o.target_period ASC
+        """
+        cursor.execute(query)
+        rows = cursor.fetchall()
+
+        items = []
+        latest_as_of = None
+        for row in rows:
+            items.append(dict(row))
+            if latest_as_of is None or row["as_of_date"] > latest_as_of:
+                latest_as_of = row["as_of_date"]
+
+        data["items"] = items
+        data["updated"] = latest_as_of or "N/A"
+        data["status"] = "success"
+        conn.close()
+    except Exception as exc:
+        print(f"Macro DB parse error: {exc}")
+        data["status"] = "failed"
+    return data
+
+
 def bake_cake():
     print("Aggregation started...")
     hormuz_data = build_hormuz_payload()
@@ -660,6 +704,7 @@ def bake_cake():
         "market": get_latest_market(),
         "polymarket": polymarket_compact,
         "macro": get_latest_macro(),
+        "nowcasts": get_latest_nowcasts(),
         "fred": get_latest_fred(),
         "youtube": get_latest_youtube(),
         "last_baked": datetime.now(tz=timezone.utc).isoformat(),

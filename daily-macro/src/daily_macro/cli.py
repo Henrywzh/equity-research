@@ -8,6 +8,7 @@ from .analysis import run_analysis
 from .config import DEFAULT_RETENTION_DAYS, get_db_path
 from .notifier import load_analysis_result, send_analysis_summary_email, send_release_warning_email, send_test_email
 from .pipeline import cleanup_old_snapshots, run_scrape, run_smoke
+from .nowcasting import refresh_nowcasts
 from .site import build_site
 from .storage import Storage
 
@@ -43,6 +44,9 @@ def build_parser() -> argparse.ArgumentParser:
     site_parser.add_argument("--json", action="store_true", help="Print the site build result as JSON.")
     site_parser.add_argument("--data-dir", default=None, help="Override the data directory.")
     site_parser.add_argument("--output-dir", default=None, help="Override the generated site output directory.")
+
+    nowcasts_parser = subparsers.add_parser("nowcasts", help="Refresh macro nowcasts (Cleveland Fed & GDPNow).")
+    nowcasts_parser.add_argument("--data-dir", default=None, help="Override the data directory.")
 
     local_test_parser = subparsers.add_parser(
         "local-test",
@@ -154,6 +158,11 @@ def main(argv: list[str] | None = None) -> int:
         else:
             _print_site_build_result(result)
         return 0 if result["status"] != "failed" else 1
+
+    if args.command == "nowcasts":
+        result = refresh_nowcasts(data_dir=args.data_dir)
+        print(json.dumps(result, ensure_ascii=False, indent=2))
+        return 0 if all(r["status"] != "failed" for r in result.values()) else 1
 
     if args.command == "local-test":
         result = run_local_test(

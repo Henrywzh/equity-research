@@ -48,7 +48,7 @@ MONTH_NAME_TO_NUMBER = {
 }
 
 
-@dataclass(frozen=True, slots=True)
+@dataclass(frozen=True)
 class ReleaseWatchItem:
     release_id: int
     name: str

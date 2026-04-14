@@ -119,7 +119,7 @@ HIGH_ATTENTION_THEME_KEYWORDS = {
 # ---------------------------------------------------------------------------
 
 
-@dataclass(frozen=True, slots=True)
+@dataclass(frozen=True)
 class SectionProfile:
     name: str
     article_key_points_limit: int
@@ -203,7 +203,7 @@ class AnalysisGraphState(TypedDict):
 # ---------------------------------------------------------------------------
 
 
-@dataclass(frozen=True, slots=True)
+@dataclass(frozen=True)
 class ModelConfig:
     model_id: str
     provider: str = DEFAULT_PROVIDER
@@ -212,7 +212,7 @@ class ModelConfig:
     api_key_env: str | None = None
 
 
-@dataclass(slots=True)
+@dataclass
 class ModelRateLimitState:
     remaining_requests: int | None = None
     reset_requests_at: float | None = None
@@ -220,7 +220,7 @@ class ModelRateLimitState:
     reset_tokens_at: float | None = None
 
 
-@dataclass(slots=True)
+@dataclass
 class CategoryBudgetState:
     article_input_budget_tokens: int = DEFAULT_INPUT_BUDGET_TOKENS
     article_request_byte_budget: int = DEFAULT_REQUEST_BYTE_BUDGET
@@ -233,7 +233,7 @@ class CategoryBudgetState:
 # ---------------------------------------------------------------------------
 
 
-@dataclass(slots=True)
+@dataclass
 class RuntimeDiagnostics:
     rate_limit_wait_count: int = 0
     rate_limit_wait_seconds_total: float = 0.0
@@ -277,7 +277,7 @@ class RuntimeDiagnostics:
         }
 
 
-@dataclass(slots=True)
+@dataclass
 class CategoryDiagnostics:
     split_reasons: list[str] = field(default_factory=list)
     models_attempted: list[str] = field(default_factory=list)
@@ -329,7 +329,7 @@ class SynthesisBudgetExceeded(RuntimeError):
 # ---------------------------------------------------------------------------
 
 
-@dataclass(frozen=True, slots=True)
+@dataclass(frozen=True)
 class BatchContext:
     category_name: str
     batch_kind: str

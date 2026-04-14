@@ -402,7 +402,7 @@ class RateLimitGovernor:
 # ---------------------------------------------------------------------------
 
 
-@dataclass(slots=True)
+@dataclass
 class AnalysisRuntime:
     governor: RateLimitGovernor
     model_chain: list[ModelConfig]

@@ -45,6 +45,11 @@ jobs:
       - name: Cleanup old parsed JSON backups
         run: python -m daily_macro cleanup --retention-days 30
 
+      - name: Refresh macro nowcasts
+        run: python -m daily_macro nowcasts
+        env:
+          FRED_API_KEY: ${{ secrets.FRED_API_KEY }}
+
       - name: Commit updated data
         working-directory: .
         run: |

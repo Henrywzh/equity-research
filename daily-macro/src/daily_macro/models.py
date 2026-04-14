@@ -3,7 +3,7 @@ from __future__ import annotations
 from dataclasses import dataclass
 
 
-@dataclass(slots=True)
+@dataclass
 class PlacementCandidate:
     collection: str
     rank: int
@@ -13,13 +13,13 @@ class PlacementCandidate:
     summary_snippet: str | None = None
 
 
-@dataclass(slots=True)
+@dataclass
 class LatestPageSnapshot:
     active_title: str | None
     items: list[PlacementCandidate]
 
 
-@dataclass(slots=True)
+@dataclass
 class ArticleDetails:
     canonical_url: str
     title: str
