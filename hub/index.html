@@ -439,6 +439,28 @@
                 const fredSubtitle = document.getElementById('fred-subtitle');
                 fredList.innerHTML = '';
 
+                const formatMacroDateLabel = (dateString) => {
+                    if (!dateString) return 'Unknown';
+                    const today = new Date();
+                    const todayUtc = new Date(Date.UTC(
+                        today.getUTCFullYear(),
+                        today.getUTCMonth(),
+                        today.getUTCDate(),
+                    ));
+                    const target = new Date(`${dateString}T00:00:00Z`);
+                    if (Number.isNaN(target.getTime())) return dateString;
+
+                    const absolute = target.toLocaleDateString('en-US', {
+                        month: 'short',
+                        day: 'numeric',
+                        timeZone: 'UTC',
+                    });
+                    const diffDays = Math.round((target - todayUtc) / (24 * 60 * 60 * 1000));
+                    if (diffDays === 0) return `Today (${absolute})`;
+                    if (diffDays === 1) return `Tomorrow (${absolute})`;
+                    return absolute;
+                };
+
                 if (fred.items && fred.items.length > 0) {
                     fredStatus.textContent = 'LIVE';
                     fredStatus.className = 'badge badge-success';
@@ -453,11 +475,8 @@
                     fred.items.forEach(item => {
                         const isToday = item.date === todayStr;
                         if (isToday && item.impact === 'high') highImpactCount++;
-                        
-                        // Parse date for weekday
-                        const dateObj = new Date(item.date);
-                        const weekday = dateObj.toLocaleDateString('en-US', { weekday: 'short', day: 'numeric' });
-                        const displayDate = isToday ? 'Today' : weekday;
+
+                        const displayDate = formatMacroDateLabel(item.date);
 
                         const row = document.createElement('div');
                         row.className = `fred-row ${isToday ? 'today' : ''}`;

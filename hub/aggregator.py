@@ -576,11 +576,24 @@ def get_latest_fred() -> Dict[str, object]:
 
         # Get high and medium impact releases for the next 31 days
         digest = build_release_digest(start_date=datetime.now(timezone.utc).date(), days_ahead=31)
-        
+
         # Include both high and medium impact items for the dashboard
         data["items"] = [
-            item for item in digest.get("items") or [] 
+            item for item in digest.get("items") or []
             if str(item.get("impact")).lower() in {"high", "medium"}
+        ]
+        # Defensive filter: legacy FRED release_id 101 produces noisy near-daily
+        # "FOMC Press Release" entries and should never surface on the hub.
+        data["items"] = [
+            item
+            for item in data["items"]
+            if not (
+                item.get("release_id") == 101
+                or (
+                    str(item.get("source") or "").lower() == "fred"
+                    and str(item.get("name") or "").strip().lower() == "fomc press release"
+                )
+            )
         ]
         data["updated"] = digest.get("generated_at", "N/A")
         data["status"] = digest.get("fetch_status", "success")
