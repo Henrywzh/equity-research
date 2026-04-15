@@ -666,6 +666,7 @@ def get_latest_nowcasts() -> Dict[str, object]:
         cursor = conn.cursor()
 
         # Fetch the latest available nowcast (by as_of_date) for every (series_id, target_period)
+        # Sort by target_period DESC so the UI/Aggegrator picks the most current/upcoming period first
         query = """
         SELECT s.name, s.series_id, o.target_period, o.value, o.as_of_date
         FROM indicator_observations o
@@ -675,7 +676,7 @@ def get_latest_nowcasts() -> Dict[str, object]:
             FROM indicator_observations
             GROUP BY series_id, target_period
         )
-        ORDER BY s.series_id, o.target_period ASC
+        ORDER BY s.series_id ASC, o.target_period DESC
         """
         cursor.execute(query)
         rows = cursor.fetchall()

@@ -30,7 +30,11 @@ jobs:
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
+          python -m pip install pandas plotly numpy yfinance
           python -m pip install ./daily-macro ./daily-market
+
+      - name: Run Market Analysis Tracker
+        run: python market_analysis/track_hub.py
 
       - name: Run Aggregator
         env:
@@ -43,7 +47,7 @@ jobs:
           set -euo pipefail
           git config user.name "hub-bot[bot]"
           git config user.email "hub-bot[bot]@users.noreply.github.com"
-          git add hub/data/signals.json hub/data/hormuz.json hub/data/polymarket.json hub/index.html hub/polymarket.html hub/css/styles.css
+          git add hub/data/signals.json hub/data/hormuz.json hub/data/polymarket.json hub/index.html hub/polymarket.html hub/market-analysis.html hub/css/styles.css
           if ! git diff --staged --quiet; then
             git commit -m "data: refresh unified intelligence hub $(date -u +%Y-%m-%dT%H:%M:%SZ)"
             for attempt in 1 2 3; do

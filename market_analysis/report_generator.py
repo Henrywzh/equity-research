@@ -3,7 +3,7 @@ import json
 from datetime import datetime
 
 class ReportGenerator:
-    def __init__(self, output_path="report/dashboard.html"):
+    def __init__(self, output_path="hub/market-analysis.html"):
         self.output_path = output_path
         self.styles = """
         :root {

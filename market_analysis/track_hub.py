@@ -1,5 +1,10 @@
 import sys
 import os
+from pathlib import Path
+
+# Fix path for running as a script from repo root
+sys.path.append(str(Path(__file__).resolve().parent.parent))
+
 from market_analysis.data_engine import DataEngine
 from market_analysis.regime_monitor import RegimeMonitor
 from market_analysis.pairs_tracker import PairsTracker
