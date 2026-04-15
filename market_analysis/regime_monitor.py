@@ -1,7 +1,4 @@
-import pandas as pd
-import numpy as np
 import plotly.graph_objects as go
-from market_analysis.data_engine import DataEngine
 
 class RegimeMonitor:
     def __init__(self, data_engine):
@@ -10,15 +7,27 @@ class RegimeMonitor:
         self.defensive = ['XLP', 'XLU', 'XLV']
         self.all_tickers = self.offensive + self.defensive
 
-    def analyze(self):
-        data = self.engine.fetch_data(self.all_tickers, period="2y")
-        prices = self.engine.get_close_prices(data)
-        
-        if prices is None: return None
+    def _available_group(self, prices, tickers, label):
+        available = [ticker for ticker in tickers if ticker in prices.columns]
+        missing = [ticker for ticker in tickers if ticker not in prices.columns]
+        if missing:
+            print(f"Warning: Missing {label} tickers: {', '.join(missing)}")
+        if not available:
+            raise ValueError(f"No {label} tickers available after data cleanup.")
+        return available
+
+    def analyze(self, prices=None):
+        if prices is None:
+            prices = self.engine.fetch_data(self.all_tickers)
+        if prices is None or prices.empty:
+            return None
+
+        offensive = self._available_group(prices, self.offensive, "offensive")
+        defensive = self._available_group(prices, self.defensive, "defensive")
 
         # Calculate equal-weighted groups
-        off_bench = prices[self.offensive].pct_change().mean(axis=1).add(1).cumprod()
-        def_bench = prices[self.defensive].pct_change().mean(axis=1).add(1).cumprod()
+        off_bench = prices[offensive].pct_change(fill_method=None).mean(axis=1).add(1).cumprod()
+        def_bench = prices[defensive].pct_change(fill_method=None).mean(axis=1).add(1).cumprod()
         
         # Calculate Ratio
         ratio = off_bench / def_bench

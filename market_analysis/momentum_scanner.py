@@ -1,7 +1,4 @@
 import pandas as pd
-import numpy as np
-import os
-from market_analysis.data_engine import DataEngine
 
 class MomentumScanner:
     def __init__(self, data_engine, mapping_file="data/sub_industries_etfs.csv"):
@@ -9,7 +6,7 @@ class MomentumScanner:
         self.mapping_file = mapping_file
         self.mapping_df = pd.read_csv(mapping_file)
         
-    def analyze(self):
+    def analyze(self, prices=None):
         # Extract unique tickers from mapping
         all_tickers_raw = self.mapping_df['Tickers'].dropna().unique()
         tickers = []
@@ -19,15 +16,15 @@ class MomentumScanner:
                 if t and t not in tickers:
                     tickers.append(t)
         
-        data = self.engine.fetch_data(tickers, period="2y")
-        prices = self.engine.get_close_prices(data)
-        
-        if prices is None: return None
+        if prices is None:
+            prices = self.engine.fetch_data(tickers)
+        if prices is None or prices.empty:
+            return None
 
         # Calculate returns
-        ret_1m = prices.pct_change(21).iloc[-1]
-        ret_3m = prices.pct_change(63).iloc[-1]
-        ret_12m = prices.pct_change(252).iloc[-1]
+        ret_1m = prices.pct_change(21, fill_method=None).iloc[-1]
+        ret_3m = prices.pct_change(63, fill_method=None).iloc[-1]
+        ret_12m = prices.pct_change(252, fill_method=None).iloc[-1]
         
         # Combine into a results list
         scan_results = []

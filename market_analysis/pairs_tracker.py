@@ -1,7 +1,4 @@
-import pandas as pd
-import numpy as np
 import plotly.graph_objects as go
-from market_analysis.data_engine import DataEngine
 
 class PairsTracker:
     def __init__(self, data_engine):
@@ -14,11 +11,11 @@ class PairsTracker:
         ]
         self.all_tickers = list(set([t for p in self.pairs for t in (p[0], p[1])]))
 
-    def analyze(self):
-        data = self.engine.fetch_data(self.all_tickers, period="2y")
-        prices = self.engine.get_close_prices(data)
-        
-        if prices is None: return []
+    def analyze(self, prices=None):
+        if prices is None:
+            prices = self.engine.fetch_data(self.all_tickers)
+        if prices is None or prices.empty:
+            return []
 
         results = []
         for t1, t2, desc in self.pairs:

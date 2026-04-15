@@ -29,20 +29,31 @@ def main():
         [t for t_str in momentum_mon.mapping_df['Tickers'].dropna() for t in t_str.split(',')]
     ))
     all_tickers = [t.strip() for t in all_tickers if t.strip()]
-    engine.fetch_data(all_tickers, period="2y", force_refresh=True)
+    shared_prices, refresh_meta = engine.refresh_market_data(all_tickers)
+    if shared_prices is None or shared_prices.empty:
+        raise RuntimeError("Market analysis refresh produced no usable price data.")
+    print(f"Cache file: {refresh_meta['cache_file']}")
+    print(f"Refresh mode: {refresh_meta['mode']}")
+    if refresh_meta["refreshed_tickers"]:
+        print(f"Fresh tickers: {', '.join(refresh_meta['refreshed_tickers'])}")
+    if refresh_meta["fallback_tickers"]:
+        print(f"Cached fallback tickers: {', '.join(refresh_meta['fallback_tickers'])}")
+    if refresh_meta["unavailable_tickers"]:
+        print(f"Degraded run warning: unavailable tickers {', '.join(refresh_meta['unavailable_tickers'])}")
+    print(f"Latest market data date: {refresh_meta['last_date']}")
 
     # Step 1: Regime Analysis
     print("📊 LEVEL 1: Running Regime Analysis...")
-    regime_results = regime_mon.analyze()
+    regime_results = regime_mon.analyze(shared_prices)
     regime_plot = regime_mon.create_plot(regime_results)
 
     # Step 2: Pairs Tracking
     print("🔗 LEVEL 2: Tracking Industry Pairs...")
-    pairs_results = pairs_mon.analyze()
+    pairs_results = pairs_mon.analyze(shared_prices)
     
     # Step 3: Momentum Scanning
     print("📈 LEVEL 3: Scanning Sub-Industry Momentum...")
-    momentum_results = momentum_mon.analyze()
+    momentum_results = momentum_mon.analyze(shared_prices)
 
     # Step 4: Generate Dashboard
     print("📝 Generating HTML Report...")
