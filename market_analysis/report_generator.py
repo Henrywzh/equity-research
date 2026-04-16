@@ -42,10 +42,26 @@ class ReportGenerator:
         td { padding: 14px 16px; border-bottom: 1px solid var(--border); font-size: 0.9rem; transition: background 0.2s; }
         tr.clickable { cursor: pointer; }
         tr.clickable:hover td { background: rgba(59, 130, 246, 0.1); }
+        .card-note { color: var(--text-dim); font-size: 0.82rem; line-height: 1.5; margin: -4px 0 14px; }
         
         .pos { color: var(--green); font-weight: 500; }
         .neg { color: var(--red); font-weight: 500; }
         .mono { font-family: 'Fira Code', monospace; font-size: 0.85rem; }
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            padding: 4px 10px;
+            border-radius: 999px;
+            border: 1px solid transparent;
+            font-size: 0.72rem;
+            font-weight: 600;
+            letter-spacing: 0.01em;
+            white-space: nowrap;
+        }
+        .badge-direct { background: rgba(16, 185, 129, 0.12); color: #6ee7b7; border-color: rgba(16, 185, 129, 0.28); }
+        .badge-industry-fallback { background: rgba(59, 130, 246, 0.12); color: #93c5fd; border-color: rgba(59, 130, 246, 0.28); }
+        .badge-industry-group-fallback { background: rgba(245, 158, 11, 0.12); color: #fcd34d; border-color: rgba(245, 158, 11, 0.28); }
+        .badge-sector-fallback { background: rgba(239, 68, 68, 0.12); color: #fca5a5; border-color: rgba(239, 68, 68, 0.28); }
         
         /* Detail Overlay */
         #detail-overlay {
@@ -90,11 +106,13 @@ class ReportGenerator:
             """
 
         momentum_rows = ""
-        for m in momentum_data[:20]:
+        for m in momentum_data:
+            badge_class = m["proxy_type"].lower().replace(" ", "-")
             momentum_rows += f"""
             <tr class="clickable" onclick="showDetail('momentum', '{m['id']}')">
                 <td>{m['sub_industry']}</td>
-                <td class="mono">{m['ticker']}</td>
+                <td class="mono">{m['proxy_etf']}</td>
+                <td><span class="badge badge-{badge_class}">{m['proxy_type']}</span></td>
                 <td class="{'pos' if m['m_1m'] > 0 else 'neg'}">{m['m_1m']:.1%}</td>
                 <td class="{'pos' if m['m_3m'] > 0 else 'neg'}">{m['m_3m']:.1%}</td>
                 <td class="{'pos' if m['m_12m'] > 0 else 'neg'}">{m['m_12m']:.1%}</td>
@@ -133,19 +151,36 @@ class ReportGenerator:
                     </div>
 
                     <div class="card">
-                        <h3>Level 2: Industry Pairs</h3>
-                        <table>
-                            <thead><tr><th>DESCRIPTION</th><th>PAIR</th><th>RATIO</th><th>Z-SCORE</th><th>SIGNAL</th></tr></thead>
-                            <tbody>{pairs_rows}</tbody>
-                        </table>
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
+                            <h3 style="margin:0">Level 2: Industry Pairs</h3>
+                        </div>
+                        <div style="max-height: 600px; overflow-y: auto;">
+                            <table>
+                                <thead style="position: sticky; top: 0; background: var(--card-bg); z-index: 10;">
+                                    <tr><th>DESCRIPTION</th><th>PAIR</th><th>RATIO</th><th>Z-SCORE</th><th>SIGNAL</th></tr>
+                                </thead>
+                                <tbody>{pairs_rows}</tbody>
+                            </table>
+                        </div>
                     </div>
 
                     <div class="card">
-                        <h3>Level 3: Sub-Industry Momentum</h3>
-                        <table>
-                            <thead><tr><th>SUB-INDUSTRY</th><th>TICKER</th><th>1M</th><th>3M</th><th>12M</th></tr></thead>
-                            <tbody>{momentum_rows}</tbody>
-                        </table>
+                        <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 12px;">
+                            <div>
+                                <h3 style="margin:0">Level 3: Sub-Industry Proxies</h3>
+                                <p class="card-note" style="margin-top:4px;">Ranked by composite momentum. Full coverage of 160+ sub-industries.</p>
+                            </div>
+                            <input type="text" id="momentum-search" placeholder="Search sub-industries..." 
+                                style="background: rgba(255,255,255,0.05); border: 1px solid var(--border); color: white; padding: 6px 12px; border-radius: 8px; font-size: 0.8rem; width: 200px;">
+                        </div>
+                        <div style="max-height: 600px; overflow-y: auto;">
+                            <table id="momentum-table">
+                                <thead style="position: sticky; top: 0; background: var(--card-bg); z-index: 10;">
+                                    <tr><th>SUB-INDUSTRY</th><th>PROXY ETF</th><th>COVERAGE</th><th>1M</th><th>3M</th><th>12M</th></tr>
+                                </thead>
+                                <tbody>{momentum_rows}</tbody>
+                            </table>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -165,6 +200,10 @@ class ReportGenerator:
 
             <script>
                 const MARKET_DATA = {json.dumps(market_data)};
+
+                function badgeClass(proxyType) {{
+                    return `badge-${{proxyType.toLowerCase().replace(/\\s+/g, '-')}}`;
+                }}
                 
                 function showDetail(type, id) {{
                     const overlay = document.getElementById('detail-overlay');
@@ -178,7 +217,7 @@ class ReportGenerator:
                     document.getElementById('detail-title').innerText = type === 'pair' ? item.description : item.sub_industry;
                     document.getElementById('detail-subtitle').innerText = type === 'pair' 
                         ? `Relationship between ${{item.ticker1}} and ${{item.ticker2}}` 
-                        : `Momentum analysis for ${{item.ticker}} (${{item.parent_industry}})`;
+                        : `${{item.sub_industry}} via ${{item.proxy_etf}}`;
 
                     let metaHtml = '';
                     if (type === 'pair') {{
@@ -188,33 +227,71 @@ class ReportGenerator:
                             <div class="meta-item" style="grid-column: span 2;"><div class="meta-label">Suggested Action</div><div class="meta-value" style="color: var(--yellow)">${{item.signal}}</div></div>
                         `;
                     }} else {{
+                        const relatedTickers = item.related_tickers && item.related_tickers.length > 1
+                            ? `<div class="meta-item" style="grid-column: span 2;"><div class="meta-label">Mapped ETF Set</div><div class="meta-value mono">${{item.related_tickers.join(', ')}}</div></div>`
+                            : '';
                         metaHtml = `
+                            <div class="meta-item"><div class="meta-label">Proxy ETF</div><div class="meta-value mono">${{item.proxy_etf}}</div></div>
+                            <div class="meta-item"><div class="meta-label">Coverage</div><div class="meta-value"><span class="badge ${{badgeClass(item.proxy_type)}}">${{item.proxy_type}}</span></div></div>
+                            <div class="meta-item"><div class="meta-label">Parent Industry</div><div class="meta-value">${{item.parent_industry}}</div></div>
                             <div class="meta-item"><div class="meta-label">1-Month</div><div class="meta-value ${{item.m_1m > 0 ? 'pos' : 'neg'}}">${{(item.m_1m*100).toFixed(1)}}%</div></div>
                             <div class="meta-item"><div class="meta-label">3-Month</div><div class="meta-value ${{item.m_3m > 0 ? 'pos' : 'neg'}}">${{(item.m_3m*100).toFixed(1)}}%</div></div>
                             <div class="meta-item"><div class="meta-label">12-Month</div><div class="meta-value ${{item.m_12m > 0 ? 'pos' : 'neg'}}">${{(item.m_12m*100).toFixed(1)}}%</div></div>
                             <div class="meta-item"><div class="meta-label">Momentum Score</div><div class="meta-value">${{item.score.toFixed(2)}}</div></div>
+                            ${{relatedTickers}}
                         `;
                     }}
                     document.getElementById('detail-meta').innerHTML = metaHtml;
 
+                    // Render Chart
                     // Render Chart
                     const trace = {{
                         x: item.history.dates,
                         y: type === 'pair' ? item.history.ratio : item.history.performance,
                         type: 'scatter',
                         mode: 'lines',
-                        line: {{ color: '#3b82f6', width: 2 }},
+                        line: {{ color: '#3b82f6', width: 2.5 }},
                         fill: 'tozeroy',
-                        fillcolor: 'rgba(59, 130, 246, 0.1)'
+                        fillcolor: 'rgba(59, 130, 246, 0.1)',
+                        hovertemplate: type === 'pair' ? "Ratio: %{{y:.4f}}<extra></extra>" : "Perf: %{{y:.1%}}<extra></extra>"
                     }};
+
+                    // Calculate 1Y range
+                    const lastDate = new Date(item.history.dates[item.history.dates.length - 1]);
+                    const oneYearAgo = new Date(lastDate);
+                    oneYearAgo.setFullYear(lastDate.getFullYear() - 1);
 
                     const layout = {{
                         template: 'plotly_dark',
                         paper_bgcolor: 'rgba(0,0,0,0)',
                         plot_bgcolor: 'rgba(0,0,0,0)',
-                        margin: {{ l: 40, r: 0, t: 20, b:40 }},
-                        xaxis: {{ showgrid: false, rangeslider: {{ visible: true, thickness: 0.1 }} }},
-                        yaxis: {{ gridcolor: '#1f2937' }}
+                        margin: {{ l: 40, r: 0, t: 30, b:40 }},
+                        hovermode: 'x unified',
+                        hoverlabel: {{
+                            bgcolor: '#111827',
+                            bordercolor: '#3b82f6',
+                            font: {{ color: '#f9fafb', family: 'Inter', size: 13 }}
+                        }},
+                        xaxis: {{ 
+                            showgrid: false, 
+                            range: [oneYearAgo.toISOString().split('T')[0], lastDate.toISOString().split('T')[0]],
+                            rangeslider: {{ visible: true, thickness: 0.1 }},
+                            rangeselector: {{
+                                buttons: [
+                                    {{count: 1, label: '1M', step: 'month', stepmode: 'backward'}},
+                                    {{count: 6, label: '6M', step: 'month', stepmode: 'backward'}},
+                                    {{count: 1, label: '1Y', step: 'year', stepmode: 'backward'}},
+                                    {{step: 'all', label: 'ALL'}}
+                                ],
+                                bgcolor: '#1e293b',
+                                activecolor: '#3b82f6',
+                                font: {{ color: '#f8fafc', size: 11 }}
+                            }}
+                        }},
+                        yaxis: {{ 
+                            gridcolor: '#1f2937',
+                            tickformat: type === 'pair' ? '.4f' : '.1%'
+                        }}
                     }};
 
                     Plotly.newPlot('detail-chart', [trace], layout);
@@ -224,6 +301,17 @@ class ReportGenerator:
                 function closeDetail() {{
                     document.getElementById('detail-overlay').classList.remove('active');
                 }}
+
+                // Search functionality
+                document.getElementById('momentum-search').addEventListener('keyup', function() {{
+                    const query = this.value.toLowerCase();
+                    const rows = document.querySelectorAll('#momentum-table tbody tr');
+                    
+                    rows.forEach(row => {{
+                        const text = row.innerText.toLowerCase();
+                        row.style.display = text.includes(query) ? '' : 'none';
+                    }});
+                }});
             </script>
         </body>
         </html>

@@ -1,4 +1,5 @@
 import plotly.graph_objects as go
+from datetime import datetime, timedelta
 
 class RegimeMonitor:
     def __init__(self, data_engine):
@@ -101,8 +102,15 @@ class RegimeMonitor:
             margin=dict(l=40, r=40, t=60, b=40),
             height=500,
             hovermode="x unified",
+            hoverlabel=dict(
+                bgcolor="#111827",
+                bordercolor="#3b82f6",
+                font=dict(color="#f9fafb", size=13),
+                namelength=-1,
+            ),
             legend=dict(orientation="h", yanchor="bottom", y=1.02, xanchor="right", x=1),
             xaxis=dict(
+                range=[results["ratio_history"].index[-1] - timedelta(days=365), results["ratio_history"].index[-1]],
                 showspikes=True,
                 spikemode="across",
                 spikesnap="cursor",

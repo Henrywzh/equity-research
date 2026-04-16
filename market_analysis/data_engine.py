@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from ast import literal_eval
 from datetime import datetime, timedelta
 from pathlib import Path
 
@@ -24,6 +25,7 @@ class DataEngine:
         self.chunk_size = chunk_size
         self.stale_after_days = stale_after_days
         self.last_refresh_meta: dict[str, object] | None = None
+        self.loaded_cache_file: str | None = None
 
     def fetch_data(self, tickers, period: str | None = None, interval: str = "1d", force_refresh: bool = False):
         """Backward-compatible wrapper around the persisted market-data refresh path."""
@@ -153,17 +155,61 @@ class DataEngine:
         return [tickers[i : i + self.chunk_size] for i in range(0, len(tickers), self.chunk_size)]
 
     def _load_cache(self) -> pd.DataFrame | None:
-        if not self.cache_file.exists():
-            return None
-        try:
-            cache = pd.read_pickle(self.cache_file)
-        except Exception as exc:
-            print(f"Warning: Failed to load market cache {self.cache_file}: {exc}")
-            return None
-        if not isinstance(cache, pd.DataFrame):
-            print(f"Warning: Market cache {self.cache_file} is not a DataFrame.")
-            return None
-        return self._normalize_prices(cache)
+        self.loaded_cache_file = None
+        for candidate in self._candidate_cache_files():
+            try:
+                cache = pd.read_pickle(candidate)
+            except Exception as exc:
+                print(f"Warning: Failed to load market cache {candidate}: {exc}")
+                continue
+            if not isinstance(cache, pd.DataFrame):
+                print(f"Warning: Market cache {candidate} is not a DataFrame.")
+                continue
+
+            normalized = self._normalize_cached_frame(cache)
+            if normalized.empty:
+                print(f"Warning: Market cache {candidate} contained no usable price columns.")
+                continue
+
+            self.loaded_cache_file = str(candidate)
+            return normalized
+        return None
+
+    def _candidate_cache_files(self) -> list[Path]:
+        candidates = [self.cache_file]
+        alternates = sorted(
+            (path for path in self.cache_dir.glob("etf_data_*.pkl") if path != self.cache_file),
+            key=lambda path: path.stat().st_mtime,
+            reverse=True,
+        )
+        candidates.extend(alternates)
+        return candidates
+
+    def _normalize_cached_frame(self, cache: pd.DataFrame) -> pd.DataFrame:
+        frame = cache.copy()
+        if not isinstance(frame.columns, pd.MultiIndex):
+            parsed_columns = self._parse_stringified_tuple_columns(frame.columns)
+            if parsed_columns is not None:
+                frame.columns = parsed_columns
+
+        if isinstance(frame.columns, pd.MultiIndex):
+            prices = self.get_close_prices(frame)
+            return prices if prices is not None else pd.DataFrame()
+        return self._normalize_prices(frame)
+
+    def _parse_stringified_tuple_columns(self, columns) -> pd.MultiIndex | None:
+        parsed: list[tuple[str, str]] = []
+        for column in columns:
+            if not isinstance(column, str):
+                return None
+            try:
+                value = literal_eval(column)
+            except (ValueError, SyntaxError):
+                return None
+            if not isinstance(value, tuple) or len(value) != 2:
+                return None
+            parsed.append((str(value[0]).strip(), str(value[1]).strip()))
+        return pd.MultiIndex.from_tuples(parsed)
 
     def _save_cache(self, prices: pd.DataFrame) -> None:
         prices.to_pickle(self.cache_file)
