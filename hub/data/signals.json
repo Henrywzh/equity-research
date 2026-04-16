@@ -251,7 +251,7 @@
   "polymarket": {
     "status": "success",
     "updated": "2026-04-16T15:51:47.505832+00:00",
-    "freshness_minutes": 80,
+    "freshness_minutes": 86,
     "error_count": 0,
     "errors": [],
     "fed_rates": [
@@ -10860,17 +10860,6 @@
   "fred": {
     "items": [
       {
-        "release_id": 9,
-        "release_key": "fred_9_2026-04-21",
-        "name": "Retail Sales Advance",
-        "date": "2026-04-21",
-        "impact": "medium",
-        "series_id": "RSXFS",
-        "display_unit": "%",
-        "prior_value": null,
-        "source": "FRED"
-      },
-      {
         "release_id": "fomc_2026-04-28_day1",
         "release_key": "fomc_2026-04-28_day1",
         "name": "FOMC Meeting (Day 1)",
@@ -10895,76 +10884,13 @@
         "source": "Federal Reserve",
         "event_type": "statement_day",
         "is_sep_meeting": false
-      },
-      {
-        "release_id": 53,
-        "release_key": "fred_53_2026-04-30",
-        "name": "GDP Advance Estimate",
-        "date": "2026-04-30",
-        "impact": "high",
-        "series_id": "GDP",
-        "display_unit": "%",
-        "prior_value": null,
-        "source": "FRED"
-      },
-      {
-        "release_id": 54,
-        "release_key": "fred_54_2026-04-30",
-        "name": "Personal Income and Outlays (PCE)",
-        "date": "2026-04-30",
-        "impact": "high",
-        "series_id": "PCEPI",
-        "display_unit": "%",
-        "prior_value": null,
-        "source": "FRED"
-      },
-      {
-        "release_id": 11,
-        "release_key": "fred_11_2026-04-30",
-        "name": "Employment Cost Index",
-        "date": "2026-04-30",
-        "impact": "medium",
-        "series_id": "ECIALLCIV",
-        "display_unit": "%",
-        "prior_value": null,
-        "source": "FRED"
-      },
-      {
-        "release_id": 50,
-        "release_key": "fred_50_2026-05-08",
-        "name": "Employment Situation",
-        "date": "2026-05-08",
-        "impact": "high",
-        "series_id": "PAYEMS",
-        "display_unit": "k",
-        "prior_value": null,
-        "source": "FRED"
-      },
-      {
-        "release_id": 10,
-        "release_key": "fred_10_2026-05-12",
-        "name": "Consumer Price Index",
-        "date": "2026-05-12",
-        "impact": "high",
-        "series_id": "CPIAUCSL",
-        "display_unit": "%",
-        "prior_value": null,
-        "source": "FRED"
-      },
-      {
-        "release_id": 9,
-        "release_key": "fred_9_2026-05-14",
-        "name": "Retail Sales Advance",
-        "date": "2026-05-14",
-        "impact": "medium",
-        "series_id": "RSXFS",
-        "display_unit": "%",
-        "prior_value": null,
-        "source": "FRED"
       }
     ],
-    "updated": "2026-04-16T17:12:00.991552+00:00",
-    "status": "success"
+    "updated": "2026-04-16T17:18:04.516904+00:00",
+    "status": "partial",
+    "error_messages": [
+      "fred:500 Server Error: Internal Server Error for url: https://api.stlouisfed.org/fred/releases/dates?api_key=fff6dc02f5a8b6dcbd78574394e0cb6f&file_type=json&realtime_start=2026-04-16&realtime_end=2026-05-16&order_by=release_date&sort_order=asc&include_release_dates_with_no_data=true"
+    ]
   },
   "youtube": {
     "signals": [
@@ -11002,5 +10928,5 @@
     "total_analyzed": 7,
     "updated": "2026-04-16T13-05-02.348967plus00-00"
   },
-  "last_baked": "2026-04-16T17:12:00.992892+00:00"
+  "last_baked": "2026-04-16T17:18:04.518451+00:00"
 }
