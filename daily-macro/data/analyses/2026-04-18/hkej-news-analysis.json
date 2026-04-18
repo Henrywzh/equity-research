@@ -1,15 +1,15 @@
 {
   "report_schema_version": 6,
   "report_date": "2026-04-18",
-  "generated_at": "2026-04-18T13:26:47.375086+00:00",
+  "generated_at": "2026-04-18T21:25:07.745238+00:00",
   "source_site": "hkej",
   "status": "success",
-  "executive_summary": [
+  "executive_summary": [],
+  "legacy_executive_summary": [
     "Meta計劃於5月20日啟動今年首輪大規模裁員，涉及約10%的全球員工，近8000名員工受影響。",
     "美股三大指數收市齊升逾1%，標指突破7100點。",
     "Anthropic行政總裁Dario Amodei將與白宮幕僚長Susie Wiles會面，討論新型AI模型Mythos。"
   ],
-  "legacy_executive_summary": [],
   "model": {
     "provider": "groq",
     "primary_model": "meta-llama/llama-4-scout-17b-16e-instruct",
@@ -20,18 +20,18 @@
   },
   "model_switches": [],
   "input": {
-    "article_count": 41,
+    "article_count": 43,
     "category_count": 6
   },
   "diagnostics": {
-    "rate_limit_wait_count": 2,
-    "rate_limit_wait_seconds_total": 4317.81,
+    "rate_limit_wait_count": 1,
+    "rate_limit_wait_seconds_total": 1296.0,
     "fallback_switch_count": 0,
     "key_rotation_count": 0,
-    "pre_send_split_count": 13,
+    "pre_send_split_count": 9,
     "response_413_split_count": 0,
     "json_repair_retry_count": 0,
-    "batch_count": 44,
+    "batch_count": 27,
     "failed_batch_count": 0,
     "delayed_retry_candidate_count": 0,
     "delayed_retry_attempted_count": 0,
@@ -44,18 +44,18 @@
     "degraded_merge_count": 0
   },
   "incremental": {
-    "reused_successful_articles": 0,
-    "new_articles_analyzed": 41,
+    "reused_successful_articles": 41,
+    "new_articles_analyzed": 2,
     "retried_previous_day_articles": 0,
     "previous_day_retry_successes": 0
   },
   "daily_stats": {
-    "total_scraped": 41,
-    "analyzed": 41,
+    "total_scraped": 43,
+    "analyzed": 43,
     "success_rate": 100.0
   },
   "macro_release_digest": {
-    "generated_at": "2026-04-18T12:13:55.417554+00:00",
+    "generated_at": "2026-04-18T21:02:14.533034+00:00",
     "window_start": "2026-04-18",
     "window_end": "2026-04-24",
     "fetch_status": "success",
@@ -76,10 +76,10 @@
   },
   "unresolved_articles": [],
   "totals": {
-    "article_count": 41,
-    "successful_article_analyses": 41,
+    "article_count": 43,
+    "successful_article_analyses": 43,
     "failed_article_analyses": 0,
-    "full_text_article_count": 40,
+    "full_text_article_count": 42,
     "truncated_article_count": 1,
     "successful_categories": 6,
     "partial_categories": 0,
@@ -95,7 +95,7 @@
         "Meta計劃於5月20日啟動今年首輪大規模裁員，涉及約10%的全球員工，近8000名員工受影響。",
         "美股三大指數收市齊升逾1%，標指突破7100點。",
         "Anthropic行政總裁Dario Amodei將與白宮幕僚長Susie Wiles會面，討論新型AI模型Mythos。",
-        "Aevex美國IPO股份首日掛牌，開盤報23.01美元，較發行價20美元高15.1%"
+        "加密貨幣市場表現：BTC-USD報76309.91 (-1.06%)。"
       ],
       "named_entities": [
         {
@@ -107,15 +107,15 @@
           "type": "country"
         },
         {
-          "name": "Aevex",
-          "type": "company"
-        },
-        {
           "name": "Anthropic",
           "type": "company"
         },
         {
           "name": "Dario Amodei",
+          "type": "person"
+        },
+        {
+          "name": "Susie Wiles",
           "type": "person"
         }
       ],
@@ -491,7 +491,7 @@
             "Meta計劃於5月20日啟動今年首輪大規模裁員，涉及約10%的全球員工，近8000名員工受影響。",
             "美股三大指數收市齊升逾1%，標指突破7100點。",
             "Anthropic行政總裁Dario Amodei將與白宮幕僚長Susie Wiles會面，討論新型AI模型Mythos。",
-            "Aevex美國IPO股份首日掛牌，開盤報23.01美元，較發行價20美元高15.1%"
+            "加密貨幣市場表現：BTC-USD報76309.91 (-1.06%)。"
           ],
           "named_entities": [
             {
@@ -503,15 +503,15 @@
               "type": "country"
             },
             {
-              "name": "Aevex",
-              "type": "company"
-            },
-            {
               "name": "Anthropic",
               "type": "company"
             },
             {
               "name": "Dario Amodei",
+              "type": "person"
+            },
+            {
+              "name": "Susie Wiles",
               "type": "person"
             }
           ],
@@ -883,17 +883,13 @@
       ],
       "analysis_profile": "standard",
       "model_used": "meta-llama/llama-4-scout-17b-16e-instruct",
-      "sub_batch_count": 8,
+      "sub_batch_count": 3,
       "diagnostics": {
-        "sub_batch_count": 5,
-        "split_reasons": [
-          "pre_send_budget"
-        ],
-        "models_attempted": [
-          "meta-llama/llama-4-scout-17b-16e-instruct"
-        ],
-        "estimated_input_tokens_max": 1625,
-        "serialized_request_bytes_max": 10680,
+        "sub_batch_count": 3,
+        "split_reasons": [],
+        "models_attempted": [],
+        "estimated_input_tokens_max": 0,
+        "serialized_request_bytes_max": 0,
         "rate_limit_waits": 0,
         "partial_article_count": 0,
         "synthesis_wait_seconds_total": 0.0,
@@ -902,7 +898,7 @@
         "synthesis_budget_exhausted": false,
         "degraded_merge_used": false,
         "degraded_merge_reason": "",
-        "synthesis_merge_depth_max": 1,
+        "synthesis_merge_depth_max": 0,
         "model_switches": []
       },
       "error": null
@@ -914,20 +910,20 @@
       "key_developments": [],
       "named_entities": [
         {
-          "name": "凌嘉勤",
-          "type": "person"
+          "name": "福特號",
+          "type": "asset"
         },
         {
-          "name": "麥當勞",
-          "type": "company"
+          "name": "伊朗",
+          "type": "country"
         },
         {
-          "name": "劉德華",
-          "type": "person"
+          "name": "美國",
+          "type": "country"
         },
         {
-          "name": "李家超",
-          "type": "person"
+          "name": "巴基斯坦",
+          "type": "country"
         }
       ],
       "articles": [
@@ -945,7 +941,10 @@
           "key_points": [],
           "content_truncated": false,
           "analysis_method": "bypassed",
-          "model_used": "direct"
+          "model_used": "direct",
+          "theme": "general",
+          "attention_reason": "Lighter treatment because this story sits in the 時事脈搏 section without strong market-moving signals.",
+          "must_keep": false
         },
         {
           "source_article_id": "4375254",
@@ -961,7 +960,10 @@
           "key_points": [],
           "content_truncated": false,
           "analysis_method": "bypassed",
-          "model_used": "direct"
+          "model_used": "direct",
+          "theme": "general",
+          "attention_reason": "Lighter treatment because this story sits in the 時事脈搏 section without strong market-moving signals.",
+          "must_keep": false
         },
         {
           "source_article_id": "4375253",
@@ -1022,7 +1024,10 @@
           "key_points": [],
           "content_truncated": false,
           "analysis_method": "bypassed",
-          "model_used": "direct"
+          "model_used": "direct",
+          "theme": "general",
+          "attention_reason": "Lighter treatment because this story sits in the 時事脈搏 section without strong market-moving signals.",
+          "must_keep": false
         },
         {
           "source_article_id": "4375251",
@@ -1038,7 +1043,10 @@
           "key_points": [],
           "content_truncated": false,
           "analysis_method": "bypassed",
-          "model_used": "direct"
+          "model_used": "direct",
+          "theme": "general",
+          "attention_reason": "Lighter treatment because this story sits in the 時事脈搏 section without strong market-moving signals.",
+          "must_keep": false
         },
         {
           "source_article_id": "4375249",
@@ -1099,7 +1107,10 @@
           "key_points": [],
           "content_truncated": false,
           "analysis_method": "bypassed",
-          "model_used": "direct"
+          "model_used": "direct",
+          "theme": "general",
+          "attention_reason": "Lighter treatment because this story sits in the 時事脈搏 section without strong market-moving signals.",
+          "must_keep": false
         },
         {
           "source_article_id": "4375245",
@@ -1115,7 +1126,10 @@
           "key_points": [],
           "content_truncated": false,
           "analysis_method": "bypassed",
-          "model_used": "direct"
+          "model_used": "direct",
+          "theme": "general",
+          "attention_reason": "Lighter treatment because this story sits in the 時事脈搏 section without strong market-moving signals.",
+          "must_keep": false
         },
         {
           "source_article_id": "4375236",
@@ -1176,7 +1190,10 @@
           "key_points": [],
           "content_truncated": false,
           "analysis_method": "bypassed",
-          "model_used": "direct"
+          "model_used": "direct",
+          "theme": "general",
+          "attention_reason": "Lighter treatment because this story sits in the 時事脈搏 section without strong market-moving signals.",
+          "must_keep": false
         },
         {
           "source_article_id": "4375241",
@@ -1237,7 +1254,10 @@
           "key_points": [],
           "content_truncated": false,
           "analysis_method": "bypassed",
-          "model_used": "direct"
+          "model_used": "direct",
+          "theme": "general",
+          "attention_reason": "Lighter treatment because this story sits in the 時事脈搏 section without strong market-moving signals.",
+          "must_keep": false
         },
         {
           "source_article_id": "4375240",
@@ -1253,7 +1273,10 @@
           "key_points": [],
           "content_truncated": false,
           "analysis_method": "bypassed",
-          "model_used": "direct"
+          "model_used": "direct",
+          "theme": "general",
+          "attention_reason": "Lighter treatment because this story sits in the 時事脈搏 section without strong market-moving signals.",
+          "must_keep": false
         },
         {
           "source_article_id": "4375239",
@@ -1269,7 +1292,10 @@
           "key_points": [],
           "content_truncated": false,
           "analysis_method": "bypassed",
-          "model_used": "direct"
+          "model_used": "direct",
+          "theme": "general",
+          "attention_reason": "Lighter treatment because this story sits in the 時事脈搏 section without strong market-moving signals.",
+          "must_keep": false
         },
         {
           "source_article_id": "4375238",
@@ -1326,7 +1352,10 @@
           "key_points": [],
           "content_truncated": false,
           "analysis_method": "bypassed",
-          "model_used": "direct"
+          "model_used": "direct",
+          "theme": "general",
+          "attention_reason": "Lighter treatment because this story sits in the 時事脈搏 section without strong market-moving signals.",
+          "must_keep": false
         },
         {
           "source_article_id": "4375233",
@@ -1657,7 +1686,10 @@
           "key_points": [],
           "content_truncated": false,
           "analysis_method": "bypassed",
-          "model_used": "direct"
+          "model_used": "direct",
+          "theme": "general",
+          "attention_reason": "Lighter treatment because this story sits in the 時事脈搏 section without strong market-moving signals.",
+          "must_keep": false
         },
         {
           "source_article_id": "4375214",
@@ -1756,463 +1788,29 @@
       ],
       "subgroups": [
         {
-          "title": "Local News & Other News",
-          "theme_rationale": "Articles related to local news and events",
-          "article_count": 12,
+          "title": "國際局勢 & Other News",
+          "theme_rationale": "與國際政治和衝突相關的新聞",
+          "article_count": 14,
           "key_developments": [
-            "房協會將個別項目資助出售單位比例調高",
-            "麥當勞兒童愛心馬拉松今日開跑，劉德華驚喜現身",
-            "李家超：月底舉辦「香港悅讀周」鼓勵市民閱讀"
-          ],
-          "named_entities": [
-            {
-              "name": "凌嘉勤",
-              "type": "person"
-            },
-            {
-              "name": "麥當勞",
-              "type": "company"
-            },
-            {
-              "name": "劉德華",
-              "type": "person"
-            },
-            {
-              "name": "李家超",
-              "type": "person"
-            }
-          ],
-          "articles": [
-            {
-              "source_article_id": "4375246",
-              "canonical_url": "https://www.hkej.com/instantnews/current/article/4375246/%E5%87%8C%E5%98%89%E5%8B%A4%3A%E6%88%BF%E5%8D%94%E6%9C%83%E5%B0%87%E5%80%8B%E5%88%A5%E9%A0%85%E7%9B%AE%E8%B3%87%E5%8A%A9%E5%87%BA%E5%94%AE%E5%96%AE%E4%BD%8D%E6%AF%94%E4%BE%8B%E8%AA%BF%E9%AB%98",
-              "title": "凌嘉勤:房協會將個別項目資助出售單位比例調高",
-              "section": "時事脈搏",
-              "published_at": "2026-04-18T15:47:00+08:00",
-              "attention_tier": "light",
-              "novelty_score": 5,
-              "relevance_score": 5,
-              "urgency_score": 5,
-              "named_entities": [],
-              "key_points": [],
-              "content_truncated": false,
-              "analysis_method": "bypassed",
-              "model_used": "direct"
-            },
-            {
-              "source_article_id": "4375245",
-              "canonical_url": "https://www.hkej.com/instantnews/current/article/4375245/%E9%BA%A5%E7%95%B6%E5%8B%9E%E5%85%92%E7%AB%A5%E6%84%9B%E5%BF%83%E9%A6%AC%E6%8B%89%E6%9D%BE%E4%BB%8A%E9%96%8B%E8%B7%91+%E5%8A%89%E5%BE%B7%E8%8F%AF%E9%A9%9A%E5%96%9C%E7%8F%BE%E8%BA%AB",
-              "title": "麥當勞兒童愛心馬拉松今開跑 劉德華驚喜現身",
-              "section": "時事脈搏",
-              "published_at": "2026-04-18T15:13:00+08:00",
-              "attention_tier": "light",
-              "novelty_score": 5,
-              "relevance_score": 5,
-              "urgency_score": 5,
-              "named_entities": [],
-              "key_points": [],
-              "content_truncated": false,
-              "analysis_method": "bypassed",
-              "model_used": "direct"
-            },
-            {
-              "source_article_id": "4375243",
-              "canonical_url": "https://www.hkej.com/instantnews/current/article/4375243/%E6%9D%8E%E5%AE%B6%E8%B6%85%3A%E6%9C%88%E5%BA%95%E8%88%89%E8%BE%A6%E3%80%8C%E9%A6%99%E6%B8%AF%E6%82%85%E8%AE%80%E5%91%A8%E3%80%8D%E9%BC%93%E5%8B%B5%E5%B8%82%E6%B0%91%E9%96%B1%E8%AE%80",
-              "title": "李家超:月底舉辦「香港悅讀周」鼓勵市民閱讀",
-              "section": "時事脈搏",
-              "published_at": "2026-04-18T14:16:00+08:00",
-              "attention_tier": "light",
-              "novelty_score": 5,
-              "relevance_score": 5,
-              "urgency_score": 5,
-              "named_entities": [],
-              "key_points": [],
-              "content_truncated": false,
-              "analysis_method": "bypassed",
-              "model_used": "direct"
-            },
-            {
-              "source_article_id": "4375242",
-              "canonical_url": "https://www.hkej.com/instantnews/current/article/4375242/%E9%A6%AC%E6%9C%83%E3%80%8A%E9%A6%AC%E5%88%B0%E5%8A%9F%E6%88%90%E3%80%8B%E9%9B%BB%E5%BD%B1%E9%A6%99%E6%B8%AF%E9%A6%96%E6%98%A0+%E5%B0%87%E5%9C%A8%E5%85%A7%E5%9C%B0%E5%90%84%E5%9C%B0%E4%B8%8A%E6%98%A0",
-              "title": "馬會《馬到功成》電影香港首映 將在內地各地上映",
-              "section": "時事脈搏",
-              "published_at": "2026-04-18T12:41:00+08:00",
-              "attention_tier": "light",
-              "novelty_score": 5,
-              "relevance_score": 5,
-              "urgency_score": 5,
-              "named_entities": [],
-              "key_points": [],
-              "content_truncated": false,
-              "analysis_method": "bypassed",
-              "model_used": "direct"
-            },
-            {
-              "source_article_id": "4375240",
-              "canonical_url": "https://www.hkej.com/instantnews/current/article/4375240/%E9%83%A8%E9%96%80%E9%A6%96%E9%95%B7%E8%B2%AC%E4%BB%BB%E5%88%B6%E4%B8%A8%E6%A5%8A%E4%BD%95%E8%93%93%E8%8C%B5%3A%E8%AA%BF%E6%9F%A5%E8%8B%A5%E6%B6%89%E5%B8%B8%E7%A7%98%E4%B8%80%E6%A8%A3%E6%9C%83%E8%AA%BF%E6%9F%A5",
-              "title": "部門首長責任制丨楊何蓓茵:調查若涉常秘一樣會調查",
-              "section": "時事脈搏",
-              "published_at": "2026-04-18T12:32:00+08:00",
-              "attention_tier": "light",
-              "novelty_score": 5,
-              "relevance_score": 5,
-              "urgency_score": 5,
-              "named_entities": [],
-              "key_points": [],
-              "content_truncated": false,
-              "analysis_method": "bypassed",
-              "model_used": "direct"
-            },
-            {
-              "source_article_id": "4375255",
-              "canonical_url": "https://www.hkej.com/instantnews/current/article/4375255/%E5%86%8D%E6%9C%89%E4%B8%80%E5%90%8D30%E6%AD%B2%E6%A9%9F%E5%A0%B4%E5%B7%A5%E4%BD%9C%E7%94%B7%E5%AD%90%E6%84%9F%E6%9F%93%E9%BA%BB%E7%96%B9",
-              "title": "再有一名30歲機場工作男子感染麻疹",
-              "section": "時事脈搏",
-              "published_at": "2026-04-18T19:30:00+08:00",
-              "attention_tier": "light",
-              "novelty_score": 5,
-              "relevance_score": 5,
-              "urgency_score": 5,
-              "named_entities": [],
-              "key_points": [],
-              "content_truncated": false,
-              "analysis_method": "bypassed",
-              "model_used": "direct"
-            },
-            {
-              "source_article_id": "4375252",
-              "canonical_url": "https://www.hkej.com/instantnews/current/article/4375252/%E9%9D%92%E8%A1%A3%E7%B6%A0%E8%89%B2%E8%88%B9%E7%94%A8%E7%87%83%E6%96%99%E8%B2%AF%E5%AD%98%E7%94%A8%E5%9C%B0%E6%8E%A57%E4%BB%BD%E5%BB%BA%E8%AD%B0%E6%9B%B8+%E9%99%B3%E7%BE%8E%E5%AF%B6%3A%E6%AD%A3%E7%A0%94%E7%A9%B6%E5%8F%AF%E8%A1%8C%E6%80%A7",
-              "title": "青衣綠色船用燃料貯存用地接7份建議書 陳美寶:正研究可行性",
-              "section": "時事脈搏",
-              "published_at": "2026-04-18T17:43:00+08:00",
-              "attention_tier": "light",
-              "novelty_score": 5,
-              "relevance_score": 5,
-              "urgency_score": 5,
-              "named_entities": [],
-              "key_points": [],
-              "content_truncated": false,
-              "analysis_method": "bypassed",
-              "model_used": "direct"
-            },
-            {
-              "source_article_id": "4375236",
-              "title": "中東局勢丨美伊據報4.20會談 特朗普:22日前未達協議或終止停火",
-              "canonical_url": "https://www.hkej.com/instantnews/current/article/4375236/%E4%B8%AD%E6%9D%B1%E5%B1%80%E5%8B%A2%E4%B8%A8%E7%BE%8E%E4%BC%8A%E6%93%9A%E5%A0%B14.20%E6%9C%83%E8%AB%87+%E7%89%B9%E6%9C%97%E6%99%AE%3A22%E6%97%A5%E5%89%8D%E6%9C%AA%E9%81%94%E5%8D%94%E8%AD%B0%E6%88%96%E7%B5%82%E6%AD%A2%E5%81%9C%E7%81%AB",
-              "published_at": "2026-04-18T15:02:00+08:00",
-              "section": "時事脈搏",
-              "novelty_score": 7,
-              "relevance_score": 9,
-              "urgency_score": 10,
-              "named_entities": [
-                {
-                  "name": "伊朗",
-                  "type": "country"
-                },
-                {
-                  "name": "美國",
-                  "type": "country"
-                },
-                {
-                  "name": "特朗普",
-                  "type": "person"
-                }
-              ],
-              "key_points": [
-                "伊朗和美國據報將於4月20日在巴基斯坦舉行新一輪會談。",
-                "特朗普稱若下周三前未達協議，可能終止與伊朗的停火。"
-              ],
-              "content_truncated": false,
-              "original_content_length_chars": 861,
-              "analyzed_content_length_chars": 861,
-              "original_content_token_estimate": 216,
-              "analyzed_content_token_estimate": 216,
-              "truncation_reason": null,
-              "analysis_method": "full_text",
-              "attention_tier": "high",
-              "theme": "geopolitics",
-              "attention_reason": "High-signal geopolitics headline based on title/summary keywords.",
-              "must_keep": true,
-              "model_used": "meta-llama/llama-4-scout-17b-16e-instruct",
-              "delayed_retry_attempted": false,
-              "delayed_retry_model_chain": [],
-              "delayed_retry_final_model": null,
-              "error_classification": null,
-              "error": null
-            },
-            {
-              "source_article_id": "4375241",
-              "title": "中東局勢丨特朗普稱習近平對霍爾木茲海峽重開非常高興",
-              "canonical_url": "https://www.hkej.com/instantnews/current/article/4375241/%E4%B8%AD%E6%9D%B1%E5%B1%80%E5%8B%A2%E4%B8%A8%E7%89%B9%E6%9C%97%E6%99%AE%E7%A8%B1%E7%BF%92%E8%BF%91%E5%B9%B3%E5%B0%8D%E9%9C%8D%E7%88%BE%E6%9C%A8%E8%8C%B2%E6%B5%B7%E5%B3%BD%E9%87%8D%E9%96%8B%E9%9D%9E%E5%B8%B8%E9%AB%98%E8%88%88",
-              "published_at": "2026-04-18T13:34:00+08:00",
-              "section": "時事脈搏",
-              "novelty_score": 6,
-              "relevance_score": 8,
-              "urgency_score": 7,
-              "named_entities": [
-                {
-                  "name": "習近平",
-                  "type": "person"
-                },
-                {
-                  "name": "特朗普",
-                  "type": "person"
-                },
-                {
-                  "name": "霍爾木茲海峽",
-                  "type": "other"
-                }
-              ],
-              "key_points": [
-                "特朗普稱習近平對霍爾木茲海峽現況非常高興",
-                "特朗普計劃5月14日至15日赴中國進行國事訪問"
-              ],
-              "content_truncated": false,
-              "original_content_length_chars": 203,
-              "analyzed_content_length_chars": 203,
-              "original_content_token_estimate": 51,
-              "analyzed_content_token_estimate": 51,
-              "truncation_reason": null,
-              "analysis_method": "full_text",
-              "attention_tier": "high",
-              "theme": "geopolitics",
-              "attention_reason": "High-signal geopolitics headline based on title/summary keywords.",
-              "must_keep": true,
-              "model_used": "meta-llama/llama-4-scout-17b-16e-instruct",
-              "delayed_retry_attempted": false,
-              "delayed_retry_model_chain": [],
-              "delayed_retry_final_model": null,
-              "error_classification": null,
-              "error": null
-            },
-            {
-              "source_article_id": "4375239",
-              "canonical_url": "https://www.hkej.com/instantnews/current/article/4375239/%E4%B8%83%E4%BA%BA%E6%AC%96%E7%90%83%E8%B3%BD%E4%B8%A8%E8%BF%915000%E7%90%83%E8%BF%B7%E9%80%B2%E5%85%A5%E5%95%9F%E5%BE%B7%E9%AB%94%E8%82%B2%E5%9C%92%E5%8D%97%E7%9C%8B%E5%8F%B0",
-              "title": "七人欖球賽丨近5000球迷進入啟德體育園南看台",
-              "section": "時事脈搏",
-              "published_at": "2026-04-18T12:15:00+08:00",
-              "attention_tier": "light",
-              "novelty_score": 5,
-              "relevance_score": 5,
-              "urgency_score": 5,
-              "named_entities": [],
-              "key_points": [],
-              "content_truncated": false,
-              "analysis_method": "bypassed",
-              "model_used": "direct"
-            },
-            {
-              "source_article_id": "4375234",
-              "canonical_url": "https://www.hkej.com/instantnews/current/article/4375234/%E5%A4%A9%E6%B0%A3%E4%B8%A8%E4%BB%8A%E6%97%A5%E6%9C%80%E9%AB%98%E6%B0%A3%E6%BA%AB%E7%B4%8429%E5%BA%A6+%E7%A8%8D%E5%BE%8C%E6%9C%89%E4%B8%80%E5%85%A9%E9%99%A3%E9%A9%9F%E9%9B%A8",
-              "title": "天氣丨今日最高氣溫約29度 稍後有一兩陣驟雨",
-              "section": "時事脈搏",
-              "published_at": "2026-04-18T09:15:00+08:00",
-              "attention_tier": "light",
-              "novelty_score": 5,
-              "relevance_score": 5,
-              "urgency_score": 5,
-              "named_entities": [],
-              "key_points": [],
-              "content_truncated": false,
-              "analysis_method": "bypassed",
-              "model_used": "direct"
-            },
-            {
-              "source_article_id": "4375217",
-              "canonical_url": "https://www.hkej.com/instantnews/current/article/4375217/%E9%84%A7%E7%82%B3%E5%BC%B7%E5%8E%BB%E4%BF%A1%E3%80%8A%E8%8F%AF%E6%97%A5%E3%80%8B+%E5%8F%8D%E9%A7%81%E6%B6%89%E9%BB%8E%E6%99%BA%E8%8B%B1%E6%96%87%E7%AB%A0%E7%84%A1%E4%BA%8B%E5%AF%A6%E6%A0%B9%E6%93%9A",
-              "title": "鄧炳強去信《華日》 反駁涉黎智英文章無事實根據",
-              "section": "時事脈搏",
-              "published_at": "2026-04-18T00:52:00+08:00",
-              "attention_tier": "light",
-              "novelty_score": 5,
-              "relevance_score": 5,
-              "urgency_score": 5,
-              "named_entities": [],
-              "key_points": [],
-              "content_truncated": false,
-              "analysis_method": "bypassed",
-              "model_used": "direct"
-            }
-          ],
-          "model_used": "meta-llama/llama-4-scout-17b-16e-instruct"
-        },
-        {
-          "title": "地緣政治",
-          "theme_rationale": "涉及國家間關係、國際事務的新聞報導",
-          "article_count": 4,
-          "key_developments": [
-            "伊朗外交部發言人巴格海伊表示，伊朗不會將濃縮鈾轉移至其他國家或美國。",
-            "伊朗因美國違背承諾，已恢復對霍爾木茲海峽的控制權。",
-            "伊朗強調對其濃縮鈾具有神聖性，任何封鎖行動將被適當回應。"
-          ],
-          "named_entities": [
-            {
-              "name": "伊朗",
-              "type": "country"
-            },
-            {
-              "name": "美國",
-              "type": "country"
-            },
-            {
-              "name": "巴格海伊",
-              "type": "person"
-            },
-            {
-              "name": "霍爾木茲海峽",
-              "type": "other"
-            }
-          ],
-          "articles": [
-            {
-              "source_article_id": "4375253",
-              "title": "中東局勢丨伊朗外交部:從未考慮轉移濃縮鈾至美國",
-              "canonical_url": "https://www.hkej.com/instantnews/current/article/4375253/%E4%B8%AD%E6%9D%B1%E5%B1%80%E5%8B%A2%E4%B8%A8%E4%BC%8A%E6%9C%97%E5%A4%96%E4%BA%A4%E9%83%A8%3A%E5%BE%9E%E6%9C%AA%E8%80%83%E6%85%AE%E8%BD%89%E7%A7%BB%E6%BF%83%E7%B8%AE%E9%88%BE%E8%87%B3%E7%BE%8E%E5%9C%8B",
-              "published_at": "2026-04-18T18:40:00+08:00",
-              "section": "時事脈搏",
-              "novelty_score": 6,
-              "relevance_score": 8,
-              "urgency_score": 9,
-              "named_entities": [
-                {
-                  "name": "伊朗",
-                  "type": "country"
-                },
-                {
-                  "name": "美國",
-                  "type": "country"
-                },
-                {
-                  "name": "巴格海伊",
-                  "type": "person"
-                }
-              ],
-              "key_points": [
-                "伊朗外交部發言人巴格海伊表示，伊朗不會將濃縮鈾轉移至其他國家或美國。",
-                "伊朗強調對其濃縮鈾具有神聖性，任何封鎖行動將被適當回應。"
-              ],
-              "content_truncated": false,
-              "original_content_length_chars": 349,
-              "analyzed_content_length_chars": 349,
-              "original_content_token_estimate": 88,
-              "analyzed_content_token_estimate": 88,
-              "truncation_reason": null,
-              "analysis_method": "full_text",
-              "attention_tier": "high",
-              "theme": "geopolitics",
-              "attention_reason": "High-signal geopolitics headline based on title/summary keywords.",
-              "must_keep": true,
-              "model_used": "meta-llama/llama-4-scout-17b-16e-instruct",
-              "delayed_retry_attempted": false,
-              "delayed_retry_model_chain": [],
-              "delayed_retry_final_model": null,
-              "error_classification": null,
-              "error": null
-            },
-            {
-              "source_article_id": "4375249",
-              "title": "伊朗:因美國違背承諾已恢復對霍爾木茲海峽控制",
-              "canonical_url": "https://www.hkej.com/instantnews/current/article/4375249/%E4%BC%8A%E6%9C%97%3A%E5%9B%A0%E7%BE%8E%E5%9C%8B%E9%81%95%E8%83%8C%E6%89%BF%E8%AB%BE%E5%B7%B2%E6%81%A2%E5%BE%A9%E5%B0%8D%E9%9C%8D%E7%88%BE%E6%9C%A8%E8%8C%B2%E6%B5%B7%E5%B3%BD%E6%8E%A7%E5%88%B6",
-              "published_at": "2026-04-18T16:47:00+08:00",
-              "section": "時事脈搏",
-              "novelty_score": 5,
-              "relevance_score": 7,
-              "urgency_score": 8,
-              "named_entities": [
-                {
-                  "name": "伊朗",
-                  "type": "country"
-                },
-                {
-                  "name": "美國",
-                  "type": "country"
-                },
-                {
-                  "name": "霍爾木茲海峽",
-                  "type": "other"
-                }
-              ],
-              "key_points": [
-                "伊朗因美國違背承諾，已恢復對霍爾木茲海峽的控制權。",
-                "伊朗武裝部隊正在嚴格管理和控制霍爾木茲海峽。"
-              ],
-              "content_truncated": false,
-              "original_content_length_chars": 201,
-              "analyzed_content_length_chars": 201,
-              "original_content_token_estimate": 51,
-              "analyzed_content_token_estimate": 51,
-              "truncation_reason": null,
-              "analysis_method": "full_text",
-              "attention_tier": "high",
-              "theme": "geopolitics",
-              "attention_reason": "High-signal geopolitics headline based on title/summary keywords.",
-              "must_keep": true,
-              "model_used": "meta-llama/llama-4-scout-17b-16e-instruct",
-              "delayed_retry_attempted": false,
-              "delayed_retry_model_chain": [],
-              "delayed_retry_final_model": null,
-              "error_classification": null,
-              "error": null
-            },
-            {
-              "source_article_id": "4375251",
-              "canonical_url": "https://www.hkej.com/instantnews/current/article/4375251/%E6%9D%B1%E9%83%A8%E6%88%B0%E5%8D%80%E6%9D%B1%E6%B5%B7%E8%81%AF%E5%90%88%E6%88%B0%E5%82%99%E5%B7%A1%E8%88%AA+%E4%B8%AD%E5%9C%8B%E5%9C%8B%E9%98%B2%E9%83%A8%E5%B0%B1%E6%97%A5%E8%89%A6%E9%80%B2%E5%8F%B0%E6%B5%B7%E6%8F%90%E5%BC%B7%E7%83%88%E6%8A%97%E8%AD%B0",
-              "title": "東部戰區東海聯合戰備巡航 中國國防部就日艦進台海提強烈抗議",
-              "section": "時事脈搏",
-              "published_at": "2026-04-18T17:42:00+08:00",
-              "attention_tier": "light",
-              "novelty_score": 5,
-              "relevance_score": 5,
-              "urgency_score": 5,
-              "named_entities": [],
-              "key_points": [],
-              "content_truncated": false,
-              "analysis_method": "bypassed",
-              "model_used": "direct"
-            },
-            {
-              "source_article_id": "4375254",
-              "canonical_url": "https://www.hkej.com/instantnews/current/article/4375254/%E6%9E%97%E5%AE%9A%E5%9C%8B%E6%98%8E%E8%B5%B4%E5%8C%97%E4%BA%AC%E6%99%A4%E4%B8%AD%E5%A4%AE%E9%83%A8%E5%A7%94%E7%AD%89%E6%A9%9F%E9%97%9C",
-              "title": "林定國明赴北京晤中央部委等機關",
-              "section": "時事脈搏",
-              "published_at": "2026-04-18T19:05:00+08:00",
-              "attention_tier": "light",
-              "novelty_score": 5,
-              "relevance_score": 5,
-              "urgency_score": 5,
-              "named_entities": [],
-              "key_points": [],
-              "content_truncated": false,
-              "analysis_method": "bypassed",
-              "model_used": "direct"
-            }
-          ],
-          "model_used": "meta-llama/llama-4-scout-17b-16e-instruct"
-        },
-        {
-          "title": "Geopolitics",
-          "theme_rationale": "Articles related to international politics and conflicts",
-          "article_count": 4,
-          "key_developments": [
-            "多艘船隻嘗試駛離波斯灣但未成功",
             "美軍福特號航母返回紅海，恢復雙航母部署",
-            "法英兩國將在條件允許時牽頭一項防禦性多國行動，以保障霍爾木茲海峽航運安全"
+            "伊朗和美國據報將於4月20日在巴基斯坦舉行新一輪會談",
+            "比特幣價格下跌1.06%至76309.91美元"
           ],
           "named_entities": [
-            {
-              "name": "霍爾木茲海峽",
-              "type": "other"
-            },
-            {
-              "name": "伊朗",
-              "type": "country"
-            },
             {
               "name": "福特號",
               "type": "asset"
             },
             {
+              "name": "伊朗",
+              "type": "country"
+            },
+            {
               "name": "美國",
+              "type": "country"
+            },
+            {
+              "name": "巴基斯坦",
               "type": "country"
             }
           ],
@@ -2388,6 +1986,472 @@
               "delayed_retry_final_model": null,
               "error_classification": null,
               "error": null
+            },
+            {
+              "source_article_id": "4375255",
+              "canonical_url": "https://www.hkej.com/instantnews/current/article/4375255/%E5%86%8D%E6%9C%89%E4%B8%80%E5%90%8D30%E6%AD%B2%E6%A9%9F%E5%A0%B4%E5%B7%A5%E4%BD%9C%E7%94%B7%E5%AD%90%E6%84%9F%E6%9F%93%E9%BA%BB%E7%96%B9",
+              "title": "再有一名30歲機場工作男子感染麻疹",
+              "section": "時事脈搏",
+              "published_at": "2026-04-18T19:30:00+08:00",
+              "attention_tier": "light",
+              "novelty_score": 5,
+              "relevance_score": 5,
+              "urgency_score": 5,
+              "named_entities": [],
+              "key_points": [],
+              "content_truncated": false,
+              "analysis_method": "bypassed",
+              "model_used": "direct",
+              "theme": "general",
+              "attention_reason": "Lighter treatment because this story sits in the 時事脈搏 section without strong market-moving signals.",
+              "must_keep": false
+            },
+            {
+              "source_article_id": "4375252",
+              "canonical_url": "https://www.hkej.com/instantnews/current/article/4375252/%E9%9D%92%E8%A1%A3%E7%B6%A0%E8%89%B2%E8%88%B9%E7%94%A8%E7%87%83%E6%96%99%E8%B2%AF%E5%AD%98%E7%94%A8%E5%9C%B0%E6%8E%A57%E4%BB%BD%E5%BB%BA%E8%AD%B0%E6%9B%B8+%E9%99%B3%E7%BE%8E%E5%AF%B6%3A%E6%AD%A3%E7%A0%94%E7%A9%B6%E5%8F%AF%E8%A1%8C%E6%80%A7",
+              "title": "青衣綠色船用燃料貯存用地接7份建議書 陳美寶:正研究可行性",
+              "section": "時事脈搏",
+              "published_at": "2026-04-18T17:43:00+08:00",
+              "attention_tier": "light",
+              "novelty_score": 5,
+              "relevance_score": 5,
+              "urgency_score": 5,
+              "named_entities": [],
+              "key_points": [],
+              "content_truncated": false,
+              "analysis_method": "bypassed",
+              "model_used": "direct",
+              "theme": "general",
+              "attention_reason": "Lighter treatment because this story sits in the 時事脈搏 section without strong market-moving signals.",
+              "must_keep": false
+            },
+            {
+              "source_article_id": "4375254",
+              "canonical_url": "https://www.hkej.com/instantnews/current/article/4375254/%E6%9E%97%E5%AE%9A%E5%9C%8B%E6%98%8E%E8%B5%B4%E5%8C%97%E4%BA%AC%E6%99%A4%E4%B8%AD%E5%A4%AE%E9%83%A8%E5%A7%94%E7%AD%89%E6%A9%9F%E9%97%9C",
+              "title": "林定國明赴北京晤中央部委等機關",
+              "section": "時事脈搏",
+              "published_at": "2026-04-18T19:05:00+08:00",
+              "attention_tier": "light",
+              "novelty_score": 5,
+              "relevance_score": 5,
+              "urgency_score": 5,
+              "named_entities": [],
+              "key_points": [],
+              "content_truncated": false,
+              "analysis_method": "bypassed",
+              "model_used": "direct",
+              "theme": "general",
+              "attention_reason": "Lighter treatment because this story sits in the 時事脈搏 section without strong market-moving signals.",
+              "must_keep": false
+            },
+            {
+              "source_article_id": "4375246",
+              "canonical_url": "https://www.hkej.com/instantnews/current/article/4375246/%E5%87%8C%E5%98%89%E5%8B%A4%3A%E6%88%BF%E5%8D%94%E6%9C%83%E5%B0%87%E5%80%8B%E5%88%A5%E9%A0%85%E7%9B%AE%E8%B3%87%E5%8A%A9%E5%87%BA%E5%94%AE%E5%96%AE%E4%BD%8D%E6%AF%94%E4%BE%8B%E8%AA%BF%E9%AB%98",
+              "title": "凌嘉勤:房協會將個別項目資助出售單位比例調高",
+              "section": "時事脈搏",
+              "published_at": "2026-04-18T15:47:00+08:00",
+              "attention_tier": "light",
+              "novelty_score": 5,
+              "relevance_score": 5,
+              "urgency_score": 5,
+              "named_entities": [],
+              "key_points": [],
+              "content_truncated": false,
+              "analysis_method": "bypassed",
+              "model_used": "direct",
+              "theme": "general",
+              "attention_reason": "Lighter treatment because this story sits in the 時事脈搏 section without strong market-moving signals.",
+              "must_keep": false
+            },
+            {
+              "source_article_id": "4375245",
+              "canonical_url": "https://www.hkej.com/instantnews/current/article/4375245/%E9%BA%A5%E7%95%B6%E5%8B%9E%E5%85%92%E7%AB%A5%E6%84%9B%E5%BF%83%E9%A6%AC%E6%8B%89%E6%9D%BE%E4%BB%8A%E9%96%8B%E8%B7%91+%E5%8A%89%E5%BE%B7%E8%8F%AF%E9%A9%9A%E5%96%9C%E7%8F%BE%E8%BA%AB",
+              "title": "麥當勞兒童愛心馬拉松今開跑 劉德華驚喜現身",
+              "section": "時事脈搏",
+              "published_at": "2026-04-18T15:13:00+08:00",
+              "attention_tier": "light",
+              "novelty_score": 5,
+              "relevance_score": 5,
+              "urgency_score": 5,
+              "named_entities": [],
+              "key_points": [],
+              "content_truncated": false,
+              "analysis_method": "bypassed",
+              "model_used": "direct",
+              "theme": "general",
+              "attention_reason": "Lighter treatment because this story sits in the 時事脈搏 section without strong market-moving signals.",
+              "must_keep": false
+            },
+            {
+              "source_article_id": "4375236",
+              "title": "中東局勢丨美伊據報4.20會談 特朗普:22日前未達協議或終止停火",
+              "canonical_url": "https://www.hkej.com/instantnews/current/article/4375236/%E4%B8%AD%E6%9D%B1%E5%B1%80%E5%8B%A2%E4%B8%A8%E7%BE%8E%E4%BC%8A%E6%93%9A%E5%A0%B14.20%E6%9C%83%E8%AB%87+%E7%89%B9%E6%9C%97%E6%99%AE%3A22%E6%97%A5%E5%89%8D%E6%9C%AA%E9%81%94%E5%8D%94%E8%AD%B0%E6%88%96%E7%B5%82%E6%AD%A2%E5%81%9C%E7%81%AB",
+              "published_at": "2026-04-18T15:02:00+08:00",
+              "section": "時事脈搏",
+              "novelty_score": 7,
+              "relevance_score": 9,
+              "urgency_score": 10,
+              "named_entities": [
+                {
+                  "name": "伊朗",
+                  "type": "country"
+                },
+                {
+                  "name": "美國",
+                  "type": "country"
+                },
+                {
+                  "name": "特朗普",
+                  "type": "person"
+                }
+              ],
+              "key_points": [
+                "伊朗和美國據報將於4月20日在巴基斯坦舉行新一輪會談。",
+                "特朗普稱若下周三前未達協議，可能終止與伊朗的停火。"
+              ],
+              "content_truncated": false,
+              "original_content_length_chars": 861,
+              "analyzed_content_length_chars": 861,
+              "original_content_token_estimate": 216,
+              "analyzed_content_token_estimate": 216,
+              "truncation_reason": null,
+              "analysis_method": "full_text",
+              "attention_tier": "high",
+              "theme": "geopolitics",
+              "attention_reason": "High-signal geopolitics headline based on title/summary keywords.",
+              "must_keep": true,
+              "model_used": "meta-llama/llama-4-scout-17b-16e-instruct",
+              "delayed_retry_attempted": false,
+              "delayed_retry_model_chain": [],
+              "delayed_retry_final_model": null,
+              "error_classification": null,
+              "error": null
+            },
+            {
+              "source_article_id": "4375241",
+              "title": "中東局勢丨特朗普稱習近平對霍爾木茲海峽重開非常高興",
+              "canonical_url": "https://www.hkej.com/instantnews/current/article/4375241/%E4%B8%AD%E6%9D%B1%E5%B1%80%E5%8B%A2%E4%B8%A8%E7%89%B9%E6%9C%97%E6%99%AE%E7%A8%B1%E7%BF%92%E8%BF%91%E5%B9%B3%E5%B0%8D%E9%9C%8D%E7%88%BE%E6%9C%A8%E8%8C%B2%E6%B5%B7%E5%B3%BD%E9%87%8D%E9%96%8B%E9%9D%9E%E5%B8%B8%E9%AB%98%E8%88%88",
+              "published_at": "2026-04-18T13:34:00+08:00",
+              "section": "時事脈搏",
+              "novelty_score": 6,
+              "relevance_score": 8,
+              "urgency_score": 7,
+              "named_entities": [
+                {
+                  "name": "習近平",
+                  "type": "person"
+                },
+                {
+                  "name": "特朗普",
+                  "type": "person"
+                },
+                {
+                  "name": "霍爾木茲海峽",
+                  "type": "other"
+                }
+              ],
+              "key_points": [
+                "特朗普稱習近平對霍爾木茲海峽現況非常高興",
+                "特朗普計劃5月14日至15日赴中國進行國事訪問"
+              ],
+              "content_truncated": false,
+              "original_content_length_chars": 203,
+              "analyzed_content_length_chars": 203,
+              "original_content_token_estimate": 51,
+              "analyzed_content_token_estimate": 51,
+              "truncation_reason": null,
+              "analysis_method": "full_text",
+              "attention_tier": "high",
+              "theme": "geopolitics",
+              "attention_reason": "High-signal geopolitics headline based on title/summary keywords.",
+              "must_keep": true,
+              "model_used": "meta-llama/llama-4-scout-17b-16e-instruct",
+              "delayed_retry_attempted": false,
+              "delayed_retry_model_chain": [],
+              "delayed_retry_final_model": null,
+              "error_classification": null,
+              "error": null
+            },
+            {
+              "source_article_id": "4375239",
+              "canonical_url": "https://www.hkej.com/instantnews/current/article/4375239/%E4%B8%83%E4%BA%BA%E6%AC%96%E7%90%83%E8%B3%BD%E4%B8%A8%E8%BF%915000%E7%90%83%E8%BF%B7%E9%80%B2%E5%85%A5%E5%95%9F%E5%BE%B7%E9%AB%94%E8%82%B2%E5%9C%92%E5%8D%97%E7%9C%8B%E5%8F%B0",
+              "title": "七人欖球賽丨近5000球迷進入啟德體育園南看台",
+              "section": "時事脈搏",
+              "published_at": "2026-04-18T12:15:00+08:00",
+              "attention_tier": "light",
+              "novelty_score": 5,
+              "relevance_score": 5,
+              "urgency_score": 5,
+              "named_entities": [],
+              "key_points": [],
+              "content_truncated": false,
+              "analysis_method": "bypassed",
+              "model_used": "direct",
+              "theme": "general",
+              "attention_reason": "Lighter treatment because this story sits in the 時事脈搏 section without strong market-moving signals.",
+              "must_keep": false
+            },
+            {
+              "source_article_id": "4375234",
+              "canonical_url": "https://www.hkej.com/instantnews/current/article/4375234/%E5%A4%A9%E6%B0%A3%E4%B8%A8%E4%BB%8A%E6%97%A5%E6%9C%80%E9%AB%98%E6%B0%A3%E6%BA%AB%E7%B4%8429%E5%BA%A6+%E7%A8%8D%E5%BE%8C%E6%9C%89%E4%B8%80%E5%85%A9%E9%99%A3%E9%A9%9F%E9%9B%A8",
+              "title": "天氣丨今日最高氣溫約29度 稍後有一兩陣驟雨",
+              "section": "時事脈搏",
+              "published_at": "2026-04-18T09:15:00+08:00",
+              "attention_tier": "light",
+              "novelty_score": 5,
+              "relevance_score": 5,
+              "urgency_score": 5,
+              "named_entities": [],
+              "key_points": [],
+              "content_truncated": false,
+              "analysis_method": "bypassed",
+              "model_used": "direct",
+              "theme": "general",
+              "attention_reason": "Lighter treatment because this story sits in the 時事脈搏 section without strong market-moving signals.",
+              "must_keep": false
+            },
+            {
+              "source_article_id": "4375217",
+              "canonical_url": "https://www.hkej.com/instantnews/current/article/4375217/%E9%84%A7%E7%82%B3%E5%BC%B7%E5%8E%BB%E4%BF%A1%E3%80%8A%E8%8F%AF%E6%97%A5%E3%80%8B+%E5%8F%8D%E9%A7%81%E6%B6%89%E9%BB%8E%E6%99%BA%E8%8B%B1%E6%96%87%E7%AB%A0%E7%84%A1%E4%BA%8B%E5%AF%A6%E6%A0%B9%E6%93%9A",
+              "title": "鄧炳強去信《華日》 反駁涉黎智英文章無事實根據",
+              "section": "時事脈搏",
+              "published_at": "2026-04-18T00:52:00+08:00",
+              "attention_tier": "light",
+              "novelty_score": 5,
+              "relevance_score": 5,
+              "urgency_score": 5,
+              "named_entities": [],
+              "key_points": [],
+              "content_truncated": false,
+              "analysis_method": "bypassed",
+              "model_used": "direct",
+              "theme": "general",
+              "attention_reason": "Lighter treatment because this story sits in the 時事脈搏 section without strong market-moving signals.",
+              "must_keep": false
+            }
+          ],
+          "model_used": "meta-llama/llama-4-scout-17b-16e-instruct"
+        },
+        {
+          "title": "地緣政治與國際關係",
+          "theme_rationale": "關注國際關係與地緣政治相關新聞",
+          "article_count": 3,
+          "key_developments": [
+            "伊朗外交部發言人巴格海伊表示，伊朗不會將濃縮鈾轉移至其他國家或美國。",
+            "伊朗因美國違背承諾，已恢復對霍爾木茲海峽的控制權。",
+            "伊朗強調對其濃縮鈾具有神聖性，任何封鎖行動將被適當回應。"
+          ],
+          "named_entities": [
+            {
+              "name": "伊朗",
+              "type": "country"
+            },
+            {
+              "name": "美國",
+              "type": "country"
+            },
+            {
+              "name": "巴格海伊",
+              "type": "person"
+            },
+            {
+              "name": "霍爾木茲海峽",
+              "type": "other"
+            }
+          ],
+          "articles": [
+            {
+              "source_article_id": "4375253",
+              "title": "中東局勢丨伊朗外交部:從未考慮轉移濃縮鈾至美國",
+              "canonical_url": "https://www.hkej.com/instantnews/current/article/4375253/%E4%B8%AD%E6%9D%B1%E5%B1%80%E5%8B%A2%E4%B8%A8%E4%BC%8A%E6%9C%97%E5%A4%96%E4%BA%A4%E9%83%A8%3A%E5%BE%9E%E6%9C%AA%E8%80%83%E6%85%AE%E8%BD%89%E7%A7%BB%E6%BF%83%E7%B8%AE%E9%88%BE%E8%87%B3%E7%BE%8E%E5%9C%8B",
+              "published_at": "2026-04-18T18:40:00+08:00",
+              "section": "時事脈搏",
+              "novelty_score": 6,
+              "relevance_score": 8,
+              "urgency_score": 9,
+              "named_entities": [
+                {
+                  "name": "伊朗",
+                  "type": "country"
+                },
+                {
+                  "name": "美國",
+                  "type": "country"
+                },
+                {
+                  "name": "巴格海伊",
+                  "type": "person"
+                }
+              ],
+              "key_points": [
+                "伊朗外交部發言人巴格海伊表示，伊朗不會將濃縮鈾轉移至其他國家或美國。",
+                "伊朗強調對其濃縮鈾具有神聖性，任何封鎖行動將被適當回應。"
+              ],
+              "content_truncated": false,
+              "original_content_length_chars": 349,
+              "analyzed_content_length_chars": 349,
+              "original_content_token_estimate": 88,
+              "analyzed_content_token_estimate": 88,
+              "truncation_reason": null,
+              "analysis_method": "full_text",
+              "attention_tier": "high",
+              "theme": "geopolitics",
+              "attention_reason": "High-signal geopolitics headline based on title/summary keywords.",
+              "must_keep": true,
+              "model_used": "meta-llama/llama-4-scout-17b-16e-instruct",
+              "delayed_retry_attempted": false,
+              "delayed_retry_model_chain": [],
+              "delayed_retry_final_model": null,
+              "error_classification": null,
+              "error": null
+            },
+            {
+              "source_article_id": "4375249",
+              "title": "伊朗:因美國違背承諾已恢復對霍爾木茲海峽控制",
+              "canonical_url": "https://www.hkej.com/instantnews/current/article/4375249/%E4%BC%8A%E6%9C%97%3A%E5%9B%A0%E7%BE%8E%E5%9C%8B%E9%81%95%E8%83%8C%E6%89%BF%E8%AB%BE%E5%B7%B2%E6%81%A2%E5%BE%A9%E5%B0%8D%E9%9C%8D%E7%88%BE%E6%9C%A8%E8%8C%B2%E6%B5%B7%E5%B3%BD%E6%8E%A7%E5%88%B6",
+              "published_at": "2026-04-18T16:47:00+08:00",
+              "section": "時事脈搏",
+              "novelty_score": 5,
+              "relevance_score": 7,
+              "urgency_score": 8,
+              "named_entities": [
+                {
+                  "name": "伊朗",
+                  "type": "country"
+                },
+                {
+                  "name": "美國",
+                  "type": "country"
+                },
+                {
+                  "name": "霍爾木茲海峽",
+                  "type": "other"
+                }
+              ],
+              "key_points": [
+                "伊朗因美國違背承諾，已恢復對霍爾木茲海峽的控制權。",
+                "伊朗武裝部隊正在嚴格管理和控制霍爾木茲海峽。"
+              ],
+              "content_truncated": false,
+              "original_content_length_chars": 201,
+              "analyzed_content_length_chars": 201,
+              "original_content_token_estimate": 51,
+              "analyzed_content_token_estimate": 51,
+              "truncation_reason": null,
+              "analysis_method": "full_text",
+              "attention_tier": "high",
+              "theme": "geopolitics",
+              "attention_reason": "High-signal geopolitics headline based on title/summary keywords.",
+              "must_keep": true,
+              "model_used": "meta-llama/llama-4-scout-17b-16e-instruct",
+              "delayed_retry_attempted": false,
+              "delayed_retry_model_chain": [],
+              "delayed_retry_final_model": null,
+              "error_classification": null,
+              "error": null
+            },
+            {
+              "source_article_id": "4375251",
+              "canonical_url": "https://www.hkej.com/instantnews/current/article/4375251/%E6%9D%B1%E9%83%A8%E6%88%B0%E5%8D%80%E6%9D%B1%E6%B5%B7%E8%81%AF%E5%90%88%E6%88%B0%E5%82%99%E5%B7%A1%E8%88%AA+%E4%B8%AD%E5%9C%8B%E5%9C%8B%E9%98%B2%E9%83%A8%E5%B0%B1%E6%97%A5%E8%89%A6%E9%80%B2%E5%8F%B0%E6%B5%B7%E6%8F%90%E5%BC%B7%E7%83%88%E6%8A%97%E8%AD%B0",
+              "title": "東部戰區東海聯合戰備巡航 中國國防部就日艦進台海提強烈抗議",
+              "section": "時事脈搏",
+              "published_at": "2026-04-18T17:42:00+08:00",
+              "attention_tier": "light",
+              "novelty_score": 5,
+              "relevance_score": 5,
+              "urgency_score": 5,
+              "named_entities": [],
+              "key_points": [],
+              "content_truncated": false,
+              "analysis_method": "bypassed",
+              "model_used": "direct",
+              "theme": "general",
+              "attention_reason": "Lighter treatment because this story sits in the 時事脈搏 section without strong market-moving signals.",
+              "must_keep": false
+            }
+          ],
+          "model_used": "meta-llama/llama-4-scout-17b-16e-instruct"
+        },
+        {
+          "title": "政治與社會",
+          "theme_rationale": "與政府政策、社會事件相關的新聞",
+          "article_count": 3,
+          "key_developments": [
+            "李家超宣布月底舉辦「香港悅讀周」鼓勵市民閱讀",
+            "馬會電影《馬到功成》將在內地各地上映",
+            "楊何蓓茵表示部門首長責任制調查若涉常秘一樣會調查"
+          ],
+          "named_entities": [
+            {
+              "name": "李家超",
+              "type": "person"
+            },
+            {
+              "name": "馬會",
+              "type": "organization"
+            },
+            {
+              "name": "楊何蓓茵",
+              "type": "person"
+            }
+          ],
+          "articles": [
+            {
+              "source_article_id": "4375243",
+              "canonical_url": "https://www.hkej.com/instantnews/current/article/4375243/%E6%9D%8E%E5%AE%B6%E8%B6%85%3A%E6%9C%88%E5%BA%95%E8%88%89%E8%BE%A6%E3%80%8C%E9%A6%99%E6%B8%AF%E6%82%85%E8%AE%80%E5%91%A8%E3%80%8D%E9%BC%93%E5%8B%B5%E5%B8%82%E6%B0%91%E9%96%B1%E8%AE%80",
+              "title": "李家超:月底舉辦「香港悅讀周」鼓勵市民閱讀",
+              "section": "時事脈搏",
+              "published_at": "2026-04-18T14:16:00+08:00",
+              "attention_tier": "light",
+              "novelty_score": 5,
+              "relevance_score": 5,
+              "urgency_score": 5,
+              "named_entities": [],
+              "key_points": [],
+              "content_truncated": false,
+              "analysis_method": "bypassed",
+              "model_used": "direct",
+              "theme": "general",
+              "attention_reason": "Lighter treatment because this story sits in the 時事脈搏 section without strong market-moving signals.",
+              "must_keep": false
+            },
+            {
+              "source_article_id": "4375242",
+              "canonical_url": "https://www.hkej.com/instantnews/current/article/4375242/%E9%A6%AC%E6%9C%83%E3%80%8A%E9%A6%AC%E5%88%B0%E5%8A%9F%E6%88%90%E3%80%8B%E9%9B%BB%E5%BD%B1%E9%A6%99%E6%B8%AF%E9%A6%96%E6%98%A0+%E5%B0%87%E5%9C%A8%E5%85%A7%E5%9C%B0%E5%90%84%E5%9C%B0%E4%B8%8A%E6%98%A0",
+              "title": "馬會《馬到功成》電影香港首映 將在內地各地上映",
+              "section": "時事脈搏",
+              "published_at": "2026-04-18T12:41:00+08:00",
+              "attention_tier": "light",
+              "novelty_score": 5,
+              "relevance_score": 5,
+              "urgency_score": 5,
+              "named_entities": [],
+              "key_points": [],
+              "content_truncated": false,
+              "analysis_method": "bypassed",
+              "model_used": "direct",
+              "theme": "general",
+              "attention_reason": "Lighter treatment because this story sits in the 時事脈搏 section without strong market-moving signals.",
+              "must_keep": false
+            },
+            {
+              "source_article_id": "4375240",
+              "canonical_url": "https://www.hkej.com/instantnews/current/article/4375240/%E9%83%A8%E9%96%80%E9%A6%96%E9%95%B7%E8%B2%AC%E4%BB%BB%E5%88%B6%E4%B8%A8%E6%A5%8A%E4%BD%95%E8%93%93%E8%8C%B5%3A%E8%AA%BF%E6%9F%A5%E8%8B%A5%E6%B6%89%E5%B8%B8%E7%A7%98%E4%B8%80%E6%A8%A3%E6%9C%83%E8%AA%BF%E6%9F%A5",
+              "title": "部門首長責任制丨楊何蓓茵:調查若涉常秘一樣會調查",
+              "section": "時事脈搏",
+              "published_at": "2026-04-18T12:32:00+08:00",
+              "attention_tier": "light",
+              "novelty_score": 5,
+              "relevance_score": 5,
+              "urgency_score": 5,
+              "named_entities": [],
+              "key_points": [],
+              "content_truncated": false,
+              "analysis_method": "bypassed",
+              "model_used": "direct",
+              "theme": "general",
+              "attention_reason": "Lighter treatment because this story sits in the 時事脈搏 section without strong market-moving signals.",
+              "must_keep": false
             }
           ],
           "model_used": "meta-llama/llama-4-scout-17b-16e-instruct"
@@ -2559,8 +2623,8 @@
           "model_used": "meta-llama/llama-4-scout-17b-16e-instruct"
         },
         {
-          "title": "中東地緣政治",
-          "theme_rationale": "與中東地區的地緣政治局勢相關的新聞報道",
+          "title": "Geopolitical Tensions",
+          "theme_rationale": "Articles discussing international relations and conflicts",
           "article_count": 3,
           "key_developments": [
             "美國總統特朗普表示，美國與伊朗潛在的協議大部分要點已敲定，預計雙方將於本周末舉行談判，可能在一兩天內達成協議。",
@@ -2735,19 +2799,14 @@
       ],
       "analysis_profile": "light",
       "model_used": "meta-llama/llama-4-scout-17b-16e-instruct",
-      "sub_batch_count": 14,
+      "sub_batch_count": 9,
       "diagnostics": {
-        "sub_batch_count": 6,
-        "split_reasons": [
-          "pre_send_budget"
-        ],
-        "models_attempted": [
-          "meta-llama/llama-4-scout-17b-16e-instruct",
-          "qwen/qwen3-32b"
-        ],
-        "estimated_input_tokens_max": 1511,
-        "serialized_request_bytes_max": 8609,
-        "rate_limit_waits": 1,
+        "sub_batch_count": 9,
+        "split_reasons": [],
+        "models_attempted": [],
+        "estimated_input_tokens_max": 0,
+        "serialized_request_bytes_max": 0,
+        "rate_limit_waits": 0,
         "partial_article_count": 0,
         "synthesis_wait_seconds_total": 0.0,
         "synthesis_retry_count": 0,
@@ -2755,7 +2814,7 @@
         "synthesis_budget_exhausted": false,
         "degraded_merge_used": false,
         "degraded_merge_reason": "",
-        "synthesis_merge_depth_max": 1,
+        "synthesis_merge_depth_max": 0,
         "model_switches": []
       },
       "error": null
@@ -2766,9 +2825,10 @@
       "status": "success",
       "key_developments": [
         "香港商品貿易總額佔全球3%，躍升為全球第五大商品貿易經濟體。",
-        "丘應樺表示長遠對中東抱有希望，機遇很強。",
         "恒指夜市期指收報26502點，升320點，較昨日恒指收市26160點，高水342點。",
-        "香港與中東貿易佔比不高，但企業積極到中東拓商機。"
+        "丘應樺表示長遠對中東抱有希望，機遇很強。",
+        "特首出訪中東後，企業到當地拓商機，暫時雖受中東局勢影響，但仍積極與對方磋商經貿辦事處計劃。",
+        "香港與中東貿易佔比不高，但長遠抱有希望，機遇很強。"
       ],
       "named_entities": [
         {
@@ -2786,6 +2846,10 @@
         {
           "name": "恒指",
           "type": "index"
+        },
+        {
+          "name": "利雅德",
+          "type": "other"
         }
       ],
       "articles": [
@@ -2935,9 +2999,9 @@
           "article_count": 3,
           "key_developments": [
             "香港商品貿易總額佔全球3%，躍升為全球第五大商品貿易經濟體。",
-            "丘應樺表示長遠對中東抱有希望，機遇很強。",
             "恒指夜市期指收報26502點，升320點，較昨日恒指收市26160點，高水342點。",
-            "香港與中東貿易佔比不高，但企業積極到中東拓商機。"
+            "丘應樺表示長遠對中東抱有希望，機遇很強。",
+            "特首出訪中東後，企業到當地拓商機，暫時雖受中東局勢影響，但仍積極與對方磋商經貿辦事處計劃。"
           ],
           "named_entities": [
             {
@@ -2955,6 +3019,10 @@
             {
               "name": "恒指",
               "type": "index"
+            },
+            {
+              "name": "利雅德",
+              "type": "other"
             }
           ],
           "articles": [
@@ -3102,15 +3170,13 @@
       ],
       "analysis_profile": "standard",
       "model_used": "meta-llama/llama-4-scout-17b-16e-instruct",
-      "sub_batch_count": 3,
+      "sub_batch_count": 1,
       "diagnostics": {
-        "sub_batch_count": 2,
+        "sub_batch_count": 1,
         "split_reasons": [],
-        "models_attempted": [
-          "meta-llama/llama-4-scout-17b-16e-instruct"
-        ],
-        "estimated_input_tokens_max": 811,
-        "serialized_request_bytes_max": 4046,
+        "models_attempted": [],
+        "estimated_input_tokens_max": 0,
+        "serialized_request_bytes_max": 0,
         "rate_limit_waits": 0,
         "partial_article_count": 0,
         "synthesis_wait_seconds_total": 0.0,
@@ -3358,15 +3424,13 @@
       ],
       "analysis_profile": "standard",
       "model_used": "meta-llama/llama-4-scout-17b-16e-instruct",
-      "sub_batch_count": 2,
+      "sub_batch_count": 1,
       "diagnostics": {
         "sub_batch_count": 1,
         "split_reasons": [],
-        "models_attempted": [
-          "meta-llama/llama-4-scout-17b-16e-instruct"
-        ],
-        "estimated_input_tokens_max": 968,
-        "serialized_request_bytes_max": 5856,
+        "models_attempted": [],
+        "estimated_input_tokens_max": 0,
+        "serialized_request_bytes_max": 0,
         "rate_limit_waits": 0,
         "partial_article_count": 0,
         "synthesis_wait_seconds_total": 0.0,
@@ -3564,18 +3628,16 @@
       ],
       "analysis_profile": "standard",
       "model_used": "meta-llama/llama-4-scout-17b-16e-instruct",
-      "sub_batch_count": 2,
+      "sub_batch_count": 1,
       "diagnostics": {
         "sub_batch_count": 1,
         "split_reasons": [],
-        "models_attempted": [
-          "meta-llama/llama-4-scout-17b-16e-instruct"
-        ],
-        "estimated_input_tokens_max": 846,
-        "serialized_request_bytes_max": 5301,
-        "rate_limit_waits": 1,
+        "models_attempted": [],
+        "estimated_input_tokens_max": 0,
+        "serialized_request_bytes_max": 0,
+        "rate_limit_waits": 0,
         "partial_article_count": 0,
-        "synthesis_wait_seconds_total": 2678.4,
+        "synthesis_wait_seconds_total": 0.0,
         "synthesis_retry_count": 0,
         "synthesis_retry_skipped_count": 0,
         "synthesis_budget_exhausted": false,
@@ -3588,32 +3650,118 @@
     },
     {
       "category": "地產新聞",
-      "article_count": 2,
+      "article_count": 4,
       "status": "success",
       "key_developments": [
-        "恒地、希慎、帝國集團及市建局合作的首岸項目第1期首批單位已開價，最快下周初加推價單2號。",
-        "首岸第1期首批提供110伙，折實售價638萬至1215.12萬元，折實呎價17365至20065元。",
-        "長實旗下名日．九肚山項目錄得一宗3房吐露港海景單位成交，折實售價1832.5萬元，實呎價17402元。"
+        "啟德海灣第2期首輪沽127伙，套現逾9億元，最高成交呎價逾2.4萬元。",
+        "柏傲莊III首輪價單發售88伙，即日沽清，合共套現逾9.5億元。",
+        "名日．九肚山項目錄得一宗3房吐露港海景單位成交，折實售價1832.5萬元，實呎價17402元。"
       ],
       "named_entities": [
         {
-          "name": "韓家輝",
-          "type": "person"
-        },
-        {
-          "name": "恒地",
+          "name": "嘉華國際",
           "type": "company"
         },
         {
-          "name": "希慎",
+          "name": "啟德海灣",
+          "type": "institution"
+        },
+        {
+          "name": "新世界發展",
           "type": "company"
         },
         {
-          "name": "帝國集團",
+          "name": "港鐵",
           "type": "company"
         }
       ],
       "articles": [
+        {
+          "source_article_id": "4375257",
+          "title": "新盤丨啟德海灣第2期首輪沽127伙 加推118伙",
+          "canonical_url": "https://www.hkej.com/instantnews/property/article/4375257/%E6%96%B0%E7%9B%A4%E4%B8%A8%E5%95%9F%E5%BE%B7%E6%B5%B7%E7%81%A3%E7%AC%AC2%E6%9C%9F%E9%A6%96%E8%BC%AA%E6%B2%BD127%E4%BC%99+%E5%8A%A0%E6%8E%A8118%E4%BC%99",
+          "published_at": "2026-04-18T21:59:00+08:00",
+          "section": "新盤情報",
+          "novelty_score": 6,
+          "relevance_score": 8,
+          "urgency_score": 7,
+          "named_entities": [
+            {
+              "name": "嘉華國際",
+              "type": "company"
+            },
+            {
+              "name": "啟德海灣",
+              "type": "institution"
+            }
+          ],
+          "key_points": [
+            "啟德海灣第2期首輪沽127伙，套現逾9億元，最高成交呎價逾2.4萬元。",
+            "發展商加推第2號價單，共118伙應市，折實平均呎價約21932元。"
+          ],
+          "content_truncated": false,
+          "original_content_length_chars": 321,
+          "analyzed_content_length_chars": 321,
+          "original_content_token_estimate": 81,
+          "analyzed_content_token_estimate": 81,
+          "truncation_reason": null,
+          "analysis_method": "full_text",
+          "attention_tier": "medium",
+          "theme": "general",
+          "attention_reason": "Default medium attention because the story is relevant but not an obvious top-priority market mover.",
+          "must_keep": false,
+          "model_used": "meta-llama/llama-4-scout-17b-16e-instruct",
+          "delayed_retry_attempted": false,
+          "delayed_retry_model_chain": [],
+          "delayed_retry_final_model": null,
+          "error_classification": null,
+          "error": null
+        },
+        {
+          "source_article_id": "4375256",
+          "title": "新盤丨柏傲莊III首輪價單發售88伙 即日沽清",
+          "canonical_url": "https://www.hkej.com/instantnews/property/article/4375256/%E6%96%B0%E7%9B%A4%E4%B8%A8%E6%9F%8F%E5%82%B2%E8%8E%8AIII%E9%A6%96%E8%BC%AA%E5%83%B9%E5%96%AE%E7%99%BC%E5%94%AE88%E4%BC%99+%E5%8D%B3%E6%97%A5%E6%B2%BD%E6%B8%85",
+          "published_at": "2026-04-18T21:54:00+08:00",
+          "section": "新盤情報",
+          "novelty_score": 5,
+          "relevance_score": 8,
+          "urgency_score": 8,
+          "named_entities": [
+            {
+              "name": "新世界發展",
+              "type": "company"
+            },
+            {
+              "name": "港鐵",
+              "type": "company"
+            },
+            {
+              "name": "柏傲莊III",
+              "type": "institution"
+            }
+          ],
+          "key_points": [
+            "柏傲莊III首輪價單發售88伙，即日沽清，合共套現逾9.5億元。",
+            "項目短短4個銷售日售出169伙，套現近30億元。"
+          ],
+          "content_truncated": false,
+          "original_content_length_chars": 412,
+          "analyzed_content_length_chars": 412,
+          "original_content_token_estimate": 103,
+          "analyzed_content_token_estimate": 103,
+          "truncation_reason": null,
+          "analysis_method": "full_text",
+          "attention_tier": "medium",
+          "theme": "general",
+          "attention_reason": "Default medium attention because the story is relevant but not an obvious top-priority market mover.",
+          "must_keep": false,
+          "model_used": "meta-llama/llama-4-scout-17b-16e-instruct",
+          "delayed_retry_attempted": false,
+          "delayed_retry_model_chain": [],
+          "delayed_retry_final_model": null,
+          "error_classification": null,
+          "error": null
+        },
         {
           "source_article_id": "4375250",
           "title": "新盤丨韓家輝:首岸最快下周初加推 月底首輪銷售",
@@ -3713,31 +3861,117 @@
         {
           "title": "地產新聞 overview",
           "theme_rationale": "Single subgroup because the category size did not require thematic splitting.",
-          "article_count": 2,
+          "article_count": 4,
           "key_developments": [
-            "恒地、希慎、帝國集團及市建局合作的首岸項目第1期首批單位已開價，最快下周初加推價單2號。",
-            "首岸第1期首批提供110伙，折實售價638萬至1215.12萬元，折實呎價17365至20065元。",
-            "長實旗下名日．九肚山項目錄得一宗3房吐露港海景單位成交，折實售價1832.5萬元，實呎價17402元。"
+            "啟德海灣第2期首輪沽127伙，套現逾9億元，最高成交呎價逾2.4萬元。",
+            "柏傲莊III首輪價單發售88伙，即日沽清，合共套現逾9.5億元。",
+            "名日．九肚山項目錄得一宗3房吐露港海景單位成交，折實售價1832.5萬元，實呎價17402元。"
           ],
           "named_entities": [
             {
-              "name": "韓家輝",
-              "type": "person"
-            },
-            {
-              "name": "恒地",
+              "name": "嘉華國際",
               "type": "company"
             },
             {
-              "name": "希慎",
+              "name": "啟德海灣",
+              "type": "institution"
+            },
+            {
+              "name": "新世界發展",
               "type": "company"
             },
             {
-              "name": "帝國集團",
+              "name": "港鐵",
               "type": "company"
             }
           ],
           "articles": [
+            {
+              "source_article_id": "4375257",
+              "title": "新盤丨啟德海灣第2期首輪沽127伙 加推118伙",
+              "canonical_url": "https://www.hkej.com/instantnews/property/article/4375257/%E6%96%B0%E7%9B%A4%E4%B8%A8%E5%95%9F%E5%BE%B7%E6%B5%B7%E7%81%A3%E7%AC%AC2%E6%9C%9F%E9%A6%96%E8%BC%AA%E6%B2%BD127%E4%BC%99+%E5%8A%A0%E6%8E%A8118%E4%BC%99",
+              "published_at": "2026-04-18T21:59:00+08:00",
+              "section": "新盤情報",
+              "novelty_score": 6,
+              "relevance_score": 8,
+              "urgency_score": 7,
+              "named_entities": [
+                {
+                  "name": "嘉華國際",
+                  "type": "company"
+                },
+                {
+                  "name": "啟德海灣",
+                  "type": "institution"
+                }
+              ],
+              "key_points": [
+                "啟德海灣第2期首輪沽127伙，套現逾9億元，最高成交呎價逾2.4萬元。",
+                "發展商加推第2號價單，共118伙應市，折實平均呎價約21932元。"
+              ],
+              "content_truncated": false,
+              "original_content_length_chars": 321,
+              "analyzed_content_length_chars": 321,
+              "original_content_token_estimate": 81,
+              "analyzed_content_token_estimate": 81,
+              "truncation_reason": null,
+              "analysis_method": "full_text",
+              "attention_tier": "medium",
+              "theme": "general",
+              "attention_reason": "Default medium attention because the story is relevant but not an obvious top-priority market mover.",
+              "must_keep": false,
+              "model_used": "meta-llama/llama-4-scout-17b-16e-instruct",
+              "delayed_retry_attempted": false,
+              "delayed_retry_model_chain": [],
+              "delayed_retry_final_model": null,
+              "error_classification": null,
+              "error": null
+            },
+            {
+              "source_article_id": "4375256",
+              "title": "新盤丨柏傲莊III首輪價單發售88伙 即日沽清",
+              "canonical_url": "https://www.hkej.com/instantnews/property/article/4375256/%E6%96%B0%E7%9B%A4%E4%B8%A8%E6%9F%8F%E5%82%B2%E8%8E%8AIII%E9%A6%96%E8%BC%AA%E5%83%B9%E5%96%AE%E7%99%BC%E5%94%AE88%E4%BC%99+%E5%8D%B3%E6%97%A5%E6%B2%BD%E6%B8%85",
+              "published_at": "2026-04-18T21:54:00+08:00",
+              "section": "新盤情報",
+              "novelty_score": 5,
+              "relevance_score": 8,
+              "urgency_score": 8,
+              "named_entities": [
+                {
+                  "name": "新世界發展",
+                  "type": "company"
+                },
+                {
+                  "name": "港鐵",
+                  "type": "company"
+                },
+                {
+                  "name": "柏傲莊III",
+                  "type": "institution"
+                }
+              ],
+              "key_points": [
+                "柏傲莊III首輪價單發售88伙，即日沽清，合共套現逾9.5億元。",
+                "項目短短4個銷售日售出169伙，套現近30億元。"
+              ],
+              "content_truncated": false,
+              "original_content_length_chars": 412,
+              "analyzed_content_length_chars": 412,
+              "original_content_token_estimate": 103,
+              "analyzed_content_token_estimate": 103,
+              "truncation_reason": null,
+              "analysis_method": "full_text",
+              "attention_tier": "medium",
+              "theme": "general",
+              "attention_reason": "Default medium attention because the story is relevant but not an obvious top-priority market mover.",
+              "must_keep": false,
+              "model_used": "meta-llama/llama-4-scout-17b-16e-instruct",
+              "delayed_retry_attempted": false,
+              "delayed_retry_model_chain": [],
+              "delayed_retry_final_model": null,
+              "error_classification": null,
+              "error": null
+            },
             {
               "source_article_id": "4375250",
               "title": "新盤丨韓家輝:首岸最快下周初加推 月底首輪銷售",
@@ -3838,15 +4072,15 @@
       ],
       "analysis_profile": "light",
       "model_used": "meta-llama/llama-4-scout-17b-16e-instruct",
-      "sub_batch_count": 2,
+      "sub_batch_count": 3,
       "diagnostics": {
-        "sub_batch_count": 1,
+        "sub_batch_count": 3,
         "split_reasons": [],
         "models_attempted": [
           "meta-llama/llama-4-scout-17b-16e-instruct"
         ],
-        "estimated_input_tokens_max": 904,
-        "serialized_request_bytes_max": 5040,
+        "estimated_input_tokens_max": 918,
+        "serialized_request_bytes_max": 5260,
         "rate_limit_waits": 0,
         "partial_article_count": 0,
         "synthesis_wait_seconds_total": 0.0,
