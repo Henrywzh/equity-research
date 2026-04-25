@@ -1,15 +1,15 @@
 {
   "report_schema_version": 6,
   "report_date": "2026-04-25",
-  "generated_at": "2026-04-25T08:43:12.305635+00:00",
+  "generated_at": "2026-04-25T21:25:10.541499+00:00",
   "source_site": "hkej",
   "status": "success",
-  "executive_summary": [
+  "executive_summary": [],
+  "legacy_executive_summary": [
     "歐洲股市反覆偏軟，泛歐指數Stoxx 600收市回吐0.58%，報610點。",
     "美股納指收市創新高，漲幅1.63%，報24836點。",
     "輝達股價創新高，收市漲4.3%，報208.26美元。"
   ],
-  "legacy_executive_summary": [],
   "model": {
     "provider": "groq",
     "primary_model": "meta-llama/llama-4-scout-17b-16e-instruct",
@@ -20,18 +20,18 @@
   },
   "model_switches": [],
   "input": {
-    "article_count": 32,
-    "category_count": 5
+    "article_count": 38,
+    "category_count": 6
   },
   "diagnostics": {
-    "rate_limit_wait_count": 2,
-    "rate_limit_wait_seconds_total": 2073.597,
+    "rate_limit_wait_count": 1,
+    "rate_limit_wait_seconds_total": 1296.0,
     "fallback_switch_count": 0,
     "key_rotation_count": 0,
-    "pre_send_split_count": 10,
+    "pre_send_split_count": 7,
     "response_413_split_count": 0,
     "json_repair_retry_count": 0,
-    "batch_count": 41,
+    "batch_count": 27,
     "failed_batch_count": 0,
     "delayed_retry_candidate_count": 0,
     "delayed_retry_attempted_count": 0,
@@ -44,18 +44,18 @@
     "degraded_merge_count": 0
   },
   "incremental": {
-    "reused_successful_articles": 0,
-    "new_articles_analyzed": 32,
+    "reused_successful_articles": 32,
+    "new_articles_analyzed": 6,
     "retried_previous_day_articles": 0,
     "previous_day_retry_successes": 0
   },
   "daily_stats": {
-    "total_scraped": 32,
-    "analyzed": 32,
+    "total_scraped": 38,
+    "analyzed": 38,
     "success_rate": 100.0
   },
   "macro_release_digest": {
-    "generated_at": "2026-04-25T08:06:51.903757+00:00",
+    "generated_at": "2026-04-25T21:03:12.840288+00:00",
     "window_start": "2026-04-25",
     "window_end": "2026-05-01",
     "fetch_status": "partial",
@@ -94,12 +94,12 @@
   },
   "unresolved_articles": [],
   "totals": {
-    "article_count": 32,
-    "successful_article_analyses": 32,
+    "article_count": 38,
+    "successful_article_analyses": 38,
     "failed_article_analyses": 0,
-    "full_text_article_count": 32,
+    "full_text_article_count": 38,
     "truncated_article_count": 0,
-    "successful_categories": 5,
+    "successful_categories": 6,
     "partial_categories": 0,
     "failed_categories": 0
   },
@@ -111,9 +111,9 @@
       "status": "success",
       "key_developments": [
         "歐洲股市反覆偏軟，泛歐指數Stoxx 600收市回吐0.58%，報610點。",
-        "美股納指收市創新高，漲幅1.63%，報24836點。",
-        "輝達股價創新高，收市漲4.3%，報208.26美元。",
-        "谷歌承諾以3500億美元的估值，立即向Anthropic投資100億美元現金。"
+        "美股納指收市創新高，輝達破頂，英特爾飆逾23%。",
+        "谷歌承諾以3500億美元的估值，立即向Anthropic投資100億美元現金。",
+        "藥廠諾和諾德股價上漲5.4%，競爭對手禮來新推出的減肥藥處方數據顯示，諾和諾德的藥物仍保持增長勢頭。"
       ],
       "named_entities": [
         {
@@ -642,9 +642,9 @@
           "article_count": 10,
           "key_developments": [
             "歐洲股市反覆偏軟，泛歐指數Stoxx 600收市回吐0.58%，報610點。",
-            "美股納指收市創新高，漲幅1.63%，報24836點。",
-            "輝達股價創新高，收市漲4.3%，報208.26美元。",
-            "谷歌承諾以3500億美元的估值，立即向Anthropic投資100億美元現金。"
+            "美股納指收市創新高，輝達破頂，英特爾飆逾23%。",
+            "谷歌承諾以3500億美元的估值，立即向Anthropic投資100億美元現金。",
+            "藥廠諾和諾德股價上漲5.4%，競爭對手禮來新推出的減肥藥處方數據顯示，諾和諾德的藥物仍保持增長勢頭。"
           ],
           "named_entities": [
             {
@@ -1171,54 +1171,98 @@
       ],
       "analysis_profile": "standard",
       "model_used": "meta-llama/llama-4-scout-17b-16e-instruct",
-      "sub_batch_count": 9,
+      "sub_batch_count": 3,
       "diagnostics": {
-        "sub_batch_count": 6,
-        "split_reasons": [
-          "pre_send_budget"
-        ],
-        "models_attempted": [
-          "meta-llama/llama-4-scout-17b-16e-instruct"
-        ],
-        "estimated_input_tokens_max": 1670,
-        "serialized_request_bytes_max": 11703,
-        "rate_limit_waits": 1,
+        "sub_batch_count": 3,
+        "split_reasons": [],
+        "models_attempted": [],
+        "estimated_input_tokens_max": 0,
+        "serialized_request_bytes_max": 0,
+        "rate_limit_waits": 0,
         "partial_article_count": 0,
-        "synthesis_wait_seconds_total": 1209.598,
+        "synthesis_wait_seconds_total": 0.0,
         "synthesis_retry_count": 0,
         "synthesis_retry_skipped_count": 0,
         "synthesis_budget_exhausted": false,
         "degraded_merge_used": false,
         "degraded_merge_reason": "",
-        "synthesis_merge_depth_max": 1,
+        "synthesis_merge_depth_max": 0,
         "model_switches": []
       },
       "error": null
     },
     {
       "category": "時事脈搏",
-      "article_count": 19,
+      "article_count": 22,
       "status": "success",
       "key_developments": [],
       "named_entities": [
         {
-          "name": "伊朗",
-          "type": "country"
+          "name": "Transport Department",
+          "type": "institution"
         },
         {
-          "name": "巴基斯坦",
-          "type": "country"
+          "name": "海關",
+          "type": "institution"
         },
         {
-          "name": "阿拉格齊",
+          "name": "孫玉菡",
           "type": "person"
         },
         {
-          "name": "美國",
-          "type": "country"
+          "name": "楊何蓓茵",
+          "type": "person"
         }
       ],
       "articles": [
+        {
+          "source_article_id": "4382588",
+          "canonical_url": "https://www.hkej.com/instantnews/current/article/4382588/%E5%AD%AB%E7%8E%89%E8%8F%A1%3A%E8%A6%81%E5%81%9A%E5%A5%BD%E4%BA%BA%E6%89%8D%E5%B7%A5%E4%BD%9C+%E9%9B%A2%E4%B8%8D%E9%96%8B%E7%94%9F%E6%85%8B%E5%BB%BA%E8%A8%AD",
+          "title": "孫玉菡:要做好人才工作 離不開生態建設",
+          "section": "時事脈搏",
+          "published_at": "2026-04-25T17:59:00+08:00",
+          "attention_tier": "light",
+          "novelty_score": 5,
+          "relevance_score": 5,
+          "urgency_score": 5,
+          "named_entities": [],
+          "key_points": [],
+          "content_truncated": false,
+          "analysis_method": "bypassed",
+          "model_used": "direct"
+        },
+        {
+          "source_article_id": "4382587",
+          "canonical_url": "https://www.hkej.com/instantnews/current/article/4382587/%E9%98%BFMo%E7%88%B6%E8%A6%AA%E6%9D%8E%E7%9B%9B%E6%9E%97%E7%89%A7%E5%B8%AB%E9%9B%A2%E4%B8%96",
+          "title": "阿Mo父親李盛林牧師離世",
+          "section": "時事脈搏",
+          "published_at": "2026-04-25T17:41:00+08:00",
+          "attention_tier": "light",
+          "novelty_score": 5,
+          "relevance_score": 5,
+          "urgency_score": 5,
+          "named_entities": [],
+          "key_points": [],
+          "content_truncated": false,
+          "analysis_method": "bypassed",
+          "model_used": "direct"
+        },
+        {
+          "source_article_id": "4382586",
+          "canonical_url": "https://www.hkej.com/instantnews/current/article/4382586/%E6%A5%8A%E4%BD%95%E8%93%93%E8%8C%B5%3A%E7%A0%94%E4%BF%AE%E7%8F%AD%E5%B0%8D%E5%B8%B8%E7%A7%98%E5%92%8C%E9%83%A8%E9%96%80%E9%A6%96%E9%95%B7%E6%97%A5%E5%BE%8C%E5%B7%A5%E4%BD%9C%E5%AE%9A%E5%BF%85%E6%9C%89%E5%B9%AB%E5%8A%A9",
+          "title": "楊何蓓茵:研修班對常秘和部門首長日後工作定必有幫助",
+          "section": "時事脈搏",
+          "published_at": "2026-04-25T17:13:00+08:00",
+          "attention_tier": "light",
+          "novelty_score": 5,
+          "relevance_score": 5,
+          "urgency_score": 5,
+          "named_entities": [],
+          "key_points": [],
+          "content_truncated": false,
+          "analysis_method": "bypassed",
+          "model_used": "direct"
+        },
         {
           "source_article_id": "4382584",
           "canonical_url": "https://www.hkej.com/instantnews/current/article/4382584/%E6%A2%85%E5%BD%A5%E6%98%8C%E8%BE%AD%E4%BB%BB%E6%A0%A1%E9%95%B7+%E5%9F%8E%E5%A4%A7%3A%E4%B8%8D%E4%BD%9C%E9%80%B2%E4%B8%80%E6%AD%A5%E8%A9%95%E8%AB%96%E5%92%8C%E6%8A%AB%E9%9C%B2",
@@ -1233,7 +1277,10 @@
           "key_points": [],
           "content_truncated": false,
           "analysis_method": "bypassed",
-          "model_used": "direct"
+          "model_used": "direct",
+          "theme": "general",
+          "attention_reason": "Lighter treatment because this story sits in the 時事脈搏 section without strong market-moving signals.",
+          "must_keep": false
         },
         {
           "source_article_id": "4382583",
@@ -1249,7 +1296,10 @@
           "key_points": [],
           "content_truncated": false,
           "analysis_method": "bypassed",
-          "model_used": "direct"
+          "model_used": "direct",
+          "theme": "general",
+          "attention_reason": "Lighter treatment because this story sits in the 時事脈搏 section without strong market-moving signals.",
+          "must_keep": false
         },
         {
           "source_article_id": "4382581",
@@ -1314,7 +1364,10 @@
           "key_points": [],
           "content_truncated": false,
           "analysis_method": "bypassed",
-          "model_used": "direct"
+          "model_used": "direct",
+          "theme": "general",
+          "attention_reason": "Lighter treatment because this story sits in the 時事脈搏 section without strong market-moving signals.",
+          "must_keep": false
         },
         {
           "source_article_id": "4382577",
@@ -1330,7 +1383,10 @@
           "key_points": [],
           "content_truncated": false,
           "analysis_method": "bypassed",
-          "model_used": "direct"
+          "model_used": "direct",
+          "theme": "general",
+          "attention_reason": "Lighter treatment because this story sits in the 時事脈搏 section without strong market-moving signals.",
+          "must_keep": false
         },
         {
           "source_article_id": "4382576",
@@ -1346,7 +1402,10 @@
           "key_points": [],
           "content_truncated": false,
           "analysis_method": "bypassed",
-          "model_used": "direct"
+          "model_used": "direct",
+          "theme": "general",
+          "attention_reason": "Lighter treatment because this story sits in the 時事脈搏 section without strong market-moving signals.",
+          "must_keep": false
         },
         {
           "source_article_id": "4382575",
@@ -1362,7 +1421,10 @@
           "key_points": [],
           "content_truncated": false,
           "analysis_method": "bypassed",
-          "model_used": "direct"
+          "model_used": "direct",
+          "theme": "general",
+          "attention_reason": "Lighter treatment because this story sits in the 時事脈搏 section without strong market-moving signals.",
+          "must_keep": false
         },
         {
           "source_article_id": "4382574",
@@ -1378,7 +1440,10 @@
           "key_points": [],
           "content_truncated": false,
           "analysis_method": "bypassed",
-          "model_used": "direct"
+          "model_used": "direct",
+          "theme": "general",
+          "attention_reason": "Lighter treatment because this story sits in the 時事脈搏 section without strong market-moving signals.",
+          "must_keep": false
         },
         {
           "source_article_id": "4382571",
@@ -1394,7 +1459,10 @@
           "key_points": [],
           "content_truncated": false,
           "analysis_method": "bypassed",
-          "model_used": "direct"
+          "model_used": "direct",
+          "theme": "general",
+          "attention_reason": "Lighter treatment because this story sits in the 時事脈搏 section without strong market-moving signals.",
+          "must_keep": false
         },
         {
           "source_article_id": "4382569",
@@ -1775,7 +1843,10 @@
           "key_points": [],
           "content_truncated": false,
           "analysis_method": "bypassed",
-          "model_used": "direct"
+          "model_used": "direct",
+          "theme": "general",
+          "attention_reason": "Lighter treatment because this story sits in the 時事脈搏 section without strong market-moving signals.",
+          "must_keep": false
         },
         {
           "source_article_id": "4382547",
@@ -1829,182 +1900,126 @@
       ],
       "subgroups": [
         {
-          "title": "中東地緣政治 & Other News",
-          "theme_rationale": "涉及中東國家間的政治、外交和國際關係",
-          "article_count": 12,
+          "title": "Local News and General Affairs & Other News",
+          "theme_rationale": "This subgroup includes articles related to local news, general affairs, and social issues.",
+          "article_count": 10,
           "key_developments": [
-            "伊朗外長阿拉格齊抵達巴基斯坦首都伊斯蘭堡，與巴基斯坦高層官員會面。",
-            "伊朗半官方塔斯尼姆通訊社否認議會議長卡利巴夫退出對美國談判團隊的報道，稱其仍將與外長阿拉格齊一同前往巴基斯坦伊斯蘭堡與美方會談。",
-            "美代表團將於周六赴巴基斯坦進行談判，萬斯隨時待命。"
+            "The government has announced a ban on carrying electronic cigarettes outside, effective Thursday.",
+            "The Transport Department plans to accelerate the promotion of autonomous driving technology, transitioning to practical operation.",
+            "海關今年檢獲約2萬公升未完稅汽油，拘捕14人。"
           ],
           "named_entities": [
             {
-              "name": "伊朗",
-              "type": "country"
+              "name": "Transport Department",
+              "type": "institution"
             },
             {
-              "name": "巴基斯坦",
-              "type": "country"
-            },
-            {
-              "name": "阿拉格齊",
-              "type": "person"
-            },
-            {
-              "name": "美國",
-              "type": "country"
+              "name": "海關",
+              "type": "institution"
             }
           ],
           "articles": [
             {
-              "source_article_id": "4382560",
-              "title": "美伊談判丨伊朗外長抵達巴基斯坦",
-              "canonical_url": "https://www.hkej.com/instantnews/current/article/4382560/%E7%BE%8E%E4%BC%8A%E8%AB%87%E5%88%A4%E4%B8%A8%E4%BC%8A%E6%9C%97%E5%A4%96%E9%95%B7%E6%8A%B5%E9%81%94%E5%B7%B4%E5%9F%BA%E6%96%AF%E5%9D%A6",
-              "published_at": "2026-04-25T03:40:00+08:00",
+              "source_article_id": "4382579",
+              "canonical_url": "https://www.hkej.com/instantnews/current/article/4382579/%E9%9B%BB%E5%AD%90%E7%85%99%E4%B8%A8%E5%91%A8%E5%9B%9B%E8%B5%B7%E7%A6%81%E5%A4%96%E6%94%9C+%E8%AD%A6%E6%96%B9%3A%E4%B8%8D%E4%B8%BB%E5%8B%95%E5%9F%B7%E6%B3%95+%E5%80%8B%E6%A1%88%E8%BD%89%E4%BB%8B%E6%8E%A7%E7%85%99%E8%BE%A6",
+              "title": "電子煙丨周四起禁外攜 警方:不主動執法 個案轉介控煙辦",
               "section": "時事脈搏",
+              "published_at": "2026-04-25T12:30:00+08:00",
+              "attention_tier": "light",
               "novelty_score": 5,
-              "relevance_score": 7,
-              "urgency_score": 8,
-              "named_entities": [
-                {
-                  "name": "伊朗",
-                  "type": "country"
-                },
-                {
-                  "name": "巴基斯坦",
-                  "type": "country"
-                },
-                {
-                  "name": "阿拉格齊",
-                  "type": "person"
-                }
-              ],
-              "key_points": [
-                "伊朗外長阿拉格齊抵達巴基斯坦首都伊斯蘭堡，與巴基斯坦高層官員會面。",
-                "阿拉格齊是否與美國特使舉行會晤尚未確定。"
-              ],
+              "relevance_score": 5,
+              "urgency_score": 5,
+              "named_entities": [],
+              "key_points": [],
               "content_truncated": false,
-              "original_content_length_chars": 248,
-              "analyzed_content_length_chars": 248,
-              "original_content_token_estimate": 62,
-              "analyzed_content_token_estimate": 62,
-              "truncation_reason": null,
-              "analysis_method": "full_text",
-              "attention_tier": "high",
-              "theme": "geopolitics",
-              "attention_reason": "High-signal geopolitics headline based on title/summary keywords.",
-              "must_keep": true,
-              "model_used": "meta-llama/llama-4-scout-17b-16e-instruct",
-              "delayed_retry_attempted": false,
-              "delayed_retry_model_chain": [],
-              "delayed_retry_final_model": null,
-              "error_classification": null,
-              "error": null
+              "analysis_method": "bypassed",
+              "model_used": "direct",
+              "theme": "general",
+              "attention_reason": "Lighter treatment because this story sits in the 時事脈搏 section without strong market-moving signals.",
+              "must_keep": false
             },
             {
-              "source_article_id": "4382559",
-              "title": "美伊談判丨伊朗媒體否認卡利巴夫退出談判團隊",
-              "canonical_url": "https://www.hkej.com/instantnews/current/article/4382559/%E7%BE%8E%E4%BC%8A%E8%AB%87%E5%88%A4%E4%B8%A8%E4%BC%8A%E6%9C%97%E5%AA%92%E9%AB%94%E5%90%A6%E8%AA%8D%E5%8D%A1%E5%88%A9%E5%B7%B4%E5%A4%AB%E9%80%80%E5%87%BA%E8%AB%87%E5%88%A4%E5%9C%98%E9%9A%8A",
-              "published_at": "2026-04-25T03:04:00+08:00",
+              "source_article_id": "4382577",
+              "canonical_url": "https://www.hkej.com/instantnews/current/article/4382577/%E5%AE%8F%E7%A6%8F%E8%8B%91%E4%B8%A8%E5%91%A8%E4%B8%80%E9%B3%B4%3A%E6%8E%A542%E5%AE%97%E8%B2%A1%E7%89%A9%E9%81%BA%E5%A4%B1%E5%80%8B%E6%A1%88+%E6%B2%92%E6%90%9C%E6%8E%A0%E7%97%95%E8%B7%A1",
+              "title": "宏福苑丨周一鳴:接42宗財物遺失個案 沒搜掠痕跡",
               "section": "時事脈搏",
-              "novelty_score": 6,
-              "relevance_score": 8,
-              "urgency_score": 7,
-              "named_entities": [
-                {
-                  "name": "伊朗",
-                  "type": "country"
-                },
-                {
-                  "name": "美國",
-                  "type": "country"
-                },
-                {
-                  "name": "Mohammad Bagher Ghalibaf",
-                  "type": "person"
-                },
-                {
-                  "name": "Abbas Araghchi",
-                  "type": "person"
-                }
-              ],
-              "key_points": [
-                "伊朗半官方塔斯尼姆通訊社否認議會議長卡利巴夫(Mohammad Bagher Ghalibaf)退出對美國談判團隊的報道，稱其仍將與外長阿拉格齊(Abbas Araghchi)一同前往巴基斯坦伊斯蘭堡與美方會談。",
-                "伊朗議會辦公室進一步澄清尚未安排新的談判輪次，但官員表示德黑蘭正透過幕後交流努力恢復與美國的對話。"
-              ],
+              "published_at": "2026-04-25T11:59:00+08:00",
+              "attention_tier": "light",
+              "novelty_score": 5,
+              "relevance_score": 5,
+              "urgency_score": 5,
+              "named_entities": [],
+              "key_points": [],
               "content_truncated": false,
-              "original_content_length_chars": 242,
-              "analyzed_content_length_chars": 242,
-              "original_content_token_estimate": 61,
-              "analyzed_content_token_estimate": 61,
-              "truncation_reason": null,
-              "analysis_method": "full_text",
-              "attention_tier": "high",
-              "theme": "geopolitics",
-              "attention_reason": "High-signal geopolitics headline based on title/summary keywords.",
-              "must_keep": true,
-              "model_used": "qwen/qwen3-32b",
-              "delayed_retry_attempted": false,
-              "delayed_retry_model_chain": [],
-              "delayed_retry_final_model": null,
-              "error_classification": null,
-              "error": null
+              "analysis_method": "bypassed",
+              "model_used": "direct",
+              "theme": "general",
+              "attention_reason": "Lighter treatment because this story sits in the 時事脈搏 section without strong market-moving signals.",
+              "must_keep": false
             },
             {
-              "source_article_id": "4382557",
-              "title": "中東局勢丨伊朗德黑蘭機場周六恢復赴華航班",
-              "canonical_url": "https://www.hkej.com/instantnews/current/article/4382557/%E4%B8%AD%E6%9D%B1%E5%B1%80%E5%8B%A2%E4%B8%A8%E4%BC%8A%E6%9C%97%E5%BE%B7%E9%BB%91%E8%98%AD%E6%A9%9F%E5%A0%B4%E5%91%A8%E5%85%AD%E6%81%A2%E5%BE%A9%E8%B5%B4%E8%8F%AF%E8%88%AA%E7%8F%AD",
-              "published_at": "2026-04-25T02:27:00+08:00",
+              "source_article_id": "4382576",
+              "canonical_url": "https://www.hkej.com/instantnews/current/article/4382576/%E9%BB%83%E9%87%91%E5%91%A8%E4%B8%A8%E7%BE%85%E6%B7%91%E4%BD%A9%3A%E6%89%93%E6%93%8A%E5%BC%B7%E8%BF%AB%E8%B3%BC%E7%89%A9+%E6%97%85%E7%9B%A3%E5%B1%80%E5%B7%B2%E6%89%93%E9%96%8B%E5%8F%A3%E7%89%8C%E5%8A%A0%E5%BC%B7%E5%B7%A1%E6%9F%A5",
+              "title": "黃金周丨羅淑佩:打擊強迫購物 旅監局已打開口牌加強巡查",
               "section": "時事脈搏",
-              "novelty_score": 6,
-              "relevance_score": 8,
-              "urgency_score": 7,
-              "named_entities": [
-                {
-                  "name": "伊朗",
-                  "type": "country"
-                },
-                {
-                  "name": "德黑蘭霍梅尼國際機場",
-                  "type": "institution"
-                },
-                {
-                  "name": "土耳其",
-                  "type": "country"
-                },
-                {
-                  "name": "伊斯坦布爾",
-                  "type": "other"
-                }
-              ],
-              "key_points": [
-                "伊朗首都最大的機場德黑蘭霍梅尼國際機場將於周六(25日)起逐步恢復飛往土耳其伊斯坦布爾、阿曼馬斯喀特和中國北京的國際航班。",
-                "首班前往伊斯坦布爾的航班由伊朗航空執飛，將於當地時間周六上午6時45分起飛。"
-              ],
+              "published_at": "2026-04-25T11:48:00+08:00",
+              "attention_tier": "light",
+              "novelty_score": 5,
+              "relevance_score": 5,
+              "urgency_score": 5,
+              "named_entities": [],
+              "key_points": [],
               "content_truncated": false,
-              "original_content_length_chars": 455,
-              "analyzed_content_length_chars": 455,
-              "original_content_token_estimate": 114,
-              "analyzed_content_token_estimate": 114,
-              "truncation_reason": null,
-              "analysis_method": "full_text",
-              "attention_tier": "high",
-              "theme": "geopolitics",
-              "attention_reason": "High-signal geopolitics headline based on title/summary keywords.",
-              "must_keep": true,
-              "model_used": "meta-llama/llama-4-scout-17b-16e-instruct",
-              "delayed_retry_attempted": false,
-              "delayed_retry_model_chain": [],
-              "delayed_retry_final_model": null,
-              "error_classification": null,
-              "error": null
+              "analysis_method": "bypassed",
+              "model_used": "direct",
+              "theme": "general",
+              "attention_reason": "Lighter treatment because this story sits in the 時事脈搏 section without strong market-moving signals.",
+              "must_keep": false
             },
             {
-              "source_article_id": "4382556",
-              "canonical_url": "https://www.hkej.com/instantnews/current/article/4382556/%E7%BE%8E%E4%BC%8A%E8%AB%87%E5%88%A4%E4%B8%A8%E7%99%BD%E5%AE%AE%3A%E7%BE%8E%E4%BB%A3%E8%A1%A8%E5%9C%98%E5%91%A8%E5%85%AD%E8%B5%B4%E5%B7%B4%E5%9F%BA%E6%96%AF%E5%9D%A6+%E8%90%AC%E6%96%AF%E9%9A%A8%E6%99%82%E5%BE%85%E5%91%BD",
-              "title": "美伊談判丨白宮:美代表團周六赴巴基斯坦 萬斯隨時待命",
+              "source_article_id": "4382575",
+              "canonical_url": "https://www.hkej.com/instantnews/current/article/4382575/%E9%81%8B%E8%BC%B8%E7%BD%B2%3A%E5%8A%A0%E5%BF%AB%E6%8E%A8%E5%8B%95%E8%87%AA%E5%8B%95%E9%A7%95%E9%A7%9B%E6%8A%80%E8%A1%93+%E9%81%8E%E6%B8%A1%E8%87%B3%E5%AF%A6%E9%9A%9B%E7%87%9F%E9%81%8B",
+              "title": "運輸署:加快推動自動駕駛技術 過渡至實際營運",
               "section": "時事脈搏",
-              "published_at": "2026-04-25T01:53:00+08:00",
+              "published_at": "2026-04-25T11:11:00+08:00",
+              "attention_tier": "light",
+              "novelty_score": 5,
+              "relevance_score": 5,
+              "urgency_score": 5,
+              "named_entities": [],
+              "key_points": [],
+              "content_truncated": false,
+              "analysis_method": "bypassed",
+              "model_used": "direct",
+              "theme": "general",
+              "attention_reason": "Lighter treatment because this story sits in the 時事脈搏 section without strong market-moving signals.",
+              "must_keep": false
+            },
+            {
+              "source_article_id": "4382574",
+              "canonical_url": "https://www.hkej.com/instantnews/current/article/4382574/%E6%9E%97%E5%AE%9A%E5%9C%8B%3A%E8%AD%A6%E9%9A%8A%E5%B1%AC%E7%B6%AD%E8%AD%B7%E6%B3%95%E6%B2%BB%E7%AC%AC%E4%B8%80%E9%81%93%E9%98%B2%E7%B7%9A",
+              "title": "林定國:警隊屬維護法治第一道防線",
+              "section": "時事脈搏",
+              "published_at": "2026-04-25T11:01:00+08:00",
+              "attention_tier": "light",
+              "novelty_score": 5,
+              "relevance_score": 5,
+              "urgency_score": 5,
+              "named_entities": [],
+              "key_points": [],
+              "content_truncated": false,
+              "analysis_method": "bypassed",
+              "model_used": "direct",
+              "theme": "general",
+              "attention_reason": "Lighter treatment because this story sits in the 時事脈搏 section without strong market-moving signals.",
+              "must_keep": false
+            },
+            {
+              "source_article_id": "4382587",
+              "canonical_url": "https://www.hkej.com/instantnews/current/article/4382587/%E9%98%BFMo%E7%88%B6%E8%A6%AA%E6%9D%8E%E7%9B%9B%E6%9E%97%E7%89%A7%E5%B8%AB%E9%9B%A2%E4%B8%96",
+              "title": "阿Mo父親李盛林牧師離世",
+              "section": "時事脈搏",
+              "published_at": "2026-04-25T17:41:00+08:00",
               "attention_tier": "light",
               "novelty_score": 5,
               "relevance_score": 5,
@@ -2016,53 +2031,23 @@
               "model_used": "direct"
             },
             {
-              "source_article_id": "4382547",
-              "title": "美伊談判丨特朗普考慮派特使 前往巴基斯坦談判伊朗問題",
-              "canonical_url": "https://www.hkej.com/instantnews/current/article/4382547/%E7%BE%8E%E4%BC%8A%E8%AB%87%E5%88%A4%E4%B8%A8%E7%89%B9%E6%9C%97%E6%99%AE%E8%80%83%E6%85%AE%E6%B4%BE%E7%89%B9%E4%BD%BF+%E5%89%8D%E5%BE%80%E5%B7%B4%E5%9F%BA%E6%96%AF%E5%9D%A6%E8%AB%87%E5%88%A4%E4%BC%8A%E6%9C%97%E5%95%8F%E9%A1%8C",
-              "published_at": "2026-04-25T00:03:00+08:00",
+              "source_article_id": "4382583",
+              "canonical_url": "https://www.hkej.com/instantnews/current/article/4382583/%E5%BC%B5%E5%9C%8B%E9%88%9E%3A%E5%90%91%E5%85%A7%E5%9C%B0%E9%83%A8%E9%96%80%E7%88%AD%E5%8F%96%E5%A4%A7%E7%81%A3%E5%8D%80%E5%BE%8B%E5%B8%AB%E5%88%B6%E5%BA%A6%E6%81%92%E5%B8%B8%E5%8C%96",
+              "title": "張國鈞:向內地部門爭取大灣區律師制度恒常化",
               "section": "時事脈搏",
+              "published_at": "2026-04-25T15:24:00+08:00",
+              "attention_tier": "light",
               "novelty_score": 5,
-              "relevance_score": 9,
-              "urgency_score": 8,
-              "named_entities": [
-                {
-                  "name": "美國",
-                  "type": "country"
-                },
-                {
-                  "name": "特朗普",
-                  "type": "person"
-                },
-                {
-                  "name": "威特科夫",
-                  "type": "person"
-                },
-                {
-                  "name": "庫什納",
-                  "type": "person"
-                }
-              ],
-              "key_points": [
-                "美國總統特朗普將派特使威特科夫和女婿庫什納前往巴基斯坦就伊朗問題進行談判。",
-                "伊朗外長阿拉格齊將以伊朗外交代表團團長身份出訪巴基斯坦、阿曼和俄羅斯。"
-              ],
+              "relevance_score": 5,
+              "urgency_score": 5,
+              "named_entities": [],
+              "key_points": [],
               "content_truncated": false,
-              "original_content_length_chars": 328,
-              "analyzed_content_length_chars": 328,
-              "original_content_token_estimate": 82,
-              "analyzed_content_token_estimate": 82,
-              "truncation_reason": null,
-              "analysis_method": "full_text",
-              "attention_tier": "high",
-              "theme": "geopolitics",
-              "attention_reason": "High-signal geopolitics headline based on title/summary keywords.",
-              "must_keep": true,
-              "model_used": "meta-llama/llama-4-scout-17b-16e-instruct",
-              "delayed_retry_attempted": false,
-              "delayed_retry_model_chain": [],
-              "delayed_retry_final_model": null,
-              "error_classification": null,
-              "error": null
+              "analysis_method": "bypassed",
+              "model_used": "direct",
+              "theme": "general",
+              "attention_reason": "Lighter treatment because this story sits in the 時事脈搏 section without strong market-moving signals.",
+              "must_keep": false
             },
             {
               "source_article_id": "4382581",
@@ -2114,22 +2099,6 @@
               "error": null
             },
             {
-              "source_article_id": "4382576",
-              "canonical_url": "https://www.hkej.com/instantnews/current/article/4382576/%E9%BB%83%E9%87%91%E5%91%A8%E4%B8%A8%E7%BE%85%E6%B7%91%E4%BD%A9%3A%E6%89%93%E6%93%8A%E5%BC%B7%E8%BF%AB%E8%B3%BC%E7%89%A9+%E6%97%85%E7%9B%A3%E5%B1%80%E5%B7%B2%E6%89%93%E9%96%8B%E5%8F%A3%E7%89%8C%E5%8A%A0%E5%BC%B7%E5%B7%A1%E6%9F%A5",
-              "title": "黃金周丨羅淑佩:打擊強迫購物 旅監局已打開口牌加強巡查",
-              "section": "時事脈搏",
-              "published_at": "2026-04-25T11:48:00+08:00",
-              "attention_tier": "light",
-              "novelty_score": 5,
-              "relevance_score": 5,
-              "urgency_score": 5,
-              "named_entities": [],
-              "key_points": [],
-              "content_truncated": false,
-              "analysis_method": "bypassed",
-              "model_used": "direct"
-            },
-            {
               "source_article_id": "4382571",
               "canonical_url": "https://www.hkej.com/instantnews/current/article/4382571/%E9%BB%83%E9%87%91%E5%91%A8%E4%B8%A8%E7%BE%85%E6%B7%91%E4%BD%A9%3A%E6%96%9998%E8%90%AC%E4%BA%BA%E6%AC%A1%E5%85%A7%E5%9C%B0%E5%AE%A2%E4%BE%86%E6%B8%AF+%E9%85%92%E5%BA%97%E8%A8%82%E6%88%BF%E7%8E%87%E4%B9%9D%E6%88%90",
               "title": "黃金周丨羅淑佩:料98萬人次內地客來港 酒店訂房率九成",
@@ -2143,55 +2112,10 @@
               "key_points": [],
               "content_truncated": false,
               "analysis_method": "bypassed",
-              "model_used": "direct"
-            },
-            {
-              "source_article_id": "4382577",
-              "canonical_url": "https://www.hkej.com/instantnews/current/article/4382577/%E5%AE%8F%E7%A6%8F%E8%8B%91%E4%B8%A8%E5%91%A8%E4%B8%80%E9%B3%B4%3A%E6%8E%A542%E5%AE%97%E8%B2%A1%E7%89%A9%E9%81%BA%E5%A4%B1%E5%80%8B%E6%A1%88+%E6%B2%92%E6%90%9C%E6%8E%A0%E7%97%95%E8%B7%A1",
-              "title": "宏福苑丨周一鳴:接42宗財物遺失個案 沒搜掠痕跡",
-              "section": "時事脈搏",
-              "published_at": "2026-04-25T11:59:00+08:00",
-              "attention_tier": "light",
-              "novelty_score": 5,
-              "relevance_score": 5,
-              "urgency_score": 5,
-              "named_entities": [],
-              "key_points": [],
-              "content_truncated": false,
-              "analysis_method": "bypassed",
-              "model_used": "direct"
-            },
-            {
-              "source_article_id": "4382574",
-              "canonical_url": "https://www.hkej.com/instantnews/current/article/4382574/%E6%9E%97%E5%AE%9A%E5%9C%8B%3A%E8%AD%A6%E9%9A%8A%E5%B1%AC%E7%B6%AD%E8%AD%B7%E6%B3%95%E6%B2%BB%E7%AC%AC%E4%B8%80%E9%81%93%E9%98%B2%E7%B7%9A",
-              "title": "林定國:警隊屬維護法治第一道防線",
-              "section": "時事脈搏",
-              "published_at": "2026-04-25T11:01:00+08:00",
-              "attention_tier": "light",
-              "novelty_score": 5,
-              "relevance_score": 5,
-              "urgency_score": 5,
-              "named_entities": [],
-              "key_points": [],
-              "content_truncated": false,
-              "analysis_method": "bypassed",
-              "model_used": "direct"
-            },
-            {
-              "source_article_id": "4382575",
-              "canonical_url": "https://www.hkej.com/instantnews/current/article/4382575/%E9%81%8B%E8%BC%B8%E7%BD%B2%3A%E5%8A%A0%E5%BF%AB%E6%8E%A8%E5%8B%95%E8%87%AA%E5%8B%95%E9%A7%95%E9%A7%9B%E6%8A%80%E8%A1%93+%E9%81%8E%E6%B8%A1%E8%87%B3%E5%AF%A6%E9%9A%9B%E7%87%9F%E9%81%8B",
-              "title": "運輸署:加快推動自動駕駛技術 過渡至實際營運",
-              "section": "時事脈搏",
-              "published_at": "2026-04-25T11:11:00+08:00",
-              "attention_tier": "light",
-              "novelty_score": 5,
-              "relevance_score": 5,
-              "urgency_score": 5,
-              "named_entities": [],
-              "key_points": [],
-              "content_truncated": false,
-              "analysis_method": "bypassed",
-              "model_used": "direct"
+              "model_used": "direct",
+              "theme": "general",
+              "attention_reason": "Lighter treatment because this story sits in the 時事脈搏 section without strong market-moving signals.",
+              "must_keep": false
             },
             {
               "source_article_id": "4382569",
@@ -2238,13 +2162,95 @@
           "model_used": "meta-llama/llama-4-scout-17b-16e-instruct"
         },
         {
+          "title": "人事消息",
+          "theme_rationale": "This subgroup includes articles related to personnel changes and appointments.",
+          "article_count": 3,
+          "key_developments": [
+            "孫玉菡強調做好人才工作離不開生態建設",
+            "楊何蓓茵表示研修班對部門首長日後工作有幫助",
+            "梅彥昌辭任城大校長"
+          ],
+          "named_entities": [
+            {
+              "name": "孫玉菡",
+              "type": "person"
+            },
+            {
+              "name": "楊何蓓茵",
+              "type": "person"
+            },
+            {
+              "name": "梅彥昌",
+              "type": "person"
+            },
+            {
+              "name": "城大",
+              "type": "institution"
+            }
+          ],
+          "articles": [
+            {
+              "source_article_id": "4382588",
+              "canonical_url": "https://www.hkej.com/instantnews/current/article/4382588/%E5%AD%AB%E7%8E%89%E8%8F%A1%3A%E8%A6%81%E5%81%9A%E5%A5%BD%E4%BA%BA%E6%89%8D%E5%B7%A5%E4%BD%9C+%E9%9B%A2%E4%B8%8D%E9%96%8B%E7%94%9F%E6%85%8B%E5%BB%BA%E8%A8%AD",
+              "title": "孫玉菡:要做好人才工作 離不開生態建設",
+              "section": "時事脈搏",
+              "published_at": "2026-04-25T17:59:00+08:00",
+              "attention_tier": "light",
+              "novelty_score": 5,
+              "relevance_score": 5,
+              "urgency_score": 5,
+              "named_entities": [],
+              "key_points": [],
+              "content_truncated": false,
+              "analysis_method": "bypassed",
+              "model_used": "direct"
+            },
+            {
+              "source_article_id": "4382586",
+              "canonical_url": "https://www.hkej.com/instantnews/current/article/4382586/%E6%A5%8A%E4%BD%95%E8%93%93%E8%8C%B5%3A%E7%A0%94%E4%BF%AE%E7%8F%AD%E5%B0%8D%E5%B8%B8%E7%A7%98%E5%92%8C%E9%83%A8%E9%96%80%E9%A6%96%E9%95%B7%E6%97%A5%E5%BE%8C%E5%B7%A5%E4%BD%9C%E5%AE%9A%E5%BF%85%E6%9C%89%E5%B9%AB%E5%8A%A9",
+              "title": "楊何蓓茵:研修班對常秘和部門首長日後工作定必有幫助",
+              "section": "時事脈搏",
+              "published_at": "2026-04-25T17:13:00+08:00",
+              "attention_tier": "light",
+              "novelty_score": 5,
+              "relevance_score": 5,
+              "urgency_score": 5,
+              "named_entities": [],
+              "key_points": [],
+              "content_truncated": false,
+              "analysis_method": "bypassed",
+              "model_used": "direct"
+            },
+            {
+              "source_article_id": "4382584",
+              "canonical_url": "https://www.hkej.com/instantnews/current/article/4382584/%E6%A2%85%E5%BD%A5%E6%98%8C%E8%BE%AD%E4%BB%BB%E6%A0%A1%E9%95%B7+%E5%9F%8E%E5%A4%A7%3A%E4%B8%8D%E4%BD%9C%E9%80%B2%E4%B8%80%E6%AD%A5%E8%A9%95%E8%AB%96%E5%92%8C%E6%8A%AB%E9%9C%B2",
+              "title": "梅彥昌辭任校長 城大:不作進一步評論和披露",
+              "section": "時事脈搏",
+              "published_at": "2026-04-25T15:53:00+08:00",
+              "attention_tier": "light",
+              "novelty_score": 5,
+              "relevance_score": 5,
+              "urgency_score": 5,
+              "named_entities": [],
+              "key_points": [],
+              "content_truncated": false,
+              "analysis_method": "bypassed",
+              "model_used": "direct",
+              "theme": "general",
+              "attention_reason": "Lighter treatment because this story sits in the 時事脈搏 section without strong market-moving signals.",
+              "must_keep": false
+            }
+          ],
+          "model_used": "meta-llama/llama-4-scout-17b-16e-instruct"
+        },
+        {
           "title": "地緣政治局勢",
           "theme_rationale": "國際關係與衝突相關新聞",
-          "article_count": 4,
+          "article_count": 3,
           "key_developments": [
             "以色列與黎巴嫩臨時停火將延長三周，聯合國秘書長古特雷斯歡迎停火延長。",
-            "伊朗扣押一艘名為「Epaminodes」的貨船，涉嫌與美軍合作。",
-            "伊朗最高領袖表示人民建構全國防線給敵人沉重打擊"
+            "伊朗最高領袖強調人民建構全國防線，給敵人沉重打擊。",
+            "伊朗外長阿拉格齊率領代表團抵達巴基斯坦首都伊斯蘭堡，與美國總統特朗普的特使進行間接談判。"
           ],
           "named_entities": [
             {
@@ -2400,7 +2406,38 @@
               "delayed_retry_final_model": null,
               "error_classification": null,
               "error": null
+            }
+          ],
+          "model_used": "meta-llama/llama-4-scout-17b-16e-instruct"
+        },
+        {
+          "title": "中東地緣政治局勢",
+          "theme_rationale": "聚焦中東地區的地緣政治緊張局勢與外交互動。",
+          "article_count": 3,
+          "key_developments": [
+            "伊朗扣押一艘名為「Epaminodes」的貨船，涉嫌與美軍合作。",
+            "伊朗外長阿拉格齊抵達巴基斯坦首都伊斯蘭堡，與巴基斯坦高層官員會面。",
+            "伊朗半官方塔斯尼姆通訊社否認議會議長卡利巴夫退出對美國談判團隊的報道。"
+          ],
+          "named_entities": [
+            {
+              "name": "伊朗",
+              "type": "country"
             },
+            {
+              "name": "美國",
+              "type": "country"
+            },
+            {
+              "name": "巴基斯坦",
+              "type": "country"
+            },
+            {
+              "name": "Epaminodes",
+              "type": "asset"
+            }
+          ],
+          "articles": [
             {
               "source_article_id": "4382564",
               "title": "中東局勢丨伊朗扣押一艘疑與美軍多次合作船隻",
@@ -2445,56 +2482,187 @@
               "delayed_retry_final_model": null,
               "error_classification": null,
               "error": null
+            },
+            {
+              "source_article_id": "4382560",
+              "title": "美伊談判丨伊朗外長抵達巴基斯坦",
+              "canonical_url": "https://www.hkej.com/instantnews/current/article/4382560/%E7%BE%8E%E4%BC%8A%E8%AB%87%E5%88%A4%E4%B8%A8%E4%BC%8A%E6%9C%97%E5%A4%96%E9%95%B7%E6%8A%B5%E9%81%94%E5%B7%B4%E5%9F%BA%E6%96%AF%E5%9D%A6",
+              "published_at": "2026-04-25T03:40:00+08:00",
+              "section": "時事脈搏",
+              "novelty_score": 5,
+              "relevance_score": 7,
+              "urgency_score": 8,
+              "named_entities": [
+                {
+                  "name": "伊朗",
+                  "type": "country"
+                },
+                {
+                  "name": "巴基斯坦",
+                  "type": "country"
+                },
+                {
+                  "name": "阿拉格齊",
+                  "type": "person"
+                }
+              ],
+              "key_points": [
+                "伊朗外長阿拉格齊抵達巴基斯坦首都伊斯蘭堡，與巴基斯坦高層官員會面。",
+                "阿拉格齊是否與美國特使舉行會晤尚未確定。"
+              ],
+              "content_truncated": false,
+              "original_content_length_chars": 248,
+              "analyzed_content_length_chars": 248,
+              "original_content_token_estimate": 62,
+              "analyzed_content_token_estimate": 62,
+              "truncation_reason": null,
+              "analysis_method": "full_text",
+              "attention_tier": "high",
+              "theme": "geopolitics",
+              "attention_reason": "High-signal geopolitics headline based on title/summary keywords.",
+              "must_keep": true,
+              "model_used": "meta-llama/llama-4-scout-17b-16e-instruct",
+              "delayed_retry_attempted": false,
+              "delayed_retry_model_chain": [],
+              "delayed_retry_final_model": null,
+              "error_classification": null,
+              "error": null
+            },
+            {
+              "source_article_id": "4382559",
+              "title": "美伊談判丨伊朗媒體否認卡利巴夫退出談判團隊",
+              "canonical_url": "https://www.hkej.com/instantnews/current/article/4382559/%E7%BE%8E%E4%BC%8A%E8%AB%87%E5%88%A4%E4%B8%A8%E4%BC%8A%E6%9C%97%E5%AA%92%E9%AB%94%E5%90%A6%E8%AA%8D%E5%8D%A1%E5%88%A9%E5%B7%B4%E5%A4%AB%E9%80%80%E5%87%BA%E8%AB%87%E5%88%A4%E5%9C%98%E9%9A%8A",
+              "published_at": "2026-04-25T03:04:00+08:00",
+              "section": "時事脈搏",
+              "novelty_score": 6,
+              "relevance_score": 8,
+              "urgency_score": 7,
+              "named_entities": [
+                {
+                  "name": "伊朗",
+                  "type": "country"
+                },
+                {
+                  "name": "美國",
+                  "type": "country"
+                },
+                {
+                  "name": "Mohammad Bagher Ghalibaf",
+                  "type": "person"
+                },
+                {
+                  "name": "Abbas Araghchi",
+                  "type": "person"
+                }
+              ],
+              "key_points": [
+                "伊朗半官方塔斯尼姆通訊社否認議會議長卡利巴夫(Mohammad Bagher Ghalibaf)退出對美國談判團隊的報道，稱其仍將與外長阿拉格齊(Abbas Araghchi)一同前往巴基斯坦伊斯蘭堡與美方會談。",
+                "伊朗議會辦公室進一步澄清尚未安排新的談判輪次，但官員表示德黑蘭正透過幕後交流努力恢復與美國的對話。"
+              ],
+              "content_truncated": false,
+              "original_content_length_chars": 242,
+              "analyzed_content_length_chars": 242,
+              "original_content_token_estimate": 61,
+              "analyzed_content_token_estimate": 61,
+              "truncation_reason": null,
+              "analysis_method": "full_text",
+              "attention_tier": "high",
+              "theme": "geopolitics",
+              "attention_reason": "High-signal geopolitics headline based on title/summary keywords.",
+              "must_keep": true,
+              "model_used": "qwen/qwen3-32b",
+              "delayed_retry_attempted": false,
+              "delayed_retry_model_chain": [],
+              "delayed_retry_final_model": null,
+              "error_classification": null,
+              "error": null
             }
           ],
           "model_used": "meta-llama/llama-4-scout-17b-16e-instruct"
         },
         {
-          "title": "國內政策",
-          "theme_rationale": "關注香港國內政策和發展",
+          "title": "中東局勢",
+          "theme_rationale": "聚焦中東地區的地緣政治局勢與外交關係",
           "article_count": 3,
           "key_developments": [
-            "張國鈞表示向內地部門爭取大灣區律師制度恒常化",
-            "梅彥昌辭任城大校長，城大稱不作進一步評論和披露",
-            "周四起香港禁止攜帶電子煙外出，警方稱不主動執法"
+            "伊朗首都最大的機場德黑蘭霍梅尼國際機場將於周六(25日)起逐步恢復飛往土耳其伊斯坦布爾、阿曼馬斯喀特和中國北京的國際航班。",
+            "首班前往伊斯坦布爾的航班由伊朗航空執飛，將於當地時間周六上午6時45分起飛。",
+            "美國總統特朗普將派特使威特科夫和女婿庫什納前往巴基斯坦就伊朗問題進行談判。"
           ],
           "named_entities": [
             {
-              "name": "張國鈞",
-              "type": "person"
+              "name": "伊朗",
+              "type": "country"
             },
             {
-              "name": "梅彥昌",
-              "type": "person"
-            },
-            {
-              "name": "香港大學",
+              "name": "德黑蘭霍梅尼國際機場",
               "type": "institution"
+            },
+            {
+              "name": "土耳其",
+              "type": "country"
+            },
+            {
+              "name": "伊斯坦布爾",
+              "type": "other"
             }
           ],
           "articles": [
             {
-              "source_article_id": "4382584",
-              "canonical_url": "https://www.hkej.com/instantnews/current/article/4382584/%E6%A2%85%E5%BD%A5%E6%98%8C%E8%BE%AD%E4%BB%BB%E6%A0%A1%E9%95%B7+%E5%9F%8E%E5%A4%A7%3A%E4%B8%8D%E4%BD%9C%E9%80%B2%E4%B8%80%E6%AD%A5%E8%A9%95%E8%AB%96%E5%92%8C%E6%8A%AB%E9%9C%B2",
-              "title": "梅彥昌辭任校長 城大:不作進一步評論和披露",
+              "source_article_id": "4382557",
+              "title": "中東局勢丨伊朗德黑蘭機場周六恢復赴華航班",
+              "canonical_url": "https://www.hkej.com/instantnews/current/article/4382557/%E4%B8%AD%E6%9D%B1%E5%B1%80%E5%8B%A2%E4%B8%A8%E4%BC%8A%E6%9C%97%E5%BE%B7%E9%BB%91%E8%98%AD%E6%A9%9F%E5%A0%B4%E5%91%A8%E5%85%AD%E6%81%A2%E5%BE%A9%E8%B5%B4%E8%8F%AF%E8%88%AA%E7%8F%AD",
+              "published_at": "2026-04-25T02:27:00+08:00",
               "section": "時事脈搏",
-              "published_at": "2026-04-25T15:53:00+08:00",
-              "attention_tier": "light",
-              "novelty_score": 5,
-              "relevance_score": 5,
-              "urgency_score": 5,
-              "named_entities": [],
-              "key_points": [],
+              "novelty_score": 6,
+              "relevance_score": 8,
+              "urgency_score": 7,
+              "named_entities": [
+                {
+                  "name": "伊朗",
+                  "type": "country"
+                },
+                {
+                  "name": "德黑蘭霍梅尼國際機場",
+                  "type": "institution"
+                },
+                {
+                  "name": "土耳其",
+                  "type": "country"
+                },
+                {
+                  "name": "伊斯坦布爾",
+                  "type": "other"
+                }
+              ],
+              "key_points": [
+                "伊朗首都最大的機場德黑蘭霍梅尼國際機場將於周六(25日)起逐步恢復飛往土耳其伊斯坦布爾、阿曼馬斯喀特和中國北京的國際航班。",
+                "首班前往伊斯坦布爾的航班由伊朗航空執飛，將於當地時間周六上午6時45分起飛。"
+              ],
               "content_truncated": false,
-              "analysis_method": "bypassed",
-              "model_used": "direct"
+              "original_content_length_chars": 455,
+              "analyzed_content_length_chars": 455,
+              "original_content_token_estimate": 114,
+              "analyzed_content_token_estimate": 114,
+              "truncation_reason": null,
+              "analysis_method": "full_text",
+              "attention_tier": "high",
+              "theme": "geopolitics",
+              "attention_reason": "High-signal geopolitics headline based on title/summary keywords.",
+              "must_keep": true,
+              "model_used": "meta-llama/llama-4-scout-17b-16e-instruct",
+              "delayed_retry_attempted": false,
+              "delayed_retry_model_chain": [],
+              "delayed_retry_final_model": null,
+              "error_classification": null,
+              "error": null
             },
             {
-              "source_article_id": "4382583",
-              "canonical_url": "https://www.hkej.com/instantnews/current/article/4382583/%E5%BC%B5%E5%9C%8B%E9%88%9E%3A%E5%90%91%E5%85%A7%E5%9C%B0%E9%83%A8%E9%96%80%E7%88%AD%E5%8F%96%E5%A4%A7%E7%81%A3%E5%8D%80%E5%BE%8B%E5%B8%AB%E5%88%B6%E5%BA%A6%E6%81%92%E5%B8%B8%E5%8C%96",
-              "title": "張國鈞:向內地部門爭取大灣區律師制度恒常化",
+              "source_article_id": "4382556",
+              "canonical_url": "https://www.hkej.com/instantnews/current/article/4382556/%E7%BE%8E%E4%BC%8A%E8%AB%87%E5%88%A4%E4%B8%A8%E7%99%BD%E5%AE%AE%3A%E7%BE%8E%E4%BB%A3%E8%A1%A8%E5%9C%98%E5%91%A8%E5%85%AD%E8%B5%B4%E5%B7%B4%E5%9F%BA%E6%96%AF%E5%9D%A6+%E8%90%AC%E6%96%AF%E9%9A%A8%E6%99%82%E5%BE%85%E5%91%BD",
+              "title": "美伊談判丨白宮:美代表團周六赴巴基斯坦 萬斯隨時待命",
               "section": "時事脈搏",
-              "published_at": "2026-04-25T15:24:00+08:00",
+              "published_at": "2026-04-25T01:53:00+08:00",
               "attention_tier": "light",
               "novelty_score": 5,
               "relevance_score": 5,
@@ -2503,23 +2671,59 @@
               "key_points": [],
               "content_truncated": false,
               "analysis_method": "bypassed",
-              "model_used": "direct"
+              "model_used": "direct",
+              "theme": "general",
+              "attention_reason": "Lighter treatment because this story sits in the 時事脈搏 section without strong market-moving signals.",
+              "must_keep": false
             },
             {
-              "source_article_id": "4382579",
-              "canonical_url": "https://www.hkej.com/instantnews/current/article/4382579/%E9%9B%BB%E5%AD%90%E7%85%99%E4%B8%A8%E5%91%A8%E5%9B%9B%E8%B5%B7%E7%A6%81%E5%A4%96%E6%94%9C+%E8%AD%A6%E6%96%B9%3A%E4%B8%8D%E4%B8%BB%E5%8B%95%E5%9F%B7%E6%B3%95+%E5%80%8B%E6%A1%88%E8%BD%89%E4%BB%8B%E6%8E%A7%E7%85%99%E8%BE%A6",
-              "title": "電子煙丨周四起禁外攜 警方:不主動執法 個案轉介控煙辦",
+              "source_article_id": "4382547",
+              "title": "美伊談判丨特朗普考慮派特使 前往巴基斯坦談判伊朗問題",
+              "canonical_url": "https://www.hkej.com/instantnews/current/article/4382547/%E7%BE%8E%E4%BC%8A%E8%AB%87%E5%88%A4%E4%B8%A8%E7%89%B9%E6%9C%97%E6%99%AE%E8%80%83%E6%85%AE%E6%B4%BE%E7%89%B9%E4%BD%BF+%E5%89%8D%E5%BE%80%E5%B7%B4%E5%9F%BA%E6%96%AF%E5%9D%A6%E8%AB%87%E5%88%A4%E4%BC%8A%E6%9C%97%E5%95%8F%E9%A1%8C",
+              "published_at": "2026-04-25T00:03:00+08:00",
               "section": "時事脈搏",
-              "published_at": "2026-04-25T12:30:00+08:00",
-              "attention_tier": "light",
               "novelty_score": 5,
-              "relevance_score": 5,
-              "urgency_score": 5,
-              "named_entities": [],
-              "key_points": [],
+              "relevance_score": 9,
+              "urgency_score": 8,
+              "named_entities": [
+                {
+                  "name": "美國",
+                  "type": "country"
+                },
+                {
+                  "name": "特朗普",
+                  "type": "person"
+                },
+                {
+                  "name": "威特科夫",
+                  "type": "person"
+                },
+                {
+                  "name": "庫什納",
+                  "type": "person"
+                }
+              ],
+              "key_points": [
+                "美國總統特朗普將派特使威特科夫和女婿庫什納前往巴基斯坦就伊朗問題進行談判。",
+                "伊朗外長阿拉格齊將以伊朗外交代表團團長身份出訪巴基斯坦、阿曼和俄羅斯。"
+              ],
               "content_truncated": false,
-              "analysis_method": "bypassed",
-              "model_used": "direct"
+              "original_content_length_chars": 328,
+              "analyzed_content_length_chars": 328,
+              "original_content_token_estimate": 82,
+              "analyzed_content_token_estimate": 82,
+              "truncation_reason": null,
+              "analysis_method": "full_text",
+              "attention_tier": "high",
+              "theme": "geopolitics",
+              "attention_reason": "High-signal geopolitics headline based on title/summary keywords.",
+              "must_keep": true,
+              "model_used": "meta-llama/llama-4-scout-17b-16e-instruct",
+              "delayed_retry_attempted": false,
+              "delayed_retry_model_chain": [],
+              "delayed_retry_final_model": null,
+              "error_classification": null,
+              "error": null
             }
           ],
           "model_used": "meta-llama/llama-4-scout-17b-16e-instruct"
@@ -2527,27 +2731,24 @@
       ],
       "analysis_profile": "light",
       "model_used": "meta-llama/llama-4-scout-17b-16e-instruct",
-      "sub_batch_count": 13,
+      "sub_batch_count": 9,
       "diagnostics": {
-        "sub_batch_count": 4,
-        "split_reasons": [
-          "pre_send_budget"
-        ],
+        "sub_batch_count": 9,
+        "split_reasons": [],
         "models_attempted": [
-          "meta-llama/llama-4-scout-17b-16e-instruct",
-          "qwen/qwen3-32b"
+          "meta-llama/llama-4-scout-17b-16e-instruct"
         ],
-        "estimated_input_tokens_max": 1447,
-        "serialized_request_bytes_max": 9397,
-        "rate_limit_waits": 1,
+        "estimated_input_tokens_max": 1188,
+        "serialized_request_bytes_max": 7505,
+        "rate_limit_waits": 0,
         "partial_article_count": 0,
-        "synthesis_wait_seconds_total": 863.999,
+        "synthesis_wait_seconds_total": 0.0,
         "synthesis_retry_count": 0,
         "synthesis_retry_skipped_count": 0,
         "synthesis_budget_exhausted": false,
         "degraded_merge_used": false,
         "degraded_merge_reason": "",
-        "synthesis_merge_depth_max": 1,
+        "synthesis_merge_depth_max": 0,
         "model_switches": []
       },
       "error": null
@@ -2684,15 +2885,13 @@
       ],
       "analysis_profile": "standard",
       "model_used": "meta-llama/llama-4-scout-17b-16e-instruct",
-      "sub_batch_count": 2,
+      "sub_batch_count": 1,
       "diagnostics": {
         "sub_batch_count": 1,
         "split_reasons": [],
-        "models_attempted": [
-          "meta-llama/llama-4-scout-17b-16e-instruct"
-        ],
-        "estimated_input_tokens_max": 614,
-        "serialized_request_bytes_max": 3471,
+        "models_attempted": [],
+        "estimated_input_tokens_max": 0,
+        "serialized_request_bytes_max": 0,
         "rate_limit_waits": 0,
         "partial_article_count": 0,
         "synthesis_wait_seconds_total": 0.0,
@@ -2708,15 +2907,18 @@
     },
     {
       "category": "中國財經",
-      "article_count": 1,
+      "article_count": 2,
       "status": "success",
       "key_developments": [
-        "美國眾議院通過MATCH法案，中國商務部表示將堅決採取必要措施。",
-        "中國商務部指出相關法案如最終出台，將嚴重破壞國際經貿秩序，衝擊全球半導體產業鏈供應鏈穩定。",
-        "中方反對任何泛化國家安全、濫用出口管制的行為，堅定維護中國企業合法正當權益。",
-        "中國商務部將密切關注並採取必要措施。"
+        "泡泡瑪特城市樂園2024年實現盈利，2025年全年客流量按年增加70%",
+        "美國眾議院通過MATCH法案等多項出口管制法案，中國商務部表示將密切關注並採取必要措施。",
+        "2027年計劃啟動第2期建設，新增以SKULLPANDA和星星人為主題的全新場景"
       ],
       "named_entities": [
+        {
+          "name": "泡泡瑪特",
+          "type": "company"
+        },
         {
           "name": "中國商務部",
           "type": "institution"
@@ -2726,11 +2928,57 @@
           "type": "institution"
         },
         {
-          "name": "MATCH Act",
-          "type": "other"
+          "name": "北京",
+          "type": "country"
         }
       ],
       "articles": [
+        {
+          "source_article_id": "4382585",
+          "title": "9992丨泡泡瑪特:北京城市樂園短期助力IP 長期助力營收",
+          "canonical_url": "https://www.hkej.com/instantnews/china/article/4382585/9992%E4%B8%A8%E6%B3%A1%E6%B3%A1%E7%91%AA%E7%89%B9%3A%E5%8C%97%E4%BA%AC%E5%9F%8E%E5%B8%82%E6%A8%82%E5%9C%92%E7%9F%AD%E6%9C%9F%E5%8A%A9%E5%8A%9BIP+%E9%95%B7%E6%9C%9F%E5%8A%A9%E5%8A%9B%E7%87%9F%E6%94%B6",
+          "published_at": "2026-04-25T17:52:00+08:00",
+          "section": "中國財經",
+          "novelty_score": 6,
+          "relevance_score": 8,
+          "urgency_score": 5,
+          "named_entities": [
+            {
+              "name": "泡泡瑪特",
+              "type": "company"
+            },
+            {
+              "name": "胡健",
+              "type": "person"
+            },
+            {
+              "name": "北京",
+              "type": "country"
+            }
+          ],
+          "key_points": [
+            "泡泡瑪特城市樂園2024年實現盈利，2025年全年客流量按年增加70%",
+            "城市樂園短期助力IP，長期助力營收",
+            "2027年計劃啟動第2期建設，新增以SKULLPANDA和星星人為主題的全新場景"
+          ],
+          "content_truncated": false,
+          "original_content_length_chars": 506,
+          "analyzed_content_length_chars": 506,
+          "original_content_token_estimate": 127,
+          "analyzed_content_token_estimate": 127,
+          "truncation_reason": null,
+          "analysis_method": "full_text",
+          "attention_tier": "medium",
+          "theme": "stocks",
+          "attention_reason": "Company-specific news with potential market impact",
+          "must_keep": true,
+          "model_used": "meta-llama/llama-4-scout-17b-16e-instruct",
+          "delayed_retry_attempted": false,
+          "delayed_retry_model_chain": [],
+          "delayed_retry_final_model": null,
+          "error_classification": null,
+          "error": null
+        },
         {
           "source_article_id": "4382578",
           "title": "美眾議院通過MATCH法案 商務部:堅決採取必要措施",
@@ -2782,14 +3030,17 @@
         {
           "title": "中國財經 overview",
           "theme_rationale": "Single subgroup because the category size did not require thematic splitting.",
-          "article_count": 1,
+          "article_count": 2,
           "key_developments": [
-            "美國眾議院通過MATCH法案，中國商務部表示將堅決採取必要措施。",
-            "中國商務部指出相關法案如最終出台，將嚴重破壞國際經貿秩序，衝擊全球半導體產業鏈供應鏈穩定。",
-            "中方反對任何泛化國家安全、濫用出口管制的行為，堅定維護中國企業合法正當權益。",
-            "中國商務部將密切關注並採取必要措施。"
+            "泡泡瑪特城市樂園2024年實現盈利，2025年全年客流量按年增加70%",
+            "美國眾議院通過MATCH法案等多項出口管制法案，中國商務部表示將密切關注並採取必要措施。",
+            "2027年計劃啟動第2期建設，新增以SKULLPANDA和星星人為主題的全新場景"
           ],
           "named_entities": [
+            {
+              "name": "泡泡瑪特",
+              "type": "company"
+            },
             {
               "name": "中國商務部",
               "type": "institution"
@@ -2799,11 +3050,57 @@
               "type": "institution"
             },
             {
-              "name": "MATCH Act",
-              "type": "other"
+              "name": "北京",
+              "type": "country"
             }
           ],
           "articles": [
+            {
+              "source_article_id": "4382585",
+              "title": "9992丨泡泡瑪特:北京城市樂園短期助力IP 長期助力營收",
+              "canonical_url": "https://www.hkej.com/instantnews/china/article/4382585/9992%E4%B8%A8%E6%B3%A1%E6%B3%A1%E7%91%AA%E7%89%B9%3A%E5%8C%97%E4%BA%AC%E5%9F%8E%E5%B8%82%E6%A8%82%E5%9C%92%E7%9F%AD%E6%9C%9F%E5%8A%A9%E5%8A%9BIP+%E9%95%B7%E6%9C%9F%E5%8A%A9%E5%8A%9B%E7%87%9F%E6%94%B6",
+              "published_at": "2026-04-25T17:52:00+08:00",
+              "section": "中國財經",
+              "novelty_score": 6,
+              "relevance_score": 8,
+              "urgency_score": 5,
+              "named_entities": [
+                {
+                  "name": "泡泡瑪特",
+                  "type": "company"
+                },
+                {
+                  "name": "胡健",
+                  "type": "person"
+                },
+                {
+                  "name": "北京",
+                  "type": "country"
+                }
+              ],
+              "key_points": [
+                "泡泡瑪特城市樂園2024年實現盈利，2025年全年客流量按年增加70%",
+                "城市樂園短期助力IP，長期助力營收",
+                "2027年計劃啟動第2期建設，新增以SKULLPANDA和星星人為主題的全新場景"
+              ],
+              "content_truncated": false,
+              "original_content_length_chars": 506,
+              "analyzed_content_length_chars": 506,
+              "original_content_token_estimate": 127,
+              "analyzed_content_token_estimate": 127,
+              "truncation_reason": null,
+              "analysis_method": "full_text",
+              "attention_tier": "medium",
+              "theme": "stocks",
+              "attention_reason": "Company-specific news with potential market impact",
+              "must_keep": true,
+              "model_used": "meta-llama/llama-4-scout-17b-16e-instruct",
+              "delayed_retry_attempted": false,
+              "delayed_retry_model_chain": [],
+              "delayed_retry_final_model": null,
+              "error_classification": null,
+              "error": null
+            },
             {
               "source_article_id": "4382578",
               "title": "美眾議院通過MATCH法案 商務部:堅決採取必要措施",
@@ -2856,15 +3153,15 @@
       ],
       "analysis_profile": "standard",
       "model_used": "meta-llama/llama-4-scout-17b-16e-instruct",
-      "sub_batch_count": 2,
+      "sub_batch_count": 3,
       "diagnostics": {
-        "sub_batch_count": 1,
+        "sub_batch_count": 3,
         "split_reasons": [],
         "models_attempted": [
           "meta-llama/llama-4-scout-17b-16e-instruct"
         ],
-        "estimated_input_tokens_max": 650,
-        "serialized_request_bytes_max": 3818,
+        "estimated_input_tokens_max": 745,
+        "serialized_request_bytes_max": 4274,
         "rate_limit_waits": 0,
         "partial_article_count": 0,
         "synthesis_wait_seconds_total": 0.0,
@@ -2885,7 +3182,7 @@
       "key_developments": [
         "恒指CAPE已攀上14.5倍，接近歷史中位數，屬偏高水平。",
         "北水2026年至今淨流入約2643億元，只及2025年同期大概四成。",
-        "根据約15年回溯測試，恒指CAPE若介乎14倍到14.5倍，一年後平均下挫12.7%，跌市機率達100%！"
+        "根據約15年回溯測試，恒指CAPE若介乎14倍到14.5倍，一年後平均下挫12.7%，跌市機率達100%！"
       ],
       "named_entities": [
         {
@@ -2957,7 +3254,7 @@
           "key_developments": [
             "恒指CAPE已攀上14.5倍，接近歷史中位數，屬偏高水平。",
             "北水2026年至今淨流入約2643億元，只及2025年同期大概四成。",
-            "根据約15年回溯測試，恒指CAPE若介乎14倍到14.5倍，一年後平均下挫12.7%，跌市機率達100%！"
+            "根據約15年回溯測試，恒指CAPE若介乎14倍到14.5倍，一年後平均下挫12.7%，跌市機率達100%！"
           ],
           "named_entities": [
             {
@@ -3026,6 +3323,254 @@
       ],
       "analysis_profile": "standard",
       "model_used": "meta-llama/llama-4-scout-17b-16e-instruct",
+      "sub_batch_count": 1,
+      "diagnostics": {
+        "sub_batch_count": 1,
+        "split_reasons": [],
+        "models_attempted": [],
+        "estimated_input_tokens_max": 0,
+        "serialized_request_bytes_max": 0,
+        "rate_limit_waits": 0,
+        "partial_article_count": 0,
+        "synthesis_wait_seconds_total": 0.0,
+        "synthesis_retry_count": 0,
+        "synthesis_retry_skipped_count": 0,
+        "synthesis_budget_exhausted": false,
+        "degraded_merge_used": false,
+        "degraded_merge_reason": "",
+        "synthesis_merge_depth_max": 0,
+        "model_switches": []
+      },
+      "error": null
+    },
+    {
+      "category": "地產新聞",
+      "article_count": 2,
+      "status": "success",
+      "key_developments": [
+        "恒地發展的首岸1期今日首輪銷售218伙單位全數沽清，套現逾16億元。",
+        "柏傲莊III次輪銷售75伙全數沽清，套現逾7.9億元，最大手買家斥資逾5500萬元購入6伙。",
+        "單位成交價範圍為789.3萬至1440.2萬元，成交呎價21928至27368元。"
+      ],
+      "named_entities": [
+        {
+          "name": "恒地",
+          "type": "company"
+        },
+        {
+          "name": "韓家輝",
+          "type": "person"
+        },
+        {
+          "name": "新世界發展",
+          "type": "company"
+        },
+        {
+          "name": "港鐵",
+          "type": "company"
+        }
+      ],
+      "articles": [
+        {
+          "source_article_id": "4382590",
+          "title": "新盤丨首岸1期首輪銷售218伙沽清",
+          "canonical_url": "https://www.hkej.com/instantnews/property/article/4382590/%E6%96%B0%E7%9B%A4%E4%B8%A8%E9%A6%96%E5%B2%B81%E6%9C%9F%E9%A6%96%E8%BC%AA%E9%8A%B7%E5%94%AE218%E4%BC%99%E6%B2%BD%E6%B8%85",
+          "published_at": "2026-04-25T18:26:00+08:00",
+          "section": "新盤情報",
+          "novelty_score": 6,
+          "relevance_score": 8,
+          "urgency_score": 7,
+          "named_entities": [
+            {
+              "name": "恒地",
+              "type": "company"
+            },
+            {
+              "name": "韓家輝",
+              "type": "person"
+            }
+          ],
+          "key_points": [
+            "恒地發展的首岸1期今日首輪銷售218伙單位全數沽清，套現逾16億元。",
+            "單位實用面積由339至642方呎，客源方面，約七成屬用家，三成屬投資者。"
+          ],
+          "content_truncated": false,
+          "original_content_length_chars": 283,
+          "analyzed_content_length_chars": 283,
+          "original_content_token_estimate": 71,
+          "analyzed_content_token_estimate": 71,
+          "truncation_reason": null,
+          "analysis_method": "full_text",
+          "attention_tier": "medium",
+          "theme": "general",
+          "attention_reason": "Default medium attention because the story is relevant but not an obvious top-priority market mover.",
+          "must_keep": false,
+          "model_used": "meta-llama/llama-4-scout-17b-16e-instruct",
+          "delayed_retry_attempted": false,
+          "delayed_retry_model_chain": [],
+          "delayed_retry_final_model": null,
+          "error_classification": null,
+          "error": null
+        },
+        {
+          "source_article_id": "4382589",
+          "title": "新盤丨柏傲莊III次輪銷售75伙沽清 最大手5500萬掃6伙",
+          "canonical_url": "https://www.hkej.com/instantnews/property/article/4382589/%E6%96%B0%E7%9B%A4%E4%B8%A8%E6%9F%8F%E5%82%B2%E8%8E%8AIII%E6%AC%A1%E8%BC%AA%E9%8A%B7%E5%94%AE75%E4%BC%99%E6%B2%BD%E6%B8%85+%E6%9C%80%E5%A4%A7%E6%89%8B5500%E8%90%AC%E6%8E%836%E4%BC%99",
+          "published_at": "2026-04-25T18:16:00+08:00",
+          "section": "新盤情報",
+          "novelty_score": 5,
+          "relevance_score": 8,
+          "urgency_score": 7,
+          "named_entities": [
+            {
+              "name": "新世界發展",
+              "type": "company"
+            },
+            {
+              "name": "港鐵",
+              "type": "company"
+            }
+          ],
+          "key_points": [
+            "柏傲莊III次輪銷售75伙全數沽清，套現逾7.9億元，最大手買家斥資逾5500萬元購入6伙。",
+            "成交價789.3萬至1440.2萬元，成交呎價21928至27368元。"
+          ],
+          "content_truncated": false,
+          "original_content_length_chars": 368,
+          "analyzed_content_length_chars": 368,
+          "original_content_token_estimate": 92,
+          "analyzed_content_token_estimate": 92,
+          "truncation_reason": null,
+          "analysis_method": "full_text",
+          "attention_tier": "medium",
+          "theme": "general",
+          "attention_reason": "Default medium attention because the story is relevant but not an obvious top-priority market mover.",
+          "must_keep": false,
+          "model_used": "meta-llama/llama-4-scout-17b-16e-instruct",
+          "delayed_retry_attempted": false,
+          "delayed_retry_model_chain": [],
+          "delayed_retry_final_model": null,
+          "error_classification": null,
+          "error": null
+        }
+      ],
+      "subgroups": [
+        {
+          "title": "地產新聞 overview",
+          "theme_rationale": "Single subgroup because the category size did not require thematic splitting.",
+          "article_count": 2,
+          "key_developments": [
+            "恒地發展的首岸1期今日首輪銷售218伙單位全數沽清，套現逾16億元。",
+            "柏傲莊III次輪銷售75伙全數沽清，套現逾7.9億元，最大手買家斥資逾5500萬元購入6伙。",
+            "單位成交價範圍為789.3萬至1440.2萬元，成交呎價21928至27368元。"
+          ],
+          "named_entities": [
+            {
+              "name": "恒地",
+              "type": "company"
+            },
+            {
+              "name": "韓家輝",
+              "type": "person"
+            },
+            {
+              "name": "新世界發展",
+              "type": "company"
+            },
+            {
+              "name": "港鐵",
+              "type": "company"
+            }
+          ],
+          "articles": [
+            {
+              "source_article_id": "4382590",
+              "title": "新盤丨首岸1期首輪銷售218伙沽清",
+              "canonical_url": "https://www.hkej.com/instantnews/property/article/4382590/%E6%96%B0%E7%9B%A4%E4%B8%A8%E9%A6%96%E5%B2%B81%E6%9C%9F%E9%A6%96%E8%BC%AA%E9%8A%B7%E5%94%AE218%E4%BC%99%E6%B2%BD%E6%B8%85",
+              "published_at": "2026-04-25T18:26:00+08:00",
+              "section": "新盤情報",
+              "novelty_score": 6,
+              "relevance_score": 8,
+              "urgency_score": 7,
+              "named_entities": [
+                {
+                  "name": "恒地",
+                  "type": "company"
+                },
+                {
+                  "name": "韓家輝",
+                  "type": "person"
+                }
+              ],
+              "key_points": [
+                "恒地發展的首岸1期今日首輪銷售218伙單位全數沽清，套現逾16億元。",
+                "單位實用面積由339至642方呎，客源方面，約七成屬用家，三成屬投資者。"
+              ],
+              "content_truncated": false,
+              "original_content_length_chars": 283,
+              "analyzed_content_length_chars": 283,
+              "original_content_token_estimate": 71,
+              "analyzed_content_token_estimate": 71,
+              "truncation_reason": null,
+              "analysis_method": "full_text",
+              "attention_tier": "medium",
+              "theme": "general",
+              "attention_reason": "Default medium attention because the story is relevant but not an obvious top-priority market mover.",
+              "must_keep": false,
+              "model_used": "meta-llama/llama-4-scout-17b-16e-instruct",
+              "delayed_retry_attempted": false,
+              "delayed_retry_model_chain": [],
+              "delayed_retry_final_model": null,
+              "error_classification": null,
+              "error": null
+            },
+            {
+              "source_article_id": "4382589",
+              "title": "新盤丨柏傲莊III次輪銷售75伙沽清 最大手5500萬掃6伙",
+              "canonical_url": "https://www.hkej.com/instantnews/property/article/4382589/%E6%96%B0%E7%9B%A4%E4%B8%A8%E6%9F%8F%E5%82%B2%E8%8E%8AIII%E6%AC%A1%E8%BC%AA%E9%8A%B7%E5%94%AE75%E4%BC%99%E6%B2%BD%E6%B8%85+%E6%9C%80%E5%A4%A7%E6%89%8B5500%E8%90%AC%E6%8E%836%E4%BC%99",
+              "published_at": "2026-04-25T18:16:00+08:00",
+              "section": "新盤情報",
+              "novelty_score": 5,
+              "relevance_score": 8,
+              "urgency_score": 7,
+              "named_entities": [
+                {
+                  "name": "新世界發展",
+                  "type": "company"
+                },
+                {
+                  "name": "港鐵",
+                  "type": "company"
+                }
+              ],
+              "key_points": [
+                "柏傲莊III次輪銷售75伙全數沽清，套現逾7.9億元，最大手買家斥資逾5500萬元購入6伙。",
+                "成交價789.3萬至1440.2萬元，成交呎價21928至27368元。"
+              ],
+              "content_truncated": false,
+              "original_content_length_chars": 368,
+              "analyzed_content_length_chars": 368,
+              "original_content_token_estimate": 92,
+              "analyzed_content_token_estimate": 92,
+              "truncation_reason": null,
+              "analysis_method": "full_text",
+              "attention_tier": "medium",
+              "theme": "general",
+              "attention_reason": "Default medium attention because the story is relevant but not an obvious top-priority market mover.",
+              "must_keep": false,
+              "model_used": "meta-llama/llama-4-scout-17b-16e-instruct",
+              "delayed_retry_attempted": false,
+              "delayed_retry_model_chain": [],
+              "delayed_retry_final_model": null,
+              "error_classification": null,
+              "error": null
+            }
+          ],
+          "model_used": "meta-llama/llama-4-scout-17b-16e-instruct"
+        }
+      ],
+      "analysis_profile": "light",
+      "model_used": "meta-llama/llama-4-scout-17b-16e-instruct",
       "sub_batch_count": 2,
       "diagnostics": {
         "sub_batch_count": 1,
@@ -3033,8 +3578,8 @@
         "models_attempted": [
           "meta-llama/llama-4-scout-17b-16e-instruct"
         ],
-        "estimated_input_tokens_max": 860,
-        "serialized_request_bytes_max": 5934,
+        "estimated_input_tokens_max": 922,
+        "serialized_request_bytes_max": 5300,
         "rate_limit_waits": 0,
         "partial_article_count": 0,
         "synthesis_wait_seconds_total": 0.0,
