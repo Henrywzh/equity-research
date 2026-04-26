@@ -1,15 +1,15 @@
 {
   "report_schema_version": 6,
   "report_date": "2026-04-26",
-  "generated_at": "2026-04-26T08:42:52.237916+00:00",
+  "generated_at": "2026-04-26T21:32:41.620232+00:00",
   "source_site": "hkej",
   "status": "success",
-  "executive_summary": [
+  "executive_summary": [],
+  "legacy_executive_summary": [
     "阿塞拜疆國家石油基金出售21.9噸黃金，涉資約30億美元，14年來首次減持黃金儲備。",
     "該基金所持黃金儲備價值佔總資產的比重由去年底的38.2%減至約35.6%。",
     "特朗普於3月進行了175筆金融交易，合共買入至少5100萬美元債券。"
   ],
-  "legacy_executive_summary": [],
   "model": {
     "provider": "groq",
     "primary_model": "meta-llama/llama-4-scout-17b-16e-instruct",
@@ -20,18 +20,18 @@
   },
   "model_switches": [],
   "input": {
-    "article_count": 22,
+    "article_count": 34,
     "category_count": 5
   },
   "diagnostics": {
     "rate_limit_wait_count": 1,
-    "rate_limit_wait_seconds_total": 1468.799,
+    "rate_limit_wait_seconds_total": 1727.999,
     "fallback_switch_count": 0,
     "key_rotation_count": 0,
-    "pre_send_split_count": 1,
+    "pre_send_split_count": 8,
     "response_413_split_count": 0,
     "json_repair_retry_count": 0,
-    "batch_count": 26,
+    "batch_count": 29,
     "failed_batch_count": 0,
     "delayed_retry_candidate_count": 0,
     "delayed_retry_attempted_count": 0,
@@ -44,18 +44,18 @@
     "degraded_merge_count": 0
   },
   "incremental": {
-    "reused_successful_articles": 0,
-    "new_articles_analyzed": 22,
+    "reused_successful_articles": 22,
+    "new_articles_analyzed": 12,
     "retried_previous_day_articles": 0,
     "previous_day_retry_successes": 0
   },
   "daily_stats": {
-    "total_scraped": 22,
-    "analyzed": 22,
+    "total_scraped": 34,
+    "analyzed": 34,
     "success_rate": 100.0
   },
   "macro_release_digest": {
-    "generated_at": "2026-04-26T08:16:55.152771+00:00",
+    "generated_at": "2026-04-26T21:03:30.244357+00:00",
     "window_start": "2026-04-26",
     "window_end": "2026-05-02",
     "fetch_status": "partial",
@@ -94,10 +94,10 @@
   },
   "unresolved_articles": [],
   "totals": {
-    "article_count": 22,
-    "successful_article_analyses": 22,
+    "article_count": 34,
+    "successful_article_analyses": 34,
     "failed_article_analyses": 0,
-    "full_text_article_count": 22,
+    "full_text_article_count": 34,
     "truncated_article_count": 0,
     "successful_categories": 5,
     "partial_categories": 0,
@@ -113,7 +113,7 @@
         "阿塞拜疆國家石油基金出售21.9噸黃金，涉資約30億美元，14年來首次減持黃金儲備。",
         "該基金所持黃金儲備價值佔總資產的比重由去年底的38.2%減至約35.6%。",
         "特朗普於3月進行了175筆金融交易，合共買入至少5100萬美元債券。",
-        "金價今年以來暫累升逾8%，期金每盎斯上周五報4740.9美元。"
+        "買入的企業債券涵蓋多個行業，包括能源、科技、醫療保健和金融服務等。"
       ],
       "named_entities": [
         {
@@ -244,7 +244,7 @@
             "阿塞拜疆國家石油基金出售21.9噸黃金，涉資約30億美元，14年來首次減持黃金儲備。",
             "該基金所持黃金儲備價值佔總資產的比重由去年底的38.2%減至約35.6%。",
             "特朗普於3月進行了175筆金融交易，合共買入至少5100萬美元債券。",
-            "金價今年以來暫累升逾8%，期金每盎斯上周五報4740.9美元。"
+            "買入的企業債券涵蓋多個行業，包括能源、科技、醫療保健和金融服務等。"
           ],
           "named_entities": [
             {
@@ -371,15 +371,13 @@
       ],
       "analysis_profile": "standard",
       "model_used": "meta-llama/llama-4-scout-17b-16e-instruct",
-      "sub_batch_count": 2,
+      "sub_batch_count": 1,
       "diagnostics": {
         "sub_batch_count": 1,
         "split_reasons": [],
-        "models_attempted": [
-          "meta-llama/llama-4-scout-17b-16e-instruct"
-        ],
-        "estimated_input_tokens_max": 949,
-        "serialized_request_bytes_max": 5765,
+        "models_attempted": [],
+        "estimated_input_tokens_max": 0,
+        "serialized_request_bytes_max": 0,
         "rate_limit_waits": 0,
         "partial_article_count": 0,
         "synthesis_wait_seconds_total": 0.0,
@@ -395,28 +393,222 @@
     },
     {
       "category": "時事脈搏",
-      "article_count": 11,
+      "article_count": 19,
       "status": "success",
       "key_developments": [],
       "named_entities": [
         {
-          "name": "衞生署",
-          "type": "institution"
-        },
-        {
-          "name": "歐美",
-          "type": "other"
-        },
-        {
-          "name": "伊朗",
+          "name": "肯尼亞",
           "type": "country"
         },
         {
-          "name": "美國",
+          "name": "倫敦馬拉松",
+          "type": "other"
+        },
+        {
+          "name": "長洲搶包山",
+          "type": "other"
+        },
+        {
+          "name": "Hong Kong",
           "type": "country"
         }
       ],
       "articles": [
+        {
+          "source_article_id": "4382719",
+          "canonical_url": "https://www.hkej.com/instantnews/current/article/4382719/%E9%A6%99%E6%B8%AF%E9%A6%AC%E5%8C%B9%E5%9B%8A%E6%8B%AC%E5%AF%8C%E8%A1%9B%E4%BF%9D%E9%9A%AA%E5%86%A0%E8%BB%8D%E8%B3%BD%E9%A6%AC%E6%97%A5%E4%B8%89%E9%A0%85%E4%B8%80%E7%B4%9A%E8%B3%BD%E5%86%A0%E8%BB%8D",
+          "title": "香港馬匹囊括富衛保險冠軍賽馬日三項一級賽冠軍",
+          "section": "時事脈搏",
+          "published_at": "2026-04-26T20:54:00+08:00",
+          "attention_tier": "light",
+          "novelty_score": 5,
+          "relevance_score": 5,
+          "urgency_score": 5,
+          "named_entities": [],
+          "key_points": [],
+          "content_truncated": false,
+          "analysis_method": "bypassed",
+          "model_used": "direct"
+        },
+        {
+          "source_article_id": "4382714",
+          "canonical_url": "https://www.hkej.com/instantnews/current/article/4382714/%E5%80%AB%E6%95%A6%E9%A6%AC%E6%8B%89%E6%9D%BE%EF%BD%9C%E8%82%AF%E5%B0%BC%E4%BA%9E%E8%B7%91%E6%89%8B1%E5%B0%8F%E6%99%8259%E5%88%8630%E7%A7%92%E5%A5%AA%E5%86%A0+2%E5%B0%8F%E6%99%82%E5%85%A7%E5%AE%8C%E6%88%90%E7%AC%AC%E4%B8%80%E4%BA%BA",
+          "title": "倫敦馬拉松｜肯尼亞跑手1小時59分30秒奪冠 2小時內完成第一人",
+          "section": "時事脈搏",
+          "published_at": "2026-04-26T20:04:00+08:00",
+          "attention_tier": "light",
+          "novelty_score": 5,
+          "relevance_score": 5,
+          "urgency_score": 5,
+          "named_entities": [],
+          "key_points": [],
+          "content_truncated": false,
+          "analysis_method": "bypassed",
+          "model_used": "direct"
+        },
+        {
+          "source_article_id": "4382695",
+          "canonical_url": "https://www.hkej.com/instantnews/current/article/4382695/%E9%95%B7%E6%B4%B2%E6%90%B6%E5%8C%85%E5%B1%B1%E4%B8%A812%E4%BA%BA%E6%99%89%E8%BA%AB%E6%B1%BA%E8%B3%BD+%E4%B8%8A%E5%B1%86%E5%8C%85%E5%B1%B1%E7%8E%8B%E5%8C%85%E5%B1%B1%E5%90%8E%E7%88%AD%E5%8F%96%E8%9F%AC%E8%81%AF",
+          "title": "長洲搶包山丨12人晉身決賽 上屆包山王包山后爭取蟬聯",
+          "section": "時事脈搏",
+          "published_at": "2026-04-26T18:49:00+08:00",
+          "attention_tier": "light",
+          "novelty_score": 5,
+          "relevance_score": 5,
+          "urgency_score": 5,
+          "named_entities": [],
+          "key_points": [],
+          "content_truncated": false,
+          "analysis_method": "bypassed",
+          "model_used": "direct"
+        },
+        {
+          "source_article_id": "4382681",
+          "canonical_url": "https://www.hkej.com/instantnews/current/article/4382681/%E5%BB%A3%E8%8F%AF%E9%86%AB%E9%99%A2%3A%E5%88%87%E5%8B%BF%E5%B0%B1%E5%8F%AF%E7%96%91%E4%BF%A1%E4%BB%B6%E6%8F%90%E4%BE%9B%E5%80%8B%E4%BA%BA%E8%B3%87%E6%96%99%E5%8F%8A%E7%B9%B3%E8%B2%BB",
+          "title": "廣華醫院:切勿就可疑信件提供個人資料及繳費",
+          "section": "時事脈搏",
+          "published_at": "2026-04-26T18:12:00+08:00",
+          "attention_tier": "light",
+          "novelty_score": 5,
+          "relevance_score": 5,
+          "urgency_score": 5,
+          "named_entities": [],
+          "key_points": [],
+          "content_truncated": false,
+          "analysis_method": "bypassed",
+          "model_used": "direct"
+        },
+        {
+          "source_article_id": "4382680",
+          "title": "中東戰事丨阿曼蘇丹晤伊朗外長 討論局勢發展",
+          "canonical_url": "https://www.hkej.com/instantnews/current/article/4382680/%E4%B8%AD%E6%9D%B1%E6%88%B0%E4%BA%8B%E4%B8%A8%E9%98%BF%E6%9B%BC%E8%98%87%E4%B8%B9%E6%99%A4%E4%BC%8A%E6%9C%97%E5%A4%96%E9%95%B7+%E8%A8%8E%E8%AB%96%E5%B1%80%E5%8B%A2%E7%99%BC%E5%B1%95",
+          "published_at": "2026-04-26T17:59:00+08:00",
+          "section": "時事脈搏",
+          "novelty_score": 6,
+          "relevance_score": 8,
+          "urgency_score": 7,
+          "named_entities": [
+            {
+              "name": "阿曼蘇丹海賽姆",
+              "type": "person"
+            },
+            {
+              "name": "伊朗外交部長阿拉格齊",
+              "type": "person"
+            },
+            {
+              "name": "伊朗",
+              "type": "country"
+            },
+            {
+              "name": "阿曼",
+              "type": "country"
+            }
+          ],
+          "key_points": [
+            "阿曼蘇丹海賽姆與伊朗外交部長阿拉格齊在馬斯喀特會面，討論地區局勢發展和調解努力。",
+            "雙方交換意見，旨在推進達成可持續政治解決方案。"
+          ],
+          "content_truncated": false,
+          "original_content_length_chars": 80,
+          "analyzed_content_length_chars": 80,
+          "original_content_token_estimate": 20,
+          "analyzed_content_token_estimate": 20,
+          "truncation_reason": null,
+          "analysis_method": "full_text",
+          "attention_tier": "high",
+          "theme": "geopolitics",
+          "attention_reason": "High-signal geopolitics headline based on title/summary keywords.",
+          "must_keep": true,
+          "model_used": "meta-llama/llama-4-scout-17b-16e-instruct",
+          "delayed_retry_attempted": false,
+          "delayed_retry_model_chain": [],
+          "delayed_retry_final_model": null,
+          "error_classification": null,
+          "error": null
+        },
+        {
+          "source_article_id": "4382678",
+          "canonical_url": "https://www.hkej.com/instantnews/current/article/4382678/%E7%B2%B5%E8%BB%8A%E5%8D%97%E4%B8%8B%E4%B8%A83500%E5%AE%97%E5%85%A5%E5%A2%83%E5%B8%82%E5%8D%80%E5%87%BA%E8%A1%8C%E9%A0%90%E7%B4%84+%E4%B9%9D%E6%88%90%E7%95%99%E6%B8%AF1%E8%87%B32%E6%97%A5",
+          "title": "粵車南下丨3500宗入境市區出行預約 九成留港1至2日",
+          "section": "時事脈搏",
+          "published_at": "2026-04-26T17:24:00+08:00",
+          "attention_tier": "light",
+          "novelty_score": 5,
+          "relevance_score": 5,
+          "urgency_score": 5,
+          "named_entities": [],
+          "key_points": [],
+          "content_truncated": false,
+          "analysis_method": "bypassed",
+          "model_used": "direct"
+        },
+        {
+          "source_article_id": "4382650",
+          "title": "美伊會談丨伊朗:不會在威脅和封鎖下談判",
+          "canonical_url": "https://www.hkej.com/instantnews/current/article/4382650/%E7%BE%8E%E4%BC%8A%E6%9C%83%E8%AB%87%E4%B8%A8%E4%BC%8A%E6%9C%97%3A%E4%B8%8D%E6%9C%83%E5%9C%A8%E5%A8%81%E8%84%85%E5%92%8C%E5%B0%81%E9%8E%96%E4%B8%8B%E8%AB%87%E5%88%A4",
+          "published_at": "2026-04-26T17:10:00+08:00",
+          "section": "時事脈搏",
+          "novelty_score": 5,
+          "relevance_score": 9,
+          "urgency_score": 8,
+          "named_entities": [
+            {
+              "name": "伊朗總統佩澤希齊揚",
+              "type": "person"
+            },
+            {
+              "name": "巴基斯坦總理希赫伯茲",
+              "type": "person"
+            },
+            {
+              "name": "伊朗",
+              "type": "country"
+            },
+            {
+              "name": "巴基斯坦",
+              "type": "country"
+            }
+          ],
+          "key_points": [
+            "伊朗總統佩澤希齊揚表示，不會在威脅或封鎖下被迫進行談判。",
+            "伊朗歡迎公平合理的解決問題途徑，強調不停止敵對行動，信任就無法重建。"
+          ],
+          "content_truncated": false,
+          "original_content_length_chars": 113,
+          "analyzed_content_length_chars": 113,
+          "original_content_token_estimate": 29,
+          "analyzed_content_token_estimate": 29,
+          "truncation_reason": null,
+          "analysis_method": "full_text",
+          "attention_tier": "high",
+          "theme": "geopolitics",
+          "attention_reason": "High-signal geopolitics headline based on title/summary keywords.",
+          "must_keep": true,
+          "model_used": "meta-llama/llama-4-scout-17b-16e-instruct",
+          "delayed_retry_attempted": false,
+          "delayed_retry_model_chain": [],
+          "delayed_retry_final_model": null,
+          "error_classification": null,
+          "error": null
+        },
+        {
+          "source_article_id": "4382649",
+          "canonical_url": "https://www.hkej.com/instantnews/current/article/4382649/%E6%A7%8D%E6%93%8A%E4%BA%8B%E4%BB%B6%E4%B8%A8%E4%BA%8B%E7%99%BC%E5%9C%B0%E7%82%BA45%E5%B9%B4%E5%89%8D%E5%88%97%E6%A0%B9%E9%81%87%E5%88%BA%E9%85%92%E5%BA%97",
+          "title": "槍擊事件丨事發地為45年前列根遇刺酒店",
+          "section": "時事脈搏",
+          "published_at": "2026-04-26T16:33:00+08:00",
+          "attention_tier": "light",
+          "novelty_score": 5,
+          "relevance_score": 5,
+          "urgency_score": 5,
+          "named_entities": [],
+          "key_points": [],
+          "content_truncated": false,
+          "analysis_method": "bypassed",
+          "model_used": "direct"
+        },
         {
           "source_article_id": "4382647",
           "canonical_url": "https://www.hkej.com/instantnews/current/article/4382647/%E5%A4%A9%E6%B0%A3%E4%B8%A8%E5%91%A8%E4%B8%89%E7%A8%8D%E5%BE%8C%E6%B0%A3%E6%BA%AB%E9%99%8D+%E5%91%A8%E5%9B%9B%E6%97%A9%E4%B8%8A%E4%BD%8E%E8%A6%8B20%E5%BA%A6",
@@ -431,7 +623,10 @@
           "key_points": [],
           "content_truncated": false,
           "analysis_method": "bypassed",
-          "model_used": "direct"
+          "model_used": "direct",
+          "theme": "general",
+          "attention_reason": "Lighter treatment because this story sits in the 時事脈搏 section without strong market-moving signals.",
+          "must_keep": false
         },
         {
           "source_article_id": "4382610",
@@ -447,7 +642,10 @@
           "key_points": [],
           "content_truncated": false,
           "analysis_method": "bypassed",
-          "model_used": "direct"
+          "model_used": "direct",
+          "theme": "general",
+          "attention_reason": "Lighter treatment because this story sits in the 時事脈搏 section without strong market-moving signals.",
+          "must_keep": false
         },
         {
           "source_article_id": "4382608",
@@ -463,7 +661,10 @@
           "key_points": [],
           "content_truncated": false,
           "analysis_method": "bypassed",
-          "model_used": "direct"
+          "model_used": "direct",
+          "theme": "general",
+          "attention_reason": "Lighter treatment because this story sits in the 時事脈搏 section without strong market-moving signals.",
+          "must_keep": false
         },
         {
           "source_article_id": "4382606",
@@ -479,7 +680,10 @@
           "key_points": [],
           "content_truncated": false,
           "analysis_method": "bypassed",
-          "model_used": "direct"
+          "model_used": "direct",
+          "theme": "general",
+          "attention_reason": "Lighter treatment because this story sits in the 時事脈搏 section without strong market-moving signals.",
+          "must_keep": false
         },
         {
           "source_article_id": "4382603",
@@ -540,7 +744,10 @@
           "key_points": [],
           "content_truncated": false,
           "analysis_method": "bypassed",
-          "model_used": "direct"
+          "model_used": "direct",
+          "theme": "general",
+          "attention_reason": "Lighter treatment because this story sits in the 時事脈搏 section without strong market-moving signals.",
+          "must_keep": false
         },
         {
           "source_article_id": "4382597",
@@ -556,7 +763,10 @@
           "key_points": [],
           "content_truncated": false,
           "analysis_method": "bypassed",
-          "model_used": "direct"
+          "model_used": "direct",
+          "theme": "general",
+          "attention_reason": "Lighter treatment because this story sits in the 時事脈搏 section without strong market-moving signals.",
+          "must_keep": false
         },
         {
           "source_article_id": "4382595",
@@ -572,7 +782,10 @@
           "key_points": [],
           "content_truncated": false,
           "analysis_method": "bypassed",
-          "model_used": "direct"
+          "model_used": "direct",
+          "theme": "general",
+          "attention_reason": "Lighter treatment because this story sits in the 時事脈搏 section without strong market-moving signals.",
+          "must_keep": false
         },
         {
           "source_article_id": "4382594",
@@ -588,7 +801,10 @@
           "key_points": [],
           "content_truncated": false,
           "analysis_method": "bypassed",
-          "model_used": "direct"
+          "model_used": "direct",
+          "theme": "general",
+          "attention_reason": "Lighter treatment because this story sits in the 時事脈搏 section without strong market-moving signals.",
+          "must_keep": false
         },
         {
           "source_article_id": "4382593",
@@ -604,7 +820,10 @@
           "key_points": [],
           "content_truncated": false,
           "analysis_method": "bypassed",
-          "model_used": "direct"
+          "model_used": "direct",
+          "theme": "general",
+          "attention_reason": "Lighter treatment because this story sits in the 時事脈搏 section without strong market-moving signals.",
+          "must_keep": false
         },
         {
           "source_article_id": "4382592",
@@ -654,31 +873,35 @@
       ],
       "subgroups": [
         {
-          "title": "Weather and Health & Other News",
-          "theme_rationale": "Articles related to weather forecast and health issues",
-          "article_count": 5,
+          "title": "體育賽事 & Other News",
+          "theme_rationale": "與體育賽事相關的新聞報導",
+          "article_count": 10,
           "key_developments": [
-            "周三稍後氣溫將下降，周四早上低見20度",
-            "衞生署呼籲市民外遊前接種疫苗，應對歐美等地麻疹個案急升",
-            "全港戲院日入場人次逾20萬，平均上座率升至逾81%"
+            "肯尼亞跑手在倫敦馬拉松比賽中以1小時59分30秒奪冠，成為首位在2小時內完成馬拉松的選手。",
+            "全港戲院日入場人次逾20萬，平均上座率升至逾81%",
+            "長洲搶包山比賽中，12人晉身決賽，上屆包山王包山后將爭取蟬聯。"
           ],
           "named_entities": [
             {
-              "name": "衞生署",
-              "type": "institution"
+              "name": "肯尼亞",
+              "type": "country"
             },
             {
-              "name": "歐美",
+              "name": "倫敦馬拉松",
+              "type": "other"
+            },
+            {
+              "name": "長洲搶包山",
               "type": "other"
             }
           ],
           "articles": [
             {
-              "source_article_id": "4382647",
-              "canonical_url": "https://www.hkej.com/instantnews/current/article/4382647/%E5%A4%A9%E6%B0%A3%E4%B8%A8%E5%91%A8%E4%B8%89%E7%A8%8D%E5%BE%8C%E6%B0%A3%E6%BA%AB%E9%99%8D+%E5%91%A8%E5%9B%9B%E6%97%A9%E4%B8%8A%E4%BD%8E%E8%A6%8B20%E5%BA%A6",
-              "title": "天氣丨周三稍後氣溫降 周四早上低見20度",
+              "source_article_id": "4382719",
+              "canonical_url": "https://www.hkej.com/instantnews/current/article/4382719/%E9%A6%99%E6%B8%AF%E9%A6%AC%E5%8C%B9%E5%9B%8A%E6%8B%AC%E5%AF%8C%E8%A1%9B%E4%BF%9D%E9%9A%AA%E5%86%A0%E8%BB%8D%E8%B3%BD%E9%A6%AC%E6%97%A5%E4%B8%89%E9%A0%85%E4%B8%80%E7%B4%9A%E8%B3%BD%E5%86%A0%E8%BB%8D",
+              "title": "香港馬匹囊括富衛保險冠軍賽馬日三項一級賽冠軍",
               "section": "時事脈搏",
-              "published_at": "2026-04-26T15:10:00+08:00",
+              "published_at": "2026-04-26T20:54:00+08:00",
               "attention_tier": "light",
               "novelty_score": 5,
               "relevance_score": 5,
@@ -690,11 +913,11 @@
               "model_used": "direct"
             },
             {
-              "source_article_id": "4382608",
-              "canonical_url": "https://www.hkej.com/instantnews/current/article/4382608/%E9%BA%BB%E7%96%B9%E4%B8%A8%E8%A1%9E%E7%94%9F%E7%BD%B2%3A%E6%AD%90%E7%BE%8E%E7%AD%89%E5%9C%B0%E5%80%8B%E6%A1%88%E6%80%A5%E5%8D%87+%E7%B1%B2%E5%B8%82%E6%B0%91%E5%A4%96%E9%81%8A%E5%89%8D%E6%8E%A5%E7%A8%AE%E7%96%AB%E8%8B%97",
-              "title": "麻疹丨衞生署:歐美等地個案急升 籲市民外遊前接種疫苗",
+              "source_article_id": "4382714",
+              "canonical_url": "https://www.hkej.com/instantnews/current/article/4382714/%E5%80%AB%E6%95%A6%E9%A6%AC%E6%8B%89%E6%9D%BE%EF%BD%9C%E8%82%AF%E5%B0%BC%E4%BA%9E%E8%B7%91%E6%89%8B1%E5%B0%8F%E6%99%8259%E5%88%8630%E7%A7%92%E5%A5%AA%E5%86%A0+2%E5%B0%8F%E6%99%82%E5%85%A7%E5%AE%8C%E6%88%90%E7%AC%AC%E4%B8%80%E4%BA%BA",
+              "title": "倫敦馬拉松｜肯尼亞跑手1小時59分30秒奪冠 2小時內完成第一人",
               "section": "時事脈搏",
-              "published_at": "2026-04-26T13:45:00+08:00",
+              "published_at": "2026-04-26T20:04:00+08:00",
               "attention_tier": "light",
               "novelty_score": 5,
               "relevance_score": 5,
@@ -706,11 +929,11 @@
               "model_used": "direct"
             },
             {
-              "source_article_id": "4382606",
-              "canonical_url": "https://www.hkej.com/instantnews/current/article/4382606/%E7%99%BB%E9%9D%A9%E7%86%B1%E4%B8%A8%E9%A3%9F%E7%92%B0%E7%BD%B2%3A%E6%9C%83%E7%A0%94%E6%98%AF%E5%90%A6%E8%AA%BF%E4%BD%8E%E5%95%9F%E5%8B%95%E5%8A%A0%E5%BC%B7%E6%8E%A7%E8%9A%8A%E9%96%80%E6%AA%BB",
-              "title": "登革熱丨食環署:會研是否調低啟動加強控蚊門檻",
+              "source_article_id": "4382695",
+              "canonical_url": "https://www.hkej.com/instantnews/current/article/4382695/%E9%95%B7%E6%B4%B2%E6%90%B6%E5%8C%85%E5%B1%B1%E4%B8%A812%E4%BA%BA%E6%99%89%E8%BA%AB%E6%B1%BA%E8%B3%BD+%E4%B8%8A%E5%B1%86%E5%8C%85%E5%B1%B1%E7%8E%8B%E5%8C%85%E5%B1%B1%E5%90%8E%E7%88%AD%E5%8F%96%E8%9F%AC%E8%81%AF",
+              "title": "長洲搶包山丨12人晉身決賽 上屆包山王包山后爭取蟬聯",
               "section": "時事脈搏",
-              "published_at": "2026-04-26T12:58:00+08:00",
+              "published_at": "2026-04-26T18:49:00+08:00",
               "attention_tier": "light",
               "novelty_score": 5,
               "relevance_score": 5,
@@ -722,11 +945,11 @@
               "model_used": "direct"
             },
             {
-              "source_article_id": "4382610",
-              "canonical_url": "https://www.hkej.com/instantnews/current/article/4382610/%E5%85%A8%E6%B8%AF%E6%88%B2%E9%99%A2%E6%97%A5%E4%B8%A8%E5%85%A5%E5%A0%B4%E4%BA%BA%E6%AC%A1%E9%80%BE20%E8%90%AC+%E5%B9%B3%E5%9D%87%E4%B8%8A%E5%BA%A7%E7%8E%87%E5%8D%87%E8%87%B3%E9%80%BE81%25",
-              "title": "全港戲院日丨入場人次逾20萬 平均上座率升至逾81%",
+              "source_article_id": "4382681",
+              "canonical_url": "https://www.hkej.com/instantnews/current/article/4382681/%E5%BB%A3%E8%8F%AF%E9%86%AB%E9%99%A2%3A%E5%88%87%E5%8B%BF%E5%B0%B1%E5%8F%AF%E7%96%91%E4%BF%A1%E4%BB%B6%E6%8F%90%E4%BE%9B%E5%80%8B%E4%BA%BA%E8%B3%87%E6%96%99%E5%8F%8A%E7%B9%B3%E8%B2%BB",
+              "title": "廣華醫院:切勿就可疑信件提供個人資料及繳費",
               "section": "時事脈搏",
-              "published_at": "2026-04-26T14:58:00+08:00",
+              "published_at": "2026-04-26T18:12:00+08:00",
               "attention_tier": "light",
               "novelty_score": 5,
               "relevance_score": 5,
@@ -736,6 +959,104 @@
               "content_truncated": false,
               "analysis_method": "bypassed",
               "model_used": "direct"
+            },
+            {
+              "source_article_id": "4382680",
+              "title": "中東戰事丨阿曼蘇丹晤伊朗外長 討論局勢發展",
+              "canonical_url": "https://www.hkej.com/instantnews/current/article/4382680/%E4%B8%AD%E6%9D%B1%E6%88%B0%E4%BA%8B%E4%B8%A8%E9%98%BF%E6%9B%BC%E8%98%87%E4%B8%B9%E6%99%A4%E4%BC%8A%E6%9C%97%E5%A4%96%E9%95%B7+%E8%A8%8E%E8%AB%96%E5%B1%80%E5%8B%A2%E7%99%BC%E5%B1%95",
+              "published_at": "2026-04-26T17:59:00+08:00",
+              "section": "時事脈搏",
+              "novelty_score": 6,
+              "relevance_score": 8,
+              "urgency_score": 7,
+              "named_entities": [
+                {
+                  "name": "阿曼蘇丹海賽姆",
+                  "type": "person"
+                },
+                {
+                  "name": "伊朗外交部長阿拉格齊",
+                  "type": "person"
+                },
+                {
+                  "name": "伊朗",
+                  "type": "country"
+                },
+                {
+                  "name": "阿曼",
+                  "type": "country"
+                }
+              ],
+              "key_points": [
+                "阿曼蘇丹海賽姆與伊朗外交部長阿拉格齊在馬斯喀特會面，討論地區局勢發展和調解努力。",
+                "雙方交換意見，旨在推進達成可持續政治解決方案。"
+              ],
+              "content_truncated": false,
+              "original_content_length_chars": 80,
+              "analyzed_content_length_chars": 80,
+              "original_content_token_estimate": 20,
+              "analyzed_content_token_estimate": 20,
+              "truncation_reason": null,
+              "analysis_method": "full_text",
+              "attention_tier": "high",
+              "theme": "geopolitics",
+              "attention_reason": "High-signal geopolitics headline based on title/summary keywords.",
+              "must_keep": true,
+              "model_used": "meta-llama/llama-4-scout-17b-16e-instruct",
+              "delayed_retry_attempted": false,
+              "delayed_retry_model_chain": [],
+              "delayed_retry_final_model": null,
+              "error_classification": null,
+              "error": null
+            },
+            {
+              "source_article_id": "4382650",
+              "title": "美伊會談丨伊朗:不會在威脅和封鎖下談判",
+              "canonical_url": "https://www.hkej.com/instantnews/current/article/4382650/%E7%BE%8E%E4%BC%8A%E6%9C%83%E8%AB%87%E4%B8%A8%E4%BC%8A%E6%9C%97%3A%E4%B8%8D%E6%9C%83%E5%9C%A8%E5%A8%81%E8%84%85%E5%92%8C%E5%B0%81%E9%8E%96%E4%B8%8B%E8%AB%87%E5%88%A4",
+              "published_at": "2026-04-26T17:10:00+08:00",
+              "section": "時事脈搏",
+              "novelty_score": 5,
+              "relevance_score": 9,
+              "urgency_score": 8,
+              "named_entities": [
+                {
+                  "name": "伊朗總統佩澤希齊揚",
+                  "type": "person"
+                },
+                {
+                  "name": "巴基斯坦總理希赫伯茲",
+                  "type": "person"
+                },
+                {
+                  "name": "伊朗",
+                  "type": "country"
+                },
+                {
+                  "name": "巴基斯坦",
+                  "type": "country"
+                }
+              ],
+              "key_points": [
+                "伊朗總統佩澤希齊揚表示，不會在威脅或封鎖下被迫進行談判。",
+                "伊朗歡迎公平合理的解決問題途徑，強調不停止敵對行動，信任就無法重建。"
+              ],
+              "content_truncated": false,
+              "original_content_length_chars": 113,
+              "analyzed_content_length_chars": 113,
+              "original_content_token_estimate": 29,
+              "analyzed_content_token_estimate": 29,
+              "truncation_reason": null,
+              "analysis_method": "full_text",
+              "attention_tier": "high",
+              "theme": "geopolitics",
+              "attention_reason": "High-signal geopolitics headline based on title/summary keywords.",
+              "must_keep": true,
+              "model_used": "meta-llama/llama-4-scout-17b-16e-instruct",
+              "delayed_retry_attempted": false,
+              "delayed_retry_model_chain": [],
+              "delayed_retry_final_model": null,
+              "error_classification": null,
+              "error": null
             },
             {
               "source_article_id": "4382603",
@@ -781,18 +1102,241 @@
               "delayed_retry_final_model": null,
               "error_classification": null,
               "error": null
+            },
+            {
+              "source_article_id": "4382610",
+              "canonical_url": "https://www.hkej.com/instantnews/current/article/4382610/%E5%85%A8%E6%B8%AF%E6%88%B2%E9%99%A2%E6%97%A5%E4%B8%A8%E5%85%A5%E5%A0%B4%E4%BA%BA%E6%AC%A1%E9%80%BE20%E8%90%AC+%E5%B9%B3%E5%9D%87%E4%B8%8A%E5%BA%A7%E7%8E%87%E5%8D%87%E8%87%B3%E9%80%BE81%25",
+              "title": "全港戲院日丨入場人次逾20萬 平均上座率升至逾81%",
+              "section": "時事脈搏",
+              "published_at": "2026-04-26T14:58:00+08:00",
+              "attention_tier": "light",
+              "novelty_score": 5,
+              "relevance_score": 5,
+              "urgency_score": 5,
+              "named_entities": [],
+              "key_points": [],
+              "content_truncated": false,
+              "analysis_method": "bypassed",
+              "model_used": "direct",
+              "theme": "general",
+              "attention_reason": "Lighter treatment because this story sits in the 時事脈搏 section without strong market-moving signals.",
+              "must_keep": false
+            },
+            {
+              "source_article_id": "4382597",
+              "canonical_url": "https://www.hkej.com/instantnews/current/article/4382597/%E5%AE%8F%E7%A6%8F%E8%8B%91%E4%B8%8A%E6%A8%93%E4%B8%A8%E5%AE%8F%E9%81%93%E9%96%A3%E5%AE%8F%E6%98%8C%E9%96%A3%E5%B1%85%E6%B0%91%E4%B8%8A%E6%A8%93%E5%9F%B7%E6%8B%BE",
+              "title": "宏福苑上樓丨宏道閣宏昌閣居民上樓執拾",
+              "section": "時事脈搏",
+              "published_at": "2026-04-26T10:15:00+08:00",
+              "attention_tier": "light",
+              "novelty_score": 5,
+              "relevance_score": 5,
+              "urgency_score": 5,
+              "named_entities": [],
+              "key_points": [],
+              "content_truncated": false,
+              "analysis_method": "bypassed",
+              "model_used": "direct",
+              "theme": "general",
+              "attention_reason": "Lighter treatment because this story sits in the 時事脈搏 section without strong market-moving signals.",
+              "must_keep": false
+            },
+            {
+              "source_article_id": "4382593",
+              "canonical_url": "https://www.hkej.com/instantnews/current/article/4382593/%E5%A4%A9%E6%B0%A3%E4%B8%A8%E6%97%A5%E9%96%93%E7%82%8E%E7%86%B1+%E5%B8%82%E5%8D%80%E6%9C%80%E9%AB%98%E6%B0%A3%E6%BA%AB%E7%B4%8428%E5%BA%A6",
+              "title": "天氣丨日間炎熱 市區最高氣溫約28度",
+              "section": "時事脈搏",
+              "published_at": "2026-04-26T09:30:00+08:00",
+              "attention_tier": "light",
+              "novelty_score": 5,
+              "relevance_score": 5,
+              "urgency_score": 5,
+              "named_entities": [],
+              "key_points": [],
+              "content_truncated": false,
+              "analysis_method": "bypassed",
+              "model_used": "direct",
+              "theme": "general",
+              "attention_reason": "Lighter treatment because this story sits in the 時事脈搏 section without strong market-moving signals.",
+              "must_keep": false
+            }
+          ],
+          "model_used": "meta-llama/llama-4-scout-17b-16e-instruct"
+        },
+        {
+          "title": "Local News",
+          "theme_rationale": "Articles related to local news and events",
+          "article_count": 3,
+          "key_developments": [
+            "3500 entries for travel in Hong Kong were booked with 90% staying for 1 to 2 days.",
+            "The temperature in Hong Kong is expected to drop to 20 degrees on Thursday morning.",
+            "A shooting incident occurred at a hotel where former US President Reagan was shot 45 years ago."
+          ],
+          "named_entities": [
+            {
+              "name": "Hong Kong",
+              "type": "country"
+            },
+            {
+              "name": "US",
+              "type": "country"
+            },
+            {
+              "name": "Reagan",
+              "type": "person"
+            }
+          ],
+          "articles": [
+            {
+              "source_article_id": "4382678",
+              "canonical_url": "https://www.hkej.com/instantnews/current/article/4382678/%E7%B2%B5%E8%BB%8A%E5%8D%97%E4%B8%8B%E4%B8%A83500%E5%AE%97%E5%85%A5%E5%A2%83%E5%B8%82%E5%8D%80%E5%87%BA%E8%A1%8C%E9%A0%90%E7%B4%84+%E4%B9%9D%E6%88%90%E7%95%99%E6%B8%AF1%E8%87%B32%E6%97%A5",
+              "title": "粵車南下丨3500宗入境市區出行預約 九成留港1至2日",
+              "section": "時事脈搏",
+              "published_at": "2026-04-26T17:24:00+08:00",
+              "attention_tier": "light",
+              "novelty_score": 5,
+              "relevance_score": 5,
+              "urgency_score": 5,
+              "named_entities": [],
+              "key_points": [],
+              "content_truncated": false,
+              "analysis_method": "bypassed",
+              "model_used": "direct"
+            },
+            {
+              "source_article_id": "4382649",
+              "canonical_url": "https://www.hkej.com/instantnews/current/article/4382649/%E6%A7%8D%E6%93%8A%E4%BA%8B%E4%BB%B6%E4%B8%A8%E4%BA%8B%E7%99%BC%E5%9C%B0%E7%82%BA45%E5%B9%B4%E5%89%8D%E5%88%97%E6%A0%B9%E9%81%87%E5%88%BA%E9%85%92%E5%BA%97",
+              "title": "槍擊事件丨事發地為45年前列根遇刺酒店",
+              "section": "時事脈搏",
+              "published_at": "2026-04-26T16:33:00+08:00",
+              "attention_tier": "light",
+              "novelty_score": 5,
+              "relevance_score": 5,
+              "urgency_score": 5,
+              "named_entities": [],
+              "key_points": [],
+              "content_truncated": false,
+              "analysis_method": "bypassed",
+              "model_used": "direct"
+            },
+            {
+              "source_article_id": "4382647",
+              "canonical_url": "https://www.hkej.com/instantnews/current/article/4382647/%E5%A4%A9%E6%B0%A3%E4%B8%A8%E5%91%A8%E4%B8%89%E7%A8%8D%E5%BE%8C%E6%B0%A3%E6%BA%AB%E9%99%8D+%E5%91%A8%E5%9B%9B%E6%97%A9%E4%B8%8A%E4%BD%8E%E8%A6%8B20%E5%BA%A6",
+              "title": "天氣丨周三稍後氣溫降 周四早上低見20度",
+              "section": "時事脈搏",
+              "published_at": "2026-04-26T15:10:00+08:00",
+              "attention_tier": "light",
+              "novelty_score": 5,
+              "relevance_score": 5,
+              "urgency_score": 5,
+              "named_entities": [],
+              "key_points": [],
+              "content_truncated": false,
+              "analysis_method": "bypassed",
+              "model_used": "direct",
+              "theme": "general",
+              "attention_reason": "Lighter treatment because this story sits in the 時事脈搏 section without strong market-moving signals.",
+              "must_keep": false
+            }
+          ],
+          "model_used": "meta-llama/llama-4-scout-17b-16e-instruct"
+        },
+        {
+          "title": "公共衛生",
+          "theme_rationale": "關注公共衛生議題的文章",
+          "article_count": 3,
+          "key_developments": [
+            "衞生署呼籲市民外遊前接種疫苗，因歐美等地麻疹個案急升。",
+            "食環署考慮調低啟動加強控蚊門檻，以防登革熱。",
+            "香港公眾地方周四起禁管有另類煙草產品。"
+          ],
+          "named_entities": [
+            {
+              "name": "衞生署",
+              "type": "institution"
+            },
+            {
+              "name": "食環署",
+              "type": "institution"
+            },
+            {
+              "name": "歐美",
+              "type": "other"
+            },
+            {
+              "name": "香港",
+              "type": "country"
+            }
+          ],
+          "articles": [
+            {
+              "source_article_id": "4382608",
+              "canonical_url": "https://www.hkej.com/instantnews/current/article/4382608/%E9%BA%BB%E7%96%B9%E4%B8%A8%E8%A1%9E%E7%94%9F%E7%BD%B2%3A%E6%AD%90%E7%BE%8E%E7%AD%89%E5%9C%B0%E5%80%8B%E6%A1%88%E6%80%A5%E5%8D%87+%E7%B1%B2%E5%B8%82%E6%B0%91%E5%A4%96%E9%81%8A%E5%89%8D%E6%8E%A5%E7%A8%AE%E7%96%AB%E8%8B%97",
+              "title": "麻疹丨衞生署:歐美等地個案急升 籲市民外遊前接種疫苗",
+              "section": "時事脈搏",
+              "published_at": "2026-04-26T13:45:00+08:00",
+              "attention_tier": "light",
+              "novelty_score": 5,
+              "relevance_score": 5,
+              "urgency_score": 5,
+              "named_entities": [],
+              "key_points": [],
+              "content_truncated": false,
+              "analysis_method": "bypassed",
+              "model_used": "direct",
+              "theme": "general",
+              "attention_reason": "Lighter treatment because this story sits in the 時事脈搏 section without strong market-moving signals.",
+              "must_keep": false
+            },
+            {
+              "source_article_id": "4382606",
+              "canonical_url": "https://www.hkej.com/instantnews/current/article/4382606/%E7%99%BB%E9%9D%A9%E7%86%B1%E4%B8%A8%E9%A3%9F%E7%92%B0%E7%BD%B2%3A%E6%9C%83%E7%A0%94%E6%98%AF%E5%90%A6%E8%AA%BF%E4%BD%8E%E5%95%9F%E5%8B%95%E5%8A%A0%E5%BC%B7%E6%8E%A7%E8%9A%8A%E9%96%80%E6%AA%BB",
+              "title": "登革熱丨食環署:會研是否調低啟動加強控蚊門檻",
+              "section": "時事脈搏",
+              "published_at": "2026-04-26T12:58:00+08:00",
+              "attention_tier": "light",
+              "novelty_score": 5,
+              "relevance_score": 5,
+              "urgency_score": 5,
+              "named_entities": [],
+              "key_points": [],
+              "content_truncated": false,
+              "analysis_method": "bypassed",
+              "model_used": "direct",
+              "theme": "general",
+              "attention_reason": "Lighter treatment because this story sits in the 時事脈搏 section without strong market-moving signals.",
+              "must_keep": false
+            },
+            {
+              "source_article_id": "4382596",
+              "canonical_url": "https://www.hkej.com/instantnews/current/article/4382596/%E5%85%AC%E7%9C%BE%E5%9C%B0%E6%96%B9%E5%91%A8%E5%9B%9B%E8%B5%B7%E7%A6%81%E7%AE%A1%E6%9C%89%E5%8F%A6%E9%A1%9E%E7%85%99%E8%8D%89%E7%94%A2%E5%93%81+%E6%9E%97%E6%96%87%E5%81%A5%3A%E4%B8%8D%E5%BD%B1%E9%9F%BF%E6%97%85%E5%AE%A2%E4%BE%86%E6%B8%AF%E6%84%8F%E6%85%BE",
+              "title": "公眾地方周四起禁管有另類煙草產品 林文健:不影響旅客來港意慾",
+              "section": "時事脈搏",
+              "published_at": "2026-04-26T10:26:00+08:00",
+              "attention_tier": "light",
+              "novelty_score": 5,
+              "relevance_score": 5,
+              "urgency_score": 5,
+              "named_entities": [],
+              "key_points": [],
+              "content_truncated": false,
+              "analysis_method": "bypassed",
+              "model_used": "direct",
+              "theme": "general",
+              "attention_reason": "Lighter treatment because this story sits in the 時事脈搏 section without strong market-moving signals.",
+              "must_keep": false
             }
           ],
           "model_used": "meta-llama/llama-4-scout-17b-16e-instruct"
         },
         {
           "title": "國際時事",
-          "theme_rationale": "與國際政治、外交相關的新聞事件",
+          "theme_rationale": "包含國際政治、外交等相關新聞",
           "article_count": 3,
           "key_developments": [
             "美國取消派代表赴巴基斯坦與伊朗談判",
-            "王毅與緬甸領導人會面，討論合作打擊網賭電詐",
-            "白宮記者晚宴傳出槍聲，特朗普緊急撤離"
+            "特朗普在白宮記者晚宴中發生槍擊事件緊急撤離，槍手被捕",
+            "王毅與緬甸對方合作徹底剷除網賭電詐毒瘤"
           ],
           "named_entities": [
             {
@@ -808,11 +1352,30 @@
               "type": "country"
             },
             {
-              "name": "王毅",
-              "type": "person"
+              "name": "白宮",
+              "type": "institution"
             }
           ],
           "articles": [
+            {
+              "source_article_id": "4382595",
+              "canonical_url": "https://www.hkej.com/instantnews/current/article/4382595/%E6%A7%8D%E6%93%8A%E4%B8%A8%E7%99%BD%E5%AE%AE%E8%A8%98%E8%80%85%E6%99%9A%E5%AE%B4%E5%82%B3%E5%87%BA%E6%A7%8D%E8%81%B2+%E7%89%B9%E6%9C%97%E6%99%AE%E7%B7%8A%E6%80%A5%E6%92%A4%E9%9B%A2+%E6%A7%8D%E6%89%8B%E8%A2%AB%E6%8D%95",
+              "title": "槍擊丨白宮記者晚宴傳出槍聲 特朗普緊急撤離 槍手被捕",
+              "section": "時事脈搏",
+              "published_at": "2026-04-26T10:00:00+08:00",
+              "attention_tier": "light",
+              "novelty_score": 5,
+              "relevance_score": 5,
+              "urgency_score": 5,
+              "named_entities": [],
+              "key_points": [],
+              "content_truncated": false,
+              "analysis_method": "bypassed",
+              "model_used": "direct",
+              "theme": "general",
+              "attention_reason": "Lighter treatment because this story sits in the 時事脈搏 section without strong market-moving signals.",
+              "must_keep": false
+            },
             {
               "source_article_id": "4382594",
               "canonical_url": "https://www.hkej.com/instantnews/current/article/4382594/%E7%8E%8B%E6%AF%85%E6%99%A4%E6%95%8F%E6%98%82%E8%90%8A+%E7%A8%B1%E9%A1%98%E8%88%87%E7%B7%AC%E6%96%B9%E5%90%88%E4%BD%9C%E5%BE%B9%E5%BA%95%E5%89%B7%E9%99%A4%E7%B6%B2%E8%B3%AD%E9%9B%BB%E8%A9%90%E6%AF%92%E7%98%A4+",
@@ -827,7 +1390,10 @@
               "key_points": [],
               "content_truncated": false,
               "analysis_method": "bypassed",
-              "model_used": "direct"
+              "model_used": "direct",
+              "theme": "general",
+              "attention_reason": "Lighter treatment because this story sits in the 時事脈搏 section without strong market-moving signals.",
+              "must_keep": false
             },
             {
               "source_article_id": "4382592",
@@ -873,93 +1439,6 @@
               "delayed_retry_final_model": null,
               "error_classification": null,
               "error": null
-            },
-            {
-              "source_article_id": "4382595",
-              "canonical_url": "https://www.hkej.com/instantnews/current/article/4382595/%E6%A7%8D%E6%93%8A%E4%B8%A8%E7%99%BD%E5%AE%AE%E8%A8%98%E8%80%85%E6%99%9A%E5%AE%B4%E5%82%B3%E5%87%BA%E6%A7%8D%E8%81%B2+%E7%89%B9%E6%9C%97%E6%99%AE%E7%B7%8A%E6%80%A5%E6%92%A4%E9%9B%A2+%E6%A7%8D%E6%89%8B%E8%A2%AB%E6%8D%95",
-              "title": "槍擊丨白宮記者晚宴傳出槍聲 特朗普緊急撤離 槍手被捕",
-              "section": "時事脈搏",
-              "published_at": "2026-04-26T10:00:00+08:00",
-              "attention_tier": "light",
-              "novelty_score": 5,
-              "relevance_score": 5,
-              "urgency_score": 5,
-              "named_entities": [],
-              "key_points": [],
-              "content_truncated": false,
-              "analysis_method": "bypassed",
-              "model_used": "direct"
-            }
-          ],
-          "model_used": "meta-llama/llama-4-scout-17b-16e-instruct"
-        },
-        {
-          "title": "本地新聞",
-          "theme_rationale": "與本地事件、政策相關的新聞",
-          "article_count": 3,
-          "key_developments": [
-            "Hong Kong will ban alternative tobacco products starting Thursday, according to Secretary for Health, Lo Chung-mao.",
-            "The city's weather is expected to be hot, with temperatures reaching up to 28 degrees Celsius in some areas.",
-            "Residents of Hong Kong's public housing estates, including the Mak Fook Estate, are moving to temporary accommodations."
-          ],
-          "named_entities": [
-            {
-              "name": "Lo Chung-mao",
-              "type": "person"
-            },
-            {
-              "name": "Hong Kong",
-              "type": "country"
-            }
-          ],
-          "articles": [
-            {
-              "source_article_id": "4382596",
-              "canonical_url": "https://www.hkej.com/instantnews/current/article/4382596/%E5%85%AC%E7%9C%BE%E5%9C%B0%E6%96%B9%E5%91%A8%E5%9B%9B%E8%B5%B7%E7%A6%81%E7%AE%A1%E6%9C%89%E5%8F%A6%E9%A1%9E%E7%85%99%E8%8D%89%E7%94%A2%E5%93%81+%E6%9E%97%E6%96%87%E5%81%A5%3A%E4%B8%8D%E5%BD%B1%E9%9F%BF%E6%97%85%E5%AE%A2%E4%BE%86%E6%B8%AF%E6%84%8F%E6%85%BE",
-              "title": "公眾地方周四起禁管有另類煙草產品 林文健:不影響旅客來港意慾",
-              "section": "時事脈搏",
-              "published_at": "2026-04-26T10:26:00+08:00",
-              "attention_tier": "light",
-              "novelty_score": 5,
-              "relevance_score": 5,
-              "urgency_score": 5,
-              "named_entities": [],
-              "key_points": [],
-              "content_truncated": false,
-              "analysis_method": "bypassed",
-              "model_used": "direct"
-            },
-            {
-              "source_article_id": "4382597",
-              "canonical_url": "https://www.hkej.com/instantnews/current/article/4382597/%E5%AE%8F%E7%A6%8F%E8%8B%91%E4%B8%8A%E6%A8%93%E4%B8%A8%E5%AE%8F%E9%81%93%E9%96%A3%E5%AE%8F%E6%98%8C%E9%96%A3%E5%B1%85%E6%B0%91%E4%B8%8A%E6%A8%93%E5%9F%B7%E6%8B%BE",
-              "title": "宏福苑上樓丨宏道閣宏昌閣居民上樓執拾",
-              "section": "時事脈搏",
-              "published_at": "2026-04-26T10:15:00+08:00",
-              "attention_tier": "light",
-              "novelty_score": 5,
-              "relevance_score": 5,
-              "urgency_score": 5,
-              "named_entities": [],
-              "key_points": [],
-              "content_truncated": false,
-              "analysis_method": "bypassed",
-              "model_used": "direct"
-            },
-            {
-              "source_article_id": "4382593",
-              "canonical_url": "https://www.hkej.com/instantnews/current/article/4382593/%E5%A4%A9%E6%B0%A3%E4%B8%A8%E6%97%A5%E9%96%93%E7%82%8E%E7%86%B1+%E5%B8%82%E5%8D%80%E6%9C%80%E9%AB%98%E6%B0%A3%E6%BA%AB%E7%B4%8428%E5%BA%A6",
-              "title": "天氣丨日間炎熱 市區最高氣溫約28度",
-              "section": "時事脈搏",
-              "published_at": "2026-04-26T09:30:00+08:00",
-              "attention_tier": "light",
-              "novelty_score": 5,
-              "relevance_score": 5,
-              "urgency_score": 5,
-              "named_entities": [],
-              "key_points": [],
-              "content_truncated": false,
-              "analysis_method": "bypassed",
-              "model_used": "direct"
             }
           ],
           "model_used": "meta-llama/llama-4-scout-17b-16e-instruct"
@@ -967,17 +1446,17 @@
       ],
       "analysis_profile": "light",
       "model_used": "meta-llama/llama-4-scout-17b-16e-instruct",
-      "sub_batch_count": 4,
+      "sub_batch_count": 10,
       "diagnostics": {
-        "sub_batch_count": 1,
+        "sub_batch_count": 10,
         "split_reasons": [
           "pre_send_budget"
         ],
         "models_attempted": [
           "meta-llama/llama-4-scout-17b-16e-instruct"
         ],
-        "estimated_input_tokens_max": 1267,
-        "serialized_request_bytes_max": 7272,
+        "estimated_input_tokens_max": 1100,
+        "serialized_request_bytes_max": 4967,
         "rate_limit_waits": 0,
         "partial_article_count": 0,
         "synthesis_wait_seconds_total": 0.0,
@@ -986,7 +1465,7 @@
         "synthesis_budget_exhausted": false,
         "degraded_merge_used": false,
         "degraded_merge_reason": "",
-        "synthesis_merge_depth_max": 0,
+        "synthesis_merge_depth_max": 1,
         "model_switches": []
       },
       "error": null
@@ -996,9 +1475,9 @@
       "article_count": 1,
       "status": "success",
       "key_developments": [
-        "香港今年以來新股集資額繼續位列全球首位，截至上周，已超過1400億元。",
+        "香港今年新股集資額已超過1400億元，位列全球首位。",
         "港股日均成交額超過2800億元，ETP日均成交額高達386億元。",
-        "香港金融市場的發展勢不可擋，穩定安全、資金與人才滙聚，對全球投資者的吸引力正進一步提升。"
+        "陳茂波表示香港金融市場的發展勢不可擋，穩定安全、資金與人才滙聚，對全球投資者的吸引力正進一步提升。"
       ],
       "named_entities": [
         {
@@ -1007,14 +1486,6 @@
         },
         {
           "name": "香港",
-          "type": "country"
-        },
-        {
-          "name": "美國",
-          "type": "country"
-        },
-        {
-          "name": "內地",
           "type": "country"
         }
       ],
@@ -1076,9 +1547,9 @@
           "theme_rationale": "Single subgroup because the category size did not require thematic splitting.",
           "article_count": 1,
           "key_developments": [
-            "香港今年以來新股集資額繼續位列全球首位，截至上周，已超過1400億元。",
+            "香港今年新股集資額已超過1400億元，位列全球首位。",
             "港股日均成交額超過2800億元，ETP日均成交額高達386億元。",
-            "香港金融市場的發展勢不可擋，穩定安全、資金與人才滙聚，對全球投資者的吸引力正進一步提升。"
+            "陳茂波表示香港金融市場的發展勢不可擋，穩定安全、資金與人才滙聚，對全球投資者的吸引力正進一步提升。"
           ],
           "named_entities": [
             {
@@ -1087,14 +1558,6 @@
             },
             {
               "name": "香港",
-              "type": "country"
-            },
-            {
-              "name": "美國",
-              "type": "country"
-            },
-            {
-              "name": "內地",
               "type": "country"
             }
           ],
@@ -1155,15 +1618,13 @@
       ],
       "analysis_profile": "standard",
       "model_used": "meta-llama/llama-4-scout-17b-16e-instruct",
-      "sub_batch_count": 2,
+      "sub_batch_count": 1,
       "diagnostics": {
         "sub_batch_count": 1,
         "split_reasons": [],
-        "models_attempted": [
-          "meta-llama/llama-4-scout-17b-16e-instruct"
-        ],
-        "estimated_input_tokens_max": 852,
-        "serialized_request_bytes_max": 6322,
+        "models_attempted": [],
+        "estimated_input_tokens_max": 0,
+        "serialized_request_bytes_max": 0,
         "rate_limit_waits": 0,
         "partial_article_count": 0,
         "synthesis_wait_seconds_total": 0.0,
@@ -1179,32 +1640,170 @@
     },
     {
       "category": "中國財經",
-      "article_count": 6,
+      "article_count": 9,
       "status": "success",
-      "key_developments": [],
+      "key_developments": [
+        "零跑汽車推出Lafa5 Ultra兩款車型，上市限時售價分別為11.88萬及12.48萬元人民幣。",
+        "奇瑞汽車與寧德時代簽署戰略合作協定，開發適配換電電池及換電網絡車型。",
+        "濱化集團擬發行不超過4.05億股境外上市普通股並在香港上市",
+        "華為常務董事余承東宣布，尊界新車將在6月底發布，價格約200萬元人民幣。"
+      ],
       "named_entities": [
         {
-          "name": "余承東",
-          "type": "person"
+          "name": "零跑汽車",
+          "type": "company"
+        },
+        {
+          "name": "奇瑞汽車",
+          "type": "company"
+        },
+        {
+          "name": "寧德時代",
+          "type": "company"
+        },
+        {
+          "name": "濱化集團",
+          "type": "company"
         },
         {
           "name": "華為",
           "type": "company"
-        },
-        {
-          "name": "江淮汽車",
-          "type": "company"
-        },
-        {
-          "name": "尊界",
-          "type": "company"
-        },
-        {
-          "name": "零跑汽車",
-          "type": "company"
         }
       ],
       "articles": [
+        {
+          "source_article_id": "4382720",
+          "title": "濱化集團來港上市獲中證監備案",
+          "canonical_url": "https://www.hkej.com/instantnews/china/article/4382720/%E6%BF%B1%E5%8C%96%E9%9B%86%E5%9C%98%E4%BE%86%E6%B8%AF%E4%B8%8A%E5%B8%82%E7%8D%B2%E4%B8%AD%E8%AD%89%E7%9B%A3%E5%82%99%E6%A1%88",
+          "published_at": "2026-04-26T21:08:00+08:00",
+          "section": "中國財經",
+          "novelty_score": 6,
+          "relevance_score": 8,
+          "urgency_score": 5,
+          "named_entities": [
+            {
+              "name": "濱化集團",
+              "type": "company"
+            },
+            {
+              "name": "中國證監會",
+              "type": "institution"
+            },
+            {
+              "name": "華泰國際",
+              "type": "company"
+            },
+            {
+              "name": "建銀國際",
+              "type": "company"
+            }
+          ],
+          "key_points": [
+            "濱化集團擬發行不超過4.05億股境外上市普通股並在香港上市",
+            "公司去年收入148.36億元人民幣，按年升45.1%",
+            "利潤2.35億元人民幣，按年升8.4%"
+          ],
+          "content_truncated": false,
+          "original_content_length_chars": 253,
+          "analyzed_content_length_chars": 253,
+          "original_content_token_estimate": 64,
+          "analyzed_content_token_estimate": 64,
+          "truncation_reason": null,
+          "analysis_method": "full_text",
+          "attention_tier": "medium",
+          "theme": "stocks",
+          "attention_reason": "A股上市化工集團境外發行上市獲中證監備案",
+          "must_keep": true,
+          "model_used": "meta-llama/llama-4-scout-17b-16e-instruct",
+          "delayed_retry_attempted": false,
+          "delayed_retry_model_chain": [],
+          "delayed_retry_final_model": null,
+          "error_classification": null,
+          "error": null
+        },
+        {
+          "source_article_id": "4382710",
+          "title": "內地促加強平台算法治理及用工制度等 保障新就業群體權益",
+          "canonical_url": "https://www.hkej.com/instantnews/china/article/4382710/%E5%85%A7%E5%9C%B0%E4%BF%83%E5%8A%A0%E5%BC%B7%E5%B9%B3%E5%8F%B0%E7%AE%97%E6%B3%95%E6%B2%BB%E7%90%86%E5%8F%8A%E7%94%A8%E5%B7%A5%E5%88%B6%E5%BA%A6%E7%AD%89+%E4%BF%9D%E9%9A%9C%E6%96%B0%E5%B0%B1%E6%A5%AD%E7%BE%A4%E9%AB%94%E6%AC%8A%E7%9B%8A",
+          "published_at": "2026-04-26T19:26:00+08:00",
+          "section": "中國財經",
+          "novelty_score": 7,
+          "relevance_score": 9,
+          "urgency_score": 6,
+          "named_entities": [
+            {
+              "name": "中共中央辦公廳",
+              "type": "institution"
+            },
+            {
+              "name": "國務院辦公廳",
+              "type": "institution"
+            }
+          ],
+          "key_points": [
+            "中共中央辦公廳、國務院辦公廳發布關於加強新就業群體服務管理的意見",
+            "要求加強互聯網平台算法治理，督促互聯網平台企業規範算法",
+            "提出到2027年，新就業群體勞動用工逐步規範，從業環境顯著改善"
+          ],
+          "content_truncated": false,
+          "original_content_length_chars": 357,
+          "analyzed_content_length_chars": 357,
+          "original_content_token_estimate": 90,
+          "analyzed_content_token_estimate": 90,
+          "truncation_reason": null,
+          "analysis_method": "full_text",
+          "attention_tier": "medium",
+          "theme": "macro",
+          "attention_reason": "中共中央辦公廳發文加強新就業群體服務管理",
+          "must_keep": true,
+          "model_used": "meta-llama/llama-4-scout-17b-16e-instruct",
+          "delayed_retry_attempted": false,
+          "delayed_retry_model_chain": [],
+          "delayed_retry_final_model": null,
+          "error_classification": null,
+          "error": null
+        },
+        {
+          "source_article_id": "4382679",
+          "title": "9992丨泡泡瑪特首款Labubu雪櫃月底開賣 售5999人民幣",
+          "canonical_url": "https://www.hkej.com/instantnews/china/article/4382679/9992%E4%B8%A8%E6%B3%A1%E6%B3%A1%E7%91%AA%E7%89%B9%E9%A6%96%E6%AC%BELabubu%E9%9B%AA%E6%AB%83%E6%9C%88%E5%BA%95%E9%96%8B%E8%B3%A3+%E5%94%AE5999%E4%BA%BA%E6%B0%91%E5%B9%A3",
+          "published_at": "2026-04-26T17:35:00+08:00",
+          "section": "中國財經",
+          "novelty_score": 4,
+          "relevance_score": 6,
+          "urgency_score": 3,
+          "named_entities": [
+            {
+              "name": "泡泡瑪特",
+              "type": "company"
+            },
+            {
+              "name": "Labubu",
+              "type": "other"
+            }
+          ],
+          "key_points": [
+            "泡泡瑪特首款家電產品THE MONSTERS生活系列雪櫃(Labubu雪櫃)月底開賣",
+            "售價5999元(人民幣‧下同)，限量發售999部"
+          ],
+          "content_truncated": false,
+          "original_content_length_chars": 339,
+          "analyzed_content_length_chars": 339,
+          "original_content_token_estimate": 85,
+          "analyzed_content_token_estimate": 85,
+          "truncation_reason": null,
+          "analysis_method": "full_text",
+          "attention_tier": "medium",
+          "theme": "general",
+          "attention_reason": "泡泡瑪特發布首款家電產品雪櫃",
+          "must_keep": true,
+          "model_used": "meta-llama/llama-4-scout-17b-16e-instruct",
+          "delayed_retry_attempted": false,
+          "delayed_retry_model_chain": [],
+          "delayed_retry_final_model": null,
+          "error_classification": null,
+          "error": null
+        },
         {
           "source_article_id": "4382609",
           "title": "華為余承東:6月底發布尊界新車 售價約200萬人民幣",
@@ -1480,88 +2079,38 @@
       ],
       "subgroups": [
         {
-          "title": "汽車產業動態",
-          "theme_rationale": "聚焦中國汽車產業最新動態，包括新車發布、企業合作及市場動向。",
-          "article_count": 3,
+          "title": "公司動向 & Other News",
+          "theme_rationale": "企業運營與市場動態相關新聞",
+          "article_count": 9,
           "key_developments": [
-            "華為常務董事余承東宣布，尊界新車將在6月底發布，價格約200萬元人民幣。",
             "零跑汽車推出Lafa5 Ultra兩款車型，上市限時售價分別為11.88萬及12.48萬元人民幣。",
             "奇瑞汽車與寧德時代簽署戰略合作協定，開發適配換電電池及換電網絡車型。",
-            "尊界S800上市10個月累計交付1.6萬輛。"
+            "濱化集團擬發行不超過4.05億股境外上市普通股並在香港上市",
+            "華為常務董事余承東宣布，尊界新車將在6月底發布，價格約200萬元人民幣。"
           ],
           "named_entities": [
             {
-              "name": "余承東",
-              "type": "person"
+              "name": "零跑汽車",
+              "type": "company"
+            },
+            {
+              "name": "奇瑞汽車",
+              "type": "company"
+            },
+            {
+              "name": "寧德時代",
+              "type": "company"
+            },
+            {
+              "name": "濱化集團",
+              "type": "company"
             },
             {
               "name": "華為",
               "type": "company"
-            },
-            {
-              "name": "江淮汽車",
-              "type": "company"
-            },
-            {
-              "name": "尊界",
-              "type": "company"
-            },
-            {
-              "name": "零跑汽車",
-              "type": "company"
             }
           ],
           "articles": [
-            {
-              "source_article_id": "4382609",
-              "title": "華為余承東:6月底發布尊界新車 售價約200萬人民幣",
-              "canonical_url": "https://www.hkej.com/instantnews/china/article/4382609/%E8%8F%AF%E7%82%BA%E4%BD%99%E6%89%BF%E6%9D%B1%3A6%E6%9C%88%E5%BA%95%E7%99%BC%E5%B8%83%E5%B0%8A%E7%95%8C%E6%96%B0%E8%BB%8A+%E5%94%AE%E5%83%B9%E7%B4%84200%E8%90%AC%E4%BA%BA%E6%B0%91%E5%B9%A3",
-              "published_at": "2026-04-26T14:31:00+08:00",
-              "section": "中國財經",
-              "novelty_score": 6,
-              "relevance_score": 8,
-              "urgency_score": 7,
-              "named_entities": [
-                {
-                  "name": "余承東",
-                  "type": "person"
-                },
-                {
-                  "name": "華為",
-                  "type": "company"
-                },
-                {
-                  "name": "江淮汽車",
-                  "type": "company"
-                },
-                {
-                  "name": "尊界",
-                  "type": "company"
-                }
-              ],
-              "key_points": [
-                "華為常務董事余承東宣布，尊界新車將在6月底發布，價格約200萬元人民幣。",
-                "尊界S800上市10個月累計交付1.6萬輛。",
-                "尊界是華為與江淮汽車合作打造的超高端汽車品牌。"
-              ],
-              "content_truncated": false,
-              "original_content_length_chars": 141,
-              "analyzed_content_length_chars": 141,
-              "original_content_token_estimate": 36,
-              "analyzed_content_token_estimate": 36,
-              "truncation_reason": null,
-              "analysis_method": "full_text",
-              "attention_tier": "high",
-              "theme": "macro",
-              "attention_reason": "High-signal macro headline based on title/summary keywords.",
-              "must_keep": true,
-              "model_used": "meta-llama/llama-4-scout-17b-16e-instruct",
-              "delayed_retry_attempted": false,
-              "delayed_retry_model_chain": [],
-              "delayed_retry_final_model": null,
-              "error_classification": null,
-              "error": null
-            },
             {
               "source_article_id": "4382607",
               "title": "零跑汽車推兩款Lafa5 Ultra車型 Lafa 5擬6月進軍歐洲",
@@ -1617,6 +2166,48 @@
               "error": null
             },
             {
+              "source_article_id": "4382599",
+              "title": "AI價格丨DeepSeek-V4-Pro推震撼價限時2.5折優惠",
+              "canonical_url": "https://www.hkej.com/instantnews/china/article/4382599/AI%E5%83%B9%E6%A0%BC%E4%B8%A8DeepSeek-V4-Pro%E6%8E%A8%E9%9C%87%E6%92%BC%E5%83%B9%E9%99%90%E6%99%822.5%E6%8A%98%E5%84%AA%E6%83%A0",
+              "published_at": "2026-04-26T11:12:00+08:00",
+              "section": "中國財經",
+              "novelty_score": 8,
+              "relevance_score": 7,
+              "urgency_score": 5,
+              "named_entities": [
+                {
+                  "name": "DeepSeek",
+                  "type": "company"
+                },
+                {
+                  "name": "DeepSeek-V4-Pro",
+                  "type": "asset"
+                }
+              ],
+              "key_points": [
+                "DeepSeek-V4-Pro模型推出限時2.5折優惠，輸入價每百萬Token價格僅0.25元",
+                "優惠期至5月5日",
+                "DeepSeek V4模型價格與OpenAI的GPT-5.5 Pro相比有顯著優勢"
+              ],
+              "content_truncated": false,
+              "original_content_length_chars": 635,
+              "analyzed_content_length_chars": 635,
+              "original_content_token_estimate": 159,
+              "analyzed_content_token_estimate": 159,
+              "truncation_reason": null,
+              "analysis_method": "full_text",
+              "attention_tier": "medium",
+              "theme": "tech",
+              "attention_reason": "AI price promotion",
+              "must_keep": true,
+              "model_used": "meta-llama/llama-4-scout-17b-16e-instruct",
+              "delayed_retry_attempted": false,
+              "delayed_retry_model_chain": [],
+              "delayed_retry_final_model": null,
+              "error_classification": null,
+              "error": null
+            },
+            {
               "source_article_id": "4382591",
               "title": "奇瑞及寧德時代簽署戰略合作",
               "canonical_url": "https://www.hkej.com/instantnews/china/article/4382591/%E5%A5%87%E7%91%9E%E5%8F%8A%E5%AF%A7%E5%BE%B7%E6%99%82%E4%BB%A3%E7%B0%BD%E7%BD%B2%E6%88%B0%E7%95%A5%E5%90%88%E4%BD%9C+",
@@ -1657,35 +2248,190 @@
               "delayed_retry_final_model": null,
               "error_classification": null,
               "error": null
-            }
-          ],
-          "model_used": "meta-llama/llama-4-scout-17b-16e-instruct"
-        },
-        {
-          "title": "貿易與地緣政治",
-          "theme_rationale": "關注中國與其他國家或組織的貿易關係和地緣政治動向。",
-          "article_count": 1,
-          "key_developments": [
-            "Chinese Ministry of Commerce urges EU to immediately remove Chinese companies from sanctions list.",
-            "The move is related to geopolitical tensions and trade relations between China and EU.",
-            "No specific price movements mentioned in the article, but market context shows CL=F down 1.51% and ^HSI up 0.24%.",
-            "The article highlights the urgency with high scores for novelty, relevance, and urgency."
-          ],
-          "named_entities": [
-            {
-              "name": "Chinese Ministry of Commerce",
-              "type": "institution"
             },
             {
-              "name": "EU",
-              "type": "organization"
+              "source_article_id": "4382720",
+              "title": "濱化集團來港上市獲中證監備案",
+              "canonical_url": "https://www.hkej.com/instantnews/china/article/4382720/%E6%BF%B1%E5%8C%96%E9%9B%86%E5%9C%98%E4%BE%86%E6%B8%AF%E4%B8%8A%E5%B8%82%E7%8D%B2%E4%B8%AD%E8%AD%89%E7%9B%A3%E5%82%99%E6%A1%88",
+              "published_at": "2026-04-26T21:08:00+08:00",
+              "section": "中國財經",
+              "novelty_score": 6,
+              "relevance_score": 8,
+              "urgency_score": 5,
+              "named_entities": [
+                {
+                  "name": "濱化集團",
+                  "type": "company"
+                },
+                {
+                  "name": "中國證監會",
+                  "type": "institution"
+                },
+                {
+                  "name": "華泰國際",
+                  "type": "company"
+                },
+                {
+                  "name": "建銀國際",
+                  "type": "company"
+                }
+              ],
+              "key_points": [
+                "濱化集團擬發行不超過4.05億股境外上市普通股並在香港上市",
+                "公司去年收入148.36億元人民幣，按年升45.1%",
+                "利潤2.35億元人民幣，按年升8.4%"
+              ],
+              "content_truncated": false,
+              "original_content_length_chars": 253,
+              "analyzed_content_length_chars": 253,
+              "original_content_token_estimate": 64,
+              "analyzed_content_token_estimate": 64,
+              "truncation_reason": null,
+              "analysis_method": "full_text",
+              "attention_tier": "medium",
+              "theme": "stocks",
+              "attention_reason": "A股上市化工集團境外發行上市獲中證監備案",
+              "must_keep": true,
+              "model_used": "meta-llama/llama-4-scout-17b-16e-instruct",
+              "delayed_retry_attempted": false,
+              "delayed_retry_model_chain": [],
+              "delayed_retry_final_model": null,
+              "error_classification": null,
+              "error": null
             },
             {
-              "name": "Chinese companies",
-              "type": "company"
-            }
-          ],
-          "articles": [
+              "source_article_id": "4382679",
+              "title": "9992丨泡泡瑪特首款Labubu雪櫃月底開賣 售5999人民幣",
+              "canonical_url": "https://www.hkej.com/instantnews/china/article/4382679/9992%E4%B8%A8%E6%B3%A1%E6%B3%A1%E7%91%AA%E7%89%B9%E9%A6%96%E6%AC%BELabubu%E9%9B%AA%E6%AB%83%E6%9C%88%E5%BA%95%E9%96%8B%E8%B3%A3+%E5%94%AE5999%E4%BA%BA%E6%B0%91%E5%B9%A3",
+              "published_at": "2026-04-26T17:35:00+08:00",
+              "section": "中國財經",
+              "novelty_score": 4,
+              "relevance_score": 6,
+              "urgency_score": 3,
+              "named_entities": [
+                {
+                  "name": "泡泡瑪特",
+                  "type": "company"
+                },
+                {
+                  "name": "Labubu",
+                  "type": "other"
+                }
+              ],
+              "key_points": [
+                "泡泡瑪特首款家電產品THE MONSTERS生活系列雪櫃(Labubu雪櫃)月底開賣",
+                "售價5999元(人民幣‧下同)，限量發售999部"
+              ],
+              "content_truncated": false,
+              "original_content_length_chars": 339,
+              "analyzed_content_length_chars": 339,
+              "original_content_token_estimate": 85,
+              "analyzed_content_token_estimate": 85,
+              "truncation_reason": null,
+              "analysis_method": "full_text",
+              "attention_tier": "medium",
+              "theme": "general",
+              "attention_reason": "泡泡瑪特發布首款家電產品雪櫃",
+              "must_keep": true,
+              "model_used": "meta-llama/llama-4-scout-17b-16e-instruct",
+              "delayed_retry_attempted": false,
+              "delayed_retry_model_chain": [],
+              "delayed_retry_final_model": null,
+              "error_classification": null,
+              "error": null
+            },
+            {
+              "source_article_id": "4382710",
+              "title": "內地促加強平台算法治理及用工制度等 保障新就業群體權益",
+              "canonical_url": "https://www.hkej.com/instantnews/china/article/4382710/%E5%85%A7%E5%9C%B0%E4%BF%83%E5%8A%A0%E5%BC%B7%E5%B9%B3%E5%8F%B0%E7%AE%97%E6%B3%95%E6%B2%BB%E7%90%86%E5%8F%8A%E7%94%A8%E5%B7%A5%E5%88%B6%E5%BA%A6%E7%AD%89+%E4%BF%9D%E9%9A%9C%E6%96%B0%E5%B0%B1%E6%A5%AD%E7%BE%A4%E9%AB%94%E6%AC%8A%E7%9B%8A",
+              "published_at": "2026-04-26T19:26:00+08:00",
+              "section": "中國財經",
+              "novelty_score": 7,
+              "relevance_score": 9,
+              "urgency_score": 6,
+              "named_entities": [
+                {
+                  "name": "中共中央辦公廳",
+                  "type": "institution"
+                },
+                {
+                  "name": "國務院辦公廳",
+                  "type": "institution"
+                }
+              ],
+              "key_points": [
+                "中共中央辦公廳、國務院辦公廳發布關於加強新就業群體服務管理的意見",
+                "要求加強互聯網平台算法治理，督促互聯網平台企業規範算法",
+                "提出到2027年，新就業群體勞動用工逐步規範，從業環境顯著改善"
+              ],
+              "content_truncated": false,
+              "original_content_length_chars": 357,
+              "analyzed_content_length_chars": 357,
+              "original_content_token_estimate": 90,
+              "analyzed_content_token_estimate": 90,
+              "truncation_reason": null,
+              "analysis_method": "full_text",
+              "attention_tier": "medium",
+              "theme": "macro",
+              "attention_reason": "中共中央辦公廳發文加強新就業群體服務管理",
+              "must_keep": true,
+              "model_used": "meta-llama/llama-4-scout-17b-16e-instruct",
+              "delayed_retry_attempted": false,
+              "delayed_retry_model_chain": [],
+              "delayed_retry_final_model": null,
+              "error_classification": null,
+              "error": null
+            },
+            {
+              "source_article_id": "4382609",
+              "title": "華為余承東:6月底發布尊界新車 售價約200萬人民幣",
+              "canonical_url": "https://www.hkej.com/instantnews/china/article/4382609/%E8%8F%AF%E7%82%BA%E4%BD%99%E6%89%BF%E6%9D%B1%3A6%E6%9C%88%E5%BA%95%E7%99%BC%E5%B8%83%E5%B0%8A%E7%95%8C%E6%96%B0%E8%BB%8A+%E5%94%AE%E5%83%B9%E7%B4%84200%E8%90%AC%E4%BA%BA%E6%B0%91%E5%B9%A3",
+              "published_at": "2026-04-26T14:31:00+08:00",
+              "section": "中國財經",
+              "novelty_score": 6,
+              "relevance_score": 8,
+              "urgency_score": 7,
+              "named_entities": [
+                {
+                  "name": "余承東",
+                  "type": "person"
+                },
+                {
+                  "name": "華為",
+                  "type": "company"
+                },
+                {
+                  "name": "江淮汽車",
+                  "type": "company"
+                },
+                {
+                  "name": "尊界",
+                  "type": "company"
+                }
+              ],
+              "key_points": [
+                "華為常務董事余承東宣布，尊界新車將在6月底發布，價格約200萬元人民幣。",
+                "尊界S800上市10個月累計交付1.6萬輛。",
+                "尊界是華為與江淮汽車合作打造的超高端汽車品牌。"
+              ],
+              "content_truncated": false,
+              "original_content_length_chars": 141,
+              "analyzed_content_length_chars": 141,
+              "original_content_token_estimate": 36,
+              "analyzed_content_token_estimate": 36,
+              "truncation_reason": null,
+              "analysis_method": "full_text",
+              "attention_tier": "high",
+              "theme": "macro",
+              "attention_reason": "High-signal macro headline based on title/summary keywords.",
+              "must_keep": true,
+              "model_used": "meta-llama/llama-4-scout-17b-16e-instruct",
+              "delayed_retry_attempted": false,
+              "delayed_retry_model_chain": [],
+              "delayed_retry_final_model": null,
+              "error_classification": null,
+              "error": null
+            },
             {
               "source_article_id": "4382604",
               "title": "中國商務部促歐方立即將中企移出制裁清單",
@@ -1727,39 +2473,7 @@
               "delayed_retry_final_model": null,
               "error_classification": null,
               "error": null
-            }
-          ],
-          "model_used": "meta-llama/llama-4-scout-17b-16e-instruct"
-        },
-        {
-          "title": "企業新聞與科技動態",
-          "theme_rationale": "匯集企業最新新聞、科技創新動態及市場反應。",
-          "article_count": 2,
-          "key_developments": [
-            "小米集團創辦人兼董事長雷軍遭網民造謠被車主圍堵維權，造謠者李某華被依法處以行政拘留10日",
-            "DeepSeek-V4-Pro模型推出限時2.5折優惠，輸入價每百萬Token價格僅0.25元，優惠期至5月5日",
-            "小米集團將拿起法律武器捍衞自身權益",
-            "DeepSeek V4模型價格與OpenAI的GPT-5.5 Pro相比有顯著優勢"
-          ],
-          "named_entities": [
-            {
-              "name": "小米集團",
-              "type": "company"
             },
-            {
-              "name": "雷軍",
-              "type": "person"
-            },
-            {
-              "name": "DeepSeek",
-              "type": "company"
-            },
-            {
-              "name": "DeepSeek-V4-Pro",
-              "type": "asset"
-            }
-          ],
-          "articles": [
             {
               "source_article_id": "4382601",
               "title": "小米:散布雷軍被車主圍堵維權謠言者 被罰行政拘留10日",
@@ -1801,48 +2515,6 @@
               "delayed_retry_final_model": null,
               "error_classification": null,
               "error": null
-            },
-            {
-              "source_article_id": "4382599",
-              "title": "AI價格丨DeepSeek-V4-Pro推震撼價限時2.5折優惠",
-              "canonical_url": "https://www.hkej.com/instantnews/china/article/4382599/AI%E5%83%B9%E6%A0%BC%E4%B8%A8DeepSeek-V4-Pro%E6%8E%A8%E9%9C%87%E6%92%BC%E5%83%B9%E9%99%90%E6%99%822.5%E6%8A%98%E5%84%AA%E6%83%A0",
-              "published_at": "2026-04-26T11:12:00+08:00",
-              "section": "中國財經",
-              "novelty_score": 8,
-              "relevance_score": 7,
-              "urgency_score": 5,
-              "named_entities": [
-                {
-                  "name": "DeepSeek",
-                  "type": "company"
-                },
-                {
-                  "name": "DeepSeek-V4-Pro",
-                  "type": "asset"
-                }
-              ],
-              "key_points": [
-                "DeepSeek-V4-Pro模型推出限時2.5折優惠，輸入價每百萬Token價格僅0.25元",
-                "優惠期至5月5日",
-                "DeepSeek V4模型價格與OpenAI的GPT-5.5 Pro相比有顯著優勢"
-              ],
-              "content_truncated": false,
-              "original_content_length_chars": 635,
-              "analyzed_content_length_chars": 635,
-              "original_content_token_estimate": 159,
-              "analyzed_content_token_estimate": 159,
-              "truncation_reason": null,
-              "analysis_method": "full_text",
-              "attention_tier": "medium",
-              "theme": "tech",
-              "attention_reason": "AI price promotion",
-              "must_keep": true,
-              "model_used": "meta-llama/llama-4-scout-17b-16e-instruct",
-              "delayed_retry_attempted": false,
-              "delayed_retry_model_chain": [],
-              "delayed_retry_final_model": null,
-              "error_classification": null,
-              "error": null
             }
           ],
           "model_used": "meta-llama/llama-4-scout-17b-16e-instruct"
@@ -1850,17 +2522,16 @@
       ],
       "analysis_profile": "standard",
       "model_used": "meta-llama/llama-4-scout-17b-16e-instruct",
-      "sub_batch_count": 7,
+      "sub_batch_count": 5,
       "diagnostics": {
-        "sub_batch_count": 4,
+        "sub_batch_count": 5,
         "split_reasons": [],
         "models_attempted": [
-          "meta-llama/llama-4-scout-17b-16e-instruct",
-          "qwen/qwen3-32b"
+          "meta-llama/llama-4-scout-17b-16e-instruct"
         ],
-        "estimated_input_tokens_max": 1512,
-        "serialized_request_bytes_max": 7896,
-        "rate_limit_waits": 1,
+        "estimated_input_tokens_max": 1180,
+        "serialized_request_bytes_max": 6933,
+        "rate_limit_waits": 0,
         "partial_article_count": 0,
         "synthesis_wait_seconds_total": 0.0,
         "synthesis_retry_count": 0,
@@ -1875,14 +2546,22 @@
     },
     {
       "category": "地產新聞",
-      "article_count": 2,
+      "article_count": 3,
       "status": "success",
       "key_developments": [
-        "新世界發展(00017)夥港鐵(00066)合作發展的柏傲莊III加推45伙，折實售價由921.6萬元起。",
-        "恒地(00012)牽頭發展的首岸第1期周四次輪發售120伙，折實售價由684.5萬起。",
-        "首輪銷售218伙全數沽清，套現逾16.4億元，錄得13宗大手客成交。"
+        "嘉華國際主導的啟德海灣項目在周末兩日售出43伙，累售989伙，套現逾80億元。",
+        "新世界發展夥港鐵合作發展的柏傲莊III加推45伙，折實售價由921.6萬元起。",
+        "恒地牽頭發展的首岸第1期周四次輪發售120伙，折實售價由684.5萬起，首輪銷售218伙全數沽清，套現逾16.4億元。"
       ],
       "named_entities": [
+        {
+          "name": "嘉華國際",
+          "type": "company"
+        },
+        {
+          "name": "啟德海灣",
+          "type": "institution"
+        },
         {
           "name": "新世界發展",
           "type": "company"
@@ -1890,17 +2569,54 @@
         {
           "name": "港鐵",
           "type": "company"
-        },
-        {
-          "name": "柏傲莊III",
-          "type": "asset"
-        },
-        {
-          "name": "恒地",
-          "type": "company"
         }
       ],
       "articles": [
+        {
+          "source_article_id": "4382718",
+          "title": "新盤丨啟德海灣兩日售出43伙",
+          "canonical_url": "https://www.hkej.com/instantnews/property/article/4382718/%E6%96%B0%E7%9B%A4%E4%B8%A8%E5%95%9F%E5%BE%B7%E6%B5%B7%E7%81%A3%E5%85%A9%E6%97%A5%E5%94%AE%E5%87%BA43%E4%BC%99",
+          "published_at": "2026-04-26T20:42:00+08:00",
+          "section": "新盤情報",
+          "novelty_score": 6,
+          "relevance_score": 8,
+          "urgency_score": 5,
+          "named_entities": [
+            {
+              "name": "嘉華國際",
+              "type": "company"
+            },
+            {
+              "name": "啟德海灣",
+              "type": "institution"
+            },
+            {
+              "name": "啟德承豐道15號",
+              "type": "institution"
+            }
+          ],
+          "key_points": [
+            "嘉華國際(00173)主導的啟德海灣項目在周末兩日售出43伙，累售989伙，套現逾80億元。",
+            "項目成交中包括一組買家以逾3500萬元購入4伙兩房單位，另一組買家以逾1980萬元購入3伙。"
+          ],
+          "content_truncated": false,
+          "original_content_length_chars": 268,
+          "analyzed_content_length_chars": 268,
+          "original_content_token_estimate": 67,
+          "analyzed_content_token_estimate": 67,
+          "truncation_reason": null,
+          "analysis_method": "full_text",
+          "attention_tier": "medium",
+          "theme": "general",
+          "attention_reason": "Default medium attention because the story is relevant but not an obvious top-priority market mover.",
+          "must_keep": false,
+          "model_used": "meta-llama/llama-4-scout-17b-16e-instruct",
+          "delayed_retry_attempted": false,
+          "delayed_retry_model_chain": [],
+          "delayed_retry_final_model": null,
+          "error_classification": null,
+          "error": null
+        },
         {
           "source_article_id": "4382648",
           "title": "新盤丨柏傲莊III加推45伙周四發售 折實921萬起",
@@ -1992,13 +2708,21 @@
         {
           "title": "地產新聞 overview",
           "theme_rationale": "Single subgroup because the category size did not require thematic splitting.",
-          "article_count": 2,
+          "article_count": 3,
           "key_developments": [
-            "新世界發展(00017)夥港鐵(00066)合作發展的柏傲莊III加推45伙，折實售價由921.6萬元起。",
-            "恒地(00012)牽頭發展的首岸第1期周四次輪發售120伙，折實售價由684.5萬起。",
-            "首輪銷售218伙全數沽清，套現逾16.4億元，錄得13宗大手客成交。"
+            "嘉華國際主導的啟德海灣項目在周末兩日售出43伙，累售989伙，套現逾80億元。",
+            "新世界發展夥港鐵合作發展的柏傲莊III加推45伙，折實售價由921.6萬元起。",
+            "恒地牽頭發展的首岸第1期周四次輪發售120伙，折實售價由684.5萬起，首輪銷售218伙全數沽清，套現逾16.4億元。"
           ],
           "named_entities": [
+            {
+              "name": "嘉華國際",
+              "type": "company"
+            },
+            {
+              "name": "啟德海灣",
+              "type": "institution"
+            },
             {
               "name": "新世界發展",
               "type": "company"
@@ -2006,17 +2730,54 @@
             {
               "name": "港鐵",
               "type": "company"
-            },
-            {
-              "name": "柏傲莊III",
-              "type": "asset"
-            },
-            {
-              "name": "恒地",
-              "type": "company"
             }
           ],
           "articles": [
+            {
+              "source_article_id": "4382718",
+              "title": "新盤丨啟德海灣兩日售出43伙",
+              "canonical_url": "https://www.hkej.com/instantnews/property/article/4382718/%E6%96%B0%E7%9B%A4%E4%B8%A8%E5%95%9F%E5%BE%B7%E6%B5%B7%E7%81%A3%E5%85%A9%E6%97%A5%E5%94%AE%E5%87%BA43%E4%BC%99",
+              "published_at": "2026-04-26T20:42:00+08:00",
+              "section": "新盤情報",
+              "novelty_score": 6,
+              "relevance_score": 8,
+              "urgency_score": 5,
+              "named_entities": [
+                {
+                  "name": "嘉華國際",
+                  "type": "company"
+                },
+                {
+                  "name": "啟德海灣",
+                  "type": "institution"
+                },
+                {
+                  "name": "啟德承豐道15號",
+                  "type": "institution"
+                }
+              ],
+              "key_points": [
+                "嘉華國際(00173)主導的啟德海灣項目在周末兩日售出43伙，累售989伙，套現逾80億元。",
+                "項目成交中包括一組買家以逾3500萬元購入4伙兩房單位，另一組買家以逾1980萬元購入3伙。"
+              ],
+              "content_truncated": false,
+              "original_content_length_chars": 268,
+              "analyzed_content_length_chars": 268,
+              "original_content_token_estimate": 67,
+              "analyzed_content_token_estimate": 67,
+              "truncation_reason": null,
+              "analysis_method": "full_text",
+              "attention_tier": "medium",
+              "theme": "general",
+              "attention_reason": "Default medium attention because the story is relevant but not an obvious top-priority market mover.",
+              "must_keep": false,
+              "model_used": "meta-llama/llama-4-scout-17b-16e-instruct",
+              "delayed_retry_attempted": false,
+              "delayed_retry_model_chain": [],
+              "delayed_retry_final_model": null,
+              "error_classification": null,
+              "error": null
+            },
             {
               "source_article_id": "4382648",
               "title": "新盤丨柏傲莊III加推45伙周四發售 折實921萬起",
@@ -2109,15 +2870,15 @@
       ],
       "analysis_profile": "light",
       "model_used": "meta-llama/llama-4-scout-17b-16e-instruct",
-      "sub_batch_count": 2,
+      "sub_batch_count": 3,
       "diagnostics": {
-        "sub_batch_count": 1,
+        "sub_batch_count": 3,
         "split_reasons": [],
         "models_attempted": [
           "meta-llama/llama-4-scout-17b-16e-instruct"
         ],
-        "estimated_input_tokens_max": 994,
-        "serialized_request_bytes_max": 6437,
+        "estimated_input_tokens_max": 653,
+        "serialized_request_bytes_max": 3376,
         "rate_limit_waits": 0,
         "partial_article_count": 0,
         "synthesis_wait_seconds_total": 0.0,
