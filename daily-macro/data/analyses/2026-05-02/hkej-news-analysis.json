@@ -1,15 +1,15 @@
 {
   "report_schema_version": 6,
   "report_date": "2026-05-02",
-  "generated_at": "2026-05-02T08:40:22.176836+00:00",
+  "generated_at": "2026-05-02T21:46:15.661109+00:00",
   "source_site": "hkej",
   "status": "success",
-  "executive_summary": [
+  "executive_summary": [],
+  "legacy_executive_summary": [
     "特朗普計劃將歐盟汽車關稅上調至25%，此舉可能加劇貿易戰。",
     "英國對美國商品出口暴跌24.7%，約15億英鎊，創下新低。",
     "蘋果股價急升逾半成，逼近歷史高位。"
   ],
-  "legacy_executive_summary": [],
   "model": {
     "provider": "groq",
     "primary_model": "meta-llama/llama-4-scout-17b-16e-instruct",
@@ -20,15 +20,15 @@
   },
   "model_switches": [],
   "input": {
-    "article_count": 33,
+    "article_count": 44,
     "category_count": 3
   },
   "diagnostics": {
-    "rate_limit_wait_count": 1,
-    "rate_limit_wait_seconds_total": 1036.8,
+    "rate_limit_wait_count": 2,
+    "rate_limit_wait_seconds_total": 2332.799,
     "fallback_switch_count": 0,
     "key_rotation_count": 0,
-    "pre_send_split_count": 8,
+    "pre_send_split_count": 12,
     "response_413_split_count": 0,
     "json_repair_retry_count": 0,
     "batch_count": 29,
@@ -44,18 +44,18 @@
     "degraded_merge_count": 0
   },
   "incremental": {
-    "reused_successful_articles": 0,
-    "new_articles_analyzed": 33,
+    "reused_successful_articles": 33,
+    "new_articles_analyzed": 11,
     "retried_previous_day_articles": 0,
     "previous_day_retry_successes": 0
   },
   "daily_stats": {
-    "total_scraped": 33,
-    "analyzed": 33,
+    "total_scraped": 44,
+    "analyzed": 44,
     "success_rate": 100.0
   },
   "macro_release_digest": {
-    "generated_at": "2026-05-02T08:22:31.602658+00:00",
+    "generated_at": "2026-05-02T21:07:07.665067+00:00",
     "window_start": "2026-05-02",
     "window_end": "2026-05-08",
     "fetch_status": "failed",
@@ -67,10 +67,10 @@
   },
   "unresolved_articles": [],
   "totals": {
-    "article_count": 33,
-    "successful_article_analyses": 33,
+    "article_count": 44,
+    "successful_article_analyses": 44,
     "failed_article_analyses": 0,
-    "full_text_article_count": 32,
+    "full_text_article_count": 43,
     "truncated_article_count": 1,
     "successful_categories": 3,
     "partial_categories": 0,
@@ -598,7 +598,7 @@
             "特朗普計劃將歐盟汽車關稅上調至25%，此舉可能加劇貿易戰。",
             "英國對美國商品出口暴跌24.7%，約15億英鎊，創下新低。",
             "蘋果股價急升逾半成，逼近歷史高位。",
-            "美股周五上漲，道指一度升336點。"
+            "道指一度升336點。"
           ],
           "named_entities": [
             {
@@ -974,7 +974,8 @@
           "key_developments": [
             "蘋果公司因AI需求推動庫存緊張和晶片供應趨緊，將Mac mini起售價從599美元上調至799美元。",
             "美股納指收市升0.89%，標指及納指齊創即市和收市新高。",
-            "蘋果公司股價曾飆5.8%，收市仍升3.2%。"
+            "蘋果公司股價曾飆5.8%，收市仍升3.2%。",
+            "新款Mac mini搭載M4晶片，存儲從256GB提升至512GB。"
           ],
           "named_entities": [
             {
@@ -988,6 +989,10 @@
             {
               "name": "美國",
               "type": "country"
+            },
+            {
+              "name": "M4晶片",
+              "type": "other"
             }
           ],
           "articles": [
@@ -1138,36 +1143,40 @@
       ],
       "analysis_profile": "standard",
       "model_used": "meta-llama/llama-4-scout-17b-16e-instruct",
-      "sub_batch_count": 9,
+      "sub_batch_count": 4,
       "diagnostics": {
-        "sub_batch_count": 5,
-        "split_reasons": [
-          "pre_send_budget"
-        ],
-        "models_attempted": [
-          "meta-llama/llama-4-scout-17b-16e-instruct"
-        ],
-        "estimated_input_tokens_max": 1759,
-        "serialized_request_bytes_max": 12271,
-        "rate_limit_waits": 1,
+        "sub_batch_count": 4,
+        "split_reasons": [],
+        "models_attempted": [],
+        "estimated_input_tokens_max": 0,
+        "serialized_request_bytes_max": 0,
+        "rate_limit_waits": 0,
         "partial_article_count": 0,
-        "synthesis_wait_seconds_total": 1036.8,
+        "synthesis_wait_seconds_total": 0.0,
         "synthesis_retry_count": 0,
         "synthesis_retry_skipped_count": 0,
         "synthesis_budget_exhausted": false,
         "degraded_merge_used": false,
         "degraded_merge_reason": "",
-        "synthesis_merge_depth_max": 1,
+        "synthesis_merge_depth_max": 0,
         "model_switches": []
       },
       "error": null
     },
     {
       "category": "時事脈搏",
-      "article_count": 21,
+      "article_count": 30,
       "status": "success",
       "key_developments": [],
       "named_entities": [
+        {
+          "name": "警方",
+          "type": "institution"
+        },
+        {
+          "name": "東航",
+          "type": "company"
+        },
         {
           "name": "美國",
           "type": "country"
@@ -1175,17 +1184,166 @@
         {
           "name": "以色列",
           "type": "country"
-        },
-        {
-          "name": "美國海軍",
-          "type": "organization"
-        },
-        {
-          "name": "美國多米諾數據實驗室公司",
-          "type": "company"
         }
       ],
       "articles": [
+        {
+          "source_article_id": "4392464",
+          "canonical_url": "https://www.hkej.com/instantnews/current/article/4392464/%E5%85%AD%E5%90%88%E5%BD%A9%EF%BD%9C50%E5%91%A8%E5%B9%B4%E9%87%91%E5%A4%9A%E5%AF%B6+%E9%A0%AD%E7%8D%8E4%E6%B3%A8%E4%B8%AD%E6%AF%8F%E6%B3%A8%E6%B4%BE5575%E8%90%AC",
+          "title": "六合彩｜50周年金多寶 頭獎4注中每注派5575萬",
+          "section": "時事脈搏",
+          "published_at": "2026-05-02T22:19:00+08:00",
+          "attention_tier": "light",
+          "novelty_score": 5,
+          "relevance_score": 5,
+          "urgency_score": 5,
+          "named_entities": [],
+          "key_points": [],
+          "content_truncated": false,
+          "analysis_method": "bypassed",
+          "model_used": "direct"
+        },
+        {
+          "source_article_id": "4392463",
+          "canonical_url": "https://www.hkej.com/instantnews/current/article/4392463/%E8%AD%A6%E6%96%B9%E6%8B%98%E5%85%A9%E5%85%A7%E5%9C%B0%E4%BA%BA+%E6%B6%89%E8%8D%83%E7%81%A3%E7%88%86%E7%AB%8A%E5%96%AE%E4%BD%8D",
+          "title": "警方拘兩內地人 涉荃灣爆竊單位",
+          "section": "時事脈搏",
+          "published_at": "2026-05-02T19:30:00+08:00",
+          "attention_tier": "light",
+          "novelty_score": 5,
+          "relevance_score": 5,
+          "urgency_score": 5,
+          "named_entities": [],
+          "key_points": [],
+          "content_truncated": false,
+          "analysis_method": "bypassed",
+          "model_used": "direct"
+        },
+        {
+          "source_article_id": "4392462",
+          "canonical_url": "https://www.hkej.com/instantnews/current/article/4392462/%E5%8C%97%E5%8D%80%E9%86%AB%E9%99%A2%E5%86%8D%E7%99%BC%E7%8F%BE%E4%B8%8075%E6%AD%B2%E7%94%B7%E7%97%85%E4%BA%BA%E7%A2%BA%E8%A8%BA%E5%B8%B6%E8%80%90%E8%90%AC%E5%8F%A4%E9%9C%89%E7%B4%A0%E8%85%B8%E7%90%83%E8%8F%8C",
+          "title": "北區醫院再發現一75歲男病人確診帶耐萬古霉素腸球菌",
+          "section": "時事脈搏",
+          "published_at": "2026-05-02T19:09:00+08:00",
+          "attention_tier": "light",
+          "novelty_score": 5,
+          "relevance_score": 5,
+          "urgency_score": 5,
+          "named_entities": [],
+          "key_points": [],
+          "content_truncated": false,
+          "analysis_method": "bypassed",
+          "model_used": "direct"
+        },
+        {
+          "source_article_id": "4392461",
+          "canonical_url": "https://www.hkej.com/instantnews/current/article/4392461/%E6%9D%B1%E8%88%AA%E5%AE%A2%E6%A9%9F%E4%B8%8A%E6%B5%B7%E8%99%B9%E6%A9%8B%E6%A9%9F%E5%A0%B4%E6%92%9E%E7%99%BB%E6%A9%9F%E6%A9%8B+%E7%84%A1%E4%BA%BA%E5%82%B7",
+          "title": "東航客機上海虹橋機場撞登機橋 無人傷",
+          "section": "時事脈搏",
+          "published_at": "2026-05-02T18:37:00+08:00",
+          "attention_tier": "light",
+          "novelty_score": 5,
+          "relevance_score": 5,
+          "urgency_score": 5,
+          "named_entities": [],
+          "key_points": [],
+          "content_truncated": false,
+          "analysis_method": "bypassed",
+          "model_used": "direct"
+        },
+        {
+          "source_article_id": "4392460",
+          "canonical_url": "https://www.hkej.com/instantnews/current/article/4392460/%E9%BB%83%E9%87%91%E5%91%A8%E4%B8%A8%E6%88%AA%E8%87%B3%E4%B8%8B%E5%8D%884%E6%99%82%E9%80%BE69%E8%90%AC%E4%BA%BA%E6%AC%A1%E5%87%BA%E5%85%A5%E5%A2%83+%E5%85%A7%E5%9C%B0%E6%97%85%E5%AE%A2%E9%80%BE23%E8%90%AC",
+          "title": "黃金周丨截至下午4時逾69萬人次出入境 內地旅客逾23萬",
+          "section": "時事脈搏",
+          "published_at": "2026-05-02T18:15:00+08:00",
+          "attention_tier": "light",
+          "novelty_score": 5,
+          "relevance_score": 5,
+          "urgency_score": 5,
+          "named_entities": [],
+          "key_points": [],
+          "content_truncated": false,
+          "analysis_method": "bypassed",
+          "model_used": "direct"
+        },
+        {
+          "source_article_id": "4392455",
+          "canonical_url": "https://www.hkej.com/instantnews/current/article/4392455/%E7%BE%8E%E5%9C%8B%E5%BB%89%E8%88%AA%E7%B2%BE%E7%A5%9E%E8%88%AA%E7%A9%BA%E5%AE%A3%E5%B8%83%E5%81%9C%E9%81%8B",
+          "title": "美國廉航精神航空宣布停運",
+          "section": "時事脈搏",
+          "published_at": "2026-05-02T17:43:00+08:00",
+          "attention_tier": "light",
+          "novelty_score": 5,
+          "relevance_score": 5,
+          "urgency_score": 5,
+          "named_entities": [],
+          "key_points": [],
+          "content_truncated": false,
+          "analysis_method": "bypassed",
+          "model_used": "direct"
+        },
+        {
+          "source_article_id": "4392456",
+          "title": "伊朗軍方:伊美再爆發衝突可能性很大",
+          "canonical_url": "https://www.hkej.com/instantnews/current/article/4392456/%E4%BC%8A%E6%9C%97%E8%BB%8D%E6%96%B9%3A%E4%BC%8A%E7%BE%8E%E5%86%8D%E7%88%86%E7%99%BC%E8%A1%9D%E7%AA%81%E5%8F%AF%E8%83%BD%E6%80%A7%E5%BE%88%E5%A4%A7",
+          "published_at": "2026-05-02T16:50:00+08:00",
+          "section": "時事脈搏",
+          "novelty_score": 6,
+          "relevance_score": 8,
+          "urgency_score": 9,
+          "named_entities": [
+            {
+              "name": "伊朗",
+              "type": "country"
+            },
+            {
+              "name": "美國",
+              "type": "country"
+            },
+            {
+              "name": "特朗普",
+              "type": "person"
+            }
+          ],
+          "key_points": [
+            "伊朗與美國再次爆發衝突的可能性很大。",
+            "伊朗已做好準備，包括啟動防空系統。"
+          ],
+          "content_truncated": false,
+          "original_content_length_chars": 111,
+          "analyzed_content_length_chars": 111,
+          "original_content_token_estimate": 28,
+          "analyzed_content_token_estimate": 28,
+          "truncation_reason": null,
+          "analysis_method": "full_text",
+          "attention_tier": "high",
+          "theme": "geopolitics",
+          "attention_reason": "High-signal geopolitics headline based on title/summary keywords.",
+          "must_keep": true,
+          "model_used": "meta-llama/llama-4-scout-17b-16e-instruct",
+          "delayed_retry_attempted": false,
+          "delayed_retry_model_chain": [],
+          "delayed_retry_final_model": null,
+          "error_classification": null,
+          "error": null
+        },
+        {
+          "source_article_id": "4392457",
+          "canonical_url": "https://www.hkej.com/instantnews/current/article/4392457/%E5%A4%A9%E6%B0%A3%E4%B8%A8%E5%A4%A9%E6%96%87%E5%8F%B0%3A%E6%98%8E%E6%99%9A%E6%B0%A3%E6%BA%AB%E9%80%90%E6%AD%A5%E9%99%8D+%E5%91%A8%E4%B8%80%E6%97%A9%E4%B8%8A%E4%BD%8E%E8%A6%8B21%E5%BA%A6",
+          "title": "天氣丨天文台:明晚氣溫逐步降 周一早上低見21度",
+          "section": "時事脈搏",
+          "published_at": "2026-05-02T16:47:00+08:00",
+          "attention_tier": "light",
+          "novelty_score": 5,
+          "relevance_score": 5,
+          "urgency_score": 5,
+          "named_entities": [],
+          "key_points": [],
+          "content_truncated": false,
+          "analysis_method": "bypassed",
+          "model_used": "direct"
+        },
         {
           "source_article_id": "4392453",
           "canonical_url": "https://www.hkej.com/instantnews/current/article/4392453/%E5%AE%8F%E7%A6%8F%E8%8B%91%E4%B8%A8%E5%8D%93%E6%B0%B8%E8%88%88%3A%E7%B4%84800%E6%88%B6%E5%B1%85%E6%B0%91%E5%86%80%E5%86%8D%E4%B8%8A%E6%A8%93+%E7%9B%A1%E5%BF%AB%E5%85%AC%E5%B8%83%E6%AC%A1%E8%BC%AA%E5%AE%89%E6%8E%92",
@@ -1200,7 +1358,10 @@
           "key_points": [],
           "content_truncated": false,
           "analysis_method": "bypassed",
-          "model_used": "direct"
+          "model_used": "direct",
+          "theme": "general",
+          "attention_reason": "Lighter treatment because this story sits in the 時事脈搏 section without strong market-moving signals.",
+          "must_keep": false
         },
         {
           "source_article_id": "4392454",
@@ -1208,6 +1369,25 @@
           "title": "女子疑墮求職騙案失逾225萬",
           "section": "時事脈搏",
           "published_at": "2026-05-02T16:05:00+08:00",
+          "attention_tier": "light",
+          "novelty_score": 5,
+          "relevance_score": 5,
+          "urgency_score": 5,
+          "named_entities": [],
+          "key_points": [],
+          "content_truncated": false,
+          "analysis_method": "bypassed",
+          "model_used": "direct",
+          "theme": "general",
+          "attention_reason": "Lighter treatment because this story sits in the 時事脈搏 section without strong market-moving signals.",
+          "must_keep": false
+        },
+        {
+          "source_article_id": "4392452",
+          "canonical_url": "https://www.hkej.com/instantnews/current/article/4392452/%E7%B2%89%E5%B6%BA%E7%B9%9E%E9%81%93%E6%9D%B1%E6%AE%B5%E5%91%A8%E6%97%A5%E9%80%9A%E8%BB%8A+%E7%94%AF%E6%BC%A2%E8%B1%AA%3A%E7%BA%8C%E5%AE%8C%E5%96%84%E5%8C%97%E9%83%BD%E7%94%A2%E6%A5%AD%E5%B8%83%E5%B1%80",
+          "title": "粉嶺繞道東段周日通車 甯漢豪:續完善北都產業布局",
+          "section": "時事脈搏",
+          "published_at": "2026-05-02T15:38:00+08:00",
           "attention_tier": "light",
           "novelty_score": 5,
           "relevance_score": 5,
@@ -1232,7 +1412,10 @@
           "key_points": [],
           "content_truncated": false,
           "analysis_method": "bypassed",
-          "model_used": "direct"
+          "model_used": "direct",
+          "theme": "general",
+          "attention_reason": "Lighter treatment because this story sits in the 時事脈搏 section without strong market-moving signals.",
+          "must_keep": false
         },
         {
           "source_article_id": "4392451",
@@ -1297,7 +1480,10 @@
           "key_points": [],
           "content_truncated": false,
           "analysis_method": "bypassed",
-          "model_used": "direct"
+          "model_used": "direct",
+          "theme": "general",
+          "attention_reason": "Lighter treatment because this story sits in the 時事脈搏 section without strong market-moving signals.",
+          "must_keep": false
         },
         {
           "source_article_id": "4392446",
@@ -1313,7 +1499,10 @@
           "key_points": [],
           "content_truncated": false,
           "analysis_method": "bypassed",
-          "model_used": "direct"
+          "model_used": "direct",
+          "theme": "general",
+          "attention_reason": "Lighter treatment because this story sits in the 時事脈搏 section without strong market-moving signals.",
+          "must_keep": false
         },
         {
           "source_article_id": "4392447",
@@ -1329,7 +1518,10 @@
           "key_points": [],
           "content_truncated": false,
           "analysis_method": "bypassed",
-          "model_used": "direct"
+          "model_used": "direct",
+          "theme": "general",
+          "attention_reason": "Lighter treatment because this story sits in the 時事脈搏 section without strong market-moving signals.",
+          "must_keep": false
         },
         {
           "source_article_id": "4392444",
@@ -1345,7 +1537,10 @@
           "key_points": [],
           "content_truncated": false,
           "analysis_method": "bypassed",
-          "model_used": "direct"
+          "model_used": "direct",
+          "theme": "general",
+          "attention_reason": "Lighter treatment because this story sits in the 時事脈搏 section without strong market-moving signals.",
+          "must_keep": false
         },
         {
           "source_article_id": "4392443",
@@ -1361,7 +1556,10 @@
           "key_points": [],
           "content_truncated": false,
           "analysis_method": "bypassed",
-          "model_used": "direct"
+          "model_used": "direct",
+          "theme": "general",
+          "attention_reason": "Lighter treatment because this story sits in the 時事脈搏 section without strong market-moving signals.",
+          "must_keep": false
         },
         {
           "source_article_id": "4392440",
@@ -1422,7 +1620,10 @@
           "key_points": [],
           "content_truncated": false,
           "analysis_method": "bypassed",
-          "model_used": "direct"
+          "model_used": "direct",
+          "theme": "general",
+          "attention_reason": "Lighter treatment because this story sits in the 時事脈搏 section without strong market-moving signals.",
+          "must_keep": false
         },
         {
           "source_article_id": "4392442",
@@ -1483,7 +1684,10 @@
           "key_points": [],
           "content_truncated": false,
           "analysis_method": "bypassed",
-          "model_used": "direct"
+          "model_used": "direct",
+          "theme": "general",
+          "attention_reason": "Lighter treatment because this story sits in the 時事脈搏 section without strong market-moving signals.",
+          "must_keep": false
         },
         {
           "source_article_id": "4392437",
@@ -1499,7 +1703,10 @@
           "key_points": [],
           "content_truncated": false,
           "analysis_method": "bypassed",
-          "model_used": "direct"
+          "model_used": "direct",
+          "theme": "general",
+          "attention_reason": "Lighter treatment because this story sits in the 時事脈搏 section without strong market-moving signals.",
+          "must_keep": false
         },
         {
           "source_article_id": "4392436",
@@ -1515,7 +1722,10 @@
           "key_points": [],
           "content_truncated": false,
           "analysis_method": "bypassed",
-          "model_used": "direct"
+          "model_used": "direct",
+          "theme": "general",
+          "attention_reason": "Lighter treatment because this story sits in the 時事脈搏 section without strong market-moving signals.",
+          "must_keep": false
         },
         {
           "source_article_id": "4392435",
@@ -1531,7 +1741,10 @@
           "key_points": [],
           "content_truncated": false,
           "analysis_method": "bypassed",
-          "model_used": "direct"
+          "model_used": "direct",
+          "theme": "general",
+          "attention_reason": "Lighter treatment because this story sits in the 時事脈搏 section without strong market-moving signals.",
+          "must_keep": false
         },
         {
           "source_article_id": "4392431",
@@ -1641,7 +1854,10 @@
           "key_points": [],
           "content_truncated": false,
           "analysis_method": "bypassed",
-          "model_used": "direct"
+          "model_used": "direct",
+          "theme": "general",
+          "attention_reason": "Lighter treatment because this story sits in the 時事脈搏 section without strong market-moving signals.",
+          "must_keep": false
         },
         {
           "source_article_id": "4392422",
@@ -1736,15 +1952,23 @@
       ],
       "subgroups": [
         {
-          "title": "社會動態 & Other News",
-          "theme_rationale": "關注本地社會議題與動態",
-          "article_count": 11,
+          "title": "社會新聞 & Other News",
+          "theme_rationale": "與社會民生相關的新聞事件",
+          "article_count": 21,
           "key_developments": [
-            "美國批准對以色列等中東盟友逾670億軍售",
-            "美國海軍與美國多米諾數據實驗室公司合作，利用人工智能技術在霍爾木茲海峽進行掃雷工作",
-            "黃金周截至早上10時，逾7.9萬人次內地客訪港"
+            "警方拘兩內地人涉荃灣爆竊單位",
+            "東航客機上海虹橋機場撞登機橋，無人傷",
+            "美國批准對以色列等中東盟友提供總價值超過86億美元(約670.8億港元)的軍售"
           ],
           "named_entities": [
+            {
+              "name": "警方",
+              "type": "institution"
+            },
+            {
+              "name": "東航",
+              "type": "company"
+            },
             {
               "name": "美國",
               "type": "country"
@@ -1752,23 +1976,15 @@
             {
               "name": "以色列",
               "type": "country"
-            },
-            {
-              "name": "美國海軍",
-              "type": "organization"
-            },
-            {
-              "name": "美國多米諾數據實驗室公司",
-              "type": "company"
             }
           ],
           "articles": [
             {
-              "source_article_id": "4392446",
-              "canonical_url": "https://www.hkej.com/instantnews/current/article/4392446/%E5%AD%AB%E6%9D%B1%3AAI%E5%A4%A7%E8%AC%9B%E5%A0%82%E6%9C%88%E5%85%A7%E5%95%9F%E6%92%AD+%E6%8B%89%E9%96%8B%E5%85%A8%E6%B0%91%E5%9F%B9%E8%A8%93%E5%BA%8F%E5%B9%95",
-              "title": "孫東:AI大講堂月內啟播 拉開全民培訓序幕",
+              "source_article_id": "4392464",
+              "canonical_url": "https://www.hkej.com/instantnews/current/article/4392464/%E5%85%AD%E5%90%88%E5%BD%A9%EF%BD%9C50%E5%91%A8%E5%B9%B4%E9%87%91%E5%A4%9A%E5%AF%B6+%E9%A0%AD%E7%8D%8E4%E6%B3%A8%E4%B8%AD%E6%AF%8F%E6%B3%A8%E6%B4%BE5575%E8%90%AC",
+              "title": "六合彩｜50周年金多寶 頭獎4注中每注派5575萬",
               "section": "時事脈搏",
-              "published_at": "2026-05-02T13:24:00+08:00",
+              "published_at": "2026-05-02T22:19:00+08:00",
               "attention_tier": "light",
               "novelty_score": 5,
               "relevance_score": 5,
@@ -1780,11 +1996,11 @@
               "model_used": "direct"
             },
             {
-              "source_article_id": "4392447",
-              "canonical_url": "https://www.hkej.com/instantnews/current/article/4392447/%E9%BB%83%E9%87%91%E5%91%A8%E4%B8%A8%E6%88%AA%E8%87%B3%E6%97%A9%E4%B8%8A10%E6%99%82+%E9%80%BE7.9%E8%90%AC%E4%BA%BA%E6%AC%A1%E5%85%A7%E5%9C%B0%E5%AE%A2%E8%A8%AA%E6%B8%AF",
-              "title": "黃金周丨截至早上10時 逾7.9萬人次內地客訪港",
+              "source_article_id": "4392463",
+              "canonical_url": "https://www.hkej.com/instantnews/current/article/4392463/%E8%AD%A6%E6%96%B9%E6%8B%98%E5%85%A9%E5%85%A7%E5%9C%B0%E4%BA%BA+%E6%B6%89%E8%8D%83%E7%81%A3%E7%88%86%E7%AB%8A%E5%96%AE%E4%BD%8D",
+              "title": "警方拘兩內地人 涉荃灣爆竊單位",
               "section": "時事脈搏",
-              "published_at": "2026-05-02T12:35:00+08:00",
+              "published_at": "2026-05-02T19:30:00+08:00",
               "attention_tier": "light",
               "novelty_score": 5,
               "relevance_score": 5,
@@ -1796,11 +2012,11 @@
               "model_used": "direct"
             },
             {
-              "source_article_id": "4392444",
-              "canonical_url": "https://www.hkej.com/instantnews/current/article/4392444/%E9%9B%BB%E5%AD%90%E7%85%99%E4%B8%A8%E6%8E%A7%E7%85%99%E9%85%92%E8%BE%A6%3A%E6%9C%AC%E6%B8%AF%E7%A6%81%E5%85%A5%E5%8F%A3%E5%8F%A6%E9%A1%9E%E7%85%99%E5%A4%9A%E5%B9%B4%E6%97%85%E5%AE%A2%E8%A8%AA%E6%B8%AF%E6%95%B8%E5%AD%97%E4%BA%A6%E5%8D%87",
-              "title": "電子煙丨控煙酒辦:本港禁入口另類煙多年旅客訪港數字亦升",
+              "source_article_id": "4392462",
+              "canonical_url": "https://www.hkej.com/instantnews/current/article/4392462/%E5%8C%97%E5%8D%80%E9%86%AB%E9%99%A2%E5%86%8D%E7%99%BC%E7%8F%BE%E4%B8%8075%E6%AD%B2%E7%94%B7%E7%97%85%E4%BA%BA%E7%A2%BA%E8%A8%BA%E5%B8%B6%E8%80%90%E8%90%AC%E5%8F%A4%E9%9C%89%E7%B4%A0%E8%85%B8%E7%90%83%E8%8F%8C",
+              "title": "北區醫院再發現一75歲男病人確診帶耐萬古霉素腸球菌",
               "section": "時事脈搏",
-              "published_at": "2026-05-02T12:04:00+08:00",
+              "published_at": "2026-05-02T19:09:00+08:00",
               "attention_tier": "light",
               "novelty_score": 5,
               "relevance_score": 5,
@@ -1812,11 +2028,11 @@
               "model_used": "direct"
             },
             {
-              "source_article_id": "4392443",
-              "canonical_url": "https://www.hkej.com/instantnews/current/article/4392443/%E6%9E%97%E5%AE%9A%E5%9C%8B%3A%E8%AA%BF%E8%A7%A3%E5%91%A8%E4%B8%8B%E5%91%A8%E8%88%89%E8%A1%8C+%E5%AF%A6%E9%AB%94%E5%8F%8A%E7%B7%9A%E4%B8%8A%E6%9C%83%E8%AD%B0%E9%80%BE%E5%8D%83%E4%BA%BA%E5%A0%B1%E5%90%8D%E5%8F%83%E8%88%87",
-              "title": "林定國:調解周下周舉行 實體及線上會議逾千人報名參與",
+              "source_article_id": "4392461",
+              "canonical_url": "https://www.hkej.com/instantnews/current/article/4392461/%E6%9D%B1%E8%88%AA%E5%AE%A2%E6%A9%9F%E4%B8%8A%E6%B5%B7%E8%99%B9%E6%A9%8B%E6%A9%9F%E5%A0%B4%E6%92%9E%E7%99%BB%E6%A9%9F%E6%A9%8B+%E7%84%A1%E4%BA%BA%E5%82%B7",
+              "title": "東航客機上海虹橋機場撞登機橋 無人傷",
               "section": "時事脈搏",
-              "published_at": "2026-05-02T11:09:00+08:00",
+              "published_at": "2026-05-02T18:37:00+08:00",
               "attention_tier": "light",
               "novelty_score": 5,
               "relevance_score": 5,
@@ -1826,6 +2042,134 @@
               "content_truncated": false,
               "analysis_method": "bypassed",
               "model_used": "direct"
+            },
+            {
+              "source_article_id": "4392460",
+              "canonical_url": "https://www.hkej.com/instantnews/current/article/4392460/%E9%BB%83%E9%87%91%E5%91%A8%E4%B8%A8%E6%88%AA%E8%87%B3%E4%B8%8B%E5%8D%884%E6%99%82%E9%80%BE69%E8%90%AC%E4%BA%BA%E6%AC%A1%E5%87%BA%E5%85%A5%E5%A2%83+%E5%85%A7%E5%9C%B0%E6%97%85%E5%AE%A2%E9%80%BE23%E8%90%AC",
+              "title": "黃金周丨截至下午4時逾69萬人次出入境 內地旅客逾23萬",
+              "section": "時事脈搏",
+              "published_at": "2026-05-02T18:15:00+08:00",
+              "attention_tier": "light",
+              "novelty_score": 5,
+              "relevance_score": 5,
+              "urgency_score": 5,
+              "named_entities": [],
+              "key_points": [],
+              "content_truncated": false,
+              "analysis_method": "bypassed",
+              "model_used": "direct"
+            },
+            {
+              "source_article_id": "4392455",
+              "canonical_url": "https://www.hkej.com/instantnews/current/article/4392455/%E7%BE%8E%E5%9C%8B%E5%BB%89%E8%88%AA%E7%B2%BE%E7%A5%9E%E8%88%AA%E7%A9%BA%E5%AE%A3%E5%B8%83%E5%81%9C%E9%81%8B",
+              "title": "美國廉航精神航空宣布停運",
+              "section": "時事脈搏",
+              "published_at": "2026-05-02T17:43:00+08:00",
+              "attention_tier": "light",
+              "novelty_score": 5,
+              "relevance_score": 5,
+              "urgency_score": 5,
+              "named_entities": [],
+              "key_points": [],
+              "content_truncated": false,
+              "analysis_method": "bypassed",
+              "model_used": "direct"
+            },
+            {
+              "source_article_id": "4392456",
+              "title": "伊朗軍方:伊美再爆發衝突可能性很大",
+              "canonical_url": "https://www.hkej.com/instantnews/current/article/4392456/%E4%BC%8A%E6%9C%97%E8%BB%8D%E6%96%B9%3A%E4%BC%8A%E7%BE%8E%E5%86%8D%E7%88%86%E7%99%BC%E8%A1%9D%E7%AA%81%E5%8F%AF%E8%83%BD%E6%80%A7%E5%BE%88%E5%A4%A7",
+              "published_at": "2026-05-02T16:50:00+08:00",
+              "section": "時事脈搏",
+              "novelty_score": 6,
+              "relevance_score": 8,
+              "urgency_score": 9,
+              "named_entities": [
+                {
+                  "name": "伊朗",
+                  "type": "country"
+                },
+                {
+                  "name": "美國",
+                  "type": "country"
+                },
+                {
+                  "name": "特朗普",
+                  "type": "person"
+                }
+              ],
+              "key_points": [
+                "伊朗與美國再次爆發衝突的可能性很大。",
+                "伊朗已做好準備，包括啟動防空系統。"
+              ],
+              "content_truncated": false,
+              "original_content_length_chars": 111,
+              "analyzed_content_length_chars": 111,
+              "original_content_token_estimate": 28,
+              "analyzed_content_token_estimate": 28,
+              "truncation_reason": null,
+              "analysis_method": "full_text",
+              "attention_tier": "high",
+              "theme": "geopolitics",
+              "attention_reason": "High-signal geopolitics headline based on title/summary keywords.",
+              "must_keep": true,
+              "model_used": "meta-llama/llama-4-scout-17b-16e-instruct",
+              "delayed_retry_attempted": false,
+              "delayed_retry_model_chain": [],
+              "delayed_retry_final_model": null,
+              "error_classification": null,
+              "error": null
+            },
+            {
+              "source_article_id": "4392457",
+              "canonical_url": "https://www.hkej.com/instantnews/current/article/4392457/%E5%A4%A9%E6%B0%A3%E4%B8%A8%E5%A4%A9%E6%96%87%E5%8F%B0%3A%E6%98%8E%E6%99%9A%E6%B0%A3%E6%BA%AB%E9%80%90%E6%AD%A5%E9%99%8D+%E5%91%A8%E4%B8%80%E6%97%A9%E4%B8%8A%E4%BD%8E%E8%A6%8B21%E5%BA%A6",
+              "title": "天氣丨天文台:明晚氣溫逐步降 周一早上低見21度",
+              "section": "時事脈搏",
+              "published_at": "2026-05-02T16:47:00+08:00",
+              "attention_tier": "light",
+              "novelty_score": 5,
+              "relevance_score": 5,
+              "urgency_score": 5,
+              "named_entities": [],
+              "key_points": [],
+              "content_truncated": false,
+              "analysis_method": "bypassed",
+              "model_used": "direct"
+            },
+            {
+              "source_article_id": "4392452",
+              "canonical_url": "https://www.hkej.com/instantnews/current/article/4392452/%E7%B2%89%E5%B6%BA%E7%B9%9E%E9%81%93%E6%9D%B1%E6%AE%B5%E5%91%A8%E6%97%A5%E9%80%9A%E8%BB%8A+%E7%94%AF%E6%BC%A2%E8%B1%AA%3A%E7%BA%8C%E5%AE%8C%E5%96%84%E5%8C%97%E9%83%BD%E7%94%A2%E6%A5%AD%E5%B8%83%E5%B1%80",
+              "title": "粉嶺繞道東段周日通車 甯漢豪:續完善北都產業布局",
+              "section": "時事脈搏",
+              "published_at": "2026-05-02T15:38:00+08:00",
+              "attention_tier": "light",
+              "novelty_score": 5,
+              "relevance_score": 5,
+              "urgency_score": 5,
+              "named_entities": [],
+              "key_points": [],
+              "content_truncated": false,
+              "analysis_method": "bypassed",
+              "model_used": "direct"
+            },
+            {
+              "source_article_id": "4392453",
+              "canonical_url": "https://www.hkej.com/instantnews/current/article/4392453/%E5%AE%8F%E7%A6%8F%E8%8B%91%E4%B8%A8%E5%8D%93%E6%B0%B8%E8%88%88%3A%E7%B4%84800%E6%88%B6%E5%B1%85%E6%B0%91%E5%86%80%E5%86%8D%E4%B8%8A%E6%A8%93+%E7%9B%A1%E5%BF%AB%E5%85%AC%E5%B8%83%E6%AC%A1%E8%BC%AA%E5%AE%89%E6%8E%92",
+              "title": "宏福苑丨卓永興:約800戶居民冀再上樓 盡快公布次輪安排",
+              "section": "時事脈搏",
+              "published_at": "2026-05-02T16:07:00+08:00",
+              "attention_tier": "light",
+              "novelty_score": 5,
+              "relevance_score": 5,
+              "urgency_score": 5,
+              "named_entities": [],
+              "key_points": [],
+              "content_truncated": false,
+              "analysis_method": "bypassed",
+              "model_used": "direct",
+              "theme": "general",
+              "attention_reason": "Lighter treatment because this story sits in the 時事脈搏 section without strong market-moving signals.",
+              "must_keep": false
             },
             {
               "source_article_id": "4392454",
@@ -1841,7 +2185,10 @@
               "key_points": [],
               "content_truncated": false,
               "analysis_method": "bypassed",
-              "model_used": "direct"
+              "model_used": "direct",
+              "theme": "general",
+              "attention_reason": "Lighter treatment because this story sits in the 時事脈搏 section without strong market-moving signals.",
+              "must_keep": false
             },
             {
               "source_article_id": "4392451",
@@ -1893,6 +2240,63 @@
               "error": null
             },
             {
+              "source_article_id": "4392447",
+              "canonical_url": "https://www.hkej.com/instantnews/current/article/4392447/%E9%BB%83%E9%87%91%E5%91%A8%E4%B8%A8%E6%88%AA%E8%87%B3%E6%97%A9%E4%B8%8A10%E6%99%82+%E9%80%BE7.9%E8%90%AC%E4%BA%BA%E6%AC%A1%E5%85%A7%E5%9C%B0%E5%AE%A2%E8%A8%AA%E6%B8%AF",
+              "title": "黃金周丨截至早上10時 逾7.9萬人次內地客訪港",
+              "section": "時事脈搏",
+              "published_at": "2026-05-02T12:35:00+08:00",
+              "attention_tier": "light",
+              "novelty_score": 5,
+              "relevance_score": 5,
+              "urgency_score": 5,
+              "named_entities": [],
+              "key_points": [],
+              "content_truncated": false,
+              "analysis_method": "bypassed",
+              "model_used": "direct",
+              "theme": "general",
+              "attention_reason": "Lighter treatment because this story sits in the 時事脈搏 section without strong market-moving signals.",
+              "must_keep": false
+            },
+            {
+              "source_article_id": "4392444",
+              "canonical_url": "https://www.hkej.com/instantnews/current/article/4392444/%E9%9B%BB%E5%AD%90%E7%85%99%E4%B8%A8%E6%8E%A7%E7%85%99%E9%85%92%E8%BE%A6%3A%E6%9C%AC%E6%B8%AF%E7%A6%81%E5%85%A5%E5%8F%A3%E5%8F%A6%E9%A1%9E%E7%85%99%E5%A4%9A%E5%B9%B4%E6%97%85%E5%AE%A2%E8%A8%AA%E6%B8%AF%E6%95%B8%E5%AD%97%E4%BA%A6%E5%8D%87",
+              "title": "電子煙丨控煙酒辦:本港禁入口另類煙多年旅客訪港數字亦升",
+              "section": "時事脈搏",
+              "published_at": "2026-05-02T12:04:00+08:00",
+              "attention_tier": "light",
+              "novelty_score": 5,
+              "relevance_score": 5,
+              "urgency_score": 5,
+              "named_entities": [],
+              "key_points": [],
+              "content_truncated": false,
+              "analysis_method": "bypassed",
+              "model_used": "direct",
+              "theme": "general",
+              "attention_reason": "Lighter treatment because this story sits in the 時事脈搏 section without strong market-moving signals.",
+              "must_keep": false
+            },
+            {
+              "source_article_id": "4392443",
+              "canonical_url": "https://www.hkej.com/instantnews/current/article/4392443/%E6%9E%97%E5%AE%9A%E5%9C%8B%3A%E8%AA%BF%E8%A7%A3%E5%91%A8%E4%B8%8B%E5%91%A8%E8%88%89%E8%A1%8C+%E5%AF%A6%E9%AB%94%E5%8F%8A%E7%B7%9A%E4%B8%8A%E6%9C%83%E8%AD%B0%E9%80%BE%E5%8D%83%E4%BA%BA%E5%A0%B1%E5%90%8D%E5%8F%83%E8%88%87",
+              "title": "林定國:調解周下周舉行 實體及線上會議逾千人報名參與",
+              "section": "時事脈搏",
+              "published_at": "2026-05-02T11:09:00+08:00",
+              "attention_tier": "light",
+              "novelty_score": 5,
+              "relevance_score": 5,
+              "urgency_score": 5,
+              "named_entities": [],
+              "key_points": [],
+              "content_truncated": false,
+              "analysis_method": "bypassed",
+              "model_used": "direct",
+              "theme": "general",
+              "attention_reason": "Lighter treatment because this story sits in the 時事脈搏 section without strong market-moving signals.",
+              "must_keep": false
+            },
+            {
               "source_article_id": "4392440",
               "title": "伊朗局勢丨美軍以AI技術在霍爾木茲海峽掃雷",
               "canonical_url": "https://www.hkej.com/instantnews/current/article/4392440/%E4%BC%8A%E6%9C%97%E5%B1%80%E5%8B%A2%E4%B8%A8%E7%BE%8E%E8%BB%8D%E4%BB%A5AI%E6%8A%80%E8%A1%93%E5%9C%A8%E9%9C%8D%E7%88%BE%E6%9C%A8%E8%8C%B2%E6%B5%B7%E5%B3%BD%E6%8E%83%E9%9B%B7",
@@ -1938,6 +2342,51 @@
               "error": null
             },
             {
+              "source_article_id": "4392442",
+              "title": "伊朗局勢丨傅聰:霍爾木茲海峽若仍關閉將成習特會議重點",
+              "canonical_url": "https://www.hkej.com/instantnews/current/article/4392442/%E4%BC%8A%E6%9C%97%E5%B1%80%E5%8B%A2%E4%B8%A8%E5%82%85%E8%81%B0%3A%E9%9C%8D%E7%88%BE%E6%9C%A8%E8%8C%B2%E6%B5%B7%E5%B3%BD%E8%8B%A5%E4%BB%8D%E9%97%9C%E9%96%89%E5%B0%87%E6%88%90%E7%BF%92%E7%89%B9%E6%9C%83%E8%AD%B0%E9%87%8D%E9%BB%9E",
+              "published_at": "2026-05-02T10:13:00+08:00",
+              "section": "時事脈搏",
+              "novelty_score": 4,
+              "relevance_score": 6,
+              "urgency_score": 7,
+              "named_entities": [
+                {
+                  "name": "傅聰",
+                  "type": "person"
+                },
+                {
+                  "name": "特朗普",
+                  "type": "person"
+                },
+                {
+                  "name": "霍爾木茲海峽",
+                  "type": "other"
+                }
+              ],
+              "key_points": [
+                "中國常駐聯合國代表傅聰表示，如果在美國總統特朗普本月訪華時霍爾木茲海峽仍處於關閉狀態，這一問題將成為議程中的重點。",
+                "傅聰呼籲國際社會應當被動員起來，對恢復戰事發出反對的聲音。"
+              ],
+              "content_truncated": false,
+              "original_content_length_chars": 606,
+              "analyzed_content_length_chars": 606,
+              "original_content_token_estimate": 152,
+              "analyzed_content_token_estimate": 152,
+              "truncation_reason": null,
+              "analysis_method": "full_text",
+              "attention_tier": "high",
+              "theme": "geopolitics",
+              "attention_reason": "High-signal geopolitics headline based on title/summary keywords.",
+              "must_keep": true,
+              "model_used": "meta-llama/llama-4-scout-17b-16e-instruct",
+              "delayed_retry_attempted": false,
+              "delayed_retry_model_chain": [],
+              "delayed_retry_final_model": null,
+              "error_classification": null,
+              "error": null
+            },
+            {
               "source_article_id": "4392441",
               "canonical_url": "https://www.hkej.com/instantnews/current/article/4392441/%E5%AE%8F%E7%A6%8F%E8%8B%91%E4%B8%A8%E9%BB%83%E5%81%89%E7%B6%B8%3A%E6%9C%89%E4%BF%A1%E5%BF%836%E6%9C%88%E5%BA%95%E5%89%8D%E6%9C%89%E8%B6%B3%E5%A4%A0%E5%AE%8F%E5%BF%97%E9%96%A3%E6%A5%AD%E4%B8%BB%E7%A2%BA%E8%AA%8D%E5%94%AE%E6%A5%AD%E6%AC%8A",
               "title": "宏福苑丨黃偉綸:有信心6月底前有足夠宏志閣業主確認售業權",
@@ -1951,7 +2400,10 @@
               "key_points": [],
               "content_truncated": false,
               "analysis_method": "bypassed",
-              "model_used": "direct"
+              "model_used": "direct",
+              "theme": "general",
+              "attention_reason": "Lighter treatment because this story sits in the 時事脈搏 section without strong market-moving signals.",
+              "must_keep": false
             },
             {
               "source_article_id": "4392439",
@@ -1967,71 +2419,11 @@
               "key_points": [],
               "content_truncated": false,
               "analysis_method": "bypassed",
-              "model_used": "direct"
+              "model_used": "direct",
+              "theme": "general",
+              "attention_reason": "Lighter treatment because this story sits in the 時事脈搏 section without strong market-moving signals.",
+              "must_keep": false
             },
-            {
-              "source_article_id": "4392435",
-              "canonical_url": "https://www.hkej.com/instantnews/current/article/4392435/%E7%BE%8E%E9%98%B2%E9%95%B7%E4%B8%8B%E4%BB%A4%E5%BE%9E%E5%BE%B7%E5%9C%8B%E6%92%A4%E5%87%BA5000%E5%90%8D%E9%A7%90%E8%BB%8D",
-              "title": "美防長下令從德國撤出5000名駐軍",
-              "section": "時事脈搏",
-              "published_at": "2026-05-02T07:10:00+08:00",
-              "attention_tier": "light",
-              "novelty_score": 5,
-              "relevance_score": 5,
-              "urgency_score": 5,
-              "named_entities": [],
-              "key_points": [],
-              "content_truncated": false,
-              "analysis_method": "bypassed",
-              "model_used": "direct"
-            },
-            {
-              "source_article_id": "4392424",
-              "canonical_url": "https://www.hkej.com/instantnews/current/article/4392424/%E7%89%B9%E6%9C%97%E6%99%AE%3A%E8%8F%AF%E5%BA%9C%E5%B7%B2%E5%90%91%E7%B2%BE%E7%A5%9E%E8%88%AA%E7%A9%BA%E6%8F%90%E5%87%BA%E6%9C%80%E7%B5%82%E6%95%91%E5%8A%A9%E6%96%B9%E6%A1%88",
-              "title": "特朗普:華府已向精神航空提出最終救助方案",
-              "section": "時事脈搏",
-              "published_at": "2026-05-02T01:34:00+08:00",
-              "attention_tier": "light",
-              "novelty_score": 5,
-              "relevance_score": 5,
-              "urgency_score": 5,
-              "named_entities": [],
-              "key_points": [],
-              "content_truncated": false,
-              "analysis_method": "bypassed",
-              "model_used": "direct"
-            }
-          ],
-          "model_used": "meta-llama/llama-4-scout-17b-16e-instruct"
-        },
-        {
-          "title": "Geopolitical Tensions",
-          "theme_rationale": "Articles related to international conflicts and diplomatic relations",
-          "article_count": 4,
-          "key_developments": [
-            "特朗普簽署行政令，加大對古巴的制裁，包含次級制裁機制，對與被制裁對象交易的第三方個人和機構施加懲罰。",
-            "特朗普告訴國會，伊朗敵對行動已結束，自4月7日宣布停火協議以來，伊朗的敵對行動已停止。",
-            "美軍最大航母福特號已離開中東地區，美軍在中東部署的航母從三艘減少至兩艘。"
-          ],
-          "named_entities": [
-            {
-              "name": "特朗普",
-              "type": "person"
-            },
-            {
-              "name": "古巴",
-              "type": "country"
-            },
-            {
-              "name": "伊朗",
-              "type": "country"
-            },
-            {
-              "name": "美軍",
-              "type": "organization"
-            }
-          ],
-          "articles": [
             {
               "source_article_id": "4392431",
               "title": "特朗普簽署行政令 加大對古巴制裁",
@@ -2077,6 +2469,224 @@
               "error_classification": null,
               "error": null
             },
+            {
+              "source_article_id": "4392424",
+              "canonical_url": "https://www.hkej.com/instantnews/current/article/4392424/%E7%89%B9%E6%9C%97%E6%99%AE%3A%E8%8F%AF%E5%BA%9C%E5%B7%B2%E5%90%91%E7%B2%BE%E7%A5%9E%E8%88%AA%E7%A9%BA%E6%8F%90%E5%87%BA%E6%9C%80%E7%B5%82%E6%95%91%E5%8A%A9%E6%96%B9%E6%A1%88",
+              "title": "特朗普:華府已向精神航空提出最終救助方案",
+              "section": "時事脈搏",
+              "published_at": "2026-05-02T01:34:00+08:00",
+              "attention_tier": "light",
+              "novelty_score": 5,
+              "relevance_score": 5,
+              "urgency_score": 5,
+              "named_entities": [],
+              "key_points": [],
+              "content_truncated": false,
+              "analysis_method": "bypassed",
+              "model_used": "direct",
+              "theme": "general",
+              "attention_reason": "Lighter treatment because this story sits in the 時事脈搏 section without strong market-moving signals.",
+              "must_keep": false
+            }
+          ],
+          "model_used": "meta-llama/llama-4-scout-17b-16e-instruct"
+        },
+        {
+          "title": "Infrastructure and Development",
+          "theme_rationale": "Articles related to infrastructure development and transportation.",
+          "article_count": 3,
+          "key_developments": [
+            "The 粉嶺繞道東段 is set to open, as announced by 甯漢豪, aiming to continue improving the industrial layout of 北都.",
+            "陳美寶 stated that financial arrangements have been made for the 東九龍集體運輸系統項目.",
+            "孫東 announced that the AI大講堂 will launch within the month, marking the beginning of comprehensive training for the public."
+          ],
+          "named_entities": [
+            {
+              "name": "甯漢豪",
+              "type": "person"
+            },
+            {
+              "name": "陳美寶",
+              "type": "person"
+            },
+            {
+              "name": "孫東",
+              "type": "person"
+            }
+          ],
+          "articles": [
+            {
+              "source_article_id": "4392452",
+              "canonical_url": "https://www.hkej.com/instantnews/current/article/4392452/%E7%B2%89%E5%B6%BA%E7%B9%9E%E9%81%93%E6%9D%B1%E6%AE%B5%E6%98%8E%E9%80%9A%E8%BB%8A+%E7%94%AF%E6%BC%A2%E8%B1%AA%3A%E7%BA%8C%E5%AE%8C%E5%96%84%E5%8C%97%E9%83%BD%E7%94%A2%E6%A5%AD%E5%B8%83%E5%B1%80",
+              "title": "粉嶺繞道東段明通車 甯漢豪:續完善北都產業布局",
+              "section": "時事脈搏",
+              "published_at": "2026-05-02T15:38:00+08:00",
+              "attention_tier": "light",
+              "novelty_score": 5,
+              "relevance_score": 5,
+              "urgency_score": 5,
+              "named_entities": [],
+              "key_points": [],
+              "content_truncated": false,
+              "analysis_method": "bypassed",
+              "model_used": "direct",
+              "theme": "general",
+              "attention_reason": "Lighter treatment because this story sits in the 時事脈搏 section without strong market-moving signals.",
+              "must_keep": false
+            },
+            {
+              "source_article_id": "4392448",
+              "canonical_url": "https://www.hkej.com/instantnews/current/article/4392448/%E9%99%B3%E7%BE%8E%E5%AF%B6%3A%E5%B7%B2%E6%93%AC%E5%AE%9A%E6%9D%B1%E4%B9%9D%E9%BE%8D%E9%9B%86%E9%AB%94%E9%81%8B%E8%BC%B8%E7%B3%BB%E7%B5%B1%E9%A0%85%E7%9B%AE%E8%B2%A1%E5%8B%99%E5%AE%89%E6%8E%92",
+              "title": "陳美寶:已擬定東九龍集體運輸系統項目財務安排",
+              "section": "時事脈搏",
+              "published_at": "2026-05-02T13:41:00+08:00",
+              "attention_tier": "light",
+              "novelty_score": 5,
+              "relevance_score": 5,
+              "urgency_score": 5,
+              "named_entities": [],
+              "key_points": [],
+              "content_truncated": false,
+              "analysis_method": "bypassed",
+              "model_used": "direct",
+              "theme": "general",
+              "attention_reason": "Lighter treatment because this story sits in the 時事脈搏 section without strong market-moving signals.",
+              "must_keep": false
+            },
+            {
+              "source_article_id": "4392446",
+              "canonical_url": "https://www.hkej.com/instantnews/current/article/4392446/%E5%AD%AB%E6%9D%B1%3AAI%E5%A4%A7%E8%AC%9B%E5%A0%82%E6%9C%88%E5%85%A7%E5%95%9F%E6%92%AD+%E6%8B%89%E9%96%8B%E5%85%A8%E6%B0%91%E5%9F%B9%E8%A8%93%E5%BA%8F%E5%B9%95",
+              "title": "孫東:AI大講堂月內啟播 拉開全民培訓序幕",
+              "section": "時事脈搏",
+              "published_at": "2026-05-02T13:24:00+08:00",
+              "attention_tier": "light",
+              "novelty_score": 5,
+              "relevance_score": 5,
+              "urgency_score": 5,
+              "named_entities": [],
+              "key_points": [],
+              "content_truncated": false,
+              "analysis_method": "bypassed",
+              "model_used": "direct",
+              "theme": "general",
+              "attention_reason": "Lighter treatment because this story sits in the 時事脈搏 section without strong market-moving signals.",
+              "must_keep": false
+            }
+          ],
+          "model_used": "meta-llama/llama-4-scout-17b-16e-instruct"
+        },
+        {
+          "title": "國際時事",
+          "theme_rationale": "涵蓋全球各地的重要新聞事件",
+          "article_count": 3,
+          "key_developments": [
+            "美防長下令從德國撤出5000名駐軍",
+            "福建艦首次離開碼頭，開始海上測試之旅",
+            "歐美多國民眾趁五一勞動節遊行爭取權益"
+          ],
+          "named_entities": [
+            {
+              "name": "美國",
+              "type": "country"
+            },
+            {
+              "name": "德國",
+              "type": "country"
+            },
+            {
+              "name": "福建艦",
+              "type": "asset"
+            }
+          ],
+          "articles": [
+            {
+              "source_article_id": "4392437",
+              "canonical_url": "https://www.hkej.com/instantnews/current/article/4392437/%E7%A6%8F%E5%BB%BA%E8%89%A6%E9%A6%96%E6%AC%A1%E9%9B%A2%E9%96%8B%E7%A2%BC%E9%A0%AD+%E9%96%8B%E5%A7%8B%E6%B5%B7%E4%B8%8A%E6%B8%AC%E8%A9%A6%E4%B9%8B%E6%97%85",
+              "title": "福建艦首次離開碼頭 開始海上測試之旅",
+              "section": "時事脈搏",
+              "published_at": "2026-05-02T07:28:00+08:00",
+              "attention_tier": "light",
+              "novelty_score": 5,
+              "relevance_score": 5,
+              "urgency_score": 5,
+              "named_entities": [],
+              "key_points": [],
+              "content_truncated": false,
+              "analysis_method": "bypassed",
+              "model_used": "direct",
+              "theme": "general",
+              "attention_reason": "Lighter treatment because this story sits in the 時事脈搏 section without strong market-moving signals.",
+              "must_keep": false
+            },
+            {
+              "source_article_id": "4392436",
+              "canonical_url": "https://www.hkej.com/instantnews/current/article/4392436/%E6%AD%90%E7%BE%8E%E5%A4%9A%E5%9C%8B%E6%B0%91%E7%9C%BE%E8%B6%81%E4%BA%94%E4%B8%80%E5%8B%9E%E5%8B%95%E7%AF%80%E9%81%8A%E8%A1%8C%E7%88%AD%E5%8F%96%E6%AC%8A%E7%9B%8A",
+              "title": "歐美多國民眾趁五一勞動節遊行爭取權益",
+              "section": "時事脈搏",
+              "published_at": "2026-05-02T07:19:00+08:00",
+              "attention_tier": "light",
+              "novelty_score": 5,
+              "relevance_score": 5,
+              "urgency_score": 5,
+              "named_entities": [],
+              "key_points": [],
+              "content_truncated": false,
+              "analysis_method": "bypassed",
+              "model_used": "direct",
+              "theme": "general",
+              "attention_reason": "Lighter treatment because this story sits in the 時事脈搏 section without strong market-moving signals.",
+              "must_keep": false
+            },
+            {
+              "source_article_id": "4392435",
+              "canonical_url": "https://www.hkej.com/instantnews/current/article/4392435/%E7%BE%8E%E9%98%B2%E9%95%B7%E4%B8%8B%E4%BB%A4%E5%BE%9E%E5%BE%B7%E5%9C%8B%E6%92%A4%E5%87%BA5000%E5%90%8D%E9%A7%90%E8%BB%8D",
+              "title": "美防長下令從德國撤出5000名駐軍",
+              "section": "時事脈搏",
+              "published_at": "2026-05-02T07:10:00+08:00",
+              "attention_tier": "light",
+              "novelty_score": 5,
+              "relevance_score": 5,
+              "urgency_score": 5,
+              "named_entities": [],
+              "key_points": [],
+              "content_truncated": false,
+              "analysis_method": "bypassed",
+              "model_used": "direct",
+              "theme": "general",
+              "attention_reason": "Lighter treatment because this story sits in the 時事脈搏 section without strong market-moving signals.",
+              "must_keep": false
+            }
+          ],
+          "model_used": "meta-llama/llama-4-scout-17b-16e-instruct"
+        },
+        {
+          "title": "Geopolitical Tensions",
+          "theme_rationale": "Articles discussing geopolitical tensions and conflicts in the Middle East",
+          "article_count": 3,
+          "key_developments": [
+            "特朗普告訴國會，伊朗敵對行動已結束，自4月7日宣布停火協議以來，伊朗的敵對行動已停止。",
+            "美軍最大航母福特號已離開中東地區，美軍在中東部署的航母從三艘減少至兩艘。",
+            "特朗普稱對伊朗提出的新方案不滿意，伊朗想要達成協議但最新提議讓人不滿意。"
+          ],
+          "named_entities": [
+            {
+              "name": "特朗普",
+              "type": "person"
+            },
+            {
+              "name": "伊朗",
+              "type": "country"
+            },
+            {
+              "name": "美國",
+              "type": "country"
+            },
+            {
+              "name": "美軍",
+              "type": "organization"
+            }
+          ],
+          "articles": [
             {
               "source_article_id": "4392429",
               "title": "中東局勢丨特朗普告訴美國會 伊朗敵對行動已結束",
@@ -2218,205 +2828,21 @@
             }
           ],
           "model_used": "meta-llama/llama-4-scout-17b-16e-instruct"
-        },
-        {
-          "title": "社區發展",
-          "theme_rationale": "關注本地社區發展和民生相關議題",
-          "article_count": 3,
-          "key_developments": [
-            "宏福苑約800戶居民冀再上樓",
-            "粉嶺繞道東段明日通車",
-            "陳美寶:已擬定東九龍集體運輸系統項目財務安排"
-          ],
-          "named_entities": [
-            {
-              "name": "宏福苑",
-              "type": "other"
-            },
-            {
-              "name": "粉嶺繞道東段",
-              "type": "other"
-            },
-            {
-              "name": "陳美寶",
-              "type": "person"
-            }
-          ],
-          "articles": [
-            {
-              "source_article_id": "4392453",
-              "canonical_url": "https://www.hkej.com/instantnews/current/article/4392453/%E5%AE%8F%E7%A6%8F%E8%8B%91%E4%B8%A8%E5%8D%93%E6%B0%B8%E8%88%88%3A%E7%B4%84800%E6%88%B6%E5%B1%85%E6%B0%91%E5%86%80%E5%86%8D%E4%B8%8A%E6%A8%93+%E7%9B%A1%E5%BF%AB%E5%85%AC%E5%B8%83%E6%AC%A1%E8%BC%AA%E5%AE%89%E6%8E%92",
-              "title": "宏福苑丨卓永興:約800戶居民冀再上樓 盡快公布次輪安排",
-              "section": "時事脈搏",
-              "published_at": "2026-05-02T16:07:00+08:00",
-              "attention_tier": "light",
-              "novelty_score": 5,
-              "relevance_score": 5,
-              "urgency_score": 5,
-              "named_entities": [],
-              "key_points": [],
-              "content_truncated": false,
-              "analysis_method": "bypassed",
-              "model_used": "direct"
-            },
-            {
-              "source_article_id": "4392452",
-              "canonical_url": "https://www.hkej.com/instantnews/current/article/4392452/%E7%B2%89%E5%B6%BA%E7%B9%9E%E9%81%93%E6%9D%B1%E6%AE%B5%E6%98%8E%E9%80%9A%E8%BB%8A+%E7%94%AF%E6%BC%A2%E8%B1%AA%3A%E7%BA%8C%E5%AE%8C%E5%96%84%E5%8C%97%E9%83%BD%E7%94%A2%E6%A5%AD%E5%B8%83%E5%B1%80",
-              "title": "粉嶺繞道東段明通車 甯漢豪:續完善北都產業布局",
-              "section": "時事脈搏",
-              "published_at": "2026-05-02T15:38:00+08:00",
-              "attention_tier": "light",
-              "novelty_score": 5,
-              "relevance_score": 5,
-              "urgency_score": 5,
-              "named_entities": [],
-              "key_points": [],
-              "content_truncated": false,
-              "analysis_method": "bypassed",
-              "model_used": "direct"
-            },
-            {
-              "source_article_id": "4392448",
-              "canonical_url": "https://www.hkej.com/instantnews/current/article/4392448/%E9%99%B3%E7%BE%8E%E5%AF%B6%3A%E5%B7%B2%E6%93%AC%E5%AE%9A%E6%9D%B1%E4%B9%9D%E9%BE%8D%E9%9B%86%E9%AB%94%E9%81%8B%E8%BC%B8%E7%B3%BB%E7%B5%B1%E9%A0%85%E7%9B%AE%E8%B2%A1%E5%8B%99%E5%AE%89%E6%8E%92",
-              "title": "陳美寶:已擬定東九龍集體運輸系統項目財務安排",
-              "section": "時事脈搏",
-              "published_at": "2026-05-02T13:41:00+08:00",
-              "attention_tier": "light",
-              "novelty_score": 5,
-              "relevance_score": 5,
-              "urgency_score": 5,
-              "named_entities": [],
-              "key_points": [],
-              "content_truncated": false,
-              "analysis_method": "bypassed",
-              "model_used": "direct"
-            }
-          ],
-          "model_used": "meta-llama/llama-4-scout-17b-16e-instruct"
-        },
-        {
-          "title": "國際時事",
-          "theme_rationale": "與國際政治、經濟相關的新聞",
-          "article_count": 3,
-          "key_developments": [
-            "中國常駐聯合國代表傅聰表示，如果在美國總統特朗普本月訪華時霍爾木茲海峽仍處於關閉狀態，這一問題將成為議程中的重點。",
-            "福建艦首次離開碼頭，開始海上測試之旅。",
-            "歐美多國民眾趁五一勞動節遊行爭取權益。"
-          ],
-          "named_entities": [
-            {
-              "name": "傅聰",
-              "type": "person"
-            },
-            {
-              "name": "特朗普",
-              "type": "person"
-            },
-            {
-              "name": "霍爾木茲海峽",
-              "type": "other"
-            },
-            {
-              "name": "福建艦",
-              "type": "other"
-            }
-          ],
-          "articles": [
-            {
-              "source_article_id": "4392442",
-              "title": "伊朗局勢丨傅聰:霍爾木茲海峽若仍關閉將成習特會議重點",
-              "canonical_url": "https://www.hkej.com/instantnews/current/article/4392442/%E4%BC%8A%E6%9C%97%E5%B1%80%E5%8B%A2%E4%B8%A8%E5%82%85%E8%81%B0%3A%E9%9C%8D%E7%88%BE%E6%9C%A8%E8%8C%B2%E6%B5%B7%E5%B3%BD%E8%8B%A5%E4%BB%8D%E9%97%9C%E9%96%89%E5%B0%87%E6%88%90%E7%BF%92%E7%89%B9%E6%9C%83%E8%AD%B0%E9%87%8D%E9%BB%9E",
-              "published_at": "2026-05-02T10:13:00+08:00",
-              "section": "時事脈搏",
-              "novelty_score": 4,
-              "relevance_score": 6,
-              "urgency_score": 7,
-              "named_entities": [
-                {
-                  "name": "傅聰",
-                  "type": "person"
-                },
-                {
-                  "name": "特朗普",
-                  "type": "person"
-                },
-                {
-                  "name": "霍爾木茲海峽",
-                  "type": "other"
-                }
-              ],
-              "key_points": [
-                "中國常駐聯合國代表傅聰表示，如果在美國總統特朗普本月訪華時霍爾木茲海峽仍處於關閉狀態，這一問題將成為議程中的重點。",
-                "傅聰呼籲國際社會應當被動員起來，對恢復戰事發出反對的聲音。"
-              ],
-              "content_truncated": false,
-              "original_content_length_chars": 606,
-              "analyzed_content_length_chars": 606,
-              "original_content_token_estimate": 152,
-              "analyzed_content_token_estimate": 152,
-              "truncation_reason": null,
-              "analysis_method": "full_text",
-              "attention_tier": "high",
-              "theme": "geopolitics",
-              "attention_reason": "High-signal geopolitics headline based on title/summary keywords.",
-              "must_keep": true,
-              "model_used": "meta-llama/llama-4-scout-17b-16e-instruct",
-              "delayed_retry_attempted": false,
-              "delayed_retry_model_chain": [],
-              "delayed_retry_final_model": null,
-              "error_classification": null,
-              "error": null
-            },
-            {
-              "source_article_id": "4392437",
-              "canonical_url": "https://www.hkej.com/instantnews/current/article/4392437/%E7%A6%8F%E5%BB%BA%E8%89%A6%E9%A6%96%E6%AC%A1%E9%9B%A2%E9%96%8B%E7%A2%BC%E9%A0%AD+%E9%96%8B%E5%A7%8B%E6%B5%B7%E4%B8%8A%E6%B8%AC%E8%A9%A6%E4%B9%8B%E6%97%85",
-              "title": "福建艦首次離開碼頭 開始海上測試之旅",
-              "section": "時事脈搏",
-              "published_at": "2026-05-02T07:28:00+08:00",
-              "attention_tier": "light",
-              "novelty_score": 5,
-              "relevance_score": 5,
-              "urgency_score": 5,
-              "named_entities": [],
-              "key_points": [],
-              "content_truncated": false,
-              "analysis_method": "bypassed",
-              "model_used": "direct"
-            },
-            {
-              "source_article_id": "4392436",
-              "canonical_url": "https://www.hkej.com/instantnews/current/article/4392436/%E6%AD%90%E7%BE%8E%E5%A4%9A%E5%9C%8B%E6%B0%91%E7%9C%BE%E8%B6%81%E4%BA%94%E4%B8%80%E5%8B%9E%E5%8B%95%E7%AF%80%E9%81%8A%E8%A1%8C%E7%88%AD%E5%8F%96%E6%AC%8A%E7%9B%8A",
-              "title": "歐美多國民眾趁五一勞動節遊行爭取權益",
-              "section": "時事脈搏",
-              "published_at": "2026-05-02T07:19:00+08:00",
-              "attention_tier": "light",
-              "novelty_score": 5,
-              "relevance_score": 5,
-              "urgency_score": 5,
-              "named_entities": [],
-              "key_points": [],
-              "content_truncated": false,
-              "analysis_method": "bypassed",
-              "model_used": "direct"
-            }
-          ],
-          "model_used": "meta-llama/llama-4-scout-17b-16e-instruct"
         }
       ],
       "analysis_profile": "light",
       "model_used": "meta-llama/llama-4-scout-17b-16e-instruct",
-      "sub_batch_count": 9,
+      "sub_batch_count": 11,
       "diagnostics": {
-        "sub_batch_count": 3,
+        "sub_batch_count": 11,
         "split_reasons": [
           "pre_send_budget"
         ],
         "models_attempted": [
-          "meta-llama/llama-4-scout-17b-16e-instruct",
-          "qwen/qwen3-32b"
+          "meta-llama/llama-4-scout-17b-16e-instruct"
         ],
-        "estimated_input_tokens_max": 1450,
-        "serialized_request_bytes_max": 9152,
+        "estimated_input_tokens_max": 1153,
+        "serialized_request_bytes_max": 5075,
         "rate_limit_waits": 0,
         "partial_article_count": 0,
         "synthesis_wait_seconds_total": 0.0,
@@ -2425,39 +2851,121 @@
         "synthesis_budget_exhausted": false,
         "degraded_merge_used": false,
         "degraded_merge_reason": "",
-        "synthesis_merge_depth_max": 1,
+        "synthesis_merge_depth_max": 0,
         "model_switches": []
       },
       "error": null
     },
     {
       "category": "地產新聞",
-      "article_count": 2,
+      "article_count": 4,
       "status": "success",
       "key_developments": [
-        "會德豐地產與港鐵合作的DEEP WATER SOUTH第6B期下周三推出48伙臻藏大宅，以招標形式發售。",
-        "項目開售至今累售149伙，套現超過27億元，近月成交表現持續理想。",
-        "首岸第3期首推100伙，折實售698萬起。"
+        "長實旗下名日．九肚山連錄兩宗成交，套現逾4100萬元。",
+        "恒地壹沐第2期加推63伙，平均折實呎價20688元。",
+        "會德豐地產與港鐵合作的DEEP WATER SOUTH第6B期下周三推出48伙臻藏大宅，以招標形式發售。"
       ],
       "named_entities": [
         {
-          "name": "會德豐地產",
+          "name": "長實",
           "type": "company"
         },
         {
-          "name": "港鐵",
+          "name": "名日．九肚山",
+          "type": "asset"
+        },
+        {
+          "name": "恒地",
           "type": "company"
         },
         {
-          "name": "黃光耀",
-          "type": "person"
-        },
-        {
-          "name": "DEEP WATER SOUTH",
-          "type": "organization"
+          "name": "壹沐",
+          "type": "asset"
         }
       ],
       "articles": [
+        {
+          "source_article_id": "4392459",
+          "title": "新盤丨名日．九肚山4100萬連沽兩伙",
+          "canonical_url": "https://www.hkej.com/instantnews/property/article/4392459/%E6%96%B0%E7%9B%A4%E4%B8%A8%E5%90%8D%E6%97%A5%EF%BC%8E%E4%B9%9D%E8%82%9A%E5%B1%B14100%E8%90%AC%E9%80%A3%E6%B2%BD%E5%85%A9%E4%BC%99",
+          "published_at": "2026-05-02T17:21:00+08:00",
+          "section": "新盤情報",
+          "novelty_score": 6,
+          "relevance_score": 8,
+          "urgency_score": 7,
+          "named_entities": [
+            {
+              "name": "長實",
+              "type": "company"
+            },
+            {
+              "name": "名日．九肚山",
+              "type": "asset"
+            }
+          ],
+          "key_points": [
+            "長實旗下名日．九肚山連錄兩宗成交，套現逾4100萬元。",
+            "最高成交單位為第1座17樓C室，成交價2253.6萬元，呎價約18382元。"
+          ],
+          "content_truncated": false,
+          "original_content_length_chars": 333,
+          "analyzed_content_length_chars": 333,
+          "original_content_token_estimate": 84,
+          "analyzed_content_token_estimate": 84,
+          "truncation_reason": null,
+          "analysis_method": "full_text",
+          "attention_tier": "medium",
+          "theme": "general",
+          "attention_reason": "Default medium attention because the story is relevant but not an obvious top-priority market mover.",
+          "must_keep": false,
+          "model_used": "meta-llama/llama-4-scout-17b-16e-instruct",
+          "delayed_retry_attempted": false,
+          "delayed_retry_model_chain": [],
+          "delayed_retry_final_model": null,
+          "error_classification": null,
+          "error": null
+        },
+        {
+          "source_article_id": "4392458",
+          "title": "新盤丨壹沐第2期加推63伙 平均折實呎價20688元",
+          "canonical_url": "https://www.hkej.com/instantnews/property/article/4392458/%E6%96%B0%E7%9B%A4%E4%B8%A8%E5%A3%B9%E6%B2%90%E7%AC%AC2%E6%9C%9F%E5%8A%A0%E6%8E%A863%E4%BC%99+%E5%B9%B3%E5%9D%87%E6%8A%98%E5%AF%A6%E5%91%8E%E5%83%B920688%E5%85%83",
+          "published_at": "2026-05-02T16:58:00+08:00",
+          "section": "新盤情報",
+          "novelty_score": 5,
+          "relevance_score": 7,
+          "urgency_score": 6,
+          "named_entities": [
+            {
+              "name": "恒地",
+              "type": "company"
+            },
+            {
+              "name": "壹沐",
+              "type": "asset"
+            }
+          ],
+          "key_points": [
+            "恒地壹沐第2期加推63伙，平均折實呎價20688元。",
+            "針對家庭客群，重點推出多個中大型單位。"
+          ],
+          "content_truncated": false,
+          "original_content_length_chars": 146,
+          "analyzed_content_length_chars": 146,
+          "original_content_token_estimate": 37,
+          "analyzed_content_token_estimate": 37,
+          "truncation_reason": null,
+          "analysis_method": "full_text",
+          "attention_tier": "medium",
+          "theme": "general",
+          "attention_reason": "Default medium attention because the story is relevant but not an obvious top-priority market mover.",
+          "must_keep": false,
+          "model_used": "meta-llama/llama-4-scout-17b-16e-instruct",
+          "delayed_retry_attempted": false,
+          "delayed_retry_model_chain": [],
+          "delayed_retry_final_model": null,
+          "error_classification": null,
+          "error": null
+        },
         {
           "source_article_id": "4392450",
           "title": "新盤丨DEEP WATER SOUTH下周三標售48伙大宅",
@@ -2521,38 +3029,123 @@
           "key_points": [],
           "content_truncated": false,
           "analysis_method": "bypassed",
-          "model_used": "direct"
+          "model_used": "direct",
+          "theme": "property",
+          "attention_reason": "Lighter treatment because this story sits in the 地產新聞 section without strong market-moving signals.",
+          "must_keep": false
         }
       ],
       "subgroups": [
         {
           "title": "地產新聞 overview",
           "theme_rationale": "Single subgroup because the category size did not require thematic splitting.",
-          "article_count": 2,
+          "article_count": 4,
           "key_developments": [
-            "會德豐地產與港鐵合作的DEEP WATER SOUTH第6B期下周三推出48伙臻藏大宅，以招標形式發售。",
-            "項目開售至今累售149伙，套現超過27億元，近月成交表現持續理想。",
-            "首岸第3期首推100伙，折實售698萬起。"
+            "長實旗下名日．九肚山連錄兩宗成交，套現逾4100萬元。",
+            "恒地壹沐第2期加推63伙，平均折實呎價20688元。",
+            "會德豐地產與港鐵合作的DEEP WATER SOUTH第6B期下周三推出48伙臻藏大宅，以招標形式發售。"
           ],
           "named_entities": [
             {
-              "name": "會德豐地產",
+              "name": "長實",
               "type": "company"
             },
             {
-              "name": "港鐵",
+              "name": "名日．九肚山",
+              "type": "asset"
+            },
+            {
+              "name": "恒地",
               "type": "company"
             },
             {
-              "name": "黃光耀",
-              "type": "person"
-            },
-            {
-              "name": "DEEP WATER SOUTH",
-              "type": "organization"
+              "name": "壹沐",
+              "type": "asset"
             }
           ],
           "articles": [
+            {
+              "source_article_id": "4392459",
+              "title": "新盤丨名日．九肚山4100萬連沽兩伙",
+              "canonical_url": "https://www.hkej.com/instantnews/property/article/4392459/%E6%96%B0%E7%9B%A4%E4%B8%A8%E5%90%8D%E6%97%A5%EF%BC%8E%E4%B9%9D%E8%82%9A%E5%B1%B14100%E8%90%AC%E9%80%A3%E6%B2%BD%E5%85%A9%E4%BC%99",
+              "published_at": "2026-05-02T17:21:00+08:00",
+              "section": "新盤情報",
+              "novelty_score": 6,
+              "relevance_score": 8,
+              "urgency_score": 7,
+              "named_entities": [
+                {
+                  "name": "長實",
+                  "type": "company"
+                },
+                {
+                  "name": "名日．九肚山",
+                  "type": "asset"
+                }
+              ],
+              "key_points": [
+                "長實旗下名日．九肚山連錄兩宗成交，套現逾4100萬元。",
+                "最高成交單位為第1座17樓C室，成交價2253.6萬元，呎價約18382元。"
+              ],
+              "content_truncated": false,
+              "original_content_length_chars": 333,
+              "analyzed_content_length_chars": 333,
+              "original_content_token_estimate": 84,
+              "analyzed_content_token_estimate": 84,
+              "truncation_reason": null,
+              "analysis_method": "full_text",
+              "attention_tier": "medium",
+              "theme": "general",
+              "attention_reason": "Default medium attention because the story is relevant but not an obvious top-priority market mover.",
+              "must_keep": false,
+              "model_used": "meta-llama/llama-4-scout-17b-16e-instruct",
+              "delayed_retry_attempted": false,
+              "delayed_retry_model_chain": [],
+              "delayed_retry_final_model": null,
+              "error_classification": null,
+              "error": null
+            },
+            {
+              "source_article_id": "4392458",
+              "title": "新盤丨壹沐第2期加推63伙 平均折實呎價20688元",
+              "canonical_url": "https://www.hkej.com/instantnews/property/article/4392458/%E6%96%B0%E7%9B%A4%E4%B8%A8%E5%A3%B9%E6%B2%90%E7%AC%AC2%E6%9C%9F%E5%8A%A0%E6%8E%A863%E4%BC%99+%E5%B9%B3%E5%9D%87%E6%8A%98%E5%AF%A6%E5%91%8E%E5%83%B920688%E5%85%83",
+              "published_at": "2026-05-02T16:58:00+08:00",
+              "section": "新盤情報",
+              "novelty_score": 5,
+              "relevance_score": 7,
+              "urgency_score": 6,
+              "named_entities": [
+                {
+                  "name": "恒地",
+                  "type": "company"
+                },
+                {
+                  "name": "壹沐",
+                  "type": "asset"
+                }
+              ],
+              "key_points": [
+                "恒地壹沐第2期加推63伙，平均折實呎價20688元。",
+                "針對家庭客群，重點推出多個中大型單位。"
+              ],
+              "content_truncated": false,
+              "original_content_length_chars": 146,
+              "analyzed_content_length_chars": 146,
+              "original_content_token_estimate": 37,
+              "analyzed_content_token_estimate": 37,
+              "truncation_reason": null,
+              "analysis_method": "full_text",
+              "attention_tier": "medium",
+              "theme": "general",
+              "attention_reason": "Default medium attention because the story is relevant but not an obvious top-priority market mover.",
+              "must_keep": false,
+              "model_used": "meta-llama/llama-4-scout-17b-16e-instruct",
+              "delayed_retry_attempted": false,
+              "delayed_retry_model_chain": [],
+              "delayed_retry_final_model": null,
+              "error_classification": null,
+              "error": null
+            },
             {
               "source_article_id": "4392450",
               "title": "新盤丨DEEP WATER SOUTH下周三標售48伙大宅",
@@ -2616,7 +3209,10 @@
               "key_points": [],
               "content_truncated": false,
               "analysis_method": "bypassed",
-              "model_used": "direct"
+              "model_used": "direct",
+              "theme": "property",
+              "attention_reason": "Lighter treatment because this story sits in the 地產新聞 section without strong market-moving signals.",
+              "must_keep": false
             }
           ],
           "model_used": "meta-llama/llama-4-scout-17b-16e-instruct"
@@ -2624,15 +3220,15 @@
       ],
       "analysis_profile": "light",
       "model_used": "meta-llama/llama-4-scout-17b-16e-instruct",
-      "sub_batch_count": 2,
+      "sub_batch_count": 3,
       "diagnostics": {
-        "sub_batch_count": 1,
+        "sub_batch_count": 3,
         "split_reasons": [],
         "models_attempted": [
           "meta-llama/llama-4-scout-17b-16e-instruct"
         ],
-        "estimated_input_tokens_max": 745,
-        "serialized_request_bytes_max": 4296,
+        "estimated_input_tokens_max": 862,
+        "serialized_request_bytes_max": 4674,
         "rate_limit_waits": 0,
         "partial_article_count": 0,
         "synthesis_wait_seconds_total": 0.0,
