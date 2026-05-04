@@ -2,8 +2,8 @@
   "maritime": {
     "count": 0,
     "status": "Active Blockade / Clear Zone",
-    "updated": "2026-05-04_13-49-58",
-    "updated_iso": "2026-05-04T13:49:58+00:00"
+    "updated": "2026-05-04_15-59-47",
+    "updated_iso": "2026-05-04T15:59:47+00:00"
   },
   "market": {
     "sections": [
@@ -251,7 +251,7 @@
   "polymarket": {
     "status": "partial",
     "updated": "2026-05-04T14:26:21.278321+00:00",
-    "freshness_minutes": 2,
+    "freshness_minutes": 95,
     "error_count": 3,
     "errors": [
       "qqq_up_down_daily: no active market matched configured slug(s)",
@@ -454,7 +454,7 @@
       },
       {
         "date": "2026-05-04",
-        "result": "up"
+        "result": "down"
       }
     ],
     "btc_track_record": [
@@ -10866,65 +10866,12 @@
     "status": "success"
   },
   "fred": {
-    "items": [
-      {
-        "release_id": 50,
-        "release_key": "fred_50_2026-05-08",
-        "name": "Employment Situation",
-        "date": "2026-05-08",
-        "impact": "high",
-        "series_id": "PAYEMS",
-        "display_unit": "k",
-        "prior_value": null,
-        "source": "FRED"
-      },
-      {
-        "release_id": 10,
-        "release_key": "fred_10_2026-05-12",
-        "name": "Consumer Price Index",
-        "date": "2026-05-12",
-        "impact": "high",
-        "series_id": "CPIAUCSL",
-        "display_unit": "%",
-        "prior_value": null,
-        "source": "FRED"
-      },
-      {
-        "release_id": 9,
-        "release_key": "fred_9_2026-05-14",
-        "name": "Retail Sales Advance",
-        "date": "2026-05-14",
-        "impact": "medium",
-        "series_id": "RSXFS",
-        "display_unit": "%",
-        "prior_value": null,
-        "source": "FRED"
-      },
-      {
-        "release_id": 53,
-        "release_key": "fred_53_2026-05-28",
-        "name": "GDP Advance Estimate",
-        "date": "2026-05-28",
-        "impact": "high",
-        "series_id": "GDP",
-        "display_unit": "%",
-        "prior_value": null,
-        "source": "FRED"
-      },
-      {
-        "release_id": 54,
-        "release_key": "fred_54_2026-05-28",
-        "name": "Personal Income and Outlays (PCE)",
-        "date": "2026-05-28",
-        "impact": "high",
-        "series_id": "PCEPI",
-        "display_unit": "%",
-        "prior_value": null,
-        "source": "FRED"
-      }
-    ],
-    "updated": "2026-05-04T14:28:15.949646+00:00",
-    "status": "success"
+    "items": [],
+    "updated": "2026-05-04T16:01:35.930679+00:00",
+    "status": "failed",
+    "error_messages": [
+      "fred:500 Server Error: Internal Server Error for url: https://api.stlouisfed.org/fred/releases/dates?api_key=fff6dc02f5a8b6dcbd78574394e0cb6f&file_type=json&realtime_start=2026-05-04&realtime_end=2026-06-03&order_by=release_date&sort_order=asc&include_release_dates_with_no_data=true"
+    ]
   },
   "youtube": {
     "signals": [
@@ -10944,5 +10891,5 @@
     "total_analyzed": 2,
     "updated": "2026-05-04T13-21-32.679662plus00-00"
   },
-  "last_baked": "2026-05-04T14:28:15.951243+00:00"
+  "last_baked": "2026-05-04T16:01:35.932361+00:00"
 }
