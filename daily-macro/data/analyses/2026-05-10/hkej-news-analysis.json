@@ -1,15 +1,15 @@
 {
   "report_schema_version": 6,
   "report_date": "2026-05-10",
-  "generated_at": "2026-05-10T09:14:37.562740+00:00",
+  "generated_at": "2026-05-10T21:44:17.471315+00:00",
   "source_site": "hkej",
-  "status": "success",
-  "executive_summary": [
+  "status": "partial",
+  "executive_summary": [],
+  "legacy_executive_summary": [
     "中方就倫敦經貿辦案向英方提嚴正交涉，警告停止反華政治操弄",
     "美國和伊朗的談判前景仍不明朗，特朗普稱預計很快收到伊朗對和平方案的回應",
     "普京稱俄烏戰爭即將結束，問題根源來自烏克蘭尋求加入歐盟"
   ],
-  "legacy_executive_summary": [],
   "model": {
     "provider": "groq",
     "primary_model": "meta-llama/llama-4-scout-17b-16e-instruct",
@@ -20,18 +20,18 @@
   },
   "model_switches": [],
   "input": {
-    "article_count": 25,
-    "category_count": 4
+    "article_count": 40,
+    "category_count": 6
   },
   "diagnostics": {
     "rate_limit_wait_count": 1,
-    "rate_limit_wait_seconds_total": 1123.199,
+    "rate_limit_wait_seconds_total": 1900.799,
     "fallback_switch_count": 0,
     "key_rotation_count": 0,
-    "pre_send_split_count": 4,
+    "pre_send_split_count": 6,
     "response_413_split_count": 0,
     "json_repair_retry_count": 0,
-    "batch_count": 19,
+    "batch_count": 29,
     "failed_batch_count": 0,
     "delayed_retry_candidate_count": 0,
     "delayed_retry_attempted_count": 0,
@@ -40,22 +40,22 @@
     "high_medium_unresolved_count": 0,
     "light_unresolved_count": 0,
     "delayed_retry_skipped_final_model_count": 0,
-    "synthesis_budget_exhausted_count": 0,
+    "synthesis_budget_exhausted_count": 1,
     "degraded_merge_count": 0
   },
   "incremental": {
-    "reused_successful_articles": 0,
-    "new_articles_analyzed": 25,
+    "reused_successful_articles": 25,
+    "new_articles_analyzed": 15,
     "retried_previous_day_articles": 0,
     "previous_day_retry_successes": 0
   },
   "daily_stats": {
-    "total_scraped": 25,
-    "analyzed": 25,
+    "total_scraped": 40,
+    "analyzed": 40,
     "success_rate": 100.0
   },
   "macro_release_digest": {
-    "generated_at": "2026-05-10T08:55:32.136964+00:00",
+    "generated_at": "2026-05-10T21:12:10.579189+00:00",
     "window_start": "2026-05-10",
     "window_end": "2026-05-16",
     "fetch_status": "failed",
@@ -67,21 +67,309 @@
   },
   "unresolved_articles": [],
   "totals": {
-    "article_count": 25,
-    "successful_article_analyses": 25,
+    "article_count": 40,
+    "successful_article_analyses": 40,
     "failed_article_analyses": 0,
-    "full_text_article_count": 25,
+    "full_text_article_count": 40,
     "truncated_article_count": 0,
-    "successful_categories": 4,
-    "partial_categories": 0,
+    "successful_categories": 5,
+    "partial_categories": 1,
     "failed_categories": 0
   },
   "market_context": [],
   "categories": [
     {
-      "category": "時事脈搏",
-      "article_count": 16,
+      "category": "國際財經",
+      "article_count": 2,
       "status": "success",
+      "key_developments": [
+        "Pimco首席投資官Dan Ivascyn警告美國聯儲局降息可能適得其反，甚至可能需要提高借貸成本。",
+        "德國機場協會警告航空燃油持續短缺可能導致更多航班被取消，機票價格或進一步漲價。",
+        "過去兩個月航空燃油價格漲至戰前的兩倍，未來幾個月內預計不會恢復正常。",
+        "伊朗關閉霍爾木茲海峽引發能源價格飆升，給美國政策制定者帶來新的挑戰。"
+      ],
+      "named_entities": [
+        {
+          "name": "Pimco",
+          "type": "organization"
+        },
+        {
+          "name": "Dan Ivascyn",
+          "type": "person"
+        },
+        {
+          "name": "美國聯儲局",
+          "type": "institution"
+        },
+        {
+          "name": "德國機場協會",
+          "type": "organization"
+        },
+        {
+          "name": "Ralph Beisel",
+          "type": "person"
+        }
+      ],
+      "articles": [
+        {
+          "source_article_id": "4400106",
+          "title": "Pimco:美國聯儲局降息將適得其反",
+          "canonical_url": "https://www.hkej.com/instantnews/international/article/4400106/Pimco%3A%E7%BE%8E%E5%9C%8B%E8%81%AF%E5%84%B2%E5%B1%80%E9%99%8D%E6%81%AF%E5%B0%87%E9%81%A9%E5%BE%97%E5%85%B6%E5%8F%8D",
+          "published_at": "2026-05-10T23:05:00+08:00",
+          "section": "國際財經",
+          "novelty_score": 6,
+          "relevance_score": 8,
+          "urgency_score": 7,
+          "named_entities": [
+            {
+              "name": "Pimco",
+              "type": "organization"
+            },
+            {
+              "name": "Dan Ivascyn",
+              "type": "person"
+            },
+            {
+              "name": "美國聯儲局",
+              "type": "institution"
+            },
+            {
+              "name": "伊朗",
+              "type": "country"
+            },
+            {
+              "name": "特朗普",
+              "type": "person"
+            }
+          ],
+          "key_points": [
+            "Pimco首席投資官Dan Ivascyn警告美國聯儲局降息可能適得其反，甚至可能需要提高借貸成本。",
+            "伊朗關閉霍爾木茲海峽引發能源價格飆升，給美國政策制定者帶來新的挑戰。",
+            "Dan Ivascyn希望央行採取謹慎的應對措施，可能收緊政策以應對通脹。"
+          ],
+          "content_truncated": false,
+          "original_content_length_chars": 192,
+          "analyzed_content_length_chars": 192,
+          "original_content_token_estimate": 48,
+          "analyzed_content_token_estimate": 48,
+          "truncation_reason": null,
+          "analysis_method": "full_text",
+          "attention_tier": "medium",
+          "theme": "macro",
+          "attention_reason": "Article discusses monetary policy and its potential effects.",
+          "must_keep": true,
+          "model_used": "meta-llama/llama-4-scout-17b-16e-instruct",
+          "delayed_retry_attempted": false,
+          "delayed_retry_model_chain": [],
+          "delayed_retry_final_model": null,
+          "error_classification": null,
+          "error": null
+        },
+        {
+          "source_article_id": "4400073",
+          "title": "石油危機丨德國機場協會料航油短缺持續 或致更多航班取消",
+          "canonical_url": "https://www.hkej.com/instantnews/international/article/4400073/%E7%9F%B3%E6%B2%B9%E5%8D%B1%E6%A9%9F%E4%B8%A8%E5%BE%B7%E5%9C%8B%E6%A9%9F%E5%A0%B4%E5%8D%94%E6%9C%83%E6%96%99%E8%88%AA%E6%B2%B9%E7%9F%AD%E7%BC%BA%E6%8C%81%E7%BA%8C+%E6%88%96%E8%87%B4%E6%9B%B4%E5%A4%9A%E8%88%AA%E7%8F%AD%E5%8F%96%E6%B6%88",
+          "published_at": "2026-05-10T18:31:00+08:00",
+          "section": "國際財經",
+          "novelty_score": 5,
+          "relevance_score": 7,
+          "urgency_score": 6,
+          "named_entities": [
+            {
+              "name": "德國機場協會",
+              "type": "organization"
+            },
+            {
+              "name": "Ralph Beisel",
+              "type": "person"
+            }
+          ],
+          "key_points": [
+            "德國機場協會警告航空燃油持續短缺可能導致更多航班被取消，機票價格或進一步漲價。",
+            "該協會行政總裁Ralph Beisel預測今年旅客數量可能維持現狀或下降10%，影響2000萬名旅客。",
+            "過去兩個月航空燃油價格漲至戰前的兩倍，未來幾個月內預計不會恢復正常。"
+          ],
+          "content_truncated": false,
+          "original_content_length_chars": 397,
+          "analyzed_content_length_chars": 397,
+          "original_content_token_estimate": 100,
+          "analyzed_content_token_estimate": 100,
+          "truncation_reason": null,
+          "analysis_method": "full_text",
+          "attention_tier": "medium",
+          "theme": "general",
+          "attention_reason": "Default medium attention because the story is relevant but not an obvious top-priority market mover.",
+          "must_keep": false,
+          "model_used": "meta-llama/llama-4-scout-17b-16e-instruct",
+          "delayed_retry_attempted": false,
+          "delayed_retry_model_chain": [],
+          "delayed_retry_final_model": null,
+          "error_classification": null,
+          "error": null
+        }
+      ],
+      "subgroups": [
+        {
+          "title": "國際財經 overview",
+          "theme_rationale": "Single subgroup because the category size did not require thematic splitting.",
+          "article_count": 2,
+          "key_developments": [
+            "Pimco首席投資官Dan Ivascyn警告美國聯儲局降息可能適得其反，甚至可能需要提高借貸成本。",
+            "德國機場協會警告航空燃油持續短缺可能導致更多航班被取消，機票價格或進一步漲價。",
+            "過去兩個月航空燃油價格漲至戰前的兩倍，未來幾個月內預計不會恢復正常。",
+            "伊朗關閉霍爾木茲海峽引發能源價格飆升，給美國政策制定者帶來新的挑戰。"
+          ],
+          "named_entities": [
+            {
+              "name": "Pimco",
+              "type": "organization"
+            },
+            {
+              "name": "Dan Ivascyn",
+              "type": "person"
+            },
+            {
+              "name": "美國聯儲局",
+              "type": "institution"
+            },
+            {
+              "name": "德國機場協會",
+              "type": "organization"
+            },
+            {
+              "name": "Ralph Beisel",
+              "type": "person"
+            }
+          ],
+          "articles": [
+            {
+              "source_article_id": "4400106",
+              "title": "Pimco:美國聯儲局降息將適得其反",
+              "canonical_url": "https://www.hkej.com/instantnews/international/article/4400106/Pimco%3A%E7%BE%8E%E5%9C%8B%E8%81%AF%E5%84%B2%E5%B1%80%E9%99%8D%E6%81%AF%E5%B0%87%E9%81%A9%E5%BE%97%E5%85%B6%E5%8F%8D",
+              "published_at": "2026-05-10T23:05:00+08:00",
+              "section": "國際財經",
+              "novelty_score": 6,
+              "relevance_score": 8,
+              "urgency_score": 7,
+              "named_entities": [
+                {
+                  "name": "Pimco",
+                  "type": "organization"
+                },
+                {
+                  "name": "Dan Ivascyn",
+                  "type": "person"
+                },
+                {
+                  "name": "美國聯儲局",
+                  "type": "institution"
+                },
+                {
+                  "name": "伊朗",
+                  "type": "country"
+                },
+                {
+                  "name": "特朗普",
+                  "type": "person"
+                }
+              ],
+              "key_points": [
+                "Pimco首席投資官Dan Ivascyn警告美國聯儲局降息可能適得其反，甚至可能需要提高借貸成本。",
+                "伊朗關閉霍爾木茲海峽引發能源價格飆升，給美國政策制定者帶來新的挑戰。",
+                "Dan Ivascyn希望央行採取謹慎的應對措施，可能收緊政策以應對通脹。"
+              ],
+              "content_truncated": false,
+              "original_content_length_chars": 192,
+              "analyzed_content_length_chars": 192,
+              "original_content_token_estimate": 48,
+              "analyzed_content_token_estimate": 48,
+              "truncation_reason": null,
+              "analysis_method": "full_text",
+              "attention_tier": "medium",
+              "theme": "macro",
+              "attention_reason": "Article discusses monetary policy and its potential effects.",
+              "must_keep": true,
+              "model_used": "meta-llama/llama-4-scout-17b-16e-instruct",
+              "delayed_retry_attempted": false,
+              "delayed_retry_model_chain": [],
+              "delayed_retry_final_model": null,
+              "error_classification": null,
+              "error": null
+            },
+            {
+              "source_article_id": "4400073",
+              "title": "石油危機丨德國機場協會料航油短缺持續 或致更多航班取消",
+              "canonical_url": "https://www.hkej.com/instantnews/international/article/4400073/%E7%9F%B3%E6%B2%B9%E5%8D%B1%E6%A9%9F%E4%B8%A8%E5%BE%B7%E5%9C%8B%E6%A9%9F%E5%A0%B4%E5%8D%94%E6%9C%83%E6%96%99%E8%88%AA%E6%B2%B9%E7%9F%AD%E7%BC%BA%E6%8C%81%E7%BA%8C+%E6%88%96%E8%87%B4%E6%9B%B4%E5%A4%9A%E8%88%AA%E7%8F%AD%E5%8F%96%E6%B6%88",
+              "published_at": "2026-05-10T18:31:00+08:00",
+              "section": "國際財經",
+              "novelty_score": 5,
+              "relevance_score": 7,
+              "urgency_score": 6,
+              "named_entities": [
+                {
+                  "name": "德國機場協會",
+                  "type": "organization"
+                },
+                {
+                  "name": "Ralph Beisel",
+                  "type": "person"
+                }
+              ],
+              "key_points": [
+                "德國機場協會警告航空燃油持續短缺可能導致更多航班被取消，機票價格或進一步漲價。",
+                "該協會行政總裁Ralph Beisel預測今年旅客數量可能維持現狀或下降10%，影響2000萬名旅客。",
+                "過去兩個月航空燃油價格漲至戰前的兩倍，未來幾個月內預計不會恢復正常。"
+              ],
+              "content_truncated": false,
+              "original_content_length_chars": 397,
+              "analyzed_content_length_chars": 397,
+              "original_content_token_estimate": 100,
+              "analyzed_content_token_estimate": 100,
+              "truncation_reason": null,
+              "analysis_method": "full_text",
+              "attention_tier": "medium",
+              "theme": "general",
+              "attention_reason": "Default medium attention because the story is relevant but not an obvious top-priority market mover.",
+              "must_keep": false,
+              "model_used": "meta-llama/llama-4-scout-17b-16e-instruct",
+              "delayed_retry_attempted": false,
+              "delayed_retry_model_chain": [],
+              "delayed_retry_final_model": null,
+              "error_classification": null,
+              "error": null
+            }
+          ],
+          "model_used": "meta-llama/llama-4-scout-17b-16e-instruct"
+        }
+      ],
+      "analysis_profile": "standard",
+      "model_used": "meta-llama/llama-4-scout-17b-16e-instruct",
+      "sub_batch_count": 2,
+      "diagnostics": {
+        "sub_batch_count": 1,
+        "split_reasons": [],
+        "models_attempted": [
+          "meta-llama/llama-4-scout-17b-16e-instruct"
+        ],
+        "estimated_input_tokens_max": 914,
+        "serialized_request_bytes_max": 5117,
+        "rate_limit_waits": 0,
+        "partial_article_count": 0,
+        "synthesis_wait_seconds_total": 0.0,
+        "synthesis_retry_count": 0,
+        "synthesis_retry_skipped_count": 0,
+        "synthesis_budget_exhausted": false,
+        "degraded_merge_used": false,
+        "degraded_merge_reason": "",
+        "synthesis_merge_depth_max": 0,
+        "model_switches": []
+      },
+      "error": null
+    },
+    {
+      "category": "時事脈搏",
+      "article_count": 24,
+      "status": "partial",
       "key_developments": [],
       "named_entities": [
         {
@@ -103,6 +391,200 @@
       ],
       "articles": [
         {
+          "source_article_id": "4400107",
+          "title": "美伊談判丨伊朗據報已回應美國提出結束戰爭方案",
+          "canonical_url": "https://www.hkej.com/instantnews/current/article/4400107/%E7%BE%8E%E4%BC%8A%E8%AB%87%E5%88%A4%E4%B8%A8%E4%BC%8A%E6%9C%97%E6%93%9A%E5%A0%B1%E5%B7%B2%E5%9B%9E%E6%87%89%E7%BE%8E%E5%9C%8B%E6%8F%90%E5%87%BA%E7%B5%90%E6%9D%9F%E6%88%B0%E7%88%AD%E6%96%B9%E6%A1%88",
+          "published_at": "2026-05-10T23:10:00+08:00",
+          "section": "時事脈搏",
+          "novelty_score": 6,
+          "relevance_score": 8,
+          "urgency_score": 7,
+          "named_entities": [
+            {
+              "name": "伊朗",
+              "type": "country"
+            },
+            {
+              "name": "美國",
+              "type": "country"
+            },
+            {
+              "name": "穆傑塔巴",
+              "type": "person"
+            },
+            {
+              "name": "阿卜杜拉希",
+              "type": "person"
+            }
+          ],
+          "key_points": [
+            "伊朗已通過巴基斯坦回應美國提出的結束戰爭方案。",
+            "雙方談判聚焦於停止區內敵對行動及海上安全問題。"
+          ],
+          "content_truncated": false,
+          "original_content_length_chars": 303,
+          "analyzed_content_length_chars": 303,
+          "original_content_token_estimate": 76,
+          "analyzed_content_token_estimate": 76,
+          "truncation_reason": null,
+          "analysis_method": "full_text",
+          "attention_tier": "high",
+          "theme": "geopolitics",
+          "attention_reason": "High-signal geopolitics headline based on title/summary keywords.",
+          "must_keep": true,
+          "model_used": "meta-llama/llama-4-scout-17b-16e-instruct",
+          "delayed_retry_attempted": false,
+          "delayed_retry_model_chain": [],
+          "delayed_retry_final_model": null,
+          "error_classification": null,
+          "error": null
+        },
+        {
+          "source_article_id": "4400099",
+          "canonical_url": "https://www.hkej.com/instantnews/current/article/4400099/%E4%B8%AD%E5%9C%8B%E5%85%AC%E6%B0%91%E6%B6%89%E9%9D%9E%E6%B3%95%E6%8C%81%E6%9C%89%E6%AD%A6%E5%99%A8+%E4%B8%AD%E9%A7%90%E6%B3%B0%E4%BD%BF%E9%A4%A8%3A%E6%94%AF%E6%8C%81%E5%8F%B8%E6%B3%95%E6%A9%9F%E9%97%9C%E4%BE%9D%E6%B3%95%E8%99%95%E7%BD%AE",
+          "title": "中國公民涉非法持有武器 中駐泰使館:支持司法機關依法處置",
+          "section": "時事脈搏",
+          "published_at": "2026-05-10T20:00:00+08:00",
+          "attention_tier": "light",
+          "novelty_score": 5,
+          "relevance_score": 5,
+          "urgency_score": 5,
+          "named_entities": [],
+          "key_points": [],
+          "content_truncated": false,
+          "analysis_method": "bypassed",
+          "model_used": "direct"
+        },
+        {
+          "source_article_id": "4400081",
+          "canonical_url": "https://www.hkej.com/instantnews/current/article/4400081/%E6%BC%A2%E5%9D%A6%E7%97%85%E6%AF%92%E4%B8%A8%E9%83%B5%E8%BC%AA%E6%8A%B5%E7%89%B9%E5%85%A7%E9%87%8C%E8%B2%BB%E5%B3%B6+%E6%97%85%E5%AE%A2%E8%88%B9%E5%93%A1%E7%96%8F%E6%95%A3%E6%92%A4%E9%9B%A2",
+          "title": "漢坦病毒丨郵輪抵特內里費島 旅客船員疏散撤離",
+          "section": "時事脈搏",
+          "published_at": "2026-05-10T19:11:00+08:00",
+          "attention_tier": "light",
+          "novelty_score": 5,
+          "relevance_score": 5,
+          "urgency_score": 5,
+          "named_entities": [],
+          "key_points": [],
+          "content_truncated": false,
+          "analysis_method": "bypassed",
+          "model_used": "direct"
+        },
+        {
+          "source_article_id": "4400065",
+          "canonical_url": "https://www.hkej.com/instantnews/current/article/4400065/%E6%84%9B%E5%9C%A8%E9%87%91%E9%B7%BA%E5%96%84%E5%A4%9C%E6%AF%8D%E8%A6%AA%E7%AF%80%E6%85%88%E5%96%84%E5%AE%B4%E6%8B%9B%E5%BE%85%E5%AE%8F%E7%A6%8F%E8%8B%91%E7%81%BD%E6%B0%91%E5%8F%8A%E9%AB%98%E9%BD%A1%E6%AF%8D%E8%A6%AA",
+          "title": "愛在金鷺善夜母親節慈善宴招待宏福苑災民及高齡母親",
+          "section": "時事脈搏",
+          "published_at": "2026-05-10T18:00:00+08:00",
+          "attention_tier": "light",
+          "novelty_score": 5,
+          "relevance_score": 5,
+          "urgency_score": 5,
+          "named_entities": [],
+          "key_points": [],
+          "content_truncated": false,
+          "analysis_method": "bypassed",
+          "model_used": "direct"
+        },
+        {
+          "source_article_id": "4400064",
+          "title": "中東局勢丨卡塔爾液化天然氣運輸船成功通過霍爾木茲海峽",
+          "canonical_url": "https://www.hkej.com/instantnews/current/article/4400064/%E4%B8%AD%E6%9D%B1%E5%B1%80%E5%8B%A2%E4%B8%A8%E5%8D%A1%E5%A1%94%E7%88%BE%E6%B6%B2%E5%8C%96%E5%A4%A9%E7%84%B6%E6%B0%A3%E9%81%8B%E8%BC%B8%E8%88%B9%E6%88%90%E5%8A%9F%E9%80%9A%E9%81%8E%E9%9C%8D%E7%88%BE%E6%9C%A8%E8%8C%B2%E6%B5%B7%E5%B3%BD",
+          "published_at": "2026-05-10T17:51:00+08:00",
+          "section": "時事脈搏",
+          "novelty_score": 5,
+          "relevance_score": 7,
+          "urgency_score": 6,
+          "named_entities": [
+            {
+              "name": "卡塔爾",
+              "type": "country"
+            },
+            {
+              "name": "伊朗",
+              "type": "country"
+            },
+            {
+              "name": "美國",
+              "type": "country"
+            },
+            {
+              "name": "以色列",
+              "type": "country"
+            }
+          ],
+          "key_points": [
+            "一艘卡塔爾液化天然氣運輸船成功通過霍爾木茲海峽。",
+            "這是美國和以色列對伊朗發動軍事行動後首艘通過該海峽的卡塔爾液化天然氣運輸船。"
+          ],
+          "content_truncated": false,
+          "original_content_length_chars": 150,
+          "analyzed_content_length_chars": 150,
+          "original_content_token_estimate": 38,
+          "analyzed_content_token_estimate": 38,
+          "truncation_reason": null,
+          "analysis_method": "full_text",
+          "attention_tier": "high",
+          "theme": "geopolitics",
+          "attention_reason": "High-signal geopolitics headline based on title/summary keywords.",
+          "must_keep": true,
+          "model_used": "meta-llama/llama-4-scout-17b-16e-instruct",
+          "delayed_retry_attempted": false,
+          "delayed_retry_model_chain": [],
+          "delayed_retry_final_model": null,
+          "error_classification": null,
+          "error": null
+        },
+        {
+          "source_article_id": "4400061",
+          "canonical_url": "https://www.hkej.com/instantnews/current/article/4400061/%E9%AB%94%E8%82%B2%E7%B8%BD%E5%B1%80%E7%B1%B2%E9%97%9C%E6%B3%A8%E9%81%8B%E5%8B%95%E5%93%A1%E8%B3%BD%E5%A0%B4%E8%A1%A8%E7%8F%BE+%E4%B8%8D%E7%B5%84%E7%B9%94%E4%B8%8D%E5%8F%83%E8%88%87%E6%85%B6%E7%94%9F%E7%AD%89%E6%B4%BB%E5%8B%95",
+          "title": "體育總局籲關注運動員賽場表現 不組織不參與慶生等活動",
+          "section": "時事脈搏",
+          "published_at": "2026-05-10T17:30:00+08:00",
+          "attention_tier": "light",
+          "novelty_score": 5,
+          "relevance_score": 5,
+          "urgency_score": 5,
+          "named_entities": [],
+          "key_points": [],
+          "content_truncated": false,
+          "analysis_method": "bypassed",
+          "model_used": "direct"
+        },
+        {
+          "source_article_id": "4400063",
+          "canonical_url": "https://www.hkej.com/instantnews/current/article/4400063/MPF%E4%B8%A8%E9%99%B3%E8%8C%82%E6%B3%A2%3A%E9%80%BE1000%E8%90%AC%E5%80%8B%E5%BC%B7%E7%A9%8D%E9%87%91%E8%B3%AC%E6%88%B6%E5%B7%B2%E5%8A%A0%E5%85%A5%E7%A9%8D%E9%87%91%E6%98%93%E5%B9%B3%E5%8F%B0",
+          "title": "MPF丨陳茂波:逾1000萬個強積金賬戶已加入積金易平台",
+          "section": "時事脈搏",
+          "published_at": "2026-05-10T17:24:00+08:00",
+          "attention_tier": "light",
+          "novelty_score": 5,
+          "relevance_score": 5,
+          "urgency_score": 5,
+          "named_entities": [],
+          "key_points": [],
+          "content_truncated": false,
+          "analysis_method": "bypassed",
+          "model_used": "direct"
+        },
+        {
+          "source_article_id": "4400062",
+          "canonical_url": "https://www.hkej.com/instantnews/current/article/4400062/%E4%B8%AD%E4%B9%9D%E9%BE%8D%E7%B9%9E%E9%81%93%E9%9A%A7%E9%81%93%E5%85%A9%E8%BB%8A%E7%98%8B%E7%8B%82%E9%A7%95%E9%A7%9B+%E9%81%8B%E8%BC%B8%E7%BD%B2%3A%E5%B7%B2%E8%BD%89%E4%BA%A4%E8%AD%A6%E6%96%B9%E8%AA%BF%E6%9F%A5",
+          "title": "中九龍繞道隧道兩車瘋狂駕駛 運輸署:已轉交警方調查",
+          "section": "時事脈搏",
+          "published_at": "2026-05-10T17:02:00+08:00",
+          "attention_tier": "light",
+          "novelty_score": 5,
+          "relevance_score": 5,
+          "urgency_score": 5,
+          "named_entities": [],
+          "key_points": [],
+          "content_truncated": false,
+          "analysis_method": "bypassed",
+          "model_used": "direct"
+        },
+        {
           "source_article_id": "4400060",
           "canonical_url": "https://www.hkej.com/instantnews/current/article/4400060/%E5%80%AB%E6%95%A6%E7%B6%93%E8%B2%BF%E8%BE%A6%E6%A1%88%E4%B8%A8%E4%B8%AD%E6%96%B9%E5%90%91%E8%8B%B1%E6%8F%90%E5%9A%B4%E6%AD%A3%E4%BA%A4%E6%B6%89+%E8%AD%A6%E5%91%8A%E5%81%9C%E6%AD%A2%E5%8F%8D%E8%8F%AF%E6%94%BF%E6%B2%BB%E6%93%8D%E5%BC%84",
           "title": "倫敦經貿辦案丨中方向英提嚴正交涉 警告停止反華政治操弄",
@@ -116,7 +598,10 @@
           "key_points": [],
           "content_truncated": false,
           "analysis_method": "bypassed",
-          "model_used": "direct"
+          "model_used": "direct",
+          "theme": "general",
+          "attention_reason": "Lighter treatment because this story sits in the 時事脈搏 section without strong market-moving signals.",
+          "must_keep": false
         },
         {
           "source_article_id": "4400059",
@@ -132,7 +617,10 @@
           "key_points": [],
           "content_truncated": false,
           "analysis_method": "bypassed",
-          "model_used": "direct"
+          "model_used": "direct",
+          "theme": "general",
+          "attention_reason": "Lighter treatment because this story sits in the 時事脈搏 section without strong market-moving signals.",
+          "must_keep": false
         },
         {
           "source_article_id": "4400057",
@@ -148,7 +636,10 @@
           "key_points": [],
           "content_truncated": false,
           "analysis_method": "bypassed",
-          "model_used": "direct"
+          "model_used": "direct",
+          "theme": "general",
+          "attention_reason": "Lighter treatment because this story sits in the 時事脈搏 section without strong market-moving signals.",
+          "must_keep": false
         },
         {
           "source_article_id": "4400056",
@@ -164,7 +655,10 @@
           "key_points": [],
           "content_truncated": false,
           "analysis_method": "bypassed",
-          "model_used": "direct"
+          "model_used": "direct",
+          "theme": "general",
+          "attention_reason": "Lighter treatment because this story sits in the 時事脈搏 section without strong market-moving signals.",
+          "must_keep": false
         },
         {
           "source_article_id": "4400055",
@@ -180,7 +674,10 @@
           "key_points": [],
           "content_truncated": false,
           "analysis_method": "bypassed",
-          "model_used": "direct"
+          "model_used": "direct",
+          "theme": "general",
+          "attention_reason": "Lighter treatment because this story sits in the 時事脈搏 section without strong market-moving signals.",
+          "must_keep": false
         },
         {
           "source_article_id": "4400054",
@@ -196,7 +693,10 @@
           "key_points": [],
           "content_truncated": false,
           "analysis_method": "bypassed",
-          "model_used": "direct"
+          "model_used": "direct",
+          "theme": "general",
+          "attention_reason": "Lighter treatment because this story sits in the 時事脈搏 section without strong market-moving signals.",
+          "must_keep": false
         },
         {
           "source_article_id": "4400053",
@@ -212,7 +712,10 @@
           "key_points": [],
           "content_truncated": false,
           "analysis_method": "bypassed",
-          "model_used": "direct"
+          "model_used": "direct",
+          "theme": "general",
+          "attention_reason": "Lighter treatment because this story sits in the 時事脈搏 section without strong market-moving signals.",
+          "must_keep": false
         },
         {
           "source_article_id": "4400047",
@@ -228,7 +731,10 @@
           "key_points": [],
           "content_truncated": false,
           "analysis_method": "bypassed",
-          "model_used": "direct"
+          "model_used": "direct",
+          "theme": "general",
+          "attention_reason": "Lighter treatment because this story sits in the 時事脈搏 section without strong market-moving signals.",
+          "must_keep": false
         },
         {
           "source_article_id": "4400045",
@@ -293,7 +799,10 @@
           "key_points": [],
           "content_truncated": false,
           "analysis_method": "bypassed",
-          "model_used": "direct"
+          "model_used": "direct",
+          "theme": "general",
+          "attention_reason": "Lighter treatment because this story sits in the 時事脈搏 section without strong market-moving signals.",
+          "must_keep": false
         },
         {
           "source_article_id": "4400043",
@@ -354,7 +863,10 @@
           "key_points": [],
           "content_truncated": false,
           "analysis_method": "bypassed",
-          "model_used": "direct"
+          "model_used": "direct",
+          "theme": "general",
+          "attention_reason": "Lighter treatment because this story sits in the 時事脈搏 section without strong market-moving signals.",
+          "must_keep": false
         },
         {
           "source_article_id": "4400040",
@@ -370,7 +882,10 @@
           "key_points": [],
           "content_truncated": false,
           "analysis_method": "bypassed",
-          "model_used": "direct"
+          "model_used": "direct",
+          "theme": "general",
+          "attention_reason": "Lighter treatment because this story sits in the 時事脈搏 section without strong market-moving signals.",
+          "must_keep": false
         },
         {
           "source_article_id": "4400038",
@@ -386,7 +901,10 @@
           "key_points": [],
           "content_truncated": false,
           "analysis_method": "bypassed",
-          "model_used": "direct"
+          "model_used": "direct",
+          "theme": "general",
+          "attention_reason": "Lighter treatment because this story sits in the 時事脈搏 section without strong market-moving signals.",
+          "must_keep": false
         },
         {
           "source_article_id": "4400037",
@@ -402,7 +920,10 @@
           "key_points": [],
           "content_truncated": false,
           "analysis_method": "bypassed",
-          "model_used": "direct"
+          "model_used": "direct",
+          "theme": "general",
+          "attention_reason": "Lighter treatment because this story sits in the 時事脈搏 section without strong market-moving signals.",
+          "must_keep": false
         },
         {
           "source_article_id": "4400036",
@@ -863,17 +1384,17 @@
       ],
       "analysis_profile": "light",
       "model_used": "meta-llama/llama-4-scout-17b-16e-instruct",
-      "sub_batch_count": 6,
+      "sub_batch_count": 4,
       "diagnostics": {
-        "sub_batch_count": 1,
+        "sub_batch_count": 4,
         "split_reasons": [
           "pre_send_budget"
         ],
         "models_attempted": [
           "meta-llama/llama-4-scout-17b-16e-instruct"
         ],
-        "estimated_input_tokens_max": 1540,
-        "serialized_request_bytes_max": 8427,
+        "estimated_input_tokens_max": 1260,
+        "serialized_request_bytes_max": 5603,
         "rate_limit_waits": 0,
         "partial_article_count": 0,
         "synthesis_wait_seconds_total": 0.0,
@@ -885,7 +1406,7 @@
         "synthesis_merge_depth_max": 1,
         "model_switches": []
       },
-      "error": null
+      "error": "Category 時事脈搏 exhausted synthesis wait budget after 1900.8 seconds."
     },
     {
       "category": "香港財經",
@@ -894,7 +1415,8 @@
       "key_developments": [
         "香港第一季本地生產總值預估按年增長5.9%，超出市場預期。",
         "財政司司長陳茂波表示，首季投資按年增長17%，反映市場看好前景。",
-        "中華煤氣擴展綠色甲醇產能，旗下合營企業VENEX在佛山三水大塘鎮興建新生產基地，新廠房首期預計於2028年投產，年產能達20萬噸。",
+        "中華煤氣擴展綠色甲醇產能，旗下合營企業VENEX在佛山三水大塘鎮興建新生產基地。",
+        "新廠房首期預計於2028年投產，年產能達20萬噸，連同內蒙古原有基地，總年產能將達50萬噸。",
         "深港金融合作委員會將於本月底召開會議，聚焦大灣區金融市場互聯互通等議題。"
       ],
       "named_entities": [
@@ -903,15 +1425,19 @@
           "type": "person"
         },
         {
-          "name": "香港",
-          "type": "country"
-        },
-        {
           "name": "中華煤氣",
           "type": "company"
         },
         {
+          "name": "香港",
+          "type": "country"
+        },
+        {
           "name": "粵港澳大灣區",
+          "type": "other"
+        },
+        {
+          "name": "佛山三水",
           "type": "other"
         }
       ],
@@ -1058,8 +1584,8 @@
           "key_developments": [
             "香港第一季本地生產總值預估按年增長5.9%，超出市場預期。",
             "財政司司長陳茂波表示，首季投資按年增長17%，反映市場看好前景。",
-            "中華煤氣擴展綠色甲醇產能，旗下合營企業VENEX在佛山三水大塘鎮興建新生產基地，新廠房首期預計於2028年投產，年產能達20萬噸。",
-            "深港金融合作委員會將於本月底召開會議，聚焦大灣區金融市場互聯互通等議題。"
+            "中華煤氣擴展綠色甲醇產能，旗下合營企業VENEX在佛山三水大塘鎮興建新生產基地。",
+            "新廠房首期預計於2028年投產，年產能達20萬噸，連同內蒙古原有基地，總年產能將達50萬噸。"
           ],
           "named_entities": [
             {
@@ -1067,15 +1593,19 @@
               "type": "person"
             },
             {
-              "name": "香港",
-              "type": "country"
-            },
-            {
               "name": "中華煤氣",
               "type": "company"
             },
             {
+              "name": "香港",
+              "type": "country"
+            },
+            {
               "name": "粵港澳大灣區",
+              "type": "other"
+            },
+            {
+              "name": "佛山三水",
               "type": "other"
             }
           ],
@@ -1219,18 +1749,16 @@
       ],
       "analysis_profile": "standard",
       "model_used": "meta-llama/llama-4-scout-17b-16e-instruct",
-      "sub_batch_count": 3,
+      "sub_batch_count": 1,
       "diagnostics": {
-        "sub_batch_count": 2,
+        "sub_batch_count": 1,
         "split_reasons": [],
-        "models_attempted": [
-          "meta-llama/llama-4-scout-17b-16e-instruct"
-        ],
-        "estimated_input_tokens_max": 1046,
-        "serialized_request_bytes_max": 7374,
-        "rate_limit_waits": 1,
+        "models_attempted": [],
+        "estimated_input_tokens_max": 0,
+        "serialized_request_bytes_max": 0,
+        "rate_limit_waits": 0,
         "partial_article_count": 0,
-        "synthesis_wait_seconds_total": 1123.199,
+        "synthesis_wait_seconds_total": 0.0,
         "synthesis_retry_count": 0,
         "synthesis_retry_skipped_count": 0,
         "synthesis_budget_exhausted": false,
@@ -1243,37 +1771,78 @@
     },
     {
       "category": "中國財經",
-      "article_count": 4,
+      "article_count": 5,
       "status": "success",
-      "key_developments": [
-        "阿里巴巴正整合通義千問AI與淘寶，推動智能對話購物服務。",
-        "Hermes Agent每日使用詞元(Token)達到2710億，登上全球應用調用量榜首。",
-        "DeepSeek首輪融資傳出500億人民幣，創辦人梁文鋒個人出資最高達200億元。",
-        "國務院總理李強主持召開國務院常務會議，持續推進房地產和地方政府債務風險化解。"
-      ],
+      "key_developments": [],
       "named_entities": [
         {
-          "name": "阿里巴巴",
-          "type": "company"
+          "name": "何立峰",
+          "type": "person"
+        },
+        {
+          "name": "韓國",
+          "type": "country"
+        },
+        {
+          "name": "美國",
+          "type": "country"
+        },
+        {
+          "name": "比特幣",
+          "type": "asset"
         },
         {
           "name": "Hermes Agent",
           "type": "other"
-        },
-        {
-          "name": "DeepSeek",
-          "type": "company"
-        },
-        {
-          "name": "梁文鋒",
-          "type": "person"
-        },
-        {
-          "name": "國務院",
-          "type": "organization"
         }
       ],
       "articles": [
+        {
+          "source_article_id": "4400108",
+          "title": "何立峰周二率團赴韓國 與美方舉行經貿磋商",
+          "canonical_url": "https://www.hkej.com/instantnews/china/article/4400108/%E4%BD%95%E7%AB%8B%E5%B3%B0%E5%91%A8%E4%BA%8C%E7%8E%87%E5%9C%98%E8%B5%B4%E9%9F%93%E5%9C%8B+%E8%88%87%E7%BE%8E%E6%96%B9%E8%88%89%E8%A1%8C%E7%B6%93%E8%B2%BF%E7%A3%8B%E5%95%86",
+          "published_at": "2026-05-10T23:14:00+08:00",
+          "section": "中國財經",
+          "novelty_score": 6,
+          "relevance_score": 8,
+          "urgency_score": 7,
+          "named_entities": [
+            {
+              "name": "何立峰",
+              "type": "person"
+            },
+            {
+              "name": "韓國",
+              "type": "country"
+            },
+            {
+              "name": "美國",
+              "type": "country"
+            }
+          ],
+          "key_points": [
+            "中共中央政治局委員、國務院副總理何立峰將於5月12日至13日率團赴韓國與美方舉行經貿磋商。",
+            "雙方將以兩國元首釜山會晤及歷次通話重要共識為引領，就彼此關心的經貿問題開展磋商。",
+            "比特幣價格最新為80860.63美元，漲幅0.24%。"
+          ],
+          "content_truncated": false,
+          "original_content_length_chars": 107,
+          "analyzed_content_length_chars": 107,
+          "original_content_token_estimate": 27,
+          "analyzed_content_token_estimate": 27,
+          "truncation_reason": null,
+          "analysis_method": "full_text",
+          "attention_tier": "medium",
+          "theme": "geopolitics",
+          "attention_reason": "Involves geopolitical and trade discussions",
+          "must_keep": true,
+          "model_used": "meta-llama/llama-4-scout-17b-16e-instruct",
+          "delayed_retry_attempted": false,
+          "delayed_retry_model_chain": [],
+          "delayed_retry_final_model": null,
+          "error_classification": null,
+          "error": null
+        },
         {
           "source_article_id": "4400050",
           "title": "AI丨Hermes超越OpenClaw登全球應用調用量榜首",
@@ -1457,35 +2026,112 @@
       ],
       "subgroups": [
         {
-          "title": "中國財經 overview",
-          "theme_rationale": "Single subgroup because the category size did not require thematic splitting.",
-          "article_count": 4,
+          "title": "Geopolitics and Trade",
+          "theme_rationale": "Articles discussing geopolitical interactions, trade negotiations, and international relations.",
+          "article_count": 1,
           "key_developments": [
-            "阿里巴巴正整合通義千問AI與淘寶，推動智能對話購物服務。",
-            "Hermes Agent每日使用詞元(Token)達到2710億，登上全球應用調用量榜首。",
-            "DeepSeek首輪融資傳出500億人民幣，創辦人梁文鋒個人出資最高達200億元。",
-            "國務院總理李強主持召開國務院常務會議，持續推進房地產和地方政府債務風險化解。"
+            "中共中央政治局委員、國務院副總理何立峰將於5月12日至13日率團赴韓國與美方舉行經貿磋商。",
+            "雙方將以兩國元首釜山會晤及歷次通話重要共識為引領，就彼此關心的經貿問題開展磋商。",
+            "比特幣價格最新為80860.63美元，漲幅0.24%。"
           ],
           "named_entities": [
             {
-              "name": "阿里巴巴",
-              "type": "company"
+              "name": "何立峰",
+              "type": "person"
             },
+            {
+              "name": "韓國",
+              "type": "country"
+            },
+            {
+              "name": "美國",
+              "type": "country"
+            },
+            {
+              "name": "比特幣",
+              "type": "asset"
+            }
+          ],
+          "articles": [
+            {
+              "source_article_id": "4400108",
+              "title": "何立峰周二率團赴韓國 與美方舉行經貿磋商",
+              "canonical_url": "https://www.hkej.com/instantnews/china/article/4400108/%E4%BD%95%E7%AB%8B%E5%B3%B0%E5%91%A8%E4%BA%8C%E7%8E%87%E5%9C%98%E8%B5%B4%E9%9F%93%E5%9C%8B+%E8%88%87%E7%BE%8E%E6%96%B9%E8%88%89%E8%A1%8C%E7%B6%93%E8%B2%BF%E7%A3%8B%E5%95%86",
+              "published_at": "2026-05-10T23:14:00+08:00",
+              "section": "中國財經",
+              "novelty_score": 6,
+              "relevance_score": 8,
+              "urgency_score": 7,
+              "named_entities": [
+                {
+                  "name": "何立峰",
+                  "type": "person"
+                },
+                {
+                  "name": "韓國",
+                  "type": "country"
+                },
+                {
+                  "name": "美國",
+                  "type": "country"
+                }
+              ],
+              "key_points": [
+                "中共中央政治局委員、國務院副總理何立峰將於5月12日至13日率團赴韓國與美方舉行經貿磋商。",
+                "雙方將以兩國元首釜山會晤及歷次通話重要共識為引領，就彼此關心的經貿問題開展磋商。",
+                "比特幣價格最新為80860.63美元，漲幅0.24%。"
+              ],
+              "content_truncated": false,
+              "original_content_length_chars": 107,
+              "analyzed_content_length_chars": 107,
+              "original_content_token_estimate": 27,
+              "analyzed_content_token_estimate": 27,
+              "truncation_reason": null,
+              "analysis_method": "full_text",
+              "attention_tier": "medium",
+              "theme": "geopolitics",
+              "attention_reason": "Involves geopolitical and trade discussions",
+              "must_keep": true,
+              "model_used": "meta-llama/llama-4-scout-17b-16e-instruct",
+              "delayed_retry_attempted": false,
+              "delayed_retry_model_chain": [],
+              "delayed_retry_final_model": null,
+              "error_classification": null,
+              "error": null
+            }
+          ],
+          "model_used": "meta-llama/llama-4-scout-17b-16e-instruct"
+        },
+        {
+          "title": "Technology and Investment",
+          "theme_rationale": "Articles covering technological advancements, investments in tech companies, and their market implications.",
+          "article_count": 3,
+          "key_developments": [
+            "Hermes Agent每日使用詞元(Token)達到2710億，登上全球應用調用量榜首。",
+            "阿里巴巴正準備公布其人工智能(AI)平台通義千問(Qwen)與電商平台淘寶的整合計劃。",
+            "DeepSeek首輪集資額據報增至最多500億元(人民幣‧下同)。",
+            "Hermes累計Token消耗量已超過6.37萬億。"
+          ],
+          "named_entities": [
             {
               "name": "Hermes Agent",
               "type": "other"
+            },
+            {
+              "name": "阿里巴巴",
+              "type": "company"
             },
             {
               "name": "DeepSeek",
               "type": "company"
             },
             {
-              "name": "梁文鋒",
-              "type": "person"
+              "name": "OpenClaw",
+              "type": "other"
             },
             {
-              "name": "國務院",
-              "type": "organization"
+              "name": "梁文鋒",
+              "type": "person"
             }
           ],
           "articles": [
@@ -1626,7 +2272,30 @@
               "delayed_retry_final_model": null,
               "error_classification": null,
               "error": null
+            }
+          ],
+          "model_used": "meta-llama/llama-4-scout-17b-16e-instruct"
+        },
+        {
+          "title": "Economic Policy and Market Trends",
+          "theme_rationale": "Articles focusing on government policies, economic trends, and their impacts on the market.",
+          "article_count": 1,
+          "key_developments": [
+            "國務院總理李強主持召開國務院常務會議，持續推進房地產和地方政府債務風險化解。",
+            "會議要求完善支持化債政策，增強地方自主償債能力，確保如期完成化債任務。",
+            "國務院將建立健全長效機制，防範新增隱性債務。"
+          ],
+          "named_entities": [
+            {
+              "name": "李強",
+              "type": "person"
             },
+            {
+              "name": "國務院",
+              "type": "organization"
+            }
+          ],
+          "articles": [
             {
               "source_article_id": "4400035",
               "title": "國務院:持續推進房地產和地方債風險化解",
@@ -1675,6 +2344,262 @@
       ],
       "analysis_profile": "standard",
       "model_used": "meta-llama/llama-4-scout-17b-16e-instruct",
+      "sub_batch_count": 5,
+      "diagnostics": {
+        "sub_batch_count": 5,
+        "split_reasons": [],
+        "models_attempted": [
+          "meta-llama/llama-4-scout-17b-16e-instruct"
+        ],
+        "estimated_input_tokens_max": 624,
+        "serialized_request_bytes_max": 2994,
+        "rate_limit_waits": 0,
+        "partial_article_count": 0,
+        "synthesis_wait_seconds_total": 0.0,
+        "synthesis_retry_count": 0,
+        "synthesis_retry_skipped_count": 0,
+        "synthesis_budget_exhausted": false,
+        "degraded_merge_used": false,
+        "degraded_merge_reason": "",
+        "synthesis_merge_depth_max": 0,
+        "model_switches": []
+      },
+      "error": null
+    },
+    {
+      "category": "重要通告",
+      "article_count": 2,
+      "status": "success",
+      "key_developments": [
+        "立訊精密將間接持有京西國際股本59.5%，成為最終控股股東。",
+        "京西國際股份將於5月11日恢復買賣。",
+        "吉利汽車發行20億元人民幣中期票據，於2028年到期。",
+        "所得資金將用於補充浙江吉潤汽車的流動資金。"
+      ],
+      "named_entities": [
+        {
+          "name": "京西國際",
+          "type": "company"
+        },
+        {
+          "name": "立訊精密",
+          "type": "company"
+        },
+        {
+          "name": "吉利汽車",
+          "type": "company"
+        },
+        {
+          "name": "浙江吉潤汽車",
+          "type": "company"
+        }
+      ],
+      "articles": [
+        {
+          "source_article_id": "4400095",
+          "title": "京西國際:立訊精密將成最終控股股東 股份明日復牌",
+          "canonical_url": "https://www.hkej.com/instantnews/announcement/article/4400095/%E4%BA%AC%E8%A5%BF%E5%9C%8B%E9%9A%9B%3A%E7%AB%8B%E8%A8%8A%E7%B2%BE%E5%AF%86%E5%B0%87%E6%88%90%E6%9C%80%E7%B5%82%E6%8E%A7%E8%82%A1%E8%82%A1%E6%9D%B1+%E8%82%A1%E4%BB%BD%E6%98%8E%E6%97%A5%E5%BE%A9%E7%89%8C+",
+          "published_at": "2026-05-10T19:35:00+08:00",
+          "section": "重要通告",
+          "novelty_score": 8,
+          "relevance_score": 9,
+          "urgency_score": 9,
+          "named_entities": [
+            {
+              "name": "京西國際",
+              "type": "company"
+            },
+            {
+              "name": "立訊精密",
+              "type": "company"
+            }
+          ],
+          "key_points": [
+            "立訊精密將間接持有京西國際股本59.5%，成為最終控股股東。",
+            "京西國際股份將於5月11日恢復買賣。",
+            "立訊精密已就確認向證監會申請，以毋須根據收購守則規則對京西國際提出全面收購要約。"
+          ],
+          "content_truncated": false,
+          "original_content_length_chars": 217,
+          "analyzed_content_length_chars": 217,
+          "original_content_token_estimate": 55,
+          "analyzed_content_token_estimate": 55,
+          "truncation_reason": null,
+          "analysis_method": "full_text",
+          "attention_tier": "high",
+          "theme": "stocks",
+          "attention_reason": "High-signal stocks headline based on title/summary keywords.",
+          "must_keep": true,
+          "model_used": "meta-llama/llama-4-scout-17b-16e-instruct",
+          "delayed_retry_attempted": false,
+          "delayed_retry_model_chain": [],
+          "delayed_retry_final_model": null,
+          "error_classification": null,
+          "error": null
+        },
+        {
+          "source_article_id": "4400094",
+          "title": "吉利發行20億人民幣中期票據",
+          "canonical_url": "https://www.hkej.com/instantnews/announcement/article/4400094/%E5%90%89%E5%88%A9%E7%99%BC%E8%A1%8C20%E5%84%84%E4%BA%BA%E6%B0%91%E5%B9%A3%E4%B8%AD%E6%9C%9F%E7%A5%A8%E6%93%9A",
+          "published_at": "2026-05-10T19:20:00+08:00",
+          "section": "重要通告",
+          "novelty_score": 4,
+          "relevance_score": 7,
+          "urgency_score": 5,
+          "named_entities": [
+            {
+              "name": "吉利汽車",
+              "type": "company"
+            },
+            {
+              "name": "浙江吉潤汽車",
+              "type": "company"
+            }
+          ],
+          "key_points": [
+            "吉利汽車發行20億元人民幣中期票據，於2028年到期。",
+            "所得資金將用於補充浙江吉潤汽車的流動資金。",
+            "票據第一年固定年利率為1.55厘。"
+          ],
+          "content_truncated": false,
+          "original_content_length_chars": 165,
+          "analyzed_content_length_chars": 165,
+          "original_content_token_estimate": 42,
+          "analyzed_content_token_estimate": 42,
+          "truncation_reason": null,
+          "analysis_method": "full_text",
+          "attention_tier": "medium",
+          "theme": "macro",
+          "attention_reason": "Involves issuance of debt securities",
+          "must_keep": true,
+          "model_used": "meta-llama/llama-4-scout-17b-16e-instruct",
+          "delayed_retry_attempted": false,
+          "delayed_retry_model_chain": [],
+          "delayed_retry_final_model": null,
+          "error_classification": null,
+          "error": null
+        }
+      ],
+      "subgroups": [
+        {
+          "title": "重要通告 overview",
+          "theme_rationale": "Single subgroup because the category size did not require thematic splitting.",
+          "article_count": 2,
+          "key_developments": [
+            "立訊精密將間接持有京西國際股本59.5%，成為最終控股股東。",
+            "京西國際股份將於5月11日恢復買賣。",
+            "吉利汽車發行20億元人民幣中期票據，於2028年到期。",
+            "所得資金將用於補充浙江吉潤汽車的流動資金。"
+          ],
+          "named_entities": [
+            {
+              "name": "京西國際",
+              "type": "company"
+            },
+            {
+              "name": "立訊精密",
+              "type": "company"
+            },
+            {
+              "name": "吉利汽車",
+              "type": "company"
+            },
+            {
+              "name": "浙江吉潤汽車",
+              "type": "company"
+            }
+          ],
+          "articles": [
+            {
+              "source_article_id": "4400095",
+              "title": "京西國際:立訊精密將成最終控股股東 股份明日復牌",
+              "canonical_url": "https://www.hkej.com/instantnews/announcement/article/4400095/%E4%BA%AC%E8%A5%BF%E5%9C%8B%E9%9A%9B%3A%E7%AB%8B%E8%A8%8A%E7%B2%BE%E5%AF%86%E5%B0%87%E6%88%90%E6%9C%80%E7%B5%82%E6%8E%A7%E8%82%A1%E8%82%A1%E6%9D%B1+%E8%82%A1%E4%BB%BD%E6%98%8E%E6%97%A5%E5%BE%A9%E7%89%8C+",
+              "published_at": "2026-05-10T19:35:00+08:00",
+              "section": "重要通告",
+              "novelty_score": 8,
+              "relevance_score": 9,
+              "urgency_score": 9,
+              "named_entities": [
+                {
+                  "name": "京西國際",
+                  "type": "company"
+                },
+                {
+                  "name": "立訊精密",
+                  "type": "company"
+                }
+              ],
+              "key_points": [
+                "立訊精密將間接持有京西國際股本59.5%，成為最終控股股東。",
+                "京西國際股份將於5月11日恢復買賣。",
+                "立訊精密已就確認向證監會申請，以毋須根據收購守則規則對京西國際提出全面收購要約。"
+              ],
+              "content_truncated": false,
+              "original_content_length_chars": 217,
+              "analyzed_content_length_chars": 217,
+              "original_content_token_estimate": 55,
+              "analyzed_content_token_estimate": 55,
+              "truncation_reason": null,
+              "analysis_method": "full_text",
+              "attention_tier": "high",
+              "theme": "stocks",
+              "attention_reason": "High-signal stocks headline based on title/summary keywords.",
+              "must_keep": true,
+              "model_used": "meta-llama/llama-4-scout-17b-16e-instruct",
+              "delayed_retry_attempted": false,
+              "delayed_retry_model_chain": [],
+              "delayed_retry_final_model": null,
+              "error_classification": null,
+              "error": null
+            },
+            {
+              "source_article_id": "4400094",
+              "title": "吉利發行20億人民幣中期票據",
+              "canonical_url": "https://www.hkej.com/instantnews/announcement/article/4400094/%E5%90%89%E5%88%A9%E7%99%BC%E8%A1%8C20%E5%84%84%E4%BA%BA%E6%B0%91%E5%B9%A3%E4%B8%AD%E6%9C%9F%E7%A5%A8%E6%93%9A",
+              "published_at": "2026-05-10T19:20:00+08:00",
+              "section": "重要通告",
+              "novelty_score": 4,
+              "relevance_score": 7,
+              "urgency_score": 5,
+              "named_entities": [
+                {
+                  "name": "吉利汽車",
+                  "type": "company"
+                },
+                {
+                  "name": "浙江吉潤汽車",
+                  "type": "company"
+                }
+              ],
+              "key_points": [
+                "吉利汽車發行20億元人民幣中期票據，於2028年到期。",
+                "所得資金將用於補充浙江吉潤汽車的流動資金。",
+                "票據第一年固定年利率為1.55厘。"
+              ],
+              "content_truncated": false,
+              "original_content_length_chars": 165,
+              "analyzed_content_length_chars": 165,
+              "original_content_token_estimate": 42,
+              "analyzed_content_token_estimate": 42,
+              "truncation_reason": null,
+              "analysis_method": "full_text",
+              "attention_tier": "medium",
+              "theme": "macro",
+              "attention_reason": "Involves issuance of debt securities",
+              "must_keep": true,
+              "model_used": "meta-llama/llama-4-scout-17b-16e-instruct",
+              "delayed_retry_attempted": false,
+              "delayed_retry_model_chain": [],
+              "delayed_retry_final_model": null,
+              "error_classification": null,
+              "error": null
+            }
+          ],
+          "model_used": "meta-llama/llama-4-scout-17b-16e-instruct"
+        }
+      ],
+      "analysis_profile": "standard",
+      "model_used": "meta-llama/llama-4-scout-17b-16e-instruct",
       "sub_batch_count": 3,
       "diagnostics": {
         "sub_batch_count": 2,
@@ -1682,8 +2607,8 @@
         "models_attempted": [
           "meta-llama/llama-4-scout-17b-16e-instruct"
         ],
-        "estimated_input_tokens_max": 1227,
-        "serialized_request_bytes_max": 7201,
+        "estimated_input_tokens_max": 673,
+        "serialized_request_bytes_max": 3469,
         "rate_limit_waits": 0,
         "partial_article_count": 0,
         "synthesis_wait_seconds_total": 0.0,
@@ -1699,32 +2624,118 @@
     },
     {
       "category": "地產新聞",
-      "article_count": 2,
+      "article_count": 4,
       "status": "success",
       "key_developments": [
-        "恒地發展的首岸第3期首輪銷售130伙單位，暫全數獲得認購，套現逾12.3億元。",
-        "新地發展的形瑨項目加推55個單位，折實售487萬起。",
-        "項目首輪單位154伙全部售罄，套現逾10億元。"
+        "啟德海灣周末兩日錄14宗成交，套現逾9000萬元。",
+        "首岸第3期加推70伙，折實售價由707.34萬元起。",
+        "恒地發展的首岸第3期首輪銷售130伙單位，暫全數獲得認購，套現逾12.3億元。"
       ],
       "named_entities": [
         {
+          "name": "嘉華國際",
+          "type": "company"
+        },
+        {
+          "name": "啟德海灣",
+          "type": "asset"
+        },
+        {
+          "name": "宏安地產",
+          "type": "company"
+        },
+        {
           "name": "恒地",
           "type": "company"
-        },
-        {
-          "name": "韓家輝",
-          "type": "person"
-        },
-        {
-          "name": "新地",
-          "type": "company"
-        },
-        {
-          "name": "譚錫湛",
-          "type": "person"
         }
       ],
       "articles": [
+        {
+          "source_article_id": "4400104",
+          "title": "新盤丨啟德海灣周末兩日錄14宗成交",
+          "canonical_url": "https://www.hkej.com/instantnews/property/article/4400104/%E6%96%B0%E7%9B%A4%E4%B8%A8%E5%95%9F%E5%BE%B7%E6%B5%B7%E7%81%A3%E5%91%A8%E6%9C%AB%E5%85%A9%E6%97%A5%E9%8C%8414%E5%AE%97%E6%88%90%E4%BA%A4",
+          "published_at": "2026-05-10T20:48:00+08:00",
+          "section": "新盤情報",
+          "novelty_score": 6,
+          "relevance_score": 8,
+          "urgency_score": 5,
+          "named_entities": [
+            {
+              "name": "嘉華國際",
+              "type": "company"
+            },
+            {
+              "name": "啟德海灣",
+              "type": "asset"
+            },
+            {
+              "name": "宏安地產",
+              "type": "company"
+            }
+          ],
+          "key_points": [
+            "啟德海灣周末兩日錄14宗成交，套現逾9000萬元。",
+            "最新成交單位包括第1C座29樓N室，實用面積278方呎，以638.4萬元易手，呎價高見22964元。"
+          ],
+          "content_truncated": false,
+          "original_content_length_chars": 283,
+          "analyzed_content_length_chars": 283,
+          "original_content_token_estimate": 71,
+          "analyzed_content_token_estimate": 71,
+          "truncation_reason": null,
+          "analysis_method": "full_text",
+          "attention_tier": "medium",
+          "theme": "general",
+          "attention_reason": "Default medium attention because the story is relevant but not an obvious top-priority market mover.",
+          "must_keep": false,
+          "model_used": "meta-llama/llama-4-scout-17b-16e-instruct",
+          "delayed_retry_attempted": false,
+          "delayed_retry_model_chain": [],
+          "delayed_retry_final_model": null,
+          "error_classification": null,
+          "error": null
+        },
+        {
+          "source_article_id": "4400103",
+          "title": "新盤丨首岸第3期加推70伙 折實售707萬起",
+          "canonical_url": "https://www.hkej.com/instantnews/property/article/4400103/%E6%96%B0%E7%9B%A4%E4%B8%A8%E9%A6%96%E5%B2%B8%E7%AC%AC3%E6%9C%9F%E5%8A%A0%E6%8E%A870%E4%BC%99+%E6%8A%98%E5%AF%A6%E5%94%AE707%E8%90%AC%E8%B5%B7",
+          "published_at": "2026-05-10T20:45:00+08:00",
+          "section": "新盤情報",
+          "novelty_score": 7,
+          "relevance_score": 9,
+          "urgency_score": 6,
+          "named_entities": [
+            {
+              "name": "恒地",
+              "type": "company"
+            },
+            {
+              "name": "首岸第3期",
+              "type": "asset"
+            }
+          ],
+          "key_points": [
+            "首岸第3期加推70伙，折實售價由707.34萬元起。",
+            "戶型涵蓋2房至3房，折實呎價由20357元起。"
+          ],
+          "content_truncated": false,
+          "original_content_length_chars": 289,
+          "analyzed_content_length_chars": 289,
+          "original_content_token_estimate": 73,
+          "analyzed_content_token_estimate": 73,
+          "truncation_reason": null,
+          "analysis_method": "full_text",
+          "attention_tier": "medium",
+          "theme": "general",
+          "attention_reason": "Default medium attention because the story is relevant but not an obvious top-priority market mover.",
+          "must_keep": false,
+          "model_used": "meta-llama/llama-4-scout-17b-16e-instruct",
+          "delayed_retry_attempted": false,
+          "delayed_retry_model_chain": [],
+          "delayed_retry_final_model": null,
+          "error_classification": null,
+          "error": null
+        },
         {
           "source_article_id": "4400058",
           "title": "新盤丨首岸第3期首輪130伙暫全數獲認購",
@@ -1812,31 +2823,117 @@
         {
           "title": "地產新聞 overview",
           "theme_rationale": "Single subgroup because the category size did not require thematic splitting.",
-          "article_count": 2,
+          "article_count": 4,
           "key_developments": [
-            "恒地發展的首岸第3期首輪銷售130伙單位，暫全數獲得認購，套現逾12.3億元。",
-            "新地發展的形瑨項目加推55個單位，折實售487萬起。",
-            "項目首輪單位154伙全部售罄，套現逾10億元。"
+            "啟德海灣周末兩日錄14宗成交，套現逾9000萬元。",
+            "首岸第3期加推70伙，折實售價由707.34萬元起。",
+            "恒地發展的首岸第3期首輪銷售130伙單位，暫全數獲得認購，套現逾12.3億元。"
           ],
           "named_entities": [
             {
+              "name": "嘉華國際",
+              "type": "company"
+            },
+            {
+              "name": "啟德海灣",
+              "type": "asset"
+            },
+            {
+              "name": "宏安地產",
+              "type": "company"
+            },
+            {
               "name": "恒地",
               "type": "company"
-            },
-            {
-              "name": "韓家輝",
-              "type": "person"
-            },
-            {
-              "name": "新地",
-              "type": "company"
-            },
-            {
-              "name": "譚錫湛",
-              "type": "person"
             }
           ],
           "articles": [
+            {
+              "source_article_id": "4400104",
+              "title": "新盤丨啟德海灣周末兩日錄14宗成交",
+              "canonical_url": "https://www.hkej.com/instantnews/property/article/4400104/%E6%96%B0%E7%9B%A4%E4%B8%A8%E5%95%9F%E5%BE%B7%E6%B5%B7%E7%81%A3%E5%91%A8%E6%9C%AB%E5%85%A9%E6%97%A5%E9%8C%8414%E5%AE%97%E6%88%90%E4%BA%A4",
+              "published_at": "2026-05-10T20:48:00+08:00",
+              "section": "新盤情報",
+              "novelty_score": 6,
+              "relevance_score": 8,
+              "urgency_score": 5,
+              "named_entities": [
+                {
+                  "name": "嘉華國際",
+                  "type": "company"
+                },
+                {
+                  "name": "啟德海灣",
+                  "type": "asset"
+                },
+                {
+                  "name": "宏安地產",
+                  "type": "company"
+                }
+              ],
+              "key_points": [
+                "啟德海灣周末兩日錄14宗成交，套現逾9000萬元。",
+                "最新成交單位包括第1C座29樓N室，實用面積278方呎，以638.4萬元易手，呎價高見22964元。"
+              ],
+              "content_truncated": false,
+              "original_content_length_chars": 283,
+              "analyzed_content_length_chars": 283,
+              "original_content_token_estimate": 71,
+              "analyzed_content_token_estimate": 71,
+              "truncation_reason": null,
+              "analysis_method": "full_text",
+              "attention_tier": "medium",
+              "theme": "general",
+              "attention_reason": "Default medium attention because the story is relevant but not an obvious top-priority market mover.",
+              "must_keep": false,
+              "model_used": "meta-llama/llama-4-scout-17b-16e-instruct",
+              "delayed_retry_attempted": false,
+              "delayed_retry_model_chain": [],
+              "delayed_retry_final_model": null,
+              "error_classification": null,
+              "error": null
+            },
+            {
+              "source_article_id": "4400103",
+              "title": "新盤丨首岸第3期加推70伙 折實售707萬起",
+              "canonical_url": "https://www.hkej.com/instantnews/property/article/4400103/%E6%96%B0%E7%9B%A4%E4%B8%A8%E9%A6%96%E5%B2%B8%E7%AC%AC3%E6%9C%9F%E5%8A%A0%E6%8E%A870%E4%BC%99+%E6%8A%98%E5%AF%A6%E5%94%AE707%E8%90%AC%E8%B5%B7",
+              "published_at": "2026-05-10T20:45:00+08:00",
+              "section": "新盤情報",
+              "novelty_score": 7,
+              "relevance_score": 9,
+              "urgency_score": 6,
+              "named_entities": [
+                {
+                  "name": "恒地",
+                  "type": "company"
+                },
+                {
+                  "name": "首岸第3期",
+                  "type": "asset"
+                }
+              ],
+              "key_points": [
+                "首岸第3期加推70伙，折實售價由707.34萬元起。",
+                "戶型涵蓋2房至3房，折實呎價由20357元起。"
+              ],
+              "content_truncated": false,
+              "original_content_length_chars": 289,
+              "analyzed_content_length_chars": 289,
+              "original_content_token_estimate": 73,
+              "analyzed_content_token_estimate": 73,
+              "truncation_reason": null,
+              "analysis_method": "full_text",
+              "attention_tier": "medium",
+              "theme": "general",
+              "attention_reason": "Default medium attention because the story is relevant but not an obvious top-priority market mover.",
+              "must_keep": false,
+              "model_used": "meta-llama/llama-4-scout-17b-16e-instruct",
+              "delayed_retry_attempted": false,
+              "delayed_retry_model_chain": [],
+              "delayed_retry_final_model": null,
+              "error_classification": null,
+              "error": null
+            },
             {
               "source_article_id": "4400058",
               "title": "新盤丨首岸第3期首輪130伙暫全數獲認購",
@@ -1925,15 +3022,15 @@
       ],
       "analysis_profile": "light",
       "model_used": "meta-llama/llama-4-scout-17b-16e-instruct",
-      "sub_batch_count": 2,
+      "sub_batch_count": 3,
       "diagnostics": {
-        "sub_batch_count": 1,
+        "sub_batch_count": 3,
         "split_reasons": [],
         "models_attempted": [
           "meta-llama/llama-4-scout-17b-16e-instruct"
         ],
-        "estimated_input_tokens_max": 882,
-        "serialized_request_bytes_max": 5460,
+        "estimated_input_tokens_max": 881,
+        "serialized_request_bytes_max": 4701,
         "rate_limit_waits": 0,
         "partial_article_count": 0,
         "synthesis_wait_seconds_total": 0.0,
@@ -1948,5 +3045,12 @@
       "error": null
     }
   ],
-  "errors": []
+  "errors": [
+    {
+      "type": "category",
+      "target": "時事脈搏",
+      "message": "Category 時事脈搏 exhausted synthesis wait budget after 1900.8 seconds.",
+      "classification": "unexpected_error"
+    }
+  ]
 }
