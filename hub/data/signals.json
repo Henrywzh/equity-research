@@ -251,7 +251,7 @@
   "polymarket": {
     "status": "partial",
     "updated": "2026-05-11T20:01:40.888354+00:00",
-    "freshness_minutes": 79,
+    "freshness_minutes": 99,
     "error_count": 3,
     "errors": [
       "qqq_up_down_daily: no active market matched configured slug(s)",
@@ -10826,76 +10826,12 @@
     "status": "success"
   },
   "fred": {
-    "items": [
-      {
-        "release_id": 10,
-        "release_key": "fred_10_2026-05-12",
-        "name": "Consumer Price Index",
-        "date": "2026-05-12",
-        "impact": "high",
-        "series_id": "CPIAUCSL",
-        "display_unit": "%",
-        "prior_value": null,
-        "source": "FRED"
-      },
-      {
-        "release_id": 9,
-        "release_key": "fred_9_2026-05-14",
-        "name": "Retail Sales Advance",
-        "date": "2026-05-14",
-        "impact": "medium",
-        "series_id": "RSXFS",
-        "display_unit": "%",
-        "prior_value": null,
-        "source": "FRED"
-      },
-      {
-        "release_id": 53,
-        "release_key": "fred_53_2026-05-28",
-        "name": "GDP Advance Estimate",
-        "date": "2026-05-28",
-        "impact": "high",
-        "series_id": "GDP",
-        "display_unit": "%",
-        "prior_value": null,
-        "source": "FRED"
-      },
-      {
-        "release_id": 54,
-        "release_key": "fred_54_2026-05-28",
-        "name": "Personal Income and Outlays (PCE)",
-        "date": "2026-05-28",
-        "impact": "high",
-        "series_id": "PCEPI",
-        "display_unit": "%",
-        "prior_value": null,
-        "source": "FRED"
-      },
-      {
-        "release_id": 50,
-        "release_key": "fred_50_2026-06-05",
-        "name": "Employment Situation",
-        "date": "2026-06-05",
-        "impact": "high",
-        "series_id": "PAYEMS",
-        "display_unit": "k",
-        "prior_value": null,
-        "source": "FRED"
-      },
-      {
-        "release_id": 10,
-        "release_key": "fred_10_2026-06-10",
-        "name": "Consumer Price Index",
-        "date": "2026-06-10",
-        "impact": "high",
-        "series_id": "CPIAUCSL",
-        "display_unit": "%",
-        "prior_value": null,
-        "source": "FRED"
-      }
-    ],
-    "updated": "2026-05-11T21:20:54.287776+00:00",
-    "status": "success"
+    "items": [],
+    "updated": "2026-05-11T21:40:37.234089+00:00",
+    "status": "failed",
+    "error_messages": [
+      "fred:500 Server Error: Internal Server Error for url: https://api.stlouisfed.org/fred/releases/dates?api_key=fff6dc02f5a8b6dcbd78574394e0cb6f&file_type=json&realtime_start=2026-05-11&realtime_end=2026-06-10&order_by=release_date&sort_order=asc&include_release_dates_with_no_data=true"
+    ]
   },
   "youtube": {
     "signals": [
@@ -10909,5 +10845,5 @@
     "total_analyzed": 1,
     "updated": "2026-05-11T19-27-19.063185plus00-00"
   },
-  "last_baked": "2026-05-11T21:20:54.289715+00:00"
+  "last_baked": "2026-05-11T21:40:37.236117+00:00"
 }
