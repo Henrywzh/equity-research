@@ -1,15 +1,15 @@
 {
   "report_schema_version": 6,
   "report_date": "2026-05-16",
-  "generated_at": "2026-05-16T09:32:20.036709+00:00",
+  "generated_at": "2026-05-16T21:36:48.529626+00:00",
   "source_site": "hkej",
   "status": "success",
-  "executive_summary": [
+  "executive_summary": [],
+  "legacy_executive_summary": [
     "道指收市下跌537點，報49526點，跌幅1.07%。",
     "輝達股價收市重挫4.4%，為跌幅最大道指成份股。",
     "SpaceX股東批准1拆5股票分拆方案，每股價值從526.59美元調整至約105.32美元。"
   ],
-  "legacy_executive_summary": [],
   "model": {
     "provider": "groq",
     "primary_model": "meta-llama/llama-4-scout-17b-16e-instruct",
@@ -20,18 +20,18 @@
   },
   "model_switches": [],
   "input": {
-    "article_count": 33,
+    "article_count": 43,
     "category_count": 5
   },
   "diagnostics": {
-    "rate_limit_wait_count": 2,
-    "rate_limit_wait_seconds_total": 2505.599,
+    "rate_limit_wait_count": 1,
+    "rate_limit_wait_seconds_total": 1555.197,
     "fallback_switch_count": 0,
     "key_rotation_count": 0,
-    "pre_send_split_count": 9,
+    "pre_send_split_count": 7,
     "response_413_split_count": 0,
     "json_repair_retry_count": 0,
-    "batch_count": 37,
+    "batch_count": 33,
     "failed_batch_count": 0,
     "delayed_retry_candidate_count": 0,
     "delayed_retry_attempted_count": 0,
@@ -44,18 +44,18 @@
     "degraded_merge_count": 0
   },
   "incremental": {
-    "reused_successful_articles": 0,
-    "new_articles_analyzed": 33,
+    "reused_successful_articles": 33,
+    "new_articles_analyzed": 10,
     "retried_previous_day_articles": 0,
     "previous_day_retry_successes": 0
   },
   "daily_stats": {
-    "total_scraped": 33,
-    "analyzed": 33,
+    "total_scraped": 43,
+    "analyzed": 43,
     "success_rate": 100.0
   },
   "macro_release_digest": {
-    "generated_at": "2026-05-16T08:49:49.006772+00:00",
+    "generated_at": "2026-05-16T21:10:32.480402+00:00",
     "window_start": "2026-05-16",
     "window_end": "2026-05-22",
     "fetch_status": "failed",
@@ -67,10 +67,10 @@
   },
   "unresolved_articles": [],
   "totals": {
-    "article_count": 33,
-    "successful_article_analyses": 33,
+    "article_count": 43,
+    "successful_article_analyses": 43,
     "failed_article_analyses": 0,
-    "full_text_article_count": 32,
+    "full_text_article_count": 42,
     "truncated_article_count": 1,
     "successful_categories": 5,
     "partial_categories": 0,
@@ -80,37 +80,74 @@
   "categories": [
     {
       "category": "國際財經",
-      "article_count": 11,
+      "article_count": 12,
       "status": "success",
-      "key_developments": [
-        "道指收市下跌537點，報49526點，跌幅1.07%。",
-        "輝達股價收市重挫4.4%，為跌幅最大道指成份股。",
-        "SpaceX股東批准1拆5股票分拆方案，每股價值從526.59美元調整至約105.32美元。",
-        "鮑威爾的聯儲局主席任期於周五屆滿，由沃什接任聯儲局主席"
-      ],
+      "key_developments": [],
       "named_entities": [
         {
-          "name": "輝達",
+          "name": "SpaceX",
           "type": "company"
         },
         {
-          "name": "鮑威爾",
+          "name": "Elon Musk",
           "type": "person"
         },
         {
-          "name": "沃什",
-          "type": "person"
-        },
-        {
-          "name": "美國聯儲局",
+          "name": "聯儲局",
           "type": "institution"
         },
         {
-          "name": "SpaceX",
+          "name": "巴郡哈撒韋",
+          "type": "company"
+        },
+        {
+          "name": "Alphabet",
           "type": "company"
         }
       ],
       "articles": [
+        {
+          "source_article_id": "4405376",
+          "title": "三星電子工會或下周罷工 李在鎔鞠躬致歉",
+          "canonical_url": "https://www.hkej.com/instantnews/international/article/4405376/%E4%B8%89%E6%98%9F%E9%9B%BB%E5%AD%90%E5%B7%A5%E6%9C%83%E6%88%96%E4%B8%8B%E5%91%A8%E7%BD%B7%E5%B7%A5+%E6%9D%8E%E5%9C%A8%E9%8E%94%E9%9E%A0%E8%BA%AC%E8%87%B4%E6%AD%89",
+          "published_at": "2026-05-16T17:59:00+08:00",
+          "section": "國際財經",
+          "novelty_score": 6,
+          "relevance_score": 8,
+          "urgency_score": 7,
+          "named_entities": [
+            {
+              "name": "三星電子",
+              "type": "company"
+            },
+            {
+              "name": "李在鎔",
+              "type": "person"
+            }
+          ],
+          "key_points": [
+            "三星電子工會計劃於本月21日展開罷工",
+            "李在鎔公開向顧客及社會大眾致歉",
+            "南韓勞動部長與三星電子管理層會面敦促解決爭議"
+          ],
+          "content_truncated": false,
+          "original_content_length_chars": 172,
+          "analyzed_content_length_chars": 172,
+          "original_content_token_estimate": 43,
+          "analyzed_content_token_estimate": 43,
+          "truncation_reason": null,
+          "analysis_method": "full_text",
+          "attention_tier": "medium",
+          "theme": "general",
+          "attention_reason": "Default medium attention because the story is relevant but not an obvious top-priority market mover.",
+          "must_keep": false,
+          "model_used": "meta-llama/llama-4-scout-17b-16e-instruct",
+          "delayed_retry_attempted": false,
+          "delayed_retry_model_chain": [],
+          "delayed_retry_final_model": null,
+          "error_classification": null,
+          "error": null
+        },
         {
           "source_article_id": "4405364",
           "title": "SpaceX股東據報批准1拆5股票分拆方案",
@@ -648,14 +685,508 @@
       ],
       "subgroups": [
         {
-          "title": "股市動態 & Other News",
+          "title": "股市動向 & Other News",
+          "theme_rationale": "與股票市場相關的新聞，包括股票分拆、IPO等。",
+          "article_count": 6,
+          "key_developments": [
+            "SpaceX股東批准1拆5股票分拆方案，每股價值從526.59美元調整至約105.32美元。",
+            "SpaceX計劃於6月11日確定IPO發售價，股份於次日上市，交易代號為「SPCX」。",
+            "市場預計聯邦公開市場委員會在今年12月加息的可能性為51%，到明年1月，聯儲局指標利率上調0.25厘的概率已升至約60%",
+            "巴郡哈撒韋清倉亞馬遜、Visa、MasterCard、UnitedHealth等股份。"
+          ],
+          "named_entities": [
+            {
+              "name": "SpaceX",
+              "type": "company"
+            },
+            {
+              "name": "Elon Musk",
+              "type": "person"
+            },
+            {
+              "name": "聯儲局",
+              "type": "institution"
+            },
+            {
+              "name": "巴郡哈撒韋",
+              "type": "company"
+            },
+            {
+              "name": "Alphabet",
+              "type": "company"
+            }
+          ],
+          "articles": [
+            {
+              "source_article_id": "4405364",
+              "title": "SpaceX股東據報批准1拆5股票分拆方案",
+              "canonical_url": "https://www.hkej.com/instantnews/international/article/4405364/SpaceX%E8%82%A1%E6%9D%B1%E6%93%9A%E5%A0%B1%E6%89%B9%E5%87%861%E6%8B%865%E8%82%A1%E7%A5%A8%E5%88%86%E6%8B%86%E6%96%B9%E6%A1%88",
+              "published_at": "2026-05-16T12:58:00+08:00",
+              "section": "國際財經",
+              "novelty_score": 6,
+              "relevance_score": 8,
+              "urgency_score": 9,
+              "named_entities": [
+                {
+                  "name": "Elon Musk",
+                  "type": "person"
+                },
+                {
+                  "name": "SpaceX",
+                  "type": "company"
+                }
+              ],
+              "key_points": [
+                "SpaceX股東批准1拆5股票分拆方案，每股價值從526.59美元調整至約105.32美元。",
+                "SpaceX計劃於6月11日確定IPO發售價，股份於次日上市，交易代號為「SPCX」。",
+                "SpaceX加速IPO進程，目標於6月12日正式上市，早於原定6月下旬的上市計劃。"
+              ],
+              "content_truncated": false,
+              "original_content_length_chars": 302,
+              "analyzed_content_length_chars": 302,
+              "original_content_token_estimate": 76,
+              "analyzed_content_token_estimate": 76,
+              "truncation_reason": null,
+              "analysis_method": "full_text",
+              "attention_tier": "high",
+              "theme": "stocks",
+              "attention_reason": "Involves stock split plan",
+              "must_keep": true,
+              "model_used": "meta-llama/llama-4-scout-17b-16e-instruct",
+              "delayed_retry_attempted": false,
+              "delayed_retry_model_chain": [],
+              "delayed_retry_final_model": null,
+              "error_classification": null,
+              "error": null
+            },
+            {
+              "source_article_id": "4405353",
+              "title": "SpaceX IPO股份據報最快6月12日上市",
+              "canonical_url": "https://www.hkej.com/instantnews/international/article/4405353/SpaceX+IPO%E8%82%A1%E4%BB%BD%E6%93%9A%E5%A0%B1%E6%9C%80%E5%BF%AB6%E6%9C%8812%E6%97%A5%E4%B8%8A%E5%B8%82",
+              "published_at": "2026-05-16T06:13:00+08:00",
+              "section": "國際財經",
+              "novelty_score": 8,
+              "relevance_score": 9,
+              "urgency_score": 9,
+              "named_entities": [
+                {
+                  "name": "Elon Musk",
+                  "type": "person"
+                },
+                {
+                  "name": "SpaceX",
+                  "type": "company"
+                },
+                {
+                  "name": "納斯特",
+                  "type": "other"
+                },
+                {
+                  "name": "馬斯克",
+                  "type": "person"
+                }
+              ],
+              "key_points": [
+                "SpaceX 最快將於 6 月 11 日確定 IPO 發售價，股份於次日上市。",
+                "SpaceX 將選擇納斯特作為 IPO 上市市場，股份以「SPCX」為代號進行交易。",
+                "SpaceX 已加快 IPO 進程，目標是最早於下周三發布招股書，並於 6 月 4 日啟動路演。"
+              ],
+              "content_truncated": false,
+              "original_content_length_chars": 219,
+              "analyzed_content_length_chars": 219,
+              "original_content_token_estimate": 55,
+              "analyzed_content_token_estimate": 55,
+              "truncation_reason": null,
+              "analysis_method": "full_text",
+              "attention_tier": "high",
+              "theme": "stocks",
+              "attention_reason": "Involves potential IPO",
+              "must_keep": true,
+              "model_used": "meta-llama/llama-4-scout-17b-16e-instruct",
+              "delayed_retry_attempted": false,
+              "delayed_retry_model_chain": [],
+              "delayed_retry_final_model": null,
+              "error_classification": null,
+              "error": null
+            },
+            {
+              "source_article_id": "4405376",
+              "title": "三星電子工會或下周罷工 李在鎔鞠躬致歉",
+              "canonical_url": "https://www.hkej.com/instantnews/international/article/4405376/%E4%B8%89%E6%98%9F%E9%9B%BB%E5%AD%90%E5%B7%A5%E6%9C%83%E6%88%96%E4%B8%8B%E5%91%A8%E7%BD%B7%E5%B7%A5+%E6%9D%8E%E5%9C%A8%E9%8E%94%E9%9E%A0%E8%BA%AC%E8%87%B4%E6%AD%89",
+              "published_at": "2026-05-16T17:59:00+08:00",
+              "section": "國際財經",
+              "novelty_score": 6,
+              "relevance_score": 8,
+              "urgency_score": 7,
+              "named_entities": [
+                {
+                  "name": "三星電子",
+                  "type": "company"
+                },
+                {
+                  "name": "李在鎔",
+                  "type": "person"
+                }
+              ],
+              "key_points": [
+                "三星電子工會計劃於本月21日展開罷工",
+                "李在鎔公開向顧客及社會大眾致歉",
+                "南韓勞動部長與三星電子管理層會面敦促解決爭議"
+              ],
+              "content_truncated": false,
+              "original_content_length_chars": 172,
+              "analyzed_content_length_chars": 172,
+              "original_content_token_estimate": 43,
+              "analyzed_content_token_estimate": 43,
+              "truncation_reason": null,
+              "analysis_method": "full_text",
+              "attention_tier": "medium",
+              "theme": "general",
+              "attention_reason": "Default medium attention because the story is relevant but not an obvious top-priority market mover.",
+              "must_keep": false,
+              "model_used": "meta-llama/llama-4-scout-17b-16e-instruct",
+              "delayed_retry_attempted": false,
+              "delayed_retry_model_chain": [],
+              "delayed_retry_final_model": null,
+              "error_classification": null,
+              "error": null
+            },
+            {
+              "source_article_id": "4405346",
+              "title": "鮑威爾聯儲局主席任期結束 沃什接任",
+              "canonical_url": "https://www.hkej.com/instantnews/international/article/4405346/%E9%AE%91%E5%A8%81%E7%88%BE%E8%81%AF%E5%84%B2%E5%B1%80%E4%B8%BB%E5%B8%AD%E4%BB%BB%E6%9C%9F%E7%B5%90%E6%9D%9F+%E6%B2%83%E4%BB%80%E6%8E%A5%E4%BB%BB",
+              "published_at": "2026-05-16T03:33:00+08:00",
+              "section": "國際財經",
+              "novelty_score": 6,
+              "relevance_score": 8,
+              "urgency_score": 7,
+              "named_entities": [
+                {
+                  "name": "Jerome Powell",
+                  "type": "person"
+                },
+                {
+                  "name": "Kevin Warsh",
+                  "type": "person"
+                },
+                {
+                  "name": "聯儲局",
+                  "type": "institution"
+                }
+              ],
+              "key_points": [
+                "鮑威爾任期結束，由沃什接任聯儲局主席",
+                "參議院以54票贊成、45票反對確認沃什為聯儲局第17任主席",
+                "鮑威爾將繼續擔任聯儲局理事，直到司法部調查結束"
+              ],
+              "content_truncated": false,
+              "original_content_length_chars": 409,
+              "analyzed_content_length_chars": 409,
+              "original_content_token_estimate": 103,
+              "analyzed_content_token_estimate": 103,
+              "truncation_reason": null,
+              "analysis_method": "full_text",
+              "attention_tier": "medium",
+              "theme": "macro",
+              "attention_reason": "central bank leadership transition",
+              "must_keep": true,
+              "model_used": "meta-llama/llama-4-scout-17b-16e-instruct",
+              "delayed_retry_attempted": false,
+              "delayed_retry_model_chain": [],
+              "delayed_retry_final_model": null,
+              "error_classification": null,
+              "error": null
+            },
+            {
+              "source_article_id": "4405342",
+              "title": "交易員押注聯儲局今年底將會加息",
+              "canonical_url": "https://www.hkej.com/instantnews/international/article/4405342/%E4%BA%A4%E6%98%93%E5%93%A1%E6%8A%BC%E6%B3%A8%E8%81%AF%E5%84%B2%E5%B1%80%E4%BB%8A%E5%B9%B4%E5%BA%95%E5%B0%87%E6%9C%83%E5%8A%A0%E6%81%AF",
+              "published_at": "2026-05-16T02:15:00+08:00",
+              "section": "國際財經",
+              "novelty_score": 6,
+              "relevance_score": 8,
+              "urgency_score": 7,
+              "named_entities": [
+                {
+                  "name": "聯儲局",
+                  "type": "institution"
+                },
+                {
+                  "name": "芝加哥商品交易所",
+                  "type": "organization"
+                },
+                {
+                  "name": "美國",
+                  "type": "country"
+                },
+                {
+                  "name": "伊朗",
+                  "type": "country"
+                }
+              ],
+              "key_points": [
+                "市場預計聯邦公開市場委員會在今年12月加息的可能性為51%，到明年1月，聯儲局指標利率上調0.25厘的概率已升至約60%",
+                "美國4月生產物價指數升至6%，創下2022年以來的最快增速",
+                "能源價格上漲推高貨運成本，消費物價指數高於經濟學家的預期，達到3.8%"
+              ],
+              "content_truncated": false,
+              "original_content_length_chars": 364,
+              "analyzed_content_length_chars": 364,
+              "original_content_token_estimate": 91,
+              "analyzed_content_token_estimate": 91,
+              "truncation_reason": null,
+              "analysis_method": "full_text",
+              "attention_tier": "high",
+              "theme": "macro",
+              "attention_reason": "interest rate hike expectations",
+              "must_keep": true,
+              "model_used": "meta-llama/llama-4-scout-17b-16e-instruct",
+              "delayed_retry_attempted": false,
+              "delayed_retry_model_chain": [],
+              "delayed_retry_final_model": null,
+              "error_classification": null,
+              "error": null
+            },
+            {
+              "source_article_id": "4405350",
+              "title": "股神旗艦首季清倉亞馬遜 增持Alphabet",
+              "canonical_url": "https://www.hkej.com/instantnews/international/article/4405350/%E8%82%A1%E7%A5%9E%E6%97%97%E8%89%A6%E9%A6%96%E5%AD%A3%E6%B8%85%E5%80%89%E4%BA%9E%E9%A6%AC%E9%81%9C+%E5%A2%9E%E6%8C%81Alphabet",
+              "published_at": "2026-05-16T05:43:00+08:00",
+              "section": "國際財經",
+              "novelty_score": 5,
+              "relevance_score": 7,
+              "urgency_score": 6,
+              "named_entities": [
+                {
+                  "name": "畢非德",
+                  "type": "person"
+                },
+                {
+                  "name": "巴郡哈撒韋",
+                  "type": "company"
+                },
+                {
+                  "name": "Alphabet",
+                  "type": "company"
+                }
+              ],
+              "key_points": [
+                "巴郡哈撒韋清倉亞馬遜、Visa、MasterCard、UnitedHealth等股份。",
+                "巴郡哈撒韋增持Alphabet等股份。",
+                "Third Point第一季建倉Meta、Alphabet等股份。"
+              ],
+              "content_truncated": false,
+              "original_content_length_chars": 232,
+              "analyzed_content_length_chars": 232,
+              "original_content_token_estimate": 58,
+              "analyzed_content_token_estimate": 58,
+              "truncation_reason": null,
+              "analysis_method": "full_text",
+              "attention_tier": "medium",
+              "theme": "general",
+              "attention_reason": "Default medium attention because the story is relevant but not an obvious top-priority market mover.",
+              "must_keep": false,
+              "model_used": "meta-llama/llama-4-scout-17b-16e-instruct",
+              "delayed_retry_attempted": false,
+              "delayed_retry_model_chain": [],
+              "delayed_retry_final_model": null,
+              "error_classification": null,
+              "error": null
+            }
+          ],
+          "model_used": "meta-llama/llama-4-scout-17b-16e-instruct"
+        },
+        {
+          "title": "企業動態",
+          "theme_rationale": "與企業經營、勞動爭議等相關的新聞。",
+          "article_count": 3,
+          "key_developments": [
+            "波音確認中國承諾購買200架飛機，價值遠超此前預期的150架。",
+            "美國總統特朗普訪華期間透露中國承諾購買200架波音飛機，有望為美國創造大量工作機會。",
+            "德國總理梅爾茨表示不建議自己的孩子赴美生活，因當地社會氛圍已變。",
+            "美股下跌，道指收市瀉537點，晶片股重挫，輝達重挫4.4%。"
+          ],
+          "named_entities": [
+            {
+              "name": "波音",
+              "type": "company"
+            },
+            {
+              "name": "中國",
+              "type": "country"
+            },
+            {
+              "name": "美國總統特朗普",
+              "type": "person"
+            },
+            {
+              "name": "德國總理梅爾茨",
+              "type": "person"
+            },
+            {
+              "name": "美國",
+              "type": "country"
+            }
+          ],
+          "articles": [
+            {
+              "source_article_id": "4405362",
+              "title": "波音確認中國承諾購200架飛機 料有更多購機承諾",
+              "canonical_url": "https://www.hkej.com/instantnews/international/article/4405362/%E6%B3%A2%E9%9F%B3%E7%A2%BA%E8%AA%8D%E4%B8%AD%E5%9C%8B%E6%89%BF%E8%AB%BE%E8%B3%BC200%E6%9E%B6%E9%A3%9B%E6%A9%9F+%E6%96%99%E6%9C%89%E6%9B%B4%E5%A4%9A%E8%B3%BC%E6%A9%9F%E6%89%BF%E8%AB%BE",
+              "published_at": "2026-05-16T11:44:00+08:00",
+              "section": "國際財經",
+              "novelty_score": 6,
+              "relevance_score": 8,
+              "urgency_score": 5,
+              "named_entities": [
+                {
+                  "name": "波音",
+                  "type": "company"
+                },
+                {
+                  "name": "中國",
+                  "type": "country"
+                },
+                {
+                  "name": "美國總統特朗普",
+                  "type": "person"
+                }
+              ],
+              "key_points": [
+                "波音確認中國承諾購買200架飛機，價值遠超此前預期的150架。",
+                "中國未來可能會有更多購機承諾，波音期待滿足中國日益增長的飛機需求。",
+                "美國總統特朗普訪華期間透露中國承諾購買200架波音飛機，有望為美國創造大量工作機會。"
+              ],
+              "content_truncated": false,
+              "original_content_length_chars": 141,
+              "analyzed_content_length_chars": 141,
+              "original_content_token_estimate": 36,
+              "analyzed_content_token_estimate": 36,
+              "truncation_reason": null,
+              "analysis_method": "full_text",
+              "attention_tier": "medium",
+              "theme": "general",
+              "attention_reason": "Default medium attention because the story is relevant but not an obvious top-priority market mover.",
+              "must_keep": false,
+              "model_used": "meta-llama/llama-4-scout-17b-16e-instruct",
+              "delayed_retry_attempted": false,
+              "delayed_retry_model_chain": [],
+              "delayed_retry_final_model": null,
+              "error_classification": null,
+              "error": null
+            },
+            {
+              "source_article_id": "4405355",
+              "title": "國際早班車丨德總理:不建議自己孩子赴美生活 歸咎於當地社會氛圍",
+              "canonical_url": "https://www.hkej.com/instantnews/international/article/4405355/%E5%9C%8B%E9%9A%9B%E6%97%A9%E7%8F%AD%E8%BB%8A%E4%B8%A8%E5%BE%B7%E7%B8%BD%E7%90%86%3A%E4%B8%8D%E5%BB%BA%E8%AD%B0%E8%87%AA%E5%B7%B1%E5%AD%A9%E5%AD%90%E8%B5%B4%E7%BE%8E%E7%94%9F%E6%B4%BB+%E6%AD%B8%E5%92%8E%E6%96%BC%E7%95%B6%E5%9C%B0%E7%A4%BE%E6%9C%83%E6%B0%9B%E5%9C%8D",
+              "published_at": "2026-05-16T07:51:00+08:00",
+              "section": "國際財經",
+              "novelty_score": 6,
+              "relevance_score": 8,
+              "urgency_score": 5,
+              "named_entities": [
+                {
+                  "name": "德國總理梅爾茨",
+                  "type": "person"
+                },
+                {
+                  "name": "特朗普",
+                  "type": "person"
+                },
+                {
+                  "name": "美國",
+                  "type": "country"
+                },
+                {
+                  "name": "德國",
+                  "type": "country"
+                },
+                {
+                  "name": "中國",
+                  "type": "country"
+                }
+              ],
+              "key_points": [
+                "德國總理梅爾茨表示不建議自己的孩子赴美生活，因當地社會氛圍已變。",
+                "美股下跌，道指收市瀉537點，晶片股重挫，輝達重挫4.4%。",
+                "交易員押注聯儲局今年底將會加息，市場料聯儲局FOMC今年12月加息可能性為51%。"
+              ],
+              "content_truncated": true,
+              "original_content_length_chars": 3662,
+              "analyzed_content_length_chars": 3262,
+              "original_content_token_estimate": 916,
+              "analyzed_content_token_estimate": 816,
+              "truncation_reason": "Category batch request exceeded the working request budget; article content was shortened to fit.",
+              "analysis_method": "truncated_text",
+              "attention_tier": "medium",
+              "theme": "general",
+              "attention_reason": "Default medium attention because the story is relevant but not an obvious top-priority market mover.",
+              "must_keep": false,
+              "model_used": "meta-llama/llama-4-scout-17b-16e-instruct",
+              "delayed_retry_attempted": false,
+              "delayed_retry_model_chain": [],
+              "delayed_retry_final_model": null,
+              "error_classification": null,
+              "error": null
+            },
+            {
+              "source_article_id": "4405351",
+              "title": "聯儲局:鮑威爾將擔任臨時主席 直至沃什宣誓就職",
+              "canonical_url": "https://www.hkej.com/instantnews/international/article/4405351/%E8%81%AF%E5%84%B2%E5%B1%80%3A%E9%AE%91%E5%A8%81%E7%88%BE%E5%B0%87%E6%93%94%E4%BB%BB%E8%87%A8%E6%99%82%E4%B8%BB%E5%B8%AD+%E7%9B%B4%E8%87%B3%E6%B2%83%E4%BB%80%E5%AE%A3%E8%AA%93%E5%B0%B1%E8%81%B7",
+              "published_at": "2026-05-16T05:58:00+08:00",
+              "section": "國際財經",
+              "novelty_score": 6,
+              "relevance_score": 8,
+              "urgency_score": 7,
+              "named_entities": [
+                {
+                  "name": "鮑威爾",
+                  "type": "person"
+                },
+                {
+                  "name": "沃什",
+                  "type": "person"
+                },
+                {
+                  "name": "美國聯儲局",
+                  "type": "institution"
+                }
+              ],
+              "key_points": [
+                "鮑威爾將擔任臨時主席，直至沃什宣誓就職。",
+                "聯儲局理事鮑曼和米蘭不支持臨時負責人任命。",
+                "鮑威爾的聯儲局主席任期於周五屆滿。"
+              ],
+              "content_truncated": false,
+              "original_content_length_chars": 218,
+              "analyzed_content_length_chars": 218,
+              "original_content_token_estimate": 55,
+              "analyzed_content_token_estimate": 55,
+              "truncation_reason": null,
+              "analysis_method": "full_text",
+              "attention_tier": "medium",
+              "theme": "macro",
+              "attention_reason": "Involves leadership transition",
+              "must_keep": true,
+              "model_used": "meta-llama/llama-4-scout-17b-16e-instruct",
+              "delayed_retry_attempted": false,
+              "delayed_retry_model_chain": [],
+              "delayed_retry_final_model": null,
+              "error_classification": null,
+              "error": null
+            }
+          ],
+          "model_used": "meta-llama/llama-4-scout-17b-16e-instruct"
+        },
+        {
+          "title": "股市動態",
           "theme_rationale": "關注全球股市走勢和個股表現。",
-          "article_count": 11,
+          "article_count": 3,
           "key_developments": [
             "道指收市下跌537點，報49526點，跌幅1.07%。",
             "輝達股價收市重挫4.4%，為跌幅最大道指成份股。",
-            "SpaceX股東批准1拆5股票分拆方案，每股價值從526.59美元調整至約105.32美元。",
-            "鮑威爾的聯儲局主席任期於周五屆滿，由沃什接任聯儲局主席"
+            "歐股收市跌1.48%，報606點。",
+            "美國銀行策略師認為美股6月獲利回吐的時機已經到來。"
           ],
           "named_entities": [
             {
@@ -663,19 +1194,15 @@
               "type": "company"
             },
             {
-              "name": "鮑威爾",
-              "type": "person"
+              "name": "道琼斯指数",
+              "type": "index"
             },
             {
-              "name": "沃什",
-              "type": "person"
+              "name": "歐洲股市",
+              "type": "index"
             },
             {
-              "name": "美國聯儲局",
-              "type": "institution"
-            },
-            {
-              "name": "SpaceX",
+              "name": "Bank of America",
               "type": "company"
             }
           ],
@@ -833,386 +1360,6 @@
               "delayed_retry_final_model": null,
               "error_classification": null,
               "error": null
-            },
-            {
-              "source_article_id": "4405364",
-              "title": "SpaceX股東據報批准1拆5股票分拆方案",
-              "canonical_url": "https://www.hkej.com/instantnews/international/article/4405364/SpaceX%E8%82%A1%E6%9D%B1%E6%93%9A%E5%A0%B1%E6%89%B9%E5%87%861%E6%8B%865%E8%82%A1%E7%A5%A8%E5%88%86%E6%8B%86%E6%96%B9%E6%A1%88",
-              "published_at": "2026-05-16T12:58:00+08:00",
-              "section": "國際財經",
-              "novelty_score": 6,
-              "relevance_score": 8,
-              "urgency_score": 9,
-              "named_entities": [
-                {
-                  "name": "Elon Musk",
-                  "type": "person"
-                },
-                {
-                  "name": "SpaceX",
-                  "type": "company"
-                }
-              ],
-              "key_points": [
-                "SpaceX股東批准1拆5股票分拆方案，每股價值從526.59美元調整至約105.32美元。",
-                "SpaceX計劃於6月11日確定IPO發售價，股份於次日上市，交易代號為「SPCX」。",
-                "SpaceX加速IPO進程，目標於6月12日正式上市，早於原定6月下旬的上市計劃。"
-              ],
-              "content_truncated": false,
-              "original_content_length_chars": 302,
-              "analyzed_content_length_chars": 302,
-              "original_content_token_estimate": 76,
-              "analyzed_content_token_estimate": 76,
-              "truncation_reason": null,
-              "analysis_method": "full_text",
-              "attention_tier": "high",
-              "theme": "stocks",
-              "attention_reason": "Involves stock split plan",
-              "must_keep": true,
-              "model_used": "meta-llama/llama-4-scout-17b-16e-instruct",
-              "delayed_retry_attempted": false,
-              "delayed_retry_model_chain": [],
-              "delayed_retry_final_model": null,
-              "error_classification": null,
-              "error": null
-            },
-            {
-              "source_article_id": "4405353",
-              "title": "SpaceX IPO股份據報最快6月12日上市",
-              "canonical_url": "https://www.hkej.com/instantnews/international/article/4405353/SpaceX+IPO%E8%82%A1%E4%BB%BD%E6%93%9A%E5%A0%B1%E6%9C%80%E5%BF%AB6%E6%9C%8812%E6%97%A5%E4%B8%8A%E5%B8%82",
-              "published_at": "2026-05-16T06:13:00+08:00",
-              "section": "國際財經",
-              "novelty_score": 8,
-              "relevance_score": 9,
-              "urgency_score": 9,
-              "named_entities": [
-                {
-                  "name": "Elon Musk",
-                  "type": "person"
-                },
-                {
-                  "name": "SpaceX",
-                  "type": "company"
-                },
-                {
-                  "name": "納斯特",
-                  "type": "other"
-                },
-                {
-                  "name": "馬斯克",
-                  "type": "person"
-                }
-              ],
-              "key_points": [
-                "SpaceX 最快將於 6 月 11 日確定 IPO 發售價，股份於次日上市。",
-                "SpaceX 將選擇納斯特作為 IPO 上市市場，股份以「SPCX」為代號進行交易。",
-                "SpaceX 已加快 IPO 進程，目標是最早於下周三發布招股書，並於 6 月 4 日啟動路演。"
-              ],
-              "content_truncated": false,
-              "original_content_length_chars": 219,
-              "analyzed_content_length_chars": 219,
-              "original_content_token_estimate": 55,
-              "analyzed_content_token_estimate": 55,
-              "truncation_reason": null,
-              "analysis_method": "full_text",
-              "attention_tier": "high",
-              "theme": "stocks",
-              "attention_reason": "Involves potential IPO",
-              "must_keep": true,
-              "model_used": "meta-llama/llama-4-scout-17b-16e-instruct",
-              "delayed_retry_attempted": false,
-              "delayed_retry_model_chain": [],
-              "delayed_retry_final_model": null,
-              "error_classification": null,
-              "error": null
-            },
-            {
-              "source_article_id": "4405362",
-              "title": "波音確認中國承諾購200架飛機 料有更多購機承諾",
-              "canonical_url": "https://www.hkej.com/instantnews/international/article/4405362/%E6%B3%A2%E9%9F%B3%E7%A2%BA%E8%AA%8D%E4%B8%AD%E5%9C%8B%E6%89%BF%E8%AB%BE%E8%B3%BC200%E6%9E%B6%E9%A3%9B%E6%A9%9F+%E6%96%99%E6%9C%89%E6%9B%B4%E5%A4%9A%E8%B3%BC%E6%A9%9F%E6%89%BF%E8%AB%BE",
-              "published_at": "2026-05-16T11:44:00+08:00",
-              "section": "國際財經",
-              "novelty_score": 6,
-              "relevance_score": 8,
-              "urgency_score": 5,
-              "named_entities": [
-                {
-                  "name": "波音",
-                  "type": "company"
-                },
-                {
-                  "name": "中國",
-                  "type": "country"
-                },
-                {
-                  "name": "美國總統特朗普",
-                  "type": "person"
-                }
-              ],
-              "key_points": [
-                "波音確認中國承諾購買200架飛機，價值遠超此前預期的150架。",
-                "中國未來可能會有更多購機承諾，波音期待滿足中國日益增長的飛機需求。",
-                "美國總統特朗普訪華期間透露中國承諾購買200架波音飛機，有望為美國創造大量工作機會。"
-              ],
-              "content_truncated": false,
-              "original_content_length_chars": 141,
-              "analyzed_content_length_chars": 141,
-              "original_content_token_estimate": 36,
-              "analyzed_content_token_estimate": 36,
-              "truncation_reason": null,
-              "analysis_method": "full_text",
-              "attention_tier": "medium",
-              "theme": "general",
-              "attention_reason": "Default medium attention because the story is relevant but not an obvious top-priority market mover.",
-              "must_keep": false,
-              "model_used": "meta-llama/llama-4-scout-17b-16e-instruct",
-              "delayed_retry_attempted": false,
-              "delayed_retry_model_chain": [],
-              "delayed_retry_final_model": null,
-              "error_classification": null,
-              "error": null
-            },
-            {
-              "source_article_id": "4405351",
-              "title": "聯儲局:鮑威爾將擔任臨時主席 直至沃什宣誓就職",
-              "canonical_url": "https://www.hkej.com/instantnews/international/article/4405351/%E8%81%AF%E5%84%B2%E5%B1%80%3A%E9%AE%91%E5%A8%81%E7%88%BE%E5%B0%87%E6%93%94%E4%BB%BB%E8%87%A8%E6%99%82%E4%B8%BB%E5%B8%AD+%E7%9B%B4%E8%87%B3%E6%B2%83%E4%BB%80%E5%AE%A3%E8%AA%93%E5%B0%B1%E8%81%B7",
-              "published_at": "2026-05-16T05:58:00+08:00",
-              "section": "國際財經",
-              "novelty_score": 6,
-              "relevance_score": 8,
-              "urgency_score": 7,
-              "named_entities": [
-                {
-                  "name": "鮑威爾",
-                  "type": "person"
-                },
-                {
-                  "name": "沃什",
-                  "type": "person"
-                },
-                {
-                  "name": "美國聯儲局",
-                  "type": "institution"
-                }
-              ],
-              "key_points": [
-                "鮑威爾將擔任臨時主席，直至沃什宣誓就職。",
-                "聯儲局理事鮑曼和米蘭不支持臨時負責人任命。",
-                "鮑威爾的聯儲局主席任期於周五屆滿。"
-              ],
-              "content_truncated": false,
-              "original_content_length_chars": 218,
-              "analyzed_content_length_chars": 218,
-              "original_content_token_estimate": 55,
-              "analyzed_content_token_estimate": 55,
-              "truncation_reason": null,
-              "analysis_method": "full_text",
-              "attention_tier": "medium",
-              "theme": "macro",
-              "attention_reason": "Involves leadership transition",
-              "must_keep": true,
-              "model_used": "meta-llama/llama-4-scout-17b-16e-instruct",
-              "delayed_retry_attempted": false,
-              "delayed_retry_model_chain": [],
-              "delayed_retry_final_model": null,
-              "error_classification": null,
-              "error": null
-            },
-            {
-              "source_article_id": "4405355",
-              "title": "國際早班車丨德總理:不建議自己孩子赴美生活 歸咎於當地社會氛圍",
-              "canonical_url": "https://www.hkej.com/instantnews/international/article/4405355/%E5%9C%8B%E9%9A%9B%E6%97%A9%E7%8F%AD%E8%BB%8A%E4%B8%A8%E5%BE%B7%E7%B8%BD%E7%90%86%3A%E4%B8%8D%E5%BB%BA%E8%AD%B0%E8%87%AA%E5%B7%B1%E5%AD%A9%E5%AD%90%E8%B5%B4%E7%BE%8E%E7%94%9F%E6%B4%BB+%E6%AD%B8%E5%92%8E%E6%96%BC%E7%95%B6%E5%9C%B0%E7%A4%BE%E6%9C%83%E6%B0%9B%E5%9C%8D",
-              "published_at": "2026-05-16T07:51:00+08:00",
-              "section": "國際財經",
-              "novelty_score": 6,
-              "relevance_score": 8,
-              "urgency_score": 5,
-              "named_entities": [
-                {
-                  "name": "德國總理梅爾茨",
-                  "type": "person"
-                },
-                {
-                  "name": "特朗普",
-                  "type": "person"
-                },
-                {
-                  "name": "美國",
-                  "type": "country"
-                },
-                {
-                  "name": "德國",
-                  "type": "country"
-                },
-                {
-                  "name": "中國",
-                  "type": "country"
-                }
-              ],
-              "key_points": [
-                "德國總理梅爾茨表示不建議自己的孩子赴美生活，因當地社會氛圍已變。",
-                "美股下跌，道指收市瀉537點，晶片股重挫，輝達重挫4.4%。",
-                "交易員押注聯儲局今年底將會加息，市場料聯儲局FOMC今年12月加息可能性為51%。"
-              ],
-              "content_truncated": true,
-              "original_content_length_chars": 3662,
-              "analyzed_content_length_chars": 3262,
-              "original_content_token_estimate": 916,
-              "analyzed_content_token_estimate": 816,
-              "truncation_reason": "Category batch request exceeded the working request budget; article content was shortened to fit.",
-              "analysis_method": "truncated_text",
-              "attention_tier": "medium",
-              "theme": "general",
-              "attention_reason": "Default medium attention because the story is relevant but not an obvious top-priority market mover.",
-              "must_keep": false,
-              "model_used": "meta-llama/llama-4-scout-17b-16e-instruct",
-              "delayed_retry_attempted": false,
-              "delayed_retry_model_chain": [],
-              "delayed_retry_final_model": null,
-              "error_classification": null,
-              "error": null
-            },
-            {
-              "source_article_id": "4405346",
-              "title": "鮑威爾聯儲局主席任期結束 沃什接任",
-              "canonical_url": "https://www.hkej.com/instantnews/international/article/4405346/%E9%AE%91%E5%A8%81%E7%88%BE%E8%81%AF%E5%84%B2%E5%B1%80%E4%B8%BB%E5%B8%AD%E4%BB%BB%E6%9C%9F%E7%B5%90%E6%9D%9F+%E6%B2%83%E4%BB%80%E6%8E%A5%E4%BB%BB",
-              "published_at": "2026-05-16T03:33:00+08:00",
-              "section": "國際財經",
-              "novelty_score": 6,
-              "relevance_score": 8,
-              "urgency_score": 7,
-              "named_entities": [
-                {
-                  "name": "Jerome Powell",
-                  "type": "person"
-                },
-                {
-                  "name": "Kevin Warsh",
-                  "type": "person"
-                },
-                {
-                  "name": "聯儲局",
-                  "type": "institution"
-                }
-              ],
-              "key_points": [
-                "鮑威爾任期結束，由沃什接任聯儲局主席",
-                "參議院以54票贊成、45票反對確認沃什為聯儲局第17任主席",
-                "鮑威爾將繼續擔任聯儲局理事，直到司法部調查結束"
-              ],
-              "content_truncated": false,
-              "original_content_length_chars": 409,
-              "analyzed_content_length_chars": 409,
-              "original_content_token_estimate": 103,
-              "analyzed_content_token_estimate": 103,
-              "truncation_reason": null,
-              "analysis_method": "full_text",
-              "attention_tier": "medium",
-              "theme": "macro",
-              "attention_reason": "central bank leadership transition",
-              "must_keep": true,
-              "model_used": "meta-llama/llama-4-scout-17b-16e-instruct",
-              "delayed_retry_attempted": false,
-              "delayed_retry_model_chain": [],
-              "delayed_retry_final_model": null,
-              "error_classification": null,
-              "error": null
-            },
-            {
-              "source_article_id": "4405342",
-              "title": "交易員押注聯儲局今年底將會加息",
-              "canonical_url": "https://www.hkej.com/instantnews/international/article/4405342/%E4%BA%A4%E6%98%93%E5%93%A1%E6%8A%BC%E6%B3%A8%E8%81%AF%E5%84%B2%E5%B1%80%E4%BB%8A%E5%B9%B4%E5%BA%95%E5%B0%87%E6%9C%83%E5%8A%A0%E6%81%AF",
-              "published_at": "2026-05-16T02:15:00+08:00",
-              "section": "國際財經",
-              "novelty_score": 6,
-              "relevance_score": 8,
-              "urgency_score": 7,
-              "named_entities": [
-                {
-                  "name": "聯儲局",
-                  "type": "institution"
-                },
-                {
-                  "name": "芝加哥商品交易所",
-                  "type": "organization"
-                },
-                {
-                  "name": "美國",
-                  "type": "country"
-                },
-                {
-                  "name": "伊朗",
-                  "type": "country"
-                }
-              ],
-              "key_points": [
-                "市場預計聯邦公開市場委員會在今年12月加息的可能性為51%，到明年1月，聯儲局指標利率上調0.25厘的概率已升至約60%",
-                "美國4月生產物價指數升至6%，創下2022年以來的最快增速",
-                "能源價格上漲推高貨運成本，消費物價指數高於經濟學家的預期，達到3.8%"
-              ],
-              "content_truncated": false,
-              "original_content_length_chars": 364,
-              "analyzed_content_length_chars": 364,
-              "original_content_token_estimate": 91,
-              "analyzed_content_token_estimate": 91,
-              "truncation_reason": null,
-              "analysis_method": "full_text",
-              "attention_tier": "high",
-              "theme": "macro",
-              "attention_reason": "interest rate hike expectations",
-              "must_keep": true,
-              "model_used": "meta-llama/llama-4-scout-17b-16e-instruct",
-              "delayed_retry_attempted": false,
-              "delayed_retry_model_chain": [],
-              "delayed_retry_final_model": null,
-              "error_classification": null,
-              "error": null
-            },
-            {
-              "source_article_id": "4405350",
-              "title": "股神旗艦首季清倉亞馬遜 增持Alphabet",
-              "canonical_url": "https://www.hkej.com/instantnews/international/article/4405350/%E8%82%A1%E7%A5%9E%E6%97%97%E8%89%A6%E9%A6%96%E5%AD%A3%E6%B8%85%E5%80%89%E4%BA%9E%E9%A6%AC%E9%81%9C+%E5%A2%9E%E6%8C%81Alphabet",
-              "published_at": "2026-05-16T05:43:00+08:00",
-              "section": "國際財經",
-              "novelty_score": 5,
-              "relevance_score": 7,
-              "urgency_score": 6,
-              "named_entities": [
-                {
-                  "name": "畢非德",
-                  "type": "person"
-                },
-                {
-                  "name": "巴郡哈撒韋",
-                  "type": "company"
-                },
-                {
-                  "name": "Alphabet",
-                  "type": "company"
-                }
-              ],
-              "key_points": [
-                "巴郡哈撒韋清倉亞馬遜、Visa、MasterCard、UnitedHealth等股份。",
-                "巴郡哈撒韋增持Alphabet等股份。",
-                "Third Point第一季建倉Meta、Alphabet等股份。"
-              ],
-              "content_truncated": false,
-              "original_content_length_chars": 232,
-              "analyzed_content_length_chars": 232,
-              "original_content_token_estimate": 58,
-              "analyzed_content_token_estimate": 58,
-              "truncation_reason": null,
-              "analysis_method": "full_text",
-              "attention_tier": "medium",
-              "theme": "general",
-              "attention_reason": "Default medium attention because the story is relevant but not an obvious top-priority market mover.",
-              "must_keep": false,
-              "model_used": "meta-llama/llama-4-scout-17b-16e-instruct",
-              "delayed_retry_attempted": false,
-              "delayed_retry_model_chain": [],
-              "delayed_retry_final_model": null,
-              "error_classification": null,
-              "error": null
             }
           ],
           "model_used": "meta-llama/llama-4-scout-17b-16e-instruct"
@@ -1220,54 +1367,226 @@
       ],
       "analysis_profile": "standard",
       "model_used": "meta-llama/llama-4-scout-17b-16e-instruct",
-      "sub_batch_count": 12,
+      "sub_batch_count": 5,
       "diagnostics": {
-        "sub_batch_count": 9,
-        "split_reasons": [
-          "pre_send_budget"
-        ],
+        "sub_batch_count": 5,
+        "split_reasons": [],
         "models_attempted": [
           "meta-llama/llama-4-scout-17b-16e-instruct"
         ],
-        "estimated_input_tokens_max": 1657,
-        "serialized_request_bytes_max": 11831,
-        "rate_limit_waits": 1,
+        "estimated_input_tokens_max": 652,
+        "serialized_request_bytes_max": 3336,
+        "rate_limit_waits": 0,
         "partial_article_count": 0,
-        "synthesis_wait_seconds_total": 1382.4,
+        "synthesis_wait_seconds_total": 0.0,
         "synthesis_retry_count": 0,
         "synthesis_retry_skipped_count": 0,
         "synthesis_budget_exhausted": false,
         "degraded_merge_used": false,
         "degraded_merge_reason": "",
-        "synthesis_merge_depth_max": 1,
+        "synthesis_merge_depth_max": 0,
         "model_switches": []
       },
       "error": null
     },
     {
       "category": "時事脈搏",
-      "article_count": 18,
+      "article_count": 25,
       "status": "success",
       "key_developments": [],
       "named_entities": [
-        {
-          "name": "以色列",
-          "type": "country"
-        },
         {
           "name": "伊朗",
           "type": "country"
         },
         {
-          "name": "特朗普",
-          "type": "person"
+          "name": "霍爾木茲海峽",
+          "type": "other"
         },
         {
-          "name": "習近平",
-          "type": "person"
+          "name": "中美",
+          "type": "country"
+        },
+        {
+          "name": "以色列",
+          "type": "country"
         }
       ],
       "articles": [
+        {
+          "source_article_id": "4405381",
+          "canonical_url": "https://www.hkej.com/instantnews/current/article/4405381/%E9%86%AB%E5%8D%93%E6%89%80%E6%AD%A3%E5%88%B6%E8%A8%82%E5%85%AD%E9%A0%85%E8%87%A8%E5%BA%8A%E6%8C%87%E5%BC%95+%E5%8A%A9%E6%8E%A8%E5%8B%95%E6%9B%B4%E5%90%88%E7%90%86%E9%86%AB%E7%99%82%E5%AE%89%E6%8E%92",
+          "title": "醫卓所正制訂六項臨床指引 助推動更合理醫療安排",
+          "section": "時事脈搏",
+          "published_at": "2026-05-16T22:39:00+08:00",
+          "attention_tier": "light",
+          "novelty_score": 5,
+          "relevance_score": 5,
+          "urgency_score": 5,
+          "named_entities": [],
+          "key_points": [],
+          "content_truncated": false,
+          "analysis_method": "bypassed",
+          "model_used": "direct"
+        },
+        {
+          "source_article_id": "4405379",
+          "title": "伊朗短期內公布霍爾木茲海峽航線交通管理機制",
+          "canonical_url": "https://www.hkej.com/instantnews/current/article/4405379/%E4%BC%8A%E6%9C%97%E7%9F%AD%E6%9C%9F%E5%85%A7%E5%85%AC%E5%B8%83%E9%9C%8D%E7%88%BE%E6%9C%A8%E8%8C%B2%E6%B5%B7%E5%B3%BD%E8%88%AA%E7%B7%9A%E4%BA%A4%E9%80%9A%E7%AE%A1%E7%90%86%E6%A9%9F%E5%88%B6",
+          "published_at": "2026-05-16T19:30:00+08:00",
+          "section": "時事脈搏",
+          "novelty_score": 6,
+          "relevance_score": 8,
+          "urgency_score": 7,
+          "named_entities": [
+            {
+              "name": "伊朗",
+              "type": "country"
+            },
+            {
+              "name": "霍爾木茲海峽",
+              "type": "other"
+            },
+            {
+              "name": "阿齊茲",
+              "type": "person"
+            }
+          ],
+          "key_points": [
+            "伊朗將於近期公布霍爾木茲海峽航線交通管理機制，僅對與伊朗合作的商船和相關方開放。",
+            "該機制將收取必要費用，提供專業服務。"
+          ],
+          "content_truncated": false,
+          "original_content_length_chars": 153,
+          "analyzed_content_length_chars": 153,
+          "original_content_token_estimate": 39,
+          "analyzed_content_token_estimate": 39,
+          "truncation_reason": null,
+          "analysis_method": "full_text",
+          "attention_tier": "high",
+          "theme": "geopolitics",
+          "attention_reason": "High-signal geopolitics headline based on title/summary keywords.",
+          "must_keep": true,
+          "model_used": "meta-llama/llama-4-scout-17b-16e-instruct",
+          "delayed_retry_attempted": false,
+          "delayed_retry_model_chain": [],
+          "delayed_retry_final_model": null,
+          "error_classification": null,
+          "error": null
+        },
+        {
+          "source_article_id": "4405378",
+          "canonical_url": "https://www.hkej.com/instantnews/current/article/4405378/%E6%9B%BC%E8%B0%B7%E7%99%BC%E7%94%9F%E8%B2%A8%E9%81%8B%E5%88%97%E8%BB%8A%E8%88%87%E5%B7%B4%E5%A3%AB%E7%9B%B8%E6%92%9E+%E8%87%B3%E5%B0%918%E6%AD%BB25%E5%82%B7",
+          "title": "曼谷發生貨運列車與巴士相撞 至少8死25傷",
+          "section": "時事脈搏",
+          "published_at": "2026-05-16T19:02:00+08:00",
+          "attention_tier": "light",
+          "novelty_score": 5,
+          "relevance_score": 5,
+          "urgency_score": 5,
+          "named_entities": [],
+          "key_points": [],
+          "content_truncated": false,
+          "analysis_method": "bypassed",
+          "model_used": "direct"
+        },
+        {
+          "source_article_id": "4405377",
+          "canonical_url": "https://www.hkej.com/instantnews/current/article/4405377/%E5%B7%A5%E4%BA%BA%E9%BB%83%E5%A4%A7%E4%BB%99%E7%BE%8E%E6%9D%B1%E9%82%A8%E5%9C%B0%E7%9B%A4%E8%A2%AB%E5%A4%BE%E9%A0%B8+%E6%98%8F%E8%BF%B7%E9%80%81%E9%99%A2",
+          "title": "工人黃大仙美東邨地盤被夾頸 昏迷送院",
+          "section": "時事脈搏",
+          "published_at": "2026-05-16T18:28:00+08:00",
+          "attention_tier": "light",
+          "novelty_score": 5,
+          "relevance_score": 5,
+          "urgency_score": 5,
+          "named_entities": [],
+          "key_points": [],
+          "content_truncated": false,
+          "analysis_method": "bypassed",
+          "model_used": "direct"
+        },
+        {
+          "source_article_id": "4405375",
+          "canonical_url": "https://www.hkej.com/instantnews/current/article/4405375/%E6%9C%AC%E6%B8%AF%E5%87%BA%E7%8F%BE%E4%BB%8A%E5%B9%B4%E9%A6%96%E5%AE%97%E5%A4%A7%E9%BC%A0%E6%88%8A%E5%9E%8B%E8%82%9D%E7%82%8E%E5%80%8B%E6%A1%88",
+          "title": "本港出現今年首宗大鼠戊型肝炎個案",
+          "section": "時事脈搏",
+          "published_at": "2026-05-16T17:20:00+08:00",
+          "attention_tier": "light",
+          "novelty_score": 5,
+          "relevance_score": 5,
+          "urgency_score": 5,
+          "named_entities": [],
+          "key_points": [],
+          "content_truncated": false,
+          "analysis_method": "bypassed",
+          "model_used": "direct"
+        },
+        {
+          "source_article_id": "4405374",
+          "canonical_url": "https://www.hkej.com/instantnews/current/article/4405374/%E8%9E%8D%E9%A6%AC%E6%83%85%E5%9C%8B%E9%9A%9B%E8%97%9D%E8%A1%93%E5%B7%A1%E5%B1%95%E5%B0%96%E6%B2%99%E5%92%80%E7%AB%99%E7%A4%BE%E5%8D%80%E5%B1%95%E8%A6%BD%E5%95%9F%E5%8B%95",
+          "title": "融馬情國際藝術巡展尖沙咀站社區展覽啟動",
+          "section": "時事脈搏",
+          "published_at": "2026-05-16T17:06:00+08:00",
+          "attention_tier": "light",
+          "novelty_score": 5,
+          "relevance_score": 5,
+          "urgency_score": 5,
+          "named_entities": [],
+          "key_points": [],
+          "content_truncated": false,
+          "analysis_method": "bypassed",
+          "model_used": "direct"
+        },
+        {
+          "source_article_id": "4405373",
+          "title": "中東局勢丨傳美以或最早下周恢復對伊朗軍事行動",
+          "canonical_url": "https://www.hkej.com/instantnews/current/article/4405373/%E4%B8%AD%E6%9D%B1%E5%B1%80%E5%8B%A2%E4%B8%A8%E5%82%B3%E7%BE%8E%E4%BB%A5%E6%88%96%E6%9C%80%E6%97%A9%E4%B8%8B%E5%91%A8%E6%81%A2%E5%BE%A9%E5%B0%8D%E4%BC%8A%E6%9C%97%E8%BB%8D%E4%BA%8B%E8%A1%8C%E5%8B%95",
+          "published_at": "2026-05-16T17:03:00+08:00",
+          "section": "時事脈搏",
+          "novelty_score": 8,
+          "relevance_score": 9,
+          "urgency_score": 9,
+          "named_entities": [
+            {
+              "name": "美國",
+              "type": "country"
+            },
+            {
+              "name": "以色列",
+              "type": "country"
+            },
+            {
+              "name": "伊朗",
+              "type": "country"
+            },
+            {
+              "name": "特朗普",
+              "type": "person"
+            }
+          ],
+          "key_points": [
+            "美國和以色列或最早下周恢復對伊朗軍事行動，選項包括對伊朗軍事和基礎設施目標進行更猛烈的轟炸。",
+            "數百名特種作戰部隊人員已於3月抵達中東，美國已為該地區的戰艦和戰機重新配備彈藥。"
+          ],
+          "content_truncated": false,
+          "original_content_length_chars": 255,
+          "analyzed_content_length_chars": 255,
+          "original_content_token_estimate": 64,
+          "analyzed_content_token_estimate": 64,
+          "truncation_reason": null,
+          "analysis_method": "full_text",
+          "attention_tier": "high",
+          "theme": "geopolitics",
+          "attention_reason": "High-signal geopolitics headline based on title/summary keywords.",
+          "must_keep": true,
+          "model_used": "meta-llama/llama-4-scout-17b-16e-instruct",
+          "delayed_retry_attempted": false,
+          "delayed_retry_model_chain": [],
+          "delayed_retry_final_model": null,
+          "error_classification": null,
+          "error": null
+        },
         {
           "source_article_id": "4405372",
           "title": "葉劉:中美關係穩定對香港經貿及金融等有利",
@@ -1323,7 +1642,10 @@
           "key_points": [],
           "content_truncated": false,
           "analysis_method": "bypassed",
-          "model_used": "direct"
+          "model_used": "direct",
+          "theme": "general",
+          "attention_reason": "Lighter treatment because this story sits in the 時事脈搏 section without strong market-moving signals.",
+          "must_keep": false
         },
         {
           "source_article_id": "4405369",
@@ -1380,7 +1702,10 @@
           "key_points": [],
           "content_truncated": false,
           "analysis_method": "bypassed",
-          "model_used": "direct"
+          "model_used": "direct",
+          "theme": "general",
+          "attention_reason": "Lighter treatment because this story sits in the 時事脈搏 section without strong market-moving signals.",
+          "must_keep": false
         },
         {
           "source_article_id": "4405366",
@@ -1396,7 +1721,10 @@
           "key_points": [],
           "content_truncated": false,
           "analysis_method": "bypassed",
-          "model_used": "direct"
+          "model_used": "direct",
+          "theme": "general",
+          "attention_reason": "Lighter treatment because this story sits in the 時事脈搏 section without strong market-moving signals.",
+          "must_keep": false
         },
         {
           "source_article_id": "4405365",
@@ -1412,7 +1740,10 @@
           "key_points": [],
           "content_truncated": false,
           "analysis_method": "bypassed",
-          "model_used": "direct"
+          "model_used": "direct",
+          "theme": "general",
+          "attention_reason": "Lighter treatment because this story sits in the 時事脈搏 section without strong market-moving signals.",
+          "must_keep": false
         },
         {
           "source_article_id": "4405359",
@@ -1428,7 +1759,10 @@
           "key_points": [],
           "content_truncated": false,
           "analysis_method": "bypassed",
-          "model_used": "direct"
+          "model_used": "direct",
+          "theme": "general",
+          "attention_reason": "Lighter treatment because this story sits in the 時事脈搏 section without strong market-moving signals.",
+          "must_keep": false
         },
         {
           "source_article_id": "4405358",
@@ -1444,7 +1778,10 @@
           "key_points": [],
           "content_truncated": false,
           "analysis_method": "bypassed",
-          "model_used": "direct"
+          "model_used": "direct",
+          "theme": "general",
+          "attention_reason": "Lighter treatment because this story sits in the 時事脈搏 section without strong market-moving signals.",
+          "must_keep": false
         },
         {
           "source_article_id": "4405361",
@@ -1460,7 +1797,10 @@
           "key_points": [],
           "content_truncated": false,
           "analysis_method": "bypassed",
-          "model_used": "direct"
+          "model_used": "direct",
+          "theme": "general",
+          "attention_reason": "Lighter treatment because this story sits in the 時事脈搏 section without strong market-moving signals.",
+          "must_keep": false
         },
         {
           "source_article_id": "4405360",
@@ -1476,7 +1816,10 @@
           "key_points": [],
           "content_truncated": false,
           "analysis_method": "bypassed",
-          "model_used": "direct"
+          "model_used": "direct",
+          "theme": "general",
+          "attention_reason": "Lighter treatment because this story sits in the 時事脈搏 section without strong market-moving signals.",
+          "must_keep": false
         },
         {
           "source_article_id": "4405357",
@@ -1492,7 +1835,10 @@
           "key_points": [],
           "content_truncated": false,
           "analysis_method": "bypassed",
-          "model_used": "direct"
+          "model_used": "direct",
+          "theme": "general",
+          "attention_reason": "Lighter treatment because this story sits in the 時事脈搏 section without strong market-moving signals.",
+          "must_keep": false
         },
         {
           "source_article_id": "4405354",
@@ -1508,7 +1854,10 @@
           "key_points": [],
           "content_truncated": false,
           "analysis_method": "bypassed",
-          "model_used": "direct"
+          "model_used": "direct",
+          "theme": "general",
+          "attention_reason": "Lighter treatment because this story sits in the 時事脈搏 section without strong market-moving signals.",
+          "must_keep": false
         },
         {
           "source_article_id": "4405352",
@@ -1524,7 +1873,10 @@
           "key_points": [],
           "content_truncated": false,
           "analysis_method": "bypassed",
-          "model_used": "direct"
+          "model_used": "direct",
+          "theme": "general",
+          "attention_reason": "Lighter treatment because this story sits in the 時事脈搏 section without strong market-moving signals.",
+          "must_keep": false
         },
         {
           "source_article_id": "4405347",
@@ -1581,7 +1933,10 @@
           "key_points": [],
           "content_truncated": false,
           "analysis_method": "bypassed",
-          "model_used": "direct"
+          "model_used": "direct",
+          "theme": "general",
+          "attention_reason": "Lighter treatment because this story sits in the 時事脈搏 section without strong market-moving signals.",
+          "must_keep": false
         },
         {
           "source_article_id": "4405341",
@@ -1597,7 +1952,10 @@
           "key_points": [],
           "content_truncated": false,
           "analysis_method": "bypassed",
-          "model_used": "direct"
+          "model_used": "direct",
+          "theme": "general",
+          "attention_reason": "Lighter treatment because this story sits in the 時事脈搏 section without strong market-moving signals.",
+          "must_keep": false
         },
         {
           "source_article_id": "4405339",
@@ -1692,33 +2050,313 @@
       ],
       "subgroups": [
         {
-          "title": "中東地緣政治 & Other News",
-          "theme_rationale": "與中東國家相關的地緣政治事件",
+          "title": "社會新聞 & Other News",
+          "theme_rationale": "與社會民生相關的新聞事件",
           "article_count": 15,
           "key_developments": [
-            "以色列正準備重啟對伊朗的軍事行動，行動可能持續數天或數周",
-            "特朗普與習近平達成共識，伊朗不能擁有核武",
-            "港股市場靜淡，HSI收報26389點"
+            "伊朗將於近期公布霍爾木茲海峽航線交通管理機制，僅對與伊朗合作的商船和相關方開放。",
+            "中美元首會晤達成構建「中美建設性戰略穩定關係」",
+            "以色列正準備重啟對伊朗的軍事行動"
           ],
           "named_entities": [
-            {
-              "name": "以色列",
-              "type": "country"
-            },
             {
               "name": "伊朗",
               "type": "country"
             },
             {
-              "name": "特朗普",
-              "type": "person"
+              "name": "霍爾木茲海峽",
+              "type": "other"
             },
             {
-              "name": "習近平",
-              "type": "person"
+              "name": "中美",
+              "type": "country"
+            },
+            {
+              "name": "以色列",
+              "type": "country"
             }
           ],
           "articles": [
+            {
+              "source_article_id": "4405381",
+              "canonical_url": "https://www.hkej.com/instantnews/current/article/4405381/%E9%86%AB%E5%8D%93%E6%89%80%E6%AD%A3%E5%88%B6%E8%A8%82%E5%85%AD%E9%A0%85%E8%87%A8%E5%BA%8A%E6%8C%87%E5%BC%95+%E5%8A%A9%E6%8E%A8%E5%8B%95%E6%9B%B4%E5%90%88%E7%90%86%E9%86%AB%E7%99%82%E5%AE%89%E6%8E%92",
+              "title": "醫卓所正制訂六項臨床指引 助推動更合理醫療安排",
+              "section": "時事脈搏",
+              "published_at": "2026-05-16T22:39:00+08:00",
+              "attention_tier": "light",
+              "novelty_score": 5,
+              "relevance_score": 5,
+              "urgency_score": 5,
+              "named_entities": [],
+              "key_points": [],
+              "content_truncated": false,
+              "analysis_method": "bypassed",
+              "model_used": "direct"
+            },
+            {
+              "source_article_id": "4405378",
+              "canonical_url": "https://www.hkej.com/instantnews/current/article/4405378/%E6%9B%BC%E8%B0%B7%E7%99%BC%E7%94%9F%E8%B2%A8%E9%81%8B%E5%88%97%E8%BB%8A%E8%88%87%E5%B7%B4%E5%A3%AB%E7%9B%B8%E6%92%9E+%E8%87%B3%E5%B0%918%E6%AD%BB25%E5%82%B7",
+              "title": "曼谷發生貨運列車與巴士相撞 至少8死25傷",
+              "section": "時事脈搏",
+              "published_at": "2026-05-16T19:02:00+08:00",
+              "attention_tier": "light",
+              "novelty_score": 5,
+              "relevance_score": 5,
+              "urgency_score": 5,
+              "named_entities": [],
+              "key_points": [],
+              "content_truncated": false,
+              "analysis_method": "bypassed",
+              "model_used": "direct"
+            },
+            {
+              "source_article_id": "4405377",
+              "canonical_url": "https://www.hkej.com/instantnews/current/article/4405377/%E5%B7%A5%E4%BA%BA%E9%BB%83%E5%A4%A7%E4%BB%99%E7%BE%8E%E6%9D%B1%E9%82%A8%E5%9C%B0%E7%9B%A4%E8%A2%AB%E5%A4%BE%E9%A0%B8+%E6%98%8F%E8%BF%B7%E9%80%81%E9%99%A2",
+              "title": "工人黃大仙美東邨地盤被夾頸 昏迷送院",
+              "section": "時事脈搏",
+              "published_at": "2026-05-16T18:28:00+08:00",
+              "attention_tier": "light",
+              "novelty_score": 5,
+              "relevance_score": 5,
+              "urgency_score": 5,
+              "named_entities": [],
+              "key_points": [],
+              "content_truncated": false,
+              "analysis_method": "bypassed",
+              "model_used": "direct"
+            },
+            {
+              "source_article_id": "4405375",
+              "canonical_url": "https://www.hkej.com/instantnews/current/article/4405375/%E6%9C%AC%E6%B8%AF%E5%87%BA%E7%8F%BE%E4%BB%8A%E5%B9%B4%E9%A6%96%E5%AE%97%E5%A4%A7%E9%BC%A0%E6%88%8A%E5%9E%8B%E8%82%9D%E7%82%8E%E5%80%8B%E6%A1%88",
+              "title": "本港出現今年首宗大鼠戊型肝炎個案",
+              "section": "時事脈搏",
+              "published_at": "2026-05-16T17:20:00+08:00",
+              "attention_tier": "light",
+              "novelty_score": 5,
+              "relevance_score": 5,
+              "urgency_score": 5,
+              "named_entities": [],
+              "key_points": [],
+              "content_truncated": false,
+              "analysis_method": "bypassed",
+              "model_used": "direct"
+            },
+            {
+              "source_article_id": "4405374",
+              "canonical_url": "https://www.hkej.com/instantnews/current/article/4405374/%E8%9E%8D%E9%A6%AC%E6%83%85%E5%9C%8B%E9%9A%9B%E8%97%9D%E8%A1%93%E5%B7%A1%E5%B1%95%E5%B0%96%E6%B2%99%E5%92%80%E7%AB%99%E7%A4%BE%E5%8D%80%E5%B1%95%E8%A6%BD%E5%95%9F%E5%8B%95",
+              "title": "融馬情國際藝術巡展尖沙咀站社區展覽啟動",
+              "section": "時事脈搏",
+              "published_at": "2026-05-16T17:06:00+08:00",
+              "attention_tier": "light",
+              "novelty_score": 5,
+              "relevance_score": 5,
+              "urgency_score": 5,
+              "named_entities": [],
+              "key_points": [],
+              "content_truncated": false,
+              "analysis_method": "bypassed",
+              "model_used": "direct"
+            },
+            {
+              "source_article_id": "4405379",
+              "title": "伊朗短期內公布霍爾木茲海峽航線交通管理機制",
+              "canonical_url": "https://www.hkej.com/instantnews/current/article/4405379/%E4%BC%8A%E6%9C%97%E7%9F%AD%E6%9C%9F%E5%85%A7%E5%85%AC%E5%B8%83%E9%9C%8D%E7%88%BE%E6%9C%A8%E8%8C%B2%E6%B5%B7%E5%B3%BD%E8%88%AA%E7%B7%9A%E4%BA%A4%E9%80%9A%E7%AE%A1%E7%90%86%E6%A9%9F%E5%88%B6",
+              "published_at": "2026-05-16T19:30:00+08:00",
+              "section": "時事脈搏",
+              "novelty_score": 6,
+              "relevance_score": 8,
+              "urgency_score": 7,
+              "named_entities": [
+                {
+                  "name": "伊朗",
+                  "type": "country"
+                },
+                {
+                  "name": "霍爾木茲海峽",
+                  "type": "other"
+                },
+                {
+                  "name": "阿齊茲",
+                  "type": "person"
+                }
+              ],
+              "key_points": [
+                "伊朗將於近期公布霍爾木茲海峽航線交通管理機制，僅對與伊朗合作的商船和相關方開放。",
+                "該機制將收取必要費用，提供專業服務。"
+              ],
+              "content_truncated": false,
+              "original_content_length_chars": 153,
+              "analyzed_content_length_chars": 153,
+              "original_content_token_estimate": 39,
+              "analyzed_content_token_estimate": 39,
+              "truncation_reason": null,
+              "analysis_method": "full_text",
+              "attention_tier": "high",
+              "theme": "geopolitics",
+              "attention_reason": "High-signal geopolitics headline based on title/summary keywords.",
+              "must_keep": true,
+              "model_used": "meta-llama/llama-4-scout-17b-16e-instruct",
+              "delayed_retry_attempted": false,
+              "delayed_retry_model_chain": [],
+              "delayed_retry_final_model": null,
+              "error_classification": null,
+              "error": null
+            },
+            {
+              "source_article_id": "4405372",
+              "title": "葉劉:中美關係穩定對香港經貿及金融等有利",
+              "canonical_url": "https://www.hkej.com/instantnews/current/article/4405372/%E8%91%89%E5%8A%89%3A%E4%B8%AD%E7%BE%8E%E9%97%9C%E4%BF%82%E7%A9%A9%E5%AE%9A%E5%B0%8D%E9%A6%99%E6%B8%AF%E7%B6%93%E8%B2%BF%E5%8F%8A%E9%87%91%E8%9E%8D%E7%AD%89%E6%9C%89%E5%88%A9",
+              "published_at": "2026-05-16T16:29:00+08:00",
+              "section": "時事脈搏",
+              "novelty_score": 6,
+              "relevance_score": 8,
+              "urgency_score": 5,
+              "named_entities": [
+                {
+                  "name": "葉劉淑儀",
+                  "type": "person"
+                },
+                {
+                  "name": "中美",
+                  "type": "country"
+                }
+              ],
+              "key_points": [
+                "葉劉淑儀表示中美關係穩定對香港經貿及金融等方面有利",
+                "中美元首會晤達成構建「中美建設性戰略穩定關係」"
+              ],
+              "content_truncated": false,
+              "original_content_length_chars": 362,
+              "analyzed_content_length_chars": 362,
+              "original_content_token_estimate": 91,
+              "analyzed_content_token_estimate": 91,
+              "truncation_reason": null,
+              "analysis_method": "full_text",
+              "attention_tier": "high",
+              "theme": "macro",
+              "attention_reason": "High-signal macro headline based on title/summary keywords.",
+              "must_keep": true,
+              "model_used": "meta-llama/llama-4-scout-17b-16e-instruct",
+              "delayed_retry_attempted": false,
+              "delayed_retry_model_chain": [],
+              "delayed_retry_final_model": null,
+              "error_classification": null,
+              "error": null
+            },
+            {
+              "source_article_id": "4405370",
+              "canonical_url": "https://www.hkej.com/instantnews/current/article/4405370/%E6%9D%B1%E4%B9%9D%E9%BE%8D%E7%B8%BD%E5%8D%80%E6%A9%9F%E5%8B%95%E9%83%A8%E9%9A%8A%E6%9C%89%E8%AD%A6%E5%93%A1%E4%BD%A9%E6%A7%8D%E7%96%91%E8%B5%B0%E7%81%AB%E7%99%BC%E5%B0%84%E5%AD%90%E5%BD%88+%E7%84%A1%E4%BA%BA%E5%82%B7",
+              "title": "東九龍總區機動部隊有警員佩槍疑走火發射子彈 無人傷",
+              "section": "時事脈搏",
+              "published_at": "2026-05-16T16:06:00+08:00",
+              "attention_tier": "light",
+              "novelty_score": 5,
+              "relevance_score": 5,
+              "urgency_score": 5,
+              "named_entities": [],
+              "key_points": [],
+              "content_truncated": false,
+              "analysis_method": "bypassed",
+              "model_used": "direct",
+              "theme": "general",
+              "attention_reason": "Lighter treatment because this story sits in the 時事脈搏 section without strong market-moving signals.",
+              "must_keep": false
+            },
+            {
+              "source_article_id": "4405367",
+              "canonical_url": "https://www.hkej.com/instantnews/current/article/4405367/%E7%B4%85%E7%A3%A1%E7%AB%99%E9%90%B5%E8%B7%AF%E5%B1%95%E4%BB%8A%E8%B5%B7%E9%96%8B%E6%94%BE+%E6%B8%AF%E9%90%B5%3A%E9%A6%96%E5%91%A8%E6%9C%AB%E9%A0%90%E7%B4%84%E5%8F%83%E8%A7%80%E4%BA%BA%E6%95%B8%E9%81%941500",
+              "title": "紅磡站鐵路展今起開放 港鐵:首周末預約參觀人數達1500",
+              "section": "時事脈搏",
+              "published_at": "2026-05-16T14:33:00+08:00",
+              "attention_tier": "light",
+              "novelty_score": 5,
+              "relevance_score": 5,
+              "urgency_score": 5,
+              "named_entities": [],
+              "key_points": [],
+              "content_truncated": false,
+              "analysis_method": "bypassed",
+              "model_used": "direct",
+              "theme": "general",
+              "attention_reason": "Lighter treatment because this story sits in the 時事脈搏 section without strong market-moving signals.",
+              "must_keep": false
+            },
+            {
+              "source_article_id": "4405361",
+              "canonical_url": "https://www.hkej.com/instantnews/current/article/4405361/%E6%A9%9F%E5%A0%B4%E4%BA%8C%E8%99%9F%E5%AE%A2%E9%81%8B%E5%A4%A7%E6%A8%93%E6%9C%88%E5%85%A7%E5%95%9F%E7%94%A8+%E9%99%B3%E7%BE%8E%E5%AF%B6%E7%A8%B1%E9%9B%A2%E6%B8%AF%E9%81%8E%E7%A8%8B%E5%8B%95%E7%B7%9A%E6%B5%81%F0%A3%88%B1",
+              "title": "機場二號客運大樓月內啟用 陳美寶稱離港過程動線流𣈱",
+              "section": "時事脈搏",
+              "published_at": "2026-05-16T11:02:00+08:00",
+              "attention_tier": "light",
+              "novelty_score": 5,
+              "relevance_score": 5,
+              "urgency_score": 5,
+              "named_entities": [],
+              "key_points": [],
+              "content_truncated": false,
+              "analysis_method": "bypassed",
+              "model_used": "direct",
+              "theme": "general",
+              "attention_reason": "Lighter treatment because this story sits in the 時事脈搏 section without strong market-moving signals.",
+              "must_keep": false
+            },
+            {
+              "source_article_id": "4405357",
+              "canonical_url": "https://www.hkej.com/instantnews/current/article/4405357/%E5%A4%A9%E6%B0%A3%E4%B8%A8%E4%BB%8A%E6%97%A5%E9%83%A8%E5%88%86%E5%9C%B0%E5%8D%80%E9%9B%A8%E5%8B%A2%E8%BC%83%E5%A4%A7+%E7%A8%8D%E5%BE%8C%E5%B1%80%E9%83%A8%E5%9C%B0%E5%8D%80%E6%9C%89%E9%9B%B7%E6%9A%B4",
+              "title": "天氣丨今日部分地區雨勢較大 稍後局部地區有雷暴",
+              "section": "時事脈搏",
+              "published_at": "2026-05-16T09:12:00+08:00",
+              "attention_tier": "light",
+              "novelty_score": 5,
+              "relevance_score": 5,
+              "urgency_score": 5,
+              "named_entities": [],
+              "key_points": [],
+              "content_truncated": false,
+              "analysis_method": "bypassed",
+              "model_used": "direct",
+              "theme": "general",
+              "attention_reason": "Lighter treatment because this story sits in the 時事脈搏 section without strong market-moving signals.",
+              "must_keep": false
+            },
+            {
+              "source_article_id": "4405352",
+              "canonical_url": "https://www.hkej.com/instantnews/current/article/4405352/%E6%A2%85%E7%88%BE%E8%8C%A8%E8%88%87%E7%89%B9%E6%9C%97%E6%99%AE%E9%80%9A%E8%A9%B1+%E8%A9%A6%E5%9C%96%E4%BF%AE%E8%A3%9C%E5%BE%B7%E7%BE%8E%E9%97%9C%E4%BF%82",
+              "title": "梅爾茨與特朗普通話 試圖修補德美關係",
+              "section": "時事脈搏",
+              "published_at": "2026-05-16T06:06:00+08:00",
+              "attention_tier": "light",
+              "novelty_score": 5,
+              "relevance_score": 5,
+              "urgency_score": 5,
+              "named_entities": [],
+              "key_points": [],
+              "content_truncated": false,
+              "analysis_method": "bypassed",
+              "model_used": "direct",
+              "theme": "general",
+              "attention_reason": "Lighter treatment because this story sits in the 時事脈搏 section without strong market-moving signals.",
+              "must_keep": false
+            },
+            {
+              "source_article_id": "4405354",
+              "canonical_url": "https://www.hkej.com/instantnews/current/article/4405354/%E5%BE%B7%E7%B8%BD%E7%90%86%3A%E4%B8%8D%E5%BB%BA%E8%AD%B0%E8%87%AA%E5%B7%B1%E5%AD%A9%E5%AD%90%E8%B5%B4%E7%BE%8E%E7%94%9F%E6%B4%BB+%E6%AD%B8%E5%92%8E%E6%96%BC%E7%95%B6%E5%9C%B0%E7%A4%BE%E6%9C%83%E6%B0%9B%E5%9C%8D",
+              "title": "德總理:不建議自己孩子赴美生活 歸咎於當地社會氛圍",
+              "section": "時事脈搏",
+              "published_at": "2026-05-16T06:29:00+08:00",
+              "attention_tier": "light",
+              "novelty_score": 5,
+              "relevance_score": 5,
+              "urgency_score": 5,
+              "named_entities": [],
+              "key_points": [],
+              "content_truncated": false,
+              "analysis_method": "bypassed",
+              "model_used": "direct",
+              "theme": "general",
+              "attention_reason": "Lighter treatment because this story sits in the 時事脈搏 section without strong market-moving signals.",
+              "must_keep": false
+            },
             {
               "source_article_id": "4405347",
               "title": "中東局勢丨以軍為重啟對伊朗軍事行動做準備",
@@ -1760,6 +2398,299 @@
               "error_classification": null,
               "error": null
             },
+            {
+              "source_article_id": "4405341",
+              "canonical_url": "https://www.hkej.com/instantnews/current/article/4405341/%E7%89%B9%E6%9C%97%E6%99%AE%E8%A8%AA%E8%8F%AF%E4%B8%A8%E9%A6%AC%E6%96%AF%E5%85%8B%E5%B9%BC%E5%AD%90%E5%B8%B6%E6%97%BA%E4%B8%AD%E5%9C%8B%E3%80%8C%E8%99%8E%E9%A0%AD%E5%8C%85%E3%80%8D+%E4%B8%80%E5%A4%9C%E5%94%AE%E7%BD%84",
+              "title": "特朗普訪華丨馬斯克幼子帶旺中國「虎頭包」 一夜售罄",
+              "section": "時事脈搏",
+              "published_at": "2026-05-16T01:47:00+08:00",
+              "attention_tier": "light",
+              "novelty_score": 5,
+              "relevance_score": 5,
+              "urgency_score": 5,
+              "named_entities": [],
+              "key_points": [],
+              "content_truncated": false,
+              "analysis_method": "bypassed",
+              "model_used": "direct",
+              "theme": "general",
+              "attention_reason": "Lighter treatment because this story sits in the 時事脈搏 section without strong market-moving signals.",
+              "must_keep": false
+            }
+          ],
+          "model_used": "meta-llama/llama-4-scout-17b-16e-instruct"
+        },
+        {
+          "title": "社會動態",
+          "theme_rationale": "與社會民生相關的新聞事件",
+          "article_count": 4,
+          "key_developments": [
+            "政府醫療衞生經常開支10年增近1倍",
+            "公院分階段延長探病時間",
+            "柴油補貼暫未見食價影響"
+          ],
+          "named_entities": [
+            {
+              "name": "盧寵茂",
+              "type": "person"
+            },
+            {
+              "name": "謝展寰",
+              "type": "person"
+            },
+            {
+              "name": "醫管局",
+              "type": "organization"
+            }
+          ],
+          "articles": [
+            {
+              "source_article_id": "4405365",
+              "canonical_url": "https://www.hkej.com/instantnews/current/article/4405365/%E5%85%A9%E5%90%8D%E6%B8%AF%E4%BA%BA%E7%B4%90%E8%A5%BF%E8%98%AD%E9%81%87%E8%BB%8A%E7%A6%8D%E6%AD%BB%E4%BA%A1",
+              "title": "兩名港人紐西蘭遇車禍死亡",
+              "section": "時事脈搏",
+              "published_at": "2026-05-16T13:09:00+08:00",
+              "attention_tier": "light",
+              "novelty_score": 5,
+              "relevance_score": 5,
+              "urgency_score": 5,
+              "named_entities": [],
+              "key_points": [],
+              "content_truncated": false,
+              "analysis_method": "bypassed",
+              "model_used": "direct",
+              "theme": "general",
+              "attention_reason": "Lighter treatment because this story sits in the 時事脈搏 section without strong market-moving signals.",
+              "must_keep": false
+            },
+            {
+              "source_article_id": "4405359",
+              "canonical_url": "https://www.hkej.com/instantnews/current/article/4405359/%E7%9B%A7%E5%AF%B5%E8%8C%82%3A%E6%94%BF%E5%BA%9C%E9%86%AB%E7%99%82%E8%A1%9E%E7%94%9F%E7%B6%93%E5%B8%B8%E9%96%8B%E6%94%AF10%E5%B9%B4%E5%A2%9E%E8%BF%911%E5%80%8D",
+              "title": "盧寵茂:政府醫療衞生經常開支10年增近1倍",
+              "section": "時事脈搏",
+              "published_at": "2026-05-16T11:53:00+08:00",
+              "attention_tier": "light",
+              "novelty_score": 5,
+              "relevance_score": 5,
+              "urgency_score": 5,
+              "named_entities": [],
+              "key_points": [],
+              "content_truncated": false,
+              "analysis_method": "bypassed",
+              "model_used": "direct",
+              "theme": "general",
+              "attention_reason": "Lighter treatment because this story sits in the 時事脈搏 section without strong market-moving signals.",
+              "must_keep": false
+            },
+            {
+              "source_article_id": "4405358",
+              "canonical_url": "https://www.hkej.com/instantnews/current/article/4405358/%E6%9F%B4%E6%B2%B9%E8%A3%9C%E8%B2%BC%E4%B8%A8%E8%AC%9D%E5%B1%95%E5%AF%B0%3A%E6%9A%AB%E6%9C%AA%E8%A6%8B%E9%A3%9F%E5%83%B9+%E7%BA%8C%E5%AF%86%E5%88%87%E7%9B%A3%E5%AF%9F%E4%B8%8D%E6%9C%83%E7%8F%BE%E5%8A%A0%E5%BF%AB%E6%B8%9B%E6%85%A2",
+              "title": "柴油補貼丨謝展寰:暫未見食價 續密切監察不會現加快減慢",
+              "section": "時事脈搏",
+              "published_at": "2026-05-16T11:17:00+08:00",
+              "attention_tier": "light",
+              "novelty_score": 5,
+              "relevance_score": 5,
+              "urgency_score": 5,
+              "named_entities": [],
+              "key_points": [],
+              "content_truncated": false,
+              "analysis_method": "bypassed",
+              "model_used": "direct",
+              "theme": "general",
+              "attention_reason": "Lighter treatment because this story sits in the 時事脈搏 section without strong market-moving signals.",
+              "must_keep": false
+            },
+            {
+              "source_article_id": "4405360",
+              "canonical_url": "https://www.hkej.com/instantnews/current/article/4405360/%E9%86%AB%E7%AE%A1%E5%B1%80%3A%E5%85%AC%E9%99%A2%E5%88%86%E9%9A%8E%E6%AE%B5%E5%BB%B6%E9%95%B7%E6%8E%A2%E7%97%85%E6%99%82%E9%96%93+%E6%9C%AA%E8%A6%8B%E5%93%A1%E5%B7%A5%E6%9C%89%E7%89%B9%E5%88%A5%E5%A3%93%E5%8A%9B",
+              "title": "醫管局:公院分階段延長探病時間 未見員工有特別壓力",
+              "section": "時事脈搏",
+              "published_at": "2026-05-16T10:25:00+08:00",
+              "attention_tier": "light",
+              "novelty_score": 5,
+              "relevance_score": 5,
+              "urgency_score": 5,
+              "named_entities": [],
+              "key_points": [],
+              "content_truncated": false,
+              "analysis_method": "bypassed",
+              "model_used": "direct",
+              "theme": "general",
+              "attention_reason": "Lighter treatment because this story sits in the 時事脈搏 section without strong market-moving signals.",
+              "must_keep": false
+            }
+          ],
+          "model_used": "meta-llama/llama-4-scout-17b-16e-instruct"
+        },
+        {
+          "title": "地緣政治",
+          "theme_rationale": "國際關係與衝突相關新聞",
+          "article_count": 3,
+          "key_developments": [
+            "美國和以色列或最早下周恢復對伊朗軍事行動，選項包括對伊朗軍事和基礎設施目標進行更猛烈的轟炸。",
+            "數百名特種作戰部隊人員已於3月抵達中東，美國已為該地區的戰艦和戰機重新配備彈藥。",
+            "普京將於5月19日至20日對中國進行國事訪問，訪問期間將與習近平討論雙邊關係及國際議題"
+          ],
+          "named_entities": [
+            {
+              "name": "美國",
+              "type": "country"
+            },
+            {
+              "name": "以色列",
+              "type": "country"
+            },
+            {
+              "name": "伊朗",
+              "type": "country"
+            },
+            {
+              "name": "特朗普",
+              "type": "person"
+            }
+          ],
+          "articles": [
+            {
+              "source_article_id": "4405373",
+              "title": "中東局勢丨傳美以或最早下周恢復對伊朗軍事行動",
+              "canonical_url": "https://www.hkej.com/instantnews/current/article/4405373/%E4%B8%AD%E6%9D%B1%E5%B1%80%E5%8B%A2%E4%B8%A8%E5%82%B3%E7%BE%8E%E4%BB%A5%E6%88%96%E6%9C%80%E6%97%A9%E4%B8%8B%E5%91%A8%E6%81%A2%E5%BE%A9%E5%B0%8D%E4%BC%8A%E6%9C%97%E8%BB%8D%E4%BA%8B%E8%A1%8C%E5%8B%95",
+              "published_at": "2026-05-16T17:03:00+08:00",
+              "section": "時事脈搏",
+              "novelty_score": 8,
+              "relevance_score": 9,
+              "urgency_score": 9,
+              "named_entities": [
+                {
+                  "name": "美國",
+                  "type": "country"
+                },
+                {
+                  "name": "以色列",
+                  "type": "country"
+                },
+                {
+                  "name": "伊朗",
+                  "type": "country"
+                },
+                {
+                  "name": "特朗普",
+                  "type": "person"
+                }
+              ],
+              "key_points": [
+                "美國和以色列或最早下周恢復對伊朗軍事行動，選項包括對伊朗軍事和基礎設施目標進行更猛烈的轟炸。",
+                "數百名特種作戰部隊人員已於3月抵達中東，美國已為該地區的戰艦和戰機重新配備彈藥。"
+              ],
+              "content_truncated": false,
+              "original_content_length_chars": 255,
+              "analyzed_content_length_chars": 255,
+              "original_content_token_estimate": 64,
+              "analyzed_content_token_estimate": 64,
+              "truncation_reason": null,
+              "analysis_method": "full_text",
+              "attention_tier": "high",
+              "theme": "geopolitics",
+              "attention_reason": "High-signal geopolitics headline based on title/summary keywords.",
+              "must_keep": true,
+              "model_used": "meta-llama/llama-4-scout-17b-16e-instruct",
+              "delayed_retry_attempted": false,
+              "delayed_retry_model_chain": [],
+              "delayed_retry_final_model": null,
+              "error_classification": null,
+              "error": null
+            },
+            {
+              "source_article_id": "4405369",
+              "title": "外交部:普京下周二至周三國事訪問中國",
+              "canonical_url": "https://www.hkej.com/instantnews/current/article/4405369/%E5%A4%96%E4%BA%A4%E9%83%A8%3A%E6%99%AE%E4%BA%AC%E4%B8%8B%E5%91%A8%E4%BA%8C%E8%87%B3%E5%91%A8%E4%B8%89%E5%9C%8B%E4%BA%8B%E8%A8%AA%E5%95%8F%E4%B8%AD%E5%9C%8B",
+              "published_at": "2026-05-16T15:14:00+08:00",
+              "section": "時事脈搏",
+              "novelty_score": 7,
+              "relevance_score": 9,
+              "urgency_score": 6,
+              "named_entities": [
+                {
+                  "name": "普京",
+                  "type": "person"
+                },
+                {
+                  "name": "中國",
+                  "type": "country"
+                }
+              ],
+              "key_points": [
+                "普京將於5月19日至20日對中國進行國事訪問",
+                "訪問期間將與習近平討論雙邊關係及國際議題"
+              ],
+              "content_truncated": false,
+              "original_content_length_chars": 124,
+              "analyzed_content_length_chars": 124,
+              "original_content_token_estimate": 31,
+              "analyzed_content_token_estimate": 31,
+              "truncation_reason": null,
+              "analysis_method": "full_text",
+              "attention_tier": "high",
+              "theme": "geopolitics",
+              "attention_reason": "High-signal geopolitics headline based on title/summary keywords.",
+              "must_keep": true,
+              "model_used": "meta-llama/llama-4-scout-17b-16e-instruct",
+              "delayed_retry_attempted": false,
+              "delayed_retry_model_chain": [],
+              "delayed_retry_final_model": null,
+              "error_classification": null,
+              "error": null
+            },
+            {
+              "source_article_id": "4405366",
+              "canonical_url": "https://www.hkej.com/instantnews/current/article/4405366/%E7%89%B9%E6%9C%97%E6%99%AE%3A%E6%93%8A%E6%96%83%E4%BC%8A%E6%96%AF%E8%98%AD%E5%9C%8B%E4%BA%8C%E8%99%9F%E9%A0%AD%E7%9B%AE",
+              "title": "特朗普:擊斃伊斯蘭國二號頭目",
+              "section": "時事脈搏",
+              "published_at": "2026-05-16T14:16:00+08:00",
+              "attention_tier": "light",
+              "novelty_score": 5,
+              "relevance_score": 5,
+              "urgency_score": 5,
+              "named_entities": [],
+              "key_points": [],
+              "content_truncated": false,
+              "analysis_method": "bypassed",
+              "model_used": "direct",
+              "theme": "general",
+              "attention_reason": "Lighter treatment because this story sits in the 時事脈搏 section without strong market-moving signals.",
+              "must_keep": false
+            }
+          ],
+          "model_used": "meta-llama/llama-4-scout-17b-16e-instruct"
+        },
+        {
+          "title": "國際局勢",
+          "theme_rationale": "關注國際間的地緣政治局勢與外交關係",
+          "article_count": 3,
+          "key_developments": [
+            "特朗普與習近平達成共識，伊朗不能擁有核武",
+            "美國總統特朗普表示停火是應其他國家要求，美國為了幫巴基斯坦一個忙而停火",
+            "美國務院表示以色列和黎巴嫩同意延長停火45天"
+          ],
+          "named_entities": [
+            {
+              "name": "特朗普",
+              "type": "person"
+            },
+            {
+              "name": "習近平",
+              "type": "person"
+            },
+            {
+              "name": "美國",
+              "type": "country"
+            },
+            {
+              "name": "伊朗",
+              "type": "country"
+            }
+          ],
+          "articles": [
             {
               "source_article_id": "4405339",
               "title": "習特會丨特朗普稱與習近平同意伊朗不能擁核武",
@@ -1864,308 +2795,10 @@
               "key_points": [],
               "content_truncated": false,
               "analysis_method": "bypassed",
-              "model_used": "direct"
-            },
-            {
-              "source_article_id": "4405372",
-              "title": "葉劉:中美關係穩定對香港經貿及金融等有利",
-              "canonical_url": "https://www.hkej.com/instantnews/current/article/4405372/%E8%91%89%E5%8A%89%3A%E4%B8%AD%E7%BE%8E%E9%97%9C%E4%BF%82%E7%A9%A9%E5%AE%9A%E5%B0%8D%E9%A6%99%E6%B8%AF%E7%B6%93%E8%B2%BF%E5%8F%8A%E9%87%91%E8%9E%8D%E7%AD%89%E6%9C%89%E5%88%A9",
-              "published_at": "2026-05-16T16:29:00+08:00",
-              "section": "時事脈搏",
-              "novelty_score": 6,
-              "relevance_score": 8,
-              "urgency_score": 5,
-              "named_entities": [
-                {
-                  "name": "葉劉淑儀",
-                  "type": "person"
-                },
-                {
-                  "name": "中美",
-                  "type": "country"
-                }
-              ],
-              "key_points": [
-                "葉劉淑儀表示中美關係穩定對香港經貿及金融等方面有利",
-                "中美元首會晤達成構建「中美建設性戰略穩定關係」"
-              ],
-              "content_truncated": false,
-              "original_content_length_chars": 362,
-              "analyzed_content_length_chars": 362,
-              "original_content_token_estimate": 91,
-              "analyzed_content_token_estimate": 91,
-              "truncation_reason": null,
-              "analysis_method": "full_text",
-              "attention_tier": "high",
-              "theme": "macro",
-              "attention_reason": "High-signal macro headline based on title/summary keywords.",
-              "must_keep": true,
-              "model_used": "meta-llama/llama-4-scout-17b-16e-instruct",
-              "delayed_retry_attempted": false,
-              "delayed_retry_model_chain": [],
-              "delayed_retry_final_model": null,
-              "error_classification": null,
-              "error": null
-            },
-            {
-              "source_article_id": "4405369",
-              "title": "外交部:普京下周二至周三國事訪問中國",
-              "canonical_url": "https://www.hkej.com/instantnews/current/article/4405369/%E5%A4%96%E4%BA%A4%E9%83%A8%3A%E6%99%AE%E4%BA%AC%E4%B8%8B%E5%91%A8%E4%BA%8C%E8%87%B3%E5%91%A8%E4%B8%89%E5%9C%8B%E4%BA%8B%E8%A8%AA%E5%95%8F%E4%B8%AD%E5%9C%8B",
-              "published_at": "2026-05-16T15:14:00+08:00",
-              "section": "時事脈搏",
-              "novelty_score": 7,
-              "relevance_score": 9,
-              "urgency_score": 6,
-              "named_entities": [
-                {
-                  "name": "普京",
-                  "type": "person"
-                },
-                {
-                  "name": "中國",
-                  "type": "country"
-                }
-              ],
-              "key_points": [
-                "普京將於5月19日至20日對中國進行國事訪問",
-                "訪問期間將與習近平討論雙邊關係及國際議題"
-              ],
-              "content_truncated": false,
-              "original_content_length_chars": 124,
-              "analyzed_content_length_chars": 124,
-              "original_content_token_estimate": 31,
-              "analyzed_content_token_estimate": 31,
-              "truncation_reason": null,
-              "analysis_method": "full_text",
-              "attention_tier": "high",
-              "theme": "geopolitics",
-              "attention_reason": "High-signal geopolitics headline based on title/summary keywords.",
-              "must_keep": true,
-              "model_used": "meta-llama/llama-4-scout-17b-16e-instruct",
-              "delayed_retry_attempted": false,
-              "delayed_retry_model_chain": [],
-              "delayed_retry_final_model": null,
-              "error_classification": null,
-              "error": null
-            },
-            {
-              "source_article_id": "4405370",
-              "canonical_url": "https://www.hkej.com/instantnews/current/article/4405370/%E6%9D%B1%E4%B9%9D%E9%BE%8D%E7%B8%BD%E5%8D%80%E6%A9%9F%E5%8B%95%E9%83%A8%E9%9A%8A%E6%9C%89%E8%AD%A6%E5%93%A1%E4%BD%A9%E6%A7%8D%E7%96%91%E8%B5%B0%E7%81%AB%E7%99%BC%E5%B0%84%E5%AD%90%E5%BD%88+%E7%84%A1%E4%BA%BA%E5%82%B7",
-              "title": "東九龍總區機動部隊有警員佩槍疑走火發射子彈 無人傷",
-              "section": "時事脈搏",
-              "published_at": "2026-05-16T16:06:00+08:00",
-              "attention_tier": "light",
-              "novelty_score": 5,
-              "relevance_score": 5,
-              "urgency_score": 5,
-              "named_entities": [],
-              "key_points": [],
-              "content_truncated": false,
-              "analysis_method": "bypassed",
-              "model_used": "direct"
-            },
-            {
-              "source_article_id": "4405367",
-              "canonical_url": "https://www.hkej.com/instantnews/current/article/4405367/%E7%B4%85%E7%A3%A1%E7%AB%99%E9%90%B5%E8%B7%AF%E5%B1%95%E4%BB%8A%E8%B5%B7%E9%96%8B%E6%94%BE+%E6%B8%AF%E9%90%B5%3A%E9%A6%96%E5%91%A8%E6%9C%AB%E9%A0%90%E7%B4%84%E5%8F%83%E8%A7%80%E4%BA%BA%E6%95%B8%E9%81%941500",
-              "title": "紅磡站鐵路展今起開放 港鐵:首周末預約參觀人數達1500",
-              "section": "時事脈搏",
-              "published_at": "2026-05-16T14:33:00+08:00",
-              "attention_tier": "light",
-              "novelty_score": 5,
-              "relevance_score": 5,
-              "urgency_score": 5,
-              "named_entities": [],
-              "key_points": [],
-              "content_truncated": false,
-              "analysis_method": "bypassed",
-              "model_used": "direct"
-            },
-            {
-              "source_article_id": "4405366",
-              "canonical_url": "https://www.hkej.com/instantnews/current/article/4405366/%E7%89%B9%E6%9C%97%E6%99%AE%3A%E6%93%8A%E6%96%83%E4%BC%8A%E6%96%AF%E8%98%AD%E5%9C%8B%E4%BA%8C%E8%99%9F%E9%A0%AD%E7%9B%AE",
-              "title": "特朗普:擊斃伊斯蘭國二號頭目",
-              "section": "時事脈搏",
-              "published_at": "2026-05-16T14:16:00+08:00",
-              "attention_tier": "light",
-              "novelty_score": 5,
-              "relevance_score": 5,
-              "urgency_score": 5,
-              "named_entities": [],
-              "key_points": [],
-              "content_truncated": false,
-              "analysis_method": "bypassed",
-              "model_used": "direct"
-            },
-            {
-              "source_article_id": "4405365",
-              "canonical_url": "https://www.hkej.com/instantnews/current/article/4405365/%E5%85%A9%E5%90%8D%E6%B8%AF%E4%BA%BA%E7%B4%90%E8%A5%BF%E8%98%AD%E9%81%87%E8%BB%8A%E7%A6%8D%E6%AD%BB%E4%BA%A1",
-              "title": "兩名港人紐西蘭遇車禍死亡",
-              "section": "時事脈搏",
-              "published_at": "2026-05-16T13:09:00+08:00",
-              "attention_tier": "light",
-              "novelty_score": 5,
-              "relevance_score": 5,
-              "urgency_score": 5,
-              "named_entities": [],
-              "key_points": [],
-              "content_truncated": false,
-              "analysis_method": "bypassed",
-              "model_used": "direct"
-            },
-            {
-              "source_article_id": "4405354",
-              "canonical_url": "https://www.hkej.com/instantnews/current/article/4405354/%E5%BE%B7%E7%B8%BD%E7%90%86%3A%E4%B8%8D%E5%BB%BA%E8%AD%B0%E8%87%AA%E5%B7%B1%E5%AD%A9%E5%AD%90%E8%B5%B4%E7%BE%8E%E7%94%9F%E6%B4%BB+%E6%AD%B8%E5%92%8E%E6%96%BC%E7%95%B6%E5%9C%B0%E7%A4%BE%E6%9C%83%E6%B0%9B%E5%9C%8D",
-              "title": "德總理:不建議自己孩子赴美生活 歸咎於當地社會氛圍",
-              "section": "時事脈搏",
-              "published_at": "2026-05-16T06:29:00+08:00",
-              "attention_tier": "light",
-              "novelty_score": 5,
-              "relevance_score": 5,
-              "urgency_score": 5,
-              "named_entities": [],
-              "key_points": [],
-              "content_truncated": false,
-              "analysis_method": "bypassed",
-              "model_used": "direct"
-            },
-            {
-              "source_article_id": "4405352",
-              "canonical_url": "https://www.hkej.com/instantnews/current/article/4405352/%E6%A2%85%E7%88%BE%E8%8C%A8%E8%88%87%E7%89%B9%E6%9C%97%E6%99%AE%E9%80%9A%E8%A9%B1+%E8%A9%A6%E5%9C%96%E4%BF%AE%E8%A3%9C%E5%BE%B7%E7%BE%8E%E9%97%9C%E4%BF%82",
-              "title": "梅爾茨與特朗普通話 試圖修補德美關係",
-              "section": "時事脈搏",
-              "published_at": "2026-05-16T06:06:00+08:00",
-              "attention_tier": "light",
-              "novelty_score": 5,
-              "relevance_score": 5,
-              "urgency_score": 5,
-              "named_entities": [],
-              "key_points": [],
-              "content_truncated": false,
-              "analysis_method": "bypassed",
-              "model_used": "direct"
-            },
-            {
-              "source_article_id": "4405360",
-              "canonical_url": "https://www.hkej.com/instantnews/current/article/4405360/%E9%86%AB%E7%AE%A1%E5%B1%80%3A%E5%85%AC%E9%99%A2%E5%88%86%E9%9A%8E%E6%AE%B5%E5%BB%B6%E9%95%B7%E6%8E%A2%E7%97%85%E6%99%82%E9%96%93+%E6%9C%AA%E8%A6%8B%E5%93%A1%E5%B7%A5%E6%9C%89%E7%89%B9%E5%88%A5%E5%A3%93%E5%8A%9B",
-              "title": "醫管局:公院分階段延長探病時間 未見員工有特別壓力",
-              "section": "時事脈搏",
-              "published_at": "2026-05-16T10:25:00+08:00",
-              "attention_tier": "light",
-              "novelty_score": 5,
-              "relevance_score": 5,
-              "urgency_score": 5,
-              "named_entities": [],
-              "key_points": [],
-              "content_truncated": false,
-              "analysis_method": "bypassed",
-              "model_used": "direct"
-            },
-            {
-              "source_article_id": "4405357",
-              "canonical_url": "https://www.hkej.com/instantnews/current/article/4405357/%E5%A4%A9%E6%B0%A3%E4%B8%A8%E4%BB%8A%E6%97%A5%E9%83%A8%E5%88%86%E5%9C%B0%E5%8D%80%E9%9B%A8%E5%8B%A2%E8%BC%83%E5%A4%A7+%E7%A8%8D%E5%BE%8C%E5%B1%80%E9%83%A8%E5%9C%B0%E5%8D%80%E6%9C%89%E9%9B%B7%E6%9A%B4",
-              "title": "天氣丨今日部分地區雨勢較大 稍後局部地區有雷暴",
-              "section": "時事脈搏",
-              "published_at": "2026-05-16T09:12:00+08:00",
-              "attention_tier": "light",
-              "novelty_score": 5,
-              "relevance_score": 5,
-              "urgency_score": 5,
-              "named_entities": [],
-              "key_points": [],
-              "content_truncated": false,
-              "analysis_method": "bypassed",
-              "model_used": "direct"
-            },
-            {
-              "source_article_id": "4405341",
-              "canonical_url": "https://www.hkej.com/instantnews/current/article/4405341/%E7%89%B9%E6%9C%97%E6%99%AE%E8%A8%AA%E8%8F%AF%E4%B8%A8%E9%A6%AC%E6%96%AF%E5%85%8B%E5%B9%BC%E5%AD%90%E5%B8%B6%E6%97%BA%E4%B8%AD%E5%9C%8B%E3%80%8C%E8%99%8E%E9%A0%AD%E5%8C%85%E3%80%8D+%E4%B8%80%E5%A4%9C%E5%94%AE%E7%BD%84",
-              "title": "特朗普訪華丨馬斯克幼子帶旺中國「虎頭包」 一夜售罄",
-              "section": "時事脈搏",
-              "published_at": "2026-05-16T01:47:00+08:00",
-              "attention_tier": "light",
-              "novelty_score": 5,
-              "relevance_score": 5,
-              "urgency_score": 5,
-              "named_entities": [],
-              "key_points": [],
-              "content_truncated": false,
-              "analysis_method": "bypassed",
-              "model_used": "direct"
-            }
-          ],
-          "model_used": "meta-llama/llama-4-scout-17b-16e-instruct"
-        },
-        {
-          "title": "本地事務",
-          "theme_rationale": "關注本地議題和政策的新聞報道",
-          "article_count": 3,
-          "key_developments": [
-            "政府醫療衞生經常開支10年增近1倍",
-            "機場二號客運大樓月內啟用",
-            "柴油補貼暫未見食價影響"
-          ],
-          "named_entities": [
-            {
-              "name": "盧寵茂",
-              "type": "person"
-            },
-            {
-              "name": "謝展寰",
-              "type": "person"
-            },
-            {
-              "name": "陳美寶",
-              "type": "person"
-            }
-          ],
-          "articles": [
-            {
-              "source_article_id": "4405359",
-              "canonical_url": "https://www.hkej.com/instantnews/current/article/4405359/%E7%9B%A7%E5%AF%B5%E8%8C%82%3A%E6%94%BF%E5%BA%9C%E9%86%AB%E7%99%82%E8%A1%9E%E7%94%9F%E7%B6%93%E5%B8%B8%E9%96%8B%E6%94%AF10%E5%B9%B4%E5%A2%9E%E8%BF%911%E5%80%8D",
-              "title": "盧寵茂:政府醫療衞生經常開支10年增近1倍",
-              "section": "時事脈搏",
-              "published_at": "2026-05-16T11:53:00+08:00",
-              "attention_tier": "light",
-              "novelty_score": 5,
-              "relevance_score": 5,
-              "urgency_score": 5,
-              "named_entities": [],
-              "key_points": [],
-              "content_truncated": false,
-              "analysis_method": "bypassed",
-              "model_used": "direct"
-            },
-            {
-              "source_article_id": "4405358",
-              "canonical_url": "https://www.hkej.com/instantnews/current/article/4405358/%E6%9F%B4%E6%B2%B9%E8%A3%9C%E8%B2%BC%E4%B8%A8%E8%AC%9D%E5%B1%95%E5%AF%B0%3A%E6%9A%AB%E6%9C%AA%E8%A6%8B%E9%A3%9F%E5%83%B9+%E7%BA%8C%E5%AF%86%E5%88%87%E7%9B%A3%E5%AF%9F%E4%B8%8D%E6%9C%83%E7%8F%BE%E5%8A%A0%E5%BF%AB%E6%B8%9B%E6%85%A2",
-              "title": "柴油補貼丨謝展寰:暫未見食價 續密切監察不會現加快減慢",
-              "section": "時事脈搏",
-              "published_at": "2026-05-16T11:17:00+08:00",
-              "attention_tier": "light",
-              "novelty_score": 5,
-              "relevance_score": 5,
-              "urgency_score": 5,
-              "named_entities": [],
-              "key_points": [],
-              "content_truncated": false,
-              "analysis_method": "bypassed",
-              "model_used": "direct"
-            },
-            {
-              "source_article_id": "4405361",
-              "canonical_url": "https://www.hkej.com/instantnews/current/article/4405361/%E6%A9%9F%E5%A0%B4%E4%BA%8C%E8%99%9F%E5%AE%A2%E9%81%8B%E5%A4%A7%E6%A8%93%E6%9C%88%E5%85%A7%E5%95%9F%E7%94%A8+%E9%99%B3%E7%BE%8E%E5%AF%B6%E7%A8%B1%E9%9B%A2%E6%B8%AF%E9%81%8E%E7%A8%8B%E5%8B%95%E7%B7%9A%E6%B5%81%F0%A3%88%B1",
-              "title": "機場二號客運大樓月內啟用 陳美寶稱離港過程動線流𣈱",
-              "section": "時事脈搏",
-              "published_at": "2026-05-16T11:02:00+08:00",
-              "attention_tier": "light",
-              "novelty_score": 5,
-              "relevance_score": 5,
-              "urgency_score": 5,
-              "named_entities": [],
-              "key_points": [],
-              "content_truncated": false,
-              "analysis_method": "bypassed",
-              "model_used": "direct"
+              "model_used": "direct",
+              "theme": "general",
+              "attention_reason": "Lighter treatment because this story sits in the 時事脈搏 section without strong market-moving signals.",
+              "must_keep": false
             }
           ],
           "model_used": "meta-llama/llama-4-scout-17b-16e-instruct"
@@ -2173,50 +2806,103 @@
       ],
       "analysis_profile": "light",
       "model_used": "meta-llama/llama-4-scout-17b-16e-instruct",
-      "sub_batch_count": 7,
+      "sub_batch_count": 10,
       "diagnostics": {
-        "sub_batch_count": 2,
-        "split_reasons": [
-          "pre_send_budget"
-        ],
+        "sub_batch_count": 10,
+        "split_reasons": [],
         "models_attempted": [
           "meta-llama/llama-4-scout-17b-16e-instruct"
         ],
-        "estimated_input_tokens_max": 1361,
-        "serialized_request_bytes_max": 8804,
-        "rate_limit_waits": 1,
+        "estimated_input_tokens_max": 1474,
+        "serialized_request_bytes_max": 6660,
+        "rate_limit_waits": 0,
         "partial_article_count": 0,
-        "synthesis_wait_seconds_total": 1123.2,
+        "synthesis_wait_seconds_total": 0.0,
         "synthesis_retry_count": 0,
         "synthesis_retry_skipped_count": 0,
         "synthesis_budget_exhausted": false,
         "degraded_merge_used": false,
         "degraded_merge_reason": "",
-        "synthesis_merge_depth_max": 1,
+        "synthesis_merge_depth_max": 0,
         "model_switches": []
       },
       "error": null
     },
     {
       "category": "香港財經",
-      "article_count": 1,
+      "article_count": 2,
       "status": "success",
       "key_developments": [
-        "恒指夜市期指收報25733點，跌75點，較昨日恒指收市25962點，低水230點。",
-        "成交21712張。",
-        "國指夜市期指收報8631點，較昨日國指收市低水60點。"
+        "陳茂波提出香港應成為全球醫療創新核心基地，強調香港具備知識產權保護、頂尖研發機構與人才、資本市場及大灣區協同效應等四大獨特優勢。",
+        "香港已有逾80家生物科技企業在港上市，總市值達1200億元，且擁有亞洲第二大私募股權市場。",
+        "全球十大藥企中，已有五家選擇香港作為區域研發中心。",
+        "恒指夜市期指收報25733點，跌75點，較昨日恒指收市25962點，低水230點。"
       ],
       "named_entities": [
         {
-          "name": "恒指",
-          "type": "index"
+          "name": "陳茂波",
+          "type": "person"
         },
         {
-          "name": "港股",
-          "type": "other"
+          "name": "香港醫學論壇",
+          "type": "organization"
+        },
+        {
+          "name": "香港",
+          "type": "country"
+        },
+        {
+          "name": "恒指",
+          "type": "index"
         }
       ],
       "articles": [
+        {
+          "source_article_id": "4405371",
+          "title": "陳茂波倡香港成全球醫療創新核心基地",
+          "canonical_url": "https://www.hkej.com/instantnews/hongkong/article/4405371/%E9%99%B3%E8%8C%82%E6%B3%A2%E5%80%A1%E9%A6%99%E6%B8%AF%E6%88%90%E5%85%A8%E7%90%83%E9%86%AB%E7%99%82%E5%89%B5%E6%96%B0%E6%A0%B8%E5%BF%83%E5%9F%BA%E5%9C%B0",
+          "published_at": "2026-05-16T16:52:00+08:00",
+          "section": "香港財經",
+          "novelty_score": 6,
+          "relevance_score": 8,
+          "urgency_score": 5,
+          "named_entities": [
+            {
+              "name": "陳茂波",
+              "type": "person"
+            },
+            {
+              "name": "香港醫學論壇",
+              "type": "organization"
+            },
+            {
+              "name": "香港",
+              "type": "country"
+            }
+          ],
+          "key_points": [
+            "陳茂波提出香港應成為全球醫療創新核心基地，強調香港具備知識產權保護、頂尖研發機構與人才、資本市場及大灣區協同效應等四大獨特優勢。",
+            "香港已有逾80家生物科技企業在港上市，總市值達1200億元，且擁有亞洲第二大私募股權市場。",
+            "全球十大藥企中，已有五家選擇香港作為區域研發中心。"
+          ],
+          "content_truncated": false,
+          "original_content_length_chars": 584,
+          "analyzed_content_length_chars": 584,
+          "original_content_token_estimate": 146,
+          "analyzed_content_token_estimate": 146,
+          "truncation_reason": null,
+          "analysis_method": "full_text",
+          "attention_tier": "medium",
+          "theme": "general",
+          "attention_reason": "Article discusses a proposal for Hong Kong to become a global medical innovation hub, but lacks market-moving signals.",
+          "must_keep": true,
+          "model_used": "meta-llama/llama-4-scout-17b-16e-instruct",
+          "delayed_retry_attempted": false,
+          "delayed_retry_model_chain": [],
+          "delayed_retry_final_model": null,
+          "error_classification": null,
+          "error": null
+        },
         {
           "source_article_id": "4405345",
           "title": "恒指夜期丨收報25733 低水230點",
@@ -2264,23 +2950,78 @@
         {
           "title": "香港財經 overview",
           "theme_rationale": "Single subgroup because the category size did not require thematic splitting.",
-          "article_count": 1,
+          "article_count": 2,
           "key_developments": [
-            "恒指夜市期指收報25733點，跌75點，較昨日恒指收市25962點，低水230點。",
-            "成交21712張。",
-            "國指夜市期指收報8631點，較昨日國指收市低水60點。"
+            "陳茂波提出香港應成為全球醫療創新核心基地，強調香港具備知識產權保護、頂尖研發機構與人才、資本市場及大灣區協同效應等四大獨特優勢。",
+            "香港已有逾80家生物科技企業在港上市，總市值達1200億元，且擁有亞洲第二大私募股權市場。",
+            "全球十大藥企中，已有五家選擇香港作為區域研發中心。",
+            "恒指夜市期指收報25733點，跌75點，較昨日恒指收市25962點，低水230點。"
           ],
           "named_entities": [
             {
-              "name": "恒指",
-              "type": "index"
+              "name": "陳茂波",
+              "type": "person"
             },
             {
-              "name": "港股",
-              "type": "other"
+              "name": "香港醫學論壇",
+              "type": "organization"
+            },
+            {
+              "name": "香港",
+              "type": "country"
+            },
+            {
+              "name": "恒指",
+              "type": "index"
             }
           ],
           "articles": [
+            {
+              "source_article_id": "4405371",
+              "title": "陳茂波倡香港成全球醫療創新核心基地",
+              "canonical_url": "https://www.hkej.com/instantnews/hongkong/article/4405371/%E9%99%B3%E8%8C%82%E6%B3%A2%E5%80%A1%E9%A6%99%E6%B8%AF%E6%88%90%E5%85%A8%E7%90%83%E9%86%AB%E7%99%82%E5%89%B5%E6%96%B0%E6%A0%B8%E5%BF%83%E5%9F%BA%E5%9C%B0",
+              "published_at": "2026-05-16T16:52:00+08:00",
+              "section": "香港財經",
+              "novelty_score": 6,
+              "relevance_score": 8,
+              "urgency_score": 5,
+              "named_entities": [
+                {
+                  "name": "陳茂波",
+                  "type": "person"
+                },
+                {
+                  "name": "香港醫學論壇",
+                  "type": "organization"
+                },
+                {
+                  "name": "香港",
+                  "type": "country"
+                }
+              ],
+              "key_points": [
+                "陳茂波提出香港應成為全球醫療創新核心基地，強調香港具備知識產權保護、頂尖研發機構與人才、資本市場及大灣區協同效應等四大獨特優勢。",
+                "香港已有逾80家生物科技企業在港上市，總市值達1200億元，且擁有亞洲第二大私募股權市場。",
+                "全球十大藥企中，已有五家選擇香港作為區域研發中心。"
+              ],
+              "content_truncated": false,
+              "original_content_length_chars": 584,
+              "analyzed_content_length_chars": 584,
+              "original_content_token_estimate": 146,
+              "analyzed_content_token_estimate": 146,
+              "truncation_reason": null,
+              "analysis_method": "full_text",
+              "attention_tier": "medium",
+              "theme": "general",
+              "attention_reason": "Article discusses a proposal for Hong Kong to become a global medical innovation hub, but lacks market-moving signals.",
+              "must_keep": true,
+              "model_used": "meta-llama/llama-4-scout-17b-16e-instruct",
+              "delayed_retry_attempted": false,
+              "delayed_retry_model_chain": [],
+              "delayed_retry_final_model": null,
+              "error_classification": null,
+              "error": null
+            },
             {
               "source_article_id": "4405345",
               "title": "恒指夜期丨收報25733 低水230點",
@@ -2329,15 +3070,15 @@
       ],
       "analysis_profile": "standard",
       "model_used": "meta-llama/llama-4-scout-17b-16e-instruct",
-      "sub_batch_count": 2,
+      "sub_batch_count": 3,
       "diagnostics": {
-        "sub_batch_count": 1,
+        "sub_batch_count": 3,
         "split_reasons": [],
         "models_attempted": [
           "meta-llama/llama-4-scout-17b-16e-instruct"
         ],
-        "estimated_input_tokens_max": 617,
-        "serialized_request_bytes_max": 3488,
+        "estimated_input_tokens_max": 751,
+        "serialized_request_bytes_max": 4518,
         "rate_limit_waits": 0,
         "partial_article_count": 0,
         "synthesis_wait_seconds_total": 0.0,
@@ -2353,15 +3094,26 @@
     },
     {
       "category": "中國財經",
-      "article_count": 2,
+      "article_count": 3,
       "status": "success",
       "key_developments": [
-        "中證監主席吳清會見花旗行政總裁范潔恩，雙方就資本市場對外開放等議題交換意見。",
-        "萬事達卡與京東宣布建立戰略合作關係，探索跨境供應鏈金融生態。",
-        "中國證監會官網發布新聞稿指，吳清與范潔恩討論全球經濟金融形勢。",
-        "合作還包括探索跨境供應鏈金融生態，支持全球中小企業。"
+        "中美經貿磋商達成5方面初步成果，包括相互降稅、採購美飛機等。",
+        "中國證監會主席吳清會見花旗行政總裁范潔恩，雙方就資本市場對外開放等議題交換意見。",
+        "萬事達卡與京東宣布建立戰略合作關係，探索跨境供應鏈金融生態。"
       ],
       "named_entities": [
+        {
+          "name": "習近平",
+          "type": "person"
+        },
+        {
+          "name": "中國商務部",
+          "type": "institution"
+        },
+        {
+          "name": "美國",
+          "type": "country"
+        },
         {
           "name": "吳清",
           "type": "person"
@@ -2369,21 +3121,55 @@
         {
           "name": "范潔恩",
           "type": "person"
-        },
-        {
-          "name": "花旗",
-          "type": "company"
-        },
-        {
-          "name": "中國證監會",
-          "type": "institution"
-        },
-        {
-          "name": "萬事達卡",
-          "type": "company"
         }
       ],
       "articles": [
+        {
+          "source_article_id": "4405380",
+          "title": "中美經貿磋商達5方面初步成果 相互降稅及採購美飛機等",
+          "canonical_url": "https://www.hkej.com/instantnews/china/article/4405380/%E4%B8%AD%E7%BE%8E%E7%B6%93%E8%B2%BF%E7%A3%8B%E5%95%86%E9%81%945%E6%96%B9%E9%9D%A2%E5%88%9D%E6%AD%A5%E6%88%90%E6%9E%9C+%E7%9B%B8%E4%BA%92%E9%99%8D%E7%A8%85%E5%8F%8A%E6%8E%A1%E8%B3%BC%E7%BE%8E%E9%A3%9B%E6%A9%9F%E7%AD%89",
+          "published_at": "2026-05-16T21:12:00+08:00",
+          "section": "中國財經",
+          "novelty_score": 6,
+          "relevance_score": 8,
+          "urgency_score": 5,
+          "named_entities": [
+            {
+              "name": "習近平",
+              "type": "person"
+            },
+            {
+              "name": "中國商務部",
+              "type": "institution"
+            },
+            {
+              "name": "美國",
+              "type": "country"
+            }
+          ],
+          "key_points": [
+            "中美經貿磋商達成5方面初步成果，包括相互降稅、採購美飛機等。",
+            "雙方同意成立貿易理事會和投資理事會，討論貿易投資領域關切。",
+            "美方將積極推動解決中方在乳製品和水產品自動扣留等長期關切。"
+          ],
+          "content_truncated": false,
+          "original_content_length_chars": 665,
+          "analyzed_content_length_chars": 665,
+          "original_content_token_estimate": 167,
+          "analyzed_content_token_estimate": 167,
+          "truncation_reason": null,
+          "analysis_method": "full_text",
+          "attention_tier": "medium",
+          "theme": "general",
+          "attention_reason": "Default medium attention because the story is relevant but not an obvious top-priority market mover.",
+          "must_keep": false,
+          "model_used": "meta-llama/llama-4-scout-17b-16e-instruct",
+          "delayed_retry_attempted": false,
+          "delayed_retry_model_chain": [],
+          "delayed_retry_final_model": null,
+          "error_classification": null,
+          "error": null
+        },
         {
           "source_article_id": "4405368",
           "title": "中證監吳清會見花旗范潔恩 就資本市場對外開放等交換意見",
@@ -2481,14 +3267,25 @@
         {
           "title": "中國財經 overview",
           "theme_rationale": "Single subgroup because the category size did not require thematic splitting.",
-          "article_count": 2,
+          "article_count": 3,
           "key_developments": [
-            "中證監主席吳清會見花旗行政總裁范潔恩，雙方就資本市場對外開放等議題交換意見。",
-            "萬事達卡與京東宣布建立戰略合作關係，探索跨境供應鏈金融生態。",
-            "中國證監會官網發布新聞稿指，吳清與范潔恩討論全球經濟金融形勢。",
-            "合作還包括探索跨境供應鏈金融生態，支持全球中小企業。"
+            "中美經貿磋商達成5方面初步成果，包括相互降稅、採購美飛機等。",
+            "中國證監會主席吳清會見花旗行政總裁范潔恩，雙方就資本市場對外開放等議題交換意見。",
+            "萬事達卡與京東宣布建立戰略合作關係，探索跨境供應鏈金融生態。"
           ],
           "named_entities": [
+            {
+              "name": "習近平",
+              "type": "person"
+            },
+            {
+              "name": "中國商務部",
+              "type": "institution"
+            },
+            {
+              "name": "美國",
+              "type": "country"
+            },
             {
               "name": "吳清",
               "type": "person"
@@ -2496,21 +3293,55 @@
             {
               "name": "范潔恩",
               "type": "person"
-            },
-            {
-              "name": "花旗",
-              "type": "company"
-            },
-            {
-              "name": "中國證監會",
-              "type": "institution"
-            },
-            {
-              "name": "萬事達卡",
-              "type": "company"
             }
           ],
           "articles": [
+            {
+              "source_article_id": "4405380",
+              "title": "中美經貿磋商達5方面初步成果 相互降稅及採購美飛機等",
+              "canonical_url": "https://www.hkej.com/instantnews/china/article/4405380/%E4%B8%AD%E7%BE%8E%E7%B6%93%E8%B2%BF%E7%A3%8B%E5%95%86%E9%81%945%E6%96%B9%E9%9D%A2%E5%88%9D%E6%AD%A5%E6%88%90%E6%9E%9C+%E7%9B%B8%E4%BA%92%E9%99%8D%E7%A8%85%E5%8F%8A%E6%8E%A1%E8%B3%BC%E7%BE%8E%E9%A3%9B%E6%A9%9F%E7%AD%89",
+              "published_at": "2026-05-16T21:12:00+08:00",
+              "section": "中國財經",
+              "novelty_score": 6,
+              "relevance_score": 8,
+              "urgency_score": 5,
+              "named_entities": [
+                {
+                  "name": "習近平",
+                  "type": "person"
+                },
+                {
+                  "name": "中國商務部",
+                  "type": "institution"
+                },
+                {
+                  "name": "美國",
+                  "type": "country"
+                }
+              ],
+              "key_points": [
+                "中美經貿磋商達成5方面初步成果，包括相互降稅、採購美飛機等。",
+                "雙方同意成立貿易理事會和投資理事會，討論貿易投資領域關切。",
+                "美方將積極推動解決中方在乳製品和水產品自動扣留等長期關切。"
+              ],
+              "content_truncated": false,
+              "original_content_length_chars": 665,
+              "analyzed_content_length_chars": 665,
+              "original_content_token_estimate": 167,
+              "analyzed_content_token_estimate": 167,
+              "truncation_reason": null,
+              "analysis_method": "full_text",
+              "attention_tier": "medium",
+              "theme": "general",
+              "attention_reason": "Default medium attention because the story is relevant but not an obvious top-priority market mover.",
+              "must_keep": false,
+              "model_used": "meta-llama/llama-4-scout-17b-16e-instruct",
+              "delayed_retry_attempted": false,
+              "delayed_retry_model_chain": [],
+              "delayed_retry_final_model": null,
+              "error_classification": null,
+              "error": null
+            },
             {
               "source_article_id": "4405368",
               "title": "中證監吳清會見花旗范潔恩 就資本市場對外開放等交換意見",
@@ -2609,15 +3440,15 @@
       ],
       "analysis_profile": "standard",
       "model_used": "meta-llama/llama-4-scout-17b-16e-instruct",
-      "sub_batch_count": 2,
+      "sub_batch_count": 3,
       "diagnostics": {
-        "sub_batch_count": 1,
+        "sub_batch_count": 3,
         "split_reasons": [],
         "models_attempted": [
           "meta-llama/llama-4-scout-17b-16e-instruct"
         ],
-        "estimated_input_tokens_max": 974,
-        "serialized_request_bytes_max": 6159,
+        "estimated_input_tokens_max": 776,
+        "serialized_request_bytes_max": 4727,
         "rate_limit_waits": 0,
         "partial_article_count": 0,
         "synthesis_wait_seconds_total": 0.0,
@@ -2656,7 +3487,7 @@
         },
         {
           "name": "華爾街",
-          "type": "other"
+          "type": "institution"
         },
         {
           "name": "標普500指數",
@@ -2746,7 +3577,7 @@
             },
             {
               "name": "華爾街",
-              "type": "other"
+              "type": "institution"
             },
             {
               "name": "標普500指數",
@@ -2815,15 +3646,13 @@
       ],
       "analysis_profile": "standard",
       "model_used": "meta-llama/llama-4-scout-17b-16e-instruct",
-      "sub_batch_count": 2,
+      "sub_batch_count": 1,
       "diagnostics": {
         "sub_batch_count": 1,
         "split_reasons": [],
-        "models_attempted": [
-          "meta-llama/llama-4-scout-17b-16e-instruct"
-        ],
-        "estimated_input_tokens_max": 856,
-        "serialized_request_bytes_max": 5994,
+        "models_attempted": [],
+        "estimated_input_tokens_max": 0,
+        "serialized_request_bytes_max": 0,
         "rate_limit_waits": 0,
         "partial_article_count": 0,
         "synthesis_wait_seconds_total": 0.0,
