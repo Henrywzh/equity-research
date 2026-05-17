@@ -1,15 +1,15 @@
 {
   "report_schema_version": 6,
   "report_date": "2026-05-17",
-  "generated_at": "2026-05-17T09:28:06.365817+00:00",
+  "generated_at": "2026-05-17T21:45:55.260506+00:00",
   "source_site": "hkej",
-  "status": "success",
-  "executive_summary": [
+  "status": "partial",
+  "executive_summary": [],
+  "legacy_executive_summary": [
     "三星電子勞資雙方將於周一(18日)早上重啟談判，韓國總理金民錫表示若罷工成真，將給經濟造成嚴重負面影響。",
     "貝萊德已就參與SpaceX於6月首次公開招股(IPO)一事展開磋商，並計劃投資50億至100億美元。",
     "李在鎔周六(16日)呼籲勞方重返談判桌，認為此次此刻應該凝聚力量，攜手向同一方向邁進。"
   ],
-  "legacy_executive_summary": [],
   "model": {
     "provider": "groq",
     "primary_model": "meta-llama/llama-4-scout-17b-16e-instruct",
@@ -20,18 +20,18 @@
   },
   "model_switches": [],
   "input": {
-    "article_count": 26,
-    "category_count": 5
+    "article_count": 41,
+    "category_count": 6
   },
   "diagnostics": {
     "rate_limit_wait_count": 1,
-    "rate_limit_wait_seconds_total": 1209.599,
+    "rate_limit_wait_seconds_total": 1814.4,
     "fallback_switch_count": 0,
     "key_rotation_count": 0,
-    "pre_send_split_count": 6,
+    "pre_send_split_count": 13,
     "response_413_split_count": 0,
     "json_repair_retry_count": 0,
-    "batch_count": 25,
+    "batch_count": 29,
     "failed_batch_count": 0,
     "delayed_retry_candidate_count": 0,
     "delayed_retry_attempted_count": 0,
@@ -40,22 +40,22 @@
     "high_medium_unresolved_count": 0,
     "light_unresolved_count": 0,
     "delayed_retry_skipped_final_model_count": 0,
-    "synthesis_budget_exhausted_count": 0,
+    "synthesis_budget_exhausted_count": 1,
     "degraded_merge_count": 0
   },
   "incremental": {
-    "reused_successful_articles": 0,
-    "new_articles_analyzed": 26,
+    "reused_successful_articles": 26,
+    "new_articles_analyzed": 15,
     "retried_previous_day_articles": 0,
     "previous_day_retry_successes": 0
   },
   "daily_stats": {
-    "total_scraped": 26,
-    "analyzed": 26,
+    "total_scraped": 41,
+    "analyzed": 41,
     "success_rate": 100.0
   },
   "macro_release_digest": {
-    "generated_at": "2026-05-17T09:07:24.299826+00:00",
+    "generated_at": "2026-05-17T21:14:20.455127+00:00",
     "window_start": "2026-05-17",
     "window_end": "2026-05-23",
     "fetch_status": "failed",
@@ -67,13 +67,13 @@
   },
   "unresolved_articles": [],
   "totals": {
-    "article_count": 26,
-    "successful_article_analyses": 26,
+    "article_count": 41,
+    "successful_article_analyses": 41,
     "failed_article_analyses": 0,
-    "full_text_article_count": 26,
+    "full_text_article_count": 41,
     "truncated_article_count": 0,
     "successful_categories": 5,
-    "partial_categories": 0,
+    "partial_categories": 1,
     "failed_categories": 0
   },
   "market_context": [],
@@ -83,7 +83,7 @@
       "article_count": 2,
       "status": "success",
       "key_developments": [
-        "三星電子勞資雙方將於周一(18日)早上重啟談判，韓國總理金民錫表示若罷工成真，將給經濟造成嚴重負面影響。",
+        "三星電子勞資雙方將於周一(18日)早上重啟談判，韓國總理金民錫表示若罷工成真將給經濟造成嚴重負面影響。",
         "貝萊德已就參與SpaceX於6月首次公開招股(IPO)一事展開磋商，並計劃投資50億至100億美元。",
         "李在鎔周六(16日)呼籲勞方重返談判桌，認為此次此刻應該凝聚力量，攜手向同一方向邁進。",
         "SpaceX已加快IPO進程，目標是最早於周三(20日)發布招股書，並於6月4日啟動路演，最早於6月12日正式上市。"
@@ -210,7 +210,7 @@
           "theme_rationale": "Single subgroup because the category size did not require thematic splitting.",
           "article_count": 2,
           "key_developments": [
-            "三星電子勞資雙方將於周一(18日)早上重啟談判，韓國總理金民錫表示若罷工成真，將給經濟造成嚴重負面影響。",
+            "三星電子勞資雙方將於周一(18日)早上重啟談判，韓國總理金民錫表示若罷工成真將給經濟造成嚴重負面影響。",
             "貝萊德已就參與SpaceX於6月首次公開招股(IPO)一事展開磋商，並計劃投資50億至100億美元。",
             "李在鎔周六(16日)呼籲勞方重返談判桌，認為此次此刻應該凝聚力量，攜手向同一方向邁進。",
             "SpaceX已加快IPO進程，目標是最早於周三(20日)發布招股書，並於6月4日啟動路演，最早於6月12日正式上市。"
@@ -336,15 +336,13 @@
       ],
       "analysis_profile": "standard",
       "model_used": "meta-llama/llama-4-scout-17b-16e-instruct",
-      "sub_batch_count": 2,
+      "sub_batch_count": 1,
       "diagnostics": {
         "sub_batch_count": 1,
         "split_reasons": [],
-        "models_attempted": [
-          "meta-llama/llama-4-scout-17b-16e-instruct"
-        ],
-        "estimated_input_tokens_max": 970,
-        "serialized_request_bytes_max": 6202,
+        "models_attempted": [],
+        "estimated_input_tokens_max": 0,
+        "serialized_request_bytes_max": 0,
         "rate_limit_waits": 0,
         "partial_article_count": 0,
         "synthesis_wait_seconds_total": 0.0,
@@ -360,8 +358,8 @@
     },
     {
       "category": "時事脈搏",
-      "article_count": 14,
-      "status": "success",
+      "article_count": 22,
+      "status": "partial",
       "key_developments": [],
       "named_entities": [
         {
@@ -383,6 +381,196 @@
       ],
       "articles": [
         {
+          "source_article_id": "4405475",
+          "canonical_url": "https://www.hkej.com/instantnews/current/article/4405475/%E7%8E%8B%E6%9B%89%E6%9D%B1%E6%B6%89%E5%9A%B4%E9%87%8D%E9%81%95%E7%B4%80%E5%8F%97%E6%9F%A5+%E6%96%B0%E5%86%A0%E7%96%AB%E6%83%85%E6%99%82%E4%BB%BB%E6%B9%96%E5%8C%97%E7%9C%81%E9%95%B7",
+          "title": "王曉東涉嚴重違紀受查 新冠疫情時任湖北省長",
+          "section": "時事脈搏",
+          "published_at": "2026-05-17T22:00:00+08:00",
+          "attention_tier": "light",
+          "novelty_score": 5,
+          "relevance_score": 5,
+          "urgency_score": 5,
+          "named_entities": [],
+          "key_points": [],
+          "content_truncated": false,
+          "analysis_method": "bypassed",
+          "model_used": "direct"
+        },
+        {
+          "source_article_id": "4405476",
+          "title": "霍爾木茲海峽丨韓伊外長通電話 促就韓船遇襲表態",
+          "canonical_url": "https://www.hkej.com/instantnews/current/article/4405476/%E9%9C%8D%E7%88%BE%E6%9C%A8%E8%8C%B2%E6%B5%B7%E5%B3%BD%E4%B8%A8%E9%9F%93%E4%BC%8A%E5%A4%96%E9%95%B7%E9%80%9A%E9%9B%BB%E8%A9%B1+%E4%BF%83%E5%B0%B1%E9%9F%93%E8%88%B9%E9%81%87%E8%A5%B2%E8%A1%A8%E6%85%8B",
+          "published_at": "2026-05-17T21:55:00+08:00",
+          "section": "時事脈搏",
+          "novelty_score": 6,
+          "relevance_score": 8,
+          "urgency_score": 9,
+          "named_entities": [
+            {
+              "name": "趙顯",
+              "type": "person"
+            },
+            {
+              "name": "阿拉格齊",
+              "type": "person"
+            },
+            {
+              "name": "南韓",
+              "type": "country"
+            },
+            {
+              "name": "伊朗",
+              "type": "country"
+            }
+          ],
+          "key_points": [
+            "南韓外長趙顯與伊朗外長阿拉格齊通電話，討論南韓貨船NAMU號在霍爾木茲海峽被襲事件。",
+            "伊朗同意盡快結束霍爾木茲海峽內的對峙局面，確保船隻安全通航。"
+          ],
+          "content_truncated": false,
+          "original_content_length_chars": 291,
+          "analyzed_content_length_chars": 291,
+          "original_content_token_estimate": 73,
+          "analyzed_content_token_estimate": 73,
+          "truncation_reason": null,
+          "analysis_method": "full_text",
+          "attention_tier": "high",
+          "theme": "geopolitics",
+          "attention_reason": "High-signal geopolitics headline based on title/summary keywords.",
+          "must_keep": true,
+          "model_used": "meta-llama/llama-4-scout-17b-16e-instruct",
+          "delayed_retry_attempted": false,
+          "delayed_retry_model_chain": [],
+          "delayed_retry_final_model": null,
+          "error_classification": null,
+          "error": null
+        },
+        {
+          "source_article_id": "4405474",
+          "canonical_url": "https://www.hkej.com/instantnews/current/article/4405474/%E6%B3%95%E6%B2%BB%E6%88%B2%E5%8A%87%E5%90%B8%E9%80%BE2000%E4%BA%BA%E5%85%A5%E5%A0%B4+%E6%9E%97%E5%AE%9A%E5%9C%8B%E5%86%80%E6%8F%90%E5%8D%87%E7%A4%BE%E6%9C%83%E6%95%B4%E9%AB%94%E6%B3%95%E6%B2%BB%E6%84%8F%E8%AD%98",
+          "title": "法治戲劇吸逾2000人入場 林定國冀提升社會整體法治意識",
+          "section": "時事脈搏",
+          "published_at": "2026-05-17T21:34:00+08:00",
+          "attention_tier": "light",
+          "novelty_score": 5,
+          "relevance_score": 5,
+          "urgency_score": 5,
+          "named_entities": [],
+          "key_points": [],
+          "content_truncated": false,
+          "analysis_method": "bypassed",
+          "model_used": "direct"
+        },
+        {
+          "source_article_id": "4405473",
+          "canonical_url": "https://www.hkej.com/instantnews/current/article/4405473/%E8%8B%B1%E9%A6%96%E7%9B%B8%E6%96%BD%E7%B4%80%E8%B3%A2%E9%81%AD%E9%80%BC%E5%AE%AE+%E6%AD%90%E6%B4%B2%E5%85%A9%E4%BD%8D%E9%A0%98%E5%B0%8E%E4%BA%BA%E6%94%AF%E6%8C%81%E7%8E%87%E6%9B%B4%E7%82%BA%E7%B3%9F%E7%B3%95",
+          "title": "英首相施紀賢遭逼宮 歐洲兩位領導人支持率更為糟糕",
+          "section": "時事脈搏",
+          "published_at": "2026-05-17T21:10:00+08:00",
+          "attention_tier": "light",
+          "novelty_score": 5,
+          "relevance_score": 5,
+          "urgency_score": 5,
+          "named_entities": [],
+          "key_points": [],
+          "content_truncated": false,
+          "analysis_method": "bypassed",
+          "model_used": "direct"
+        },
+        {
+          "source_article_id": "4405463",
+          "canonical_url": "https://www.hkej.com/instantnews/current/article/4405463/%E4%B8%AD%E7%BE%8E%E9%98%BF%E8%81%AF%E9%85%8B%E8%81%AF%E6%89%8B%E6%89%93%E6%93%8A%E6%9D%9C%E6%8B%9C%E9%9B%BB%E9%A8%99+%E6%8B%98276%E4%BA%BA",
+          "title": "中美阿聯酋聯手打擊杜拜電騙 拘276人",
+          "section": "時事脈搏",
+          "published_at": "2026-05-17T19:05:00+08:00",
+          "attention_tier": "light",
+          "novelty_score": 5,
+          "relevance_score": 5,
+          "urgency_score": 5,
+          "named_entities": [],
+          "key_points": [],
+          "content_truncated": false,
+          "analysis_method": "bypassed",
+          "model_used": "direct"
+        },
+        {
+          "source_article_id": "4405456",
+          "title": "中東局勢丨伊朗稱美方對其提出5個關鍵條件",
+          "canonical_url": "https://www.hkej.com/instantnews/current/article/4405456/%E4%B8%AD%E6%9D%B1%E5%B1%80%E5%8B%A2%E4%B8%A8%E4%BC%8A%E6%9C%97%E7%A8%B1%E7%BE%8E%E6%96%B9%E5%B0%8D%E5%85%B6%E6%8F%90%E5%87%BA5%E5%80%8B%E9%97%9C%E9%8D%B5%E6%A2%9D%E4%BB%B6",
+          "published_at": "2026-05-17T18:41:00+08:00",
+          "section": "時事脈搏",
+          "novelty_score": 7,
+          "relevance_score": 9,
+          "urgency_score": 8,
+          "named_entities": [
+            {
+              "name": "伊朗",
+              "type": "country"
+            },
+            {
+              "name": "美國",
+              "type": "country"
+            },
+            {
+              "name": "以色列",
+              "type": "country"
+            }
+          ],
+          "key_points": [
+            "伊朗稱美國對其提出5個關鍵條件，包括不支付賠償或戰爭損失費用等。",
+            "分析人士稱美國方案試圖通過談判實現其在戰爭期間未能達成的政治與軍事目標。"
+          ],
+          "content_truncated": false,
+          "original_content_length_chars": 300,
+          "analyzed_content_length_chars": 300,
+          "original_content_token_estimate": 75,
+          "analyzed_content_token_estimate": 75,
+          "truncation_reason": null,
+          "analysis_method": "full_text",
+          "attention_tier": "high",
+          "theme": "geopolitics",
+          "attention_reason": "High-signal geopolitics headline based on title/summary keywords.",
+          "must_keep": true,
+          "model_used": "meta-llama/llama-4-scout-17b-16e-instruct",
+          "delayed_retry_attempted": false,
+          "delayed_retry_model_chain": [],
+          "delayed_retry_final_model": null,
+          "error_classification": null,
+          "error": null
+        },
+        {
+          "source_article_id": "4405450",
+          "canonical_url": "https://www.hkej.com/instantnews/current/article/4405450/%E9%9B%BB%E5%96%AE%E8%BB%8A%E5%8F%B8%E6%A9%9F%E7%96%91%E6%92%9E%E6%A8%B9%E6%9E%9D%E4%B8%8D%E6%B2%BB+%E8%B7%AF%E6%94%BF%E7%BD%B2%E6%8C%87%E5%A4%A9%E9%9B%A8%E5%8F%8A%E9%99%A3%E9%A2%A8%E8%87%B4%E6%A8%B9%E5%B9%B9%E8%85%90%E7%88%9B%E4%BD%8D%E7%BD%AE%E6%96%B7%E8%A3%82",
+          "title": "電單車司機疑撞樹枝不治 路政署指天雨及陣風致樹幹腐爛位置斷裂",
+          "section": "時事脈搏",
+          "published_at": "2026-05-17T18:20:00+08:00",
+          "attention_tier": "light",
+          "novelty_score": 5,
+          "relevance_score": 5,
+          "urgency_score": 5,
+          "named_entities": [],
+          "key_points": [],
+          "content_truncated": false,
+          "analysis_method": "bypassed",
+          "model_used": "direct"
+        },
+        {
+          "source_article_id": "4405449",
+          "canonical_url": "https://www.hkej.com/instantnews/current/article/4405449/%E7%89%B9%E5%8D%80%E6%94%BF%E5%BA%9C%E5%95%9F%E5%8B%95%E4%BC%8A%E6%B3%A2%E6%8B%89%E7%97%85%E6%AF%92%E7%97%85%E6%BA%96%E5%82%99%E5%8F%8A%E6%87%89%E8%AE%8A%E8%A8%88%E5%8A%83%E6%88%92%E5%82%99%E6%87%89%E8%AE%8A%E7%B4%9A%E5%88%A5",
+          "title": "特區政府啟動伊波拉病毒病準備及應變計劃戒備應變級別",
+          "section": "時事脈搏",
+          "published_at": "2026-05-17T17:46:00+08:00",
+          "attention_tier": "light",
+          "novelty_score": 5,
+          "relevance_score": 5,
+          "urgency_score": 5,
+          "named_entities": [],
+          "key_points": [],
+          "content_truncated": false,
+          "analysis_method": "bypassed",
+          "model_used": "direct"
+        },
+        {
           "source_article_id": "4405447",
           "canonical_url": "https://www.hkej.com/instantnews/current/article/4405447/%E9%86%AB%E8%A1%9E%E5%B1%80%E7%B1%B2%E6%9B%B4%E5%A4%9A%E5%AE%B6%E5%BA%AD%E9%86%AB%E7%94%9F%E5%8F%83%E5%8A%A0%E5%9F%BA%E5%B1%A4%E9%86%AB%E7%99%82%E6%8C%87%E5%8D%97",
           "title": "醫衞局籲更多家庭醫生參加基層醫療指南",
@@ -396,7 +584,10 @@
           "key_points": [],
           "content_truncated": false,
           "analysis_method": "bypassed",
-          "model_used": "direct"
+          "model_used": "direct",
+          "theme": "general",
+          "attention_reason": "Lighter treatment because this story sits in the 時事脈搏 section without strong market-moving signals.",
+          "must_keep": false
         },
         {
           "source_article_id": "4405446",
@@ -412,7 +603,10 @@
           "key_points": [],
           "content_truncated": false,
           "analysis_method": "bypassed",
-          "model_used": "direct"
+          "model_used": "direct",
+          "theme": "general",
+          "attention_reason": "Lighter treatment because this story sits in the 時事脈搏 section without strong market-moving signals.",
+          "must_keep": false
         },
         {
           "source_article_id": "4405445",
@@ -428,7 +622,10 @@
           "key_points": [],
           "content_truncated": false,
           "analysis_method": "bypassed",
-          "model_used": "direct"
+          "model_used": "direct",
+          "theme": "general",
+          "attention_reason": "Lighter treatment because this story sits in the 時事脈搏 section without strong market-moving signals.",
+          "must_keep": false
         },
         {
           "source_article_id": "4405438",
@@ -444,7 +641,10 @@
           "key_points": [],
           "content_truncated": false,
           "analysis_method": "bypassed",
-          "model_used": "direct"
+          "model_used": "direct",
+          "theme": "general",
+          "attention_reason": "Lighter treatment because this story sits in the 時事脈搏 section without strong market-moving signals.",
+          "must_keep": false
         },
         {
           "source_article_id": "4405433",
@@ -460,7 +660,10 @@
           "key_points": [],
           "content_truncated": false,
           "analysis_method": "bypassed",
-          "model_used": "direct"
+          "model_used": "direct",
+          "theme": "general",
+          "attention_reason": "Lighter treatment because this story sits in the 時事脈搏 section without strong market-moving signals.",
+          "must_keep": false
         },
         {
           "source_article_id": "4405429",
@@ -476,7 +679,10 @@
           "key_points": [],
           "content_truncated": false,
           "analysis_method": "bypassed",
-          "model_used": "direct"
+          "model_used": "direct",
+          "theme": "general",
+          "attention_reason": "Lighter treatment because this story sits in the 時事脈搏 section without strong market-moving signals.",
+          "must_keep": false
         },
         {
           "source_article_id": "4405427",
@@ -492,7 +698,10 @@
           "key_points": [],
           "content_truncated": false,
           "analysis_method": "bypassed",
-          "model_used": "direct"
+          "model_used": "direct",
+          "theme": "general",
+          "attention_reason": "Lighter treatment because this story sits in the 時事脈搏 section without strong market-moving signals.",
+          "must_keep": false
         },
         {
           "source_article_id": "4405390",
@@ -508,7 +717,10 @@
           "key_points": [],
           "content_truncated": false,
           "analysis_method": "bypassed",
-          "model_used": "direct"
+          "model_used": "direct",
+          "theme": "general",
+          "attention_reason": "Lighter treatment because this story sits in the 時事脈搏 section without strong market-moving signals.",
+          "must_keep": false
         },
         {
           "source_article_id": "4405388",
@@ -524,7 +736,10 @@
           "key_points": [],
           "content_truncated": false,
           "analysis_method": "bypassed",
-          "model_used": "direct"
+          "model_used": "direct",
+          "theme": "general",
+          "attention_reason": "Lighter treatment because this story sits in the 時事脈搏 section without strong market-moving signals.",
+          "must_keep": false
         },
         {
           "source_article_id": "4405387",
@@ -540,7 +755,10 @@
           "key_points": [],
           "content_truncated": false,
           "analysis_method": "bypassed",
-          "model_used": "direct"
+          "model_used": "direct",
+          "theme": "general",
+          "attention_reason": "Lighter treatment because this story sits in the 時事脈搏 section without strong market-moving signals.",
+          "must_keep": false
         },
         {
           "source_article_id": "4405386",
@@ -556,7 +774,10 @@
           "key_points": [],
           "content_truncated": false,
           "analysis_method": "bypassed",
-          "model_used": "direct"
+          "model_used": "direct",
+          "theme": "general",
+          "attention_reason": "Lighter treatment because this story sits in the 時事脈搏 section without strong market-moving signals.",
+          "must_keep": false
         },
         {
           "source_article_id": "4405384",
@@ -572,7 +793,10 @@
           "key_points": [],
           "content_truncated": false,
           "analysis_method": "bypassed",
-          "model_used": "direct"
+          "model_used": "direct",
+          "theme": "general",
+          "attention_reason": "Lighter treatment because this story sits in the 時事脈搏 section without strong market-moving signals.",
+          "must_keep": false
         },
         {
           "source_article_id": "4405383",
@@ -588,7 +812,10 @@
           "key_points": [],
           "content_truncated": false,
           "analysis_method": "bypassed",
-          "model_used": "direct"
+          "model_used": "direct",
+          "theme": "general",
+          "attention_reason": "Lighter treatment because this story sits in the 時事脈搏 section without strong market-moving signals.",
+          "must_keep": false
         },
         {
           "source_article_id": "4405382",
@@ -604,7 +831,10 @@
           "key_points": [],
           "content_truncated": false,
           "analysis_method": "bypassed",
-          "model_used": "direct"
+          "model_used": "direct",
+          "theme": "general",
+          "attention_reason": "Lighter treatment because this story sits in the 時事脈搏 section without strong market-moving signals.",
+          "must_keep": false
         }
       ],
       "subgroups": [
@@ -928,21 +1158,20 @@
       ],
       "analysis_profile": "light",
       "model_used": "meta-llama/llama-4-scout-17b-16e-instruct",
-      "sub_batch_count": 9,
+      "sub_batch_count": 4,
       "diagnostics": {
         "sub_batch_count": 4,
         "split_reasons": [
           "pre_send_budget"
         ],
         "models_attempted": [
-          "meta-llama/llama-4-scout-17b-16e-instruct",
-          "qwen/qwen3-32b"
+          "meta-llama/llama-4-scout-17b-16e-instruct"
         ],
-        "estimated_input_tokens_max": 1621,
-        "serialized_request_bytes_max": 8345,
-        "rate_limit_waits": 1,
+        "estimated_input_tokens_max": 1073,
+        "serialized_request_bytes_max": 5362,
+        "rate_limit_waits": 0,
         "partial_article_count": 0,
-        "synthesis_wait_seconds_total": 1209.599,
+        "synthesis_wait_seconds_total": 0.0,
         "synthesis_retry_count": 0,
         "synthesis_retry_skipped_count": 0,
         "synthesis_budget_exhausted": false,
@@ -951,30 +1180,26 @@
         "synthesis_merge_depth_max": 1,
         "model_switches": []
       },
-      "error": null
+      "error": "Category 時事脈搏 exhausted synthesis wait budget after 1814.4 seconds."
     },
     {
       "category": "香港財經",
-      "article_count": 3,
+      "article_count": 4,
       "status": "success",
       "key_developments": [
-        "洪水橋產業園公司獲撥款100億元作為起始資金，林健鋒表示將與政府商討為部分進駐企業免稅。",
-        "陳茂波將訪歐洲三地，推廣香港國際金融中心新發展，推動招商引資。",
-        "劉凱旋表示中東戰火帶來機遇，香港或引進更多人才及資金，今年來助310多間企業落戶或擴充業務，首年對港直接投資額逾260億元。",
-        "港股市場下滑，恒生指數（^HSI）下跌1.62%至25962.73。"
+        "龍豐集團通過港交所上市聆訊，擬在本港主板上市，計劃集資1億美元(約7.8億港元)。",
+        "集團在香港美妝產品、保健產品及藥品零售商中排名第二，市場份額為5.8%。",
+        "陳茂波將訪歐洲三地，推廣香港國際金融中心新發展，推動招商引資，促進交流。",
+        "劉凱旋表示中東戰火帶來機遇，香港或引進更多人才及資金，今年來助310多間企業落戶或擴充業務，首年對港直接投資額逾260億元。"
       ],
       "named_entities": [
         {
-          "name": "林健鋒",
-          "type": "person"
+          "name": "龍豐集團",
+          "type": "company"
         },
         {
-          "name": "洪水橋產業園公司",
-          "type": "organization"
-        },
-        {
-          "name": "香港政府",
-          "type": "organization"
+          "name": "港交所",
+          "type": "institution"
         },
         {
           "name": "陳茂波",
@@ -983,9 +1208,63 @@
         {
           "name": "劉凱旋",
           "type": "person"
+        },
+        {
+          "name": "香港",
+          "type": "country"
         }
       ],
       "articles": [
+        {
+          "source_article_id": "4405468",
+          "title": "新股IPO丨龍豐集團通過上市聆訊",
+          "canonical_url": "https://www.hkej.com/instantnews/hongkong/article/4405468/%E6%96%B0%E8%82%A1IPO%E4%B8%A8%E9%BE%8D%E8%B1%90%E9%9B%86%E5%9C%98%E9%80%9A%E9%81%8E%E4%B8%8A%E5%B8%82%E8%81%86%E8%A8%8A",
+          "published_at": "2026-05-17T20:05:00+08:00",
+          "section": "香港財經",
+          "novelty_score": 6,
+          "relevance_score": 8,
+          "urgency_score": 7,
+          "named_entities": [
+            {
+              "name": "龍豐集團",
+              "type": "company"
+            },
+            {
+              "name": "星展集團",
+              "type": "company"
+            },
+            {
+              "name": "港交所",
+              "type": "institution"
+            },
+            {
+              "name": "香港",
+              "type": "country"
+            }
+          ],
+          "key_points": [
+            "龍豐集團通過港交所上市聆訊，擬在本港主板上市。",
+            "集團在香港美妝產品、保健產品及藥品零售商中排名第二，市場份額為5.8%。",
+            "龍豐集團計劃在本港上市集資1億美元(約7.8億港元)。"
+          ],
+          "content_truncated": false,
+          "original_content_length_chars": 276,
+          "analyzed_content_length_chars": 276,
+          "original_content_token_estimate": 69,
+          "analyzed_content_token_estimate": 69,
+          "truncation_reason": null,
+          "analysis_method": "full_text",
+          "attention_tier": "high",
+          "theme": "stocks",
+          "attention_reason": "High-signal stocks headline based on title/summary keywords.",
+          "must_keep": true,
+          "model_used": "meta-llama/llama-4-scout-17b-16e-instruct",
+          "delayed_retry_attempted": false,
+          "delayed_retry_model_chain": [],
+          "delayed_retry_final_model": null,
+          "error_classification": null,
+          "error": null
+        },
         {
           "source_article_id": "4405431",
           "title": "洪水橋園區丨林健鋒:將與政府商討能否為部分進駐企業免稅",
@@ -1121,25 +1400,21 @@
         {
           "title": "香港財經 overview",
           "theme_rationale": "Single subgroup because the category size did not require thematic splitting.",
-          "article_count": 3,
+          "article_count": 4,
           "key_developments": [
-            "洪水橋產業園公司獲撥款100億元作為起始資金，林健鋒表示將與政府商討為部分進駐企業免稅。",
-            "陳茂波將訪歐洲三地，推廣香港國際金融中心新發展，推動招商引資。",
-            "劉凱旋表示中東戰火帶來機遇，香港或引進更多人才及資金，今年來助310多間企業落戶或擴充業務，首年對港直接投資額逾260億元。",
-            "港股市場下滑，恒生指數（^HSI）下跌1.62%至25962.73。"
+            "龍豐集團通過港交所上市聆訊，擬在本港主板上市，計劃集資1億美元(約7.8億港元)。",
+            "集團在香港美妝產品、保健產品及藥品零售商中排名第二，市場份額為5.8%。",
+            "陳茂波將訪歐洲三地，推廣香港國際金融中心新發展，推動招商引資，促進交流。",
+            "劉凱旋表示中東戰火帶來機遇，香港或引進更多人才及資金，今年來助310多間企業落戶或擴充業務，首年對港直接投資額逾260億元。"
           ],
           "named_entities": [
             {
-              "name": "林健鋒",
-              "type": "person"
+              "name": "龍豐集團",
+              "type": "company"
             },
             {
-              "name": "洪水橋產業園公司",
-              "type": "organization"
-            },
-            {
-              "name": "香港政府",
-              "type": "organization"
+              "name": "港交所",
+              "type": "institution"
             },
             {
               "name": "陳茂波",
@@ -1148,9 +1423,63 @@
             {
               "name": "劉凱旋",
               "type": "person"
+            },
+            {
+              "name": "香港",
+              "type": "country"
             }
           ],
           "articles": [
+            {
+              "source_article_id": "4405468",
+              "title": "新股IPO丨龍豐集團通過上市聆訊",
+              "canonical_url": "https://www.hkej.com/instantnews/hongkong/article/4405468/%E6%96%B0%E8%82%A1IPO%E4%B8%A8%E9%BE%8D%E8%B1%90%E9%9B%86%E5%9C%98%E9%80%9A%E9%81%8E%E4%B8%8A%E5%B8%82%E8%81%86%E8%A8%8A",
+              "published_at": "2026-05-17T20:05:00+08:00",
+              "section": "香港財經",
+              "novelty_score": 6,
+              "relevance_score": 8,
+              "urgency_score": 7,
+              "named_entities": [
+                {
+                  "name": "龍豐集團",
+                  "type": "company"
+                },
+                {
+                  "name": "星展集團",
+                  "type": "company"
+                },
+                {
+                  "name": "港交所",
+                  "type": "institution"
+                },
+                {
+                  "name": "香港",
+                  "type": "country"
+                }
+              ],
+              "key_points": [
+                "龍豐集團通過港交所上市聆訊，擬在本港主板上市。",
+                "集團在香港美妝產品、保健產品及藥品零售商中排名第二，市場份額為5.8%。",
+                "龍豐集團計劃在本港上市集資1億美元(約7.8億港元)。"
+              ],
+              "content_truncated": false,
+              "original_content_length_chars": 276,
+              "analyzed_content_length_chars": 276,
+              "original_content_token_estimate": 69,
+              "analyzed_content_token_estimate": 69,
+              "truncation_reason": null,
+              "analysis_method": "full_text",
+              "attention_tier": "high",
+              "theme": "stocks",
+              "attention_reason": "High-signal stocks headline based on title/summary keywords.",
+              "must_keep": true,
+              "model_used": "meta-llama/llama-4-scout-17b-16e-instruct",
+              "delayed_retry_attempted": false,
+              "delayed_retry_model_chain": [],
+              "delayed_retry_final_model": null,
+              "error_classification": null,
+              "error": null
+            },
             {
               "source_article_id": "4405431",
               "title": "洪水橋園區丨林健鋒:將與政府商討能否為部分進駐企業免稅",
@@ -1287,15 +1616,15 @@
       ],
       "analysis_profile": "standard",
       "model_used": "meta-llama/llama-4-scout-17b-16e-instruct",
-      "sub_batch_count": 2,
+      "sub_batch_count": 3,
       "diagnostics": {
-        "sub_batch_count": 1,
+        "sub_batch_count": 3,
         "split_reasons": [],
         "models_attempted": [
           "meta-llama/llama-4-scout-17b-16e-instruct"
         ],
-        "estimated_input_tokens_max": 1340,
-        "serialized_request_bytes_max": 9628,
+        "estimated_input_tokens_max": 664,
+        "serialized_request_bytes_max": 3523,
         "rate_limit_waits": 0,
         "partial_article_count": 0,
         "synthesis_wait_seconds_total": 0.0,
@@ -1311,24 +1640,91 @@
     },
     {
       "category": "中國財經",
-      "article_count": 1,
+      "article_count": 2,
       "status": "success",
       "key_developments": [
-        "市場監管總局提出34項重點工作任務促進民營經濟發展",
-        "重點工作包括強化民營經濟法治政策保障、維護公平競爭市場秩序、提升監管執法效能和增強服務民營經濟發展能力",
-        "目標是推動民營經濟高質量發展，營造公平競爭環境"
+        "中國民航局局長宋志勇會見美國GE航空航天集團董事長兼行政總裁卡爾普和波音公司行政總裁奧爾特貝格，雙方就中國發展及進一步加強合作交換意見。",
+        "市場監管總局提出34項重點工作任務促進民營經濟發展，重點工作包括強化民營經濟法治政策保障、維護公平競爭市場秩序、提升監管執法效能和增強服務民營經濟發展能力。",
+        "中美經貿磋商達成初步成果，包括成立貿易理事會和投資理事會，並原則同意對同等規模的各自關注產品降稅。",
+        "比特幣價格最新報78371.59美元，漲幅0.31%"
       ],
       "named_entities": [
         {
-          "name": "市場監管總局",
-          "type": "institution"
+          "name": "宋志勇",
+          "type": "person"
         },
         {
-          "name": "民營經濟",
-          "type": "other"
+          "name": "卡爾普",
+          "type": "person"
+        },
+        {
+          "name": "奧爾特貝格",
+          "type": "person"
+        },
+        {
+          "name": "GE航空航天集團",
+          "type": "company"
+        },
+        {
+          "name": "波音公司",
+          "type": "company"
         }
       ],
       "articles": [
+        {
+          "source_article_id": "4405471",
+          "title": "民航局局長晤美國GE航空航天及波音行政總裁",
+          "canonical_url": "https://www.hkej.com/instantnews/china/article/4405471/%E6%B0%91%E8%88%AA%E5%B1%80%E5%B1%80%E9%95%B7%E6%99%A4%E7%BE%8E%E5%9C%8BGE%E8%88%AA%E7%A9%BA%E8%88%AA%E5%A4%A9%E5%8F%8A%E6%B3%A2%E9%9F%B3%E8%A1%8C%E6%94%BF%E7%B8%BD%E8%A3%81",
+          "published_at": "2026-05-17T20:48:00+08:00",
+          "section": "中國財經",
+          "novelty_score": 6,
+          "relevance_score": 8,
+          "urgency_score": 5,
+          "named_entities": [
+            {
+              "name": "宋志勇",
+              "type": "person"
+            },
+            {
+              "name": "卡爾普",
+              "type": "person"
+            },
+            {
+              "name": "奧爾特貝格",
+              "type": "person"
+            },
+            {
+              "name": "GE航空航天集團",
+              "type": "company"
+            },
+            {
+              "name": "波音公司",
+              "type": "company"
+            }
+          ],
+          "key_points": [
+            "中國民航局局長宋志勇會見美國GE航空航天集團董事長兼行政總裁卡爾普和波音公司行政總裁奧爾特貝格。",
+            "雙方就中國發展及進一步加強合作交換意見。",
+            "中美經貿磋商達成初步成果，包括成立貿易理事會和投資理事會，並原則同意對同等規模的各自關注產品降稅。"
+          ],
+          "content_truncated": false,
+          "original_content_length_chars": 227,
+          "analyzed_content_length_chars": 227,
+          "original_content_token_estimate": 57,
+          "analyzed_content_token_estimate": 57,
+          "truncation_reason": null,
+          "analysis_method": "full_text",
+          "attention_tier": "medium",
+          "theme": "general",
+          "attention_reason": "Default medium attention because the story is relevant but not an obvious top-priority market mover.",
+          "must_keep": false,
+          "model_used": "meta-llama/llama-4-scout-17b-16e-instruct",
+          "delayed_retry_attempted": false,
+          "delayed_retry_model_chain": [],
+          "delayed_retry_final_model": null,
+          "error_classification": null,
+          "error": null
+        },
         {
           "source_article_id": "4405389",
           "title": "民營經濟丨市監總局提34項重點工作促進發展",
@@ -1376,23 +1772,90 @@
         {
           "title": "中國財經 overview",
           "theme_rationale": "Single subgroup because the category size did not require thematic splitting.",
-          "article_count": 1,
+          "article_count": 2,
           "key_developments": [
-            "市場監管總局提出34項重點工作任務促進民營經濟發展",
-            "重點工作包括強化民營經濟法治政策保障、維護公平競爭市場秩序、提升監管執法效能和增強服務民營經濟發展能力",
-            "目標是推動民營經濟高質量發展，營造公平競爭環境"
+            "中國民航局局長宋志勇會見美國GE航空航天集團董事長兼行政總裁卡爾普和波音公司行政總裁奧爾特貝格，雙方就中國發展及進一步加強合作交換意見。",
+            "市場監管總局提出34項重點工作任務促進民營經濟發展，重點工作包括強化民營經濟法治政策保障、維護公平競爭市場秩序、提升監管執法效能和增強服務民營經濟發展能力。",
+            "中美經貿磋商達成初步成果，包括成立貿易理事會和投資理事會，並原則同意對同等規模的各自關注產品降稅。",
+            "比特幣價格最新報78371.59美元，漲幅0.31%"
           ],
           "named_entities": [
             {
-              "name": "市場監管總局",
-              "type": "institution"
+              "name": "宋志勇",
+              "type": "person"
             },
             {
-              "name": "民營經濟",
-              "type": "other"
+              "name": "卡爾普",
+              "type": "person"
+            },
+            {
+              "name": "奧爾特貝格",
+              "type": "person"
+            },
+            {
+              "name": "GE航空航天集團",
+              "type": "company"
+            },
+            {
+              "name": "波音公司",
+              "type": "company"
             }
           ],
           "articles": [
+            {
+              "source_article_id": "4405471",
+              "title": "民航局局長晤美國GE航空航天及波音行政總裁",
+              "canonical_url": "https://www.hkej.com/instantnews/china/article/4405471/%E6%B0%91%E8%88%AA%E5%B1%80%E5%B1%80%E9%95%B7%E6%99%A4%E7%BE%8E%E5%9C%8BGE%E8%88%AA%E7%A9%BA%E8%88%AA%E5%A4%A9%E5%8F%8A%E6%B3%A2%E9%9F%B3%E8%A1%8C%E6%94%BF%E7%B8%BD%E8%A3%81",
+              "published_at": "2026-05-17T20:48:00+08:00",
+              "section": "中國財經",
+              "novelty_score": 6,
+              "relevance_score": 8,
+              "urgency_score": 5,
+              "named_entities": [
+                {
+                  "name": "宋志勇",
+                  "type": "person"
+                },
+                {
+                  "name": "卡爾普",
+                  "type": "person"
+                },
+                {
+                  "name": "奧爾特貝格",
+                  "type": "person"
+                },
+                {
+                  "name": "GE航空航天集團",
+                  "type": "company"
+                },
+                {
+                  "name": "波音公司",
+                  "type": "company"
+                }
+              ],
+              "key_points": [
+                "中國民航局局長宋志勇會見美國GE航空航天集團董事長兼行政總裁卡爾普和波音公司行政總裁奧爾特貝格。",
+                "雙方就中國發展及進一步加強合作交換意見。",
+                "中美經貿磋商達成初步成果，包括成立貿易理事會和投資理事會，並原則同意對同等規模的各自關注產品降稅。"
+              ],
+              "content_truncated": false,
+              "original_content_length_chars": 227,
+              "analyzed_content_length_chars": 227,
+              "original_content_token_estimate": 57,
+              "analyzed_content_token_estimate": 57,
+              "truncation_reason": null,
+              "analysis_method": "full_text",
+              "attention_tier": "medium",
+              "theme": "general",
+              "attention_reason": "Default medium attention because the story is relevant but not an obvious top-priority market mover.",
+              "must_keep": false,
+              "model_used": "meta-llama/llama-4-scout-17b-16e-instruct",
+              "delayed_retry_attempted": false,
+              "delayed_retry_model_chain": [],
+              "delayed_retry_final_model": null,
+              "error_classification": null,
+              "error": null
+            },
             {
               "source_article_id": "4405389",
               "title": "民營經濟丨市監總局提34項重點工作促進發展",
@@ -1441,6 +1904,354 @@
       ],
       "analysis_profile": "standard",
       "model_used": "meta-llama/llama-4-scout-17b-16e-instruct",
+      "sub_batch_count": 3,
+      "diagnostics": {
+        "sub_batch_count": 3,
+        "split_reasons": [],
+        "models_attempted": [
+          "meta-llama/llama-4-scout-17b-16e-instruct"
+        ],
+        "estimated_input_tokens_max": 667,
+        "serialized_request_bytes_max": 3477,
+        "rate_limit_waits": 0,
+        "partial_article_count": 0,
+        "synthesis_wait_seconds_total": 0.0,
+        "synthesis_retry_count": 0,
+        "synthesis_retry_skipped_count": 0,
+        "synthesis_budget_exhausted": false,
+        "degraded_merge_used": false,
+        "degraded_merge_reason": "",
+        "synthesis_merge_depth_max": 0,
+        "model_switches": []
+      },
+      "error": null
+    },
+    {
+      "category": "重要通告",
+      "article_count": 3,
+      "status": "success",
+      "key_developments": [
+        "保誠以350億印度盧比收購Bharti Life Insurance 75%股權",
+        "香港中旅旗下松花湖度假區首4月經營利潤5700萬人民幣",
+        "協鑫科技將向多產品新能源材料平台轉型，聚焦「硅、鋰、碳」核心業務",
+        "該交易或要求保誠減持其於ICICIPru Life的股權至10%以下"
+      ],
+      "named_entities": [
+        {
+          "name": "保誠",
+          "type": "company"
+        },
+        {
+          "name": "Bharti Life Insurance",
+          "type": "company"
+        },
+        {
+          "name": "香港中旅",
+          "type": "company"
+        },
+        {
+          "name": "松花湖度假區",
+          "type": "institution"
+        },
+        {
+          "name": "協鑫科技",
+          "type": "company"
+        }
+      ],
+      "articles": [
+        {
+          "source_article_id": "4405470",
+          "title": "保誠購印度Bharti Life Insurance控股權",
+          "canonical_url": "https://www.hkej.com/instantnews/announcement/article/4405470/%E4%BF%9D%E8%AA%A0%E8%B3%BC%E5%8D%B0%E5%BA%A6Bharti+Life+Insurance%E6%8E%A7%E8%82%A1%E6%AC%8A",
+          "published_at": "2026-05-17T20:29:00+08:00",
+          "section": "重要通告",
+          "novelty_score": 8,
+          "relevance_score": 9,
+          "urgency_score": 8,
+          "named_entities": [
+            {
+              "name": "保誠",
+              "type": "company"
+            },
+            {
+              "name": "Bharti Life Insurance",
+              "type": "company"
+            },
+            {
+              "name": "印度",
+              "type": "country"
+            }
+          ],
+          "key_points": [
+            "保誠以350億印度盧比收購Bharti Life Insurance 75%股權",
+            "交易完成後，保誠在印度的業務將由控股的Bharti Life Insurance及Prudential HCL Health Insurance組成",
+            "該交易或要求保誠減持其於ICICIPru Life的股權至10%以下"
+          ],
+          "content_truncated": false,
+          "original_content_length_chars": 606,
+          "analyzed_content_length_chars": 606,
+          "original_content_token_estimate": 152,
+          "analyzed_content_token_estimate": 152,
+          "truncation_reason": null,
+          "analysis_method": "full_text",
+          "attention_tier": "high",
+          "theme": "stocks",
+          "attention_reason": "Acquisition announcement by a listed company",
+          "must_keep": true,
+          "model_used": "meta-llama/llama-4-scout-17b-16e-instruct",
+          "delayed_retry_attempted": false,
+          "delayed_retry_model_chain": [],
+          "delayed_retry_final_model": null,
+          "error_classification": null,
+          "error": null
+        },
+        {
+          "source_article_id": "4405467",
+          "title": "香港中旅:松花湖度假區業務首4月經營利潤5700萬人民幣",
+          "canonical_url": "https://www.hkej.com/instantnews/announcement/article/4405467/%E9%A6%99%E6%B8%AF%E4%B8%AD%E6%97%85%3A%E6%9D%BE%E8%8A%B1%E6%B9%96%E5%BA%A6%E5%81%87%E5%8D%80%E6%A5%AD%E5%8B%99%E9%A6%964%E6%9C%88%E7%B6%93%E7%87%9F%E5%88%A9%E6%BD%A45700%E8%90%AC%E4%BA%BA%E6%B0%91%E5%B9%A3",
+          "published_at": "2026-05-17T19:53:00+08:00",
+          "section": "重要通告",
+          "novelty_score": 6,
+          "relevance_score": 7,
+          "urgency_score": 6,
+          "named_entities": [
+            {
+              "name": "香港中旅",
+              "type": "company"
+            },
+            {
+              "name": "松花湖度假區",
+              "type": "institution"
+            }
+          ],
+          "key_points": [
+            "香港中旅旗下松花湖度假區首4月經營利潤5700萬人民幣",
+            "度假區共接待100萬人次，按年上升約9%",
+            "集團預期新增投資業態將於2028年建設完成並開業"
+          ],
+          "content_truncated": false,
+          "original_content_length_chars": 349,
+          "analyzed_content_length_chars": 349,
+          "original_content_token_estimate": 88,
+          "analyzed_content_token_estimate": 88,
+          "truncation_reason": null,
+          "analysis_method": "full_text",
+          "attention_tier": "high",
+          "theme": "macro",
+          "attention_reason": "High-signal macro headline based on title/summary keywords.",
+          "must_keep": true,
+          "model_used": "meta-llama/llama-4-scout-17b-16e-instruct",
+          "delayed_retry_attempted": false,
+          "delayed_retry_model_chain": [],
+          "delayed_retry_final_model": null,
+          "error_classification": null,
+          "error": null
+        },
+        {
+          "source_article_id": "4405464",
+          "title": "協鑫科技將向多產品新能源材料平台轉型",
+          "canonical_url": "https://www.hkej.com/instantnews/announcement/article/4405464/%E5%8D%94%E9%91%AB%E7%A7%91%E6%8A%80%E5%B0%87%E5%90%91%E5%A4%9A%E7%94%A2%E5%93%81%E6%96%B0%E8%83%BD%E6%BA%90%E6%9D%90%E6%96%99%E5%B9%B3%E5%8F%B0%E8%BD%89%E5%9E%8B",
+          "published_at": "2026-05-17T19:28:00+08:00",
+          "section": "重要通告",
+          "novelty_score": 9,
+          "relevance_score": 8,
+          "urgency_score": 7,
+          "named_entities": [
+            {
+              "name": "協鑫科技",
+              "type": "company"
+            }
+          ],
+          "key_points": [
+            "協鑫科技將向多產品新能源材料平台轉型，聚焦「硅、鋰、碳」核心業務",
+            "公司將打造覆蓋上游資源整合、先進材料製造、行業標準制定及前瞻科技閉環的高價值產業鏈",
+            "協鑫科技將加速新一代硅碳負極在高端動力電池等領域的市場滲透"
+          ],
+          "content_truncated": false,
+          "original_content_length_chars": 493,
+          "analyzed_content_length_chars": 493,
+          "original_content_token_estimate": 124,
+          "analyzed_content_token_estimate": 124,
+          "truncation_reason": null,
+          "analysis_method": "full_text",
+          "attention_tier": "high",
+          "theme": "stocks",
+          "attention_reason": "Strategic transformation announcement by a listed company",
+          "must_keep": true,
+          "model_used": "meta-llama/llama-4-scout-17b-16e-instruct",
+          "delayed_retry_attempted": false,
+          "delayed_retry_model_chain": [],
+          "delayed_retry_final_model": null,
+          "error_classification": null,
+          "error": null
+        }
+      ],
+      "subgroups": [
+        {
+          "title": "重要通告 overview",
+          "theme_rationale": "Single subgroup because the category size did not require thematic splitting.",
+          "article_count": 3,
+          "key_developments": [
+            "保誠以350億印度盧比收購Bharti Life Insurance 75%股權",
+            "香港中旅旗下松花湖度假區首4月經營利潤5700萬人民幣",
+            "協鑫科技將向多產品新能源材料平台轉型，聚焦「硅、鋰、碳」核心業務",
+            "該交易或要求保誠減持其於ICICIPru Life的股權至10%以下"
+          ],
+          "named_entities": [
+            {
+              "name": "保誠",
+              "type": "company"
+            },
+            {
+              "name": "Bharti Life Insurance",
+              "type": "company"
+            },
+            {
+              "name": "香港中旅",
+              "type": "company"
+            },
+            {
+              "name": "松花湖度假區",
+              "type": "institution"
+            },
+            {
+              "name": "協鑫科技",
+              "type": "company"
+            }
+          ],
+          "articles": [
+            {
+              "source_article_id": "4405470",
+              "title": "保誠購印度Bharti Life Insurance控股權",
+              "canonical_url": "https://www.hkej.com/instantnews/announcement/article/4405470/%E4%BF%9D%E8%AA%A0%E8%B3%BC%E5%8D%B0%E5%BA%A6Bharti+Life+Insurance%E6%8E%A7%E8%82%A1%E6%AC%8A",
+              "published_at": "2026-05-17T20:29:00+08:00",
+              "section": "重要通告",
+              "novelty_score": 8,
+              "relevance_score": 9,
+              "urgency_score": 8,
+              "named_entities": [
+                {
+                  "name": "保誠",
+                  "type": "company"
+                },
+                {
+                  "name": "Bharti Life Insurance",
+                  "type": "company"
+                },
+                {
+                  "name": "印度",
+                  "type": "country"
+                }
+              ],
+              "key_points": [
+                "保誠以350億印度盧比收購Bharti Life Insurance 75%股權",
+                "交易完成後，保誠在印度的業務將由控股的Bharti Life Insurance及Prudential HCL Health Insurance組成",
+                "該交易或要求保誠減持其於ICICIPru Life的股權至10%以下"
+              ],
+              "content_truncated": false,
+              "original_content_length_chars": 606,
+              "analyzed_content_length_chars": 606,
+              "original_content_token_estimate": 152,
+              "analyzed_content_token_estimate": 152,
+              "truncation_reason": null,
+              "analysis_method": "full_text",
+              "attention_tier": "high",
+              "theme": "stocks",
+              "attention_reason": "Acquisition announcement by a listed company",
+              "must_keep": true,
+              "model_used": "meta-llama/llama-4-scout-17b-16e-instruct",
+              "delayed_retry_attempted": false,
+              "delayed_retry_model_chain": [],
+              "delayed_retry_final_model": null,
+              "error_classification": null,
+              "error": null
+            },
+            {
+              "source_article_id": "4405467",
+              "title": "香港中旅:松花湖度假區業務首4月經營利潤5700萬人民幣",
+              "canonical_url": "https://www.hkej.com/instantnews/announcement/article/4405467/%E9%A6%99%E6%B8%AF%E4%B8%AD%E6%97%85%3A%E6%9D%BE%E8%8A%B1%E6%B9%96%E5%BA%A6%E5%81%87%E5%8D%80%E6%A5%AD%E5%8B%99%E9%A6%964%E6%9C%88%E7%B6%93%E7%87%9F%E5%88%A9%E6%BD%A45700%E8%90%AC%E4%BA%BA%E6%B0%91%E5%B9%A3",
+              "published_at": "2026-05-17T19:53:00+08:00",
+              "section": "重要通告",
+              "novelty_score": 6,
+              "relevance_score": 7,
+              "urgency_score": 6,
+              "named_entities": [
+                {
+                  "name": "香港中旅",
+                  "type": "company"
+                },
+                {
+                  "name": "松花湖度假區",
+                  "type": "institution"
+                }
+              ],
+              "key_points": [
+                "香港中旅旗下松花湖度假區首4月經營利潤5700萬人民幣",
+                "度假區共接待100萬人次，按年上升約9%",
+                "集團預期新增投資業態將於2028年建設完成並開業"
+              ],
+              "content_truncated": false,
+              "original_content_length_chars": 349,
+              "analyzed_content_length_chars": 349,
+              "original_content_token_estimate": 88,
+              "analyzed_content_token_estimate": 88,
+              "truncation_reason": null,
+              "analysis_method": "full_text",
+              "attention_tier": "high",
+              "theme": "macro",
+              "attention_reason": "High-signal macro headline based on title/summary keywords.",
+              "must_keep": true,
+              "model_used": "meta-llama/llama-4-scout-17b-16e-instruct",
+              "delayed_retry_attempted": false,
+              "delayed_retry_model_chain": [],
+              "delayed_retry_final_model": null,
+              "error_classification": null,
+              "error": null
+            },
+            {
+              "source_article_id": "4405464",
+              "title": "協鑫科技將向多產品新能源材料平台轉型",
+              "canonical_url": "https://www.hkej.com/instantnews/announcement/article/4405464/%E5%8D%94%E9%91%AB%E7%A7%91%E6%8A%80%E5%B0%87%E5%90%91%E5%A4%9A%E7%94%A2%E5%93%81%E6%96%B0%E8%83%BD%E6%BA%90%E6%9D%90%E6%96%99%E5%B9%B3%E5%8F%B0%E8%BD%89%E5%9E%8B",
+              "published_at": "2026-05-17T19:28:00+08:00",
+              "section": "重要通告",
+              "novelty_score": 9,
+              "relevance_score": 8,
+              "urgency_score": 7,
+              "named_entities": [
+                {
+                  "name": "協鑫科技",
+                  "type": "company"
+                }
+              ],
+              "key_points": [
+                "協鑫科技將向多產品新能源材料平台轉型，聚焦「硅、鋰、碳」核心業務",
+                "公司將打造覆蓋上游資源整合、先進材料製造、行業標準制定及前瞻科技閉環的高價值產業鏈",
+                "協鑫科技將加速新一代硅碳負極在高端動力電池等領域的市場滲透"
+              ],
+              "content_truncated": false,
+              "original_content_length_chars": 493,
+              "analyzed_content_length_chars": 493,
+              "original_content_token_estimate": 124,
+              "analyzed_content_token_estimate": 124,
+              "truncation_reason": null,
+              "analysis_method": "full_text",
+              "attention_tier": "high",
+              "theme": "stocks",
+              "attention_reason": "Strategic transformation announcement by a listed company",
+              "must_keep": true,
+              "model_used": "meta-llama/llama-4-scout-17b-16e-instruct",
+              "delayed_retry_attempted": false,
+              "delayed_retry_model_chain": [],
+              "delayed_retry_final_model": null,
+              "error_classification": null,
+              "error": null
+            }
+          ],
+          "model_used": "meta-llama/llama-4-scout-17b-16e-instruct"
+        }
+      ],
+      "analysis_profile": "standard",
+      "model_used": "meta-llama/llama-4-scout-17b-16e-instruct",
       "sub_batch_count": 2,
       "diagnostics": {
         "sub_batch_count": 1,
@@ -1448,8 +2259,8 @@
         "models_attempted": [
           "meta-llama/llama-4-scout-17b-16e-instruct"
         ],
-        "estimated_input_tokens_max": 709,
-        "serialized_request_bytes_max": 4614,
+        "estimated_input_tokens_max": 1289,
+        "serialized_request_bytes_max": 7937,
         "rate_limit_waits": 0,
         "partial_article_count": 0,
         "synthesis_wait_seconds_total": 0.0,
@@ -1465,32 +2276,85 @@
     },
     {
       "category": "地產新聞",
-      "article_count": 6,
+      "article_count": 8,
       "status": "success",
       "key_developments": [
-        "大興花園兩房月租1.05萬元，租金回報超過11厘",
-        "中環半山雅盈峰三房單位成交價7773.2萬元，創下新高，實用呎價達61987元",
-        "寶翠園三房持貨23年賺1819萬元，賣出價2373.8萬元"
+        "宇晴軒兩房單位以2.1萬元租出，實用呎租約47元，業主持貨6年，享回報約3.1厘。",
+        "大興花園兩房月租1.05萬元，租金回報超過11厘。",
+        "新地's 形瑨項目加推87伙單位，折實平均呎價約18613元"
       ],
       "named_entities": [
+        {
+          "name": "宇晴軒",
+          "type": "institution"
+        },
         {
           "name": "大興花園",
           "type": "institution"
         },
         {
-          "name": "中環半山雅盈峰",
-          "type": "institution"
-        },
-        {
-          "name": "寶翠園",
-          "type": "institution"
-        },
-        {
-          "name": "盈大地產",
+          "name": "新地",
           "type": "company"
         }
       ],
       "articles": [
+        {
+          "source_article_id": "4405444",
+          "title": "宇晴軒兩房2.1萬租出 回報3.1厘",
+          "canonical_url": "https://www.hkej.com/instantnews/property/article/4405444/%E5%AE%87%E6%99%B4%E8%BB%92%E5%85%A9%E6%88%BF2.1%E8%90%AC%E7%A7%9F%E5%87%BA+%E5%9B%9E%E5%A0%B13.1%E5%8E%98",
+          "published_at": "2026-05-17T18:30:00+08:00",
+          "section": "二手市場",
+          "novelty_score": 4,
+          "relevance_score": 6,
+          "urgency_score": 3,
+          "named_entities": [
+            {
+              "name": "宇晴軒",
+              "type": "institution"
+            },
+            {
+              "name": "香港置業",
+              "type": "organization"
+            }
+          ],
+          "key_points": [
+            "單位實用面積約447方呎，2房間隔，以2.1萬元租出，實用呎租約47元。",
+            "業主持貨6年，享回報約3.1厘。"
+          ],
+          "content_truncated": false,
+          "original_content_length_chars": 157,
+          "analyzed_content_length_chars": 157,
+          "original_content_token_estimate": 40,
+          "analyzed_content_token_estimate": 40,
+          "truncation_reason": null,
+          "analysis_method": "full_text",
+          "attention_tier": "medium",
+          "theme": "general",
+          "attention_reason": "Default medium attention because the story is relevant but not an obvious top-priority market mover.",
+          "must_keep": false,
+          "model_used": "meta-llama/llama-4-scout-17b-16e-instruct",
+          "delayed_retry_attempted": false,
+          "delayed_retry_model_chain": [],
+          "delayed_retry_final_model": null,
+          "error_classification": null,
+          "error": null
+        },
+        {
+          "source_article_id": "4405451",
+          "canonical_url": "https://www.hkej.com/instantnews/property/article/4405451/%E6%9C%83%E5%9C%B0%E9%8A%B7%E5%94%AE%E9%A1%8D%E7%AA%81%E7%A0%B4200%E5%84%84+%E8%BC%83%E5%8E%BB%E5%B9%B4%E6%97%A9%E5%85%AD%E5%80%8B%E6%9C%88%E9%81%94%E6%88%90",
+          "title": "會地銷售額突破200億 較去年早六個月達成",
+          "section": "地產新聞",
+          "published_at": "2026-05-17T18:06:00+08:00",
+          "attention_tier": "light",
+          "novelty_score": 5,
+          "relevance_score": 5,
+          "urgency_score": 5,
+          "named_entities": [],
+          "key_points": [],
+          "content_truncated": false,
+          "analysis_method": "bypassed",
+          "model_used": "direct"
+        },
         {
           "source_article_id": "4405442",
           "title": "大興花園兩房月租1.05萬 回報逾11厘",
@@ -1748,33 +2612,70 @@
       ],
       "subgroups": [
         {
-          "title": "地產新聞 overview",
-          "theme_rationale": "Single subgroup because the category size did not require thematic splitting.",
-          "article_count": 6,
+          "title": "Combined Market Overview",
+          "theme_rationale": "Consolidated smaller themes for brevity.",
+          "article_count": 8,
           "key_developments": [
-            "大興花園兩房月租1.05萬元，租金回報超過11厘",
-            "中環半山雅盈峰三房單位成交價7773.2萬元，創下新高，實用呎價達61987元",
-            "寶翠園三房持貨23年賺1819萬元，賣出價2373.8萬元"
+            "宇晴軒兩房單位以2.1萬元租出，實用呎租約47元，業主持貨6年，享回報約3.1厘。",
+            "大興花園兩房月租1.05萬元，租金回報超過11厘。",
+            "新地's 形瑨項目加推87伙單位，折實平均呎價約18613元"
           ],
           "named_entities": [
+            {
+              "name": "宇晴軒",
+              "type": "institution"
+            },
             {
               "name": "大興花園",
               "type": "institution"
             },
             {
-              "name": "中環半山雅盈峰",
-              "type": "institution"
-            },
-            {
-              "name": "寶翠園",
-              "type": "institution"
-            },
-            {
-              "name": "盈大地產",
+              "name": "新地",
               "type": "company"
             }
           ],
           "articles": [
+            {
+              "source_article_id": "4405444",
+              "title": "宇晴軒兩房2.1萬租出 回報3.1厘",
+              "canonical_url": "https://www.hkej.com/instantnews/property/article/4405444/%E5%AE%87%E6%99%B4%E8%BB%92%E5%85%A9%E6%88%BF2.1%E8%90%AC%E7%A7%9F%E5%87%BA+%E5%9B%9E%E5%A0%B13.1%E5%8E%98",
+              "published_at": "2026-05-17T18:30:00+08:00",
+              "section": "二手市場",
+              "novelty_score": 4,
+              "relevance_score": 6,
+              "urgency_score": 3,
+              "named_entities": [
+                {
+                  "name": "宇晴軒",
+                  "type": "institution"
+                },
+                {
+                  "name": "香港置業",
+                  "type": "organization"
+                }
+              ],
+              "key_points": [
+                "單位實用面積約447方呎，2房間隔，以2.1萬元租出，實用呎租約47元。",
+                "業主持貨6年，享回報約3.1厘。"
+              ],
+              "content_truncated": false,
+              "original_content_length_chars": 157,
+              "analyzed_content_length_chars": 157,
+              "original_content_token_estimate": 40,
+              "analyzed_content_token_estimate": 40,
+              "truncation_reason": null,
+              "analysis_method": "full_text",
+              "attention_tier": "medium",
+              "theme": "general",
+              "attention_reason": "Default medium attention because the story is relevant but not an obvious top-priority market mover.",
+              "must_keep": false,
+              "model_used": "meta-llama/llama-4-scout-17b-16e-instruct",
+              "delayed_retry_attempted": false,
+              "delayed_retry_model_chain": [],
+              "delayed_retry_final_model": null,
+              "error_classification": null,
+              "error": null
+            },
             {
               "source_article_id": "4405442",
               "title": "大興花園兩房月租1.05萬 回報逾11厘",
@@ -1815,6 +2716,22 @@
               "delayed_retry_final_model": null,
               "error_classification": null,
               "error": null
+            },
+            {
+              "source_article_id": "4405451",
+              "canonical_url": "https://www.hkej.com/instantnews/property/article/4405451/%E6%9C%83%E5%9C%B0%E9%8A%B7%E5%94%AE%E9%A1%8D%E7%AA%81%E7%A0%B4200%E5%84%84+%E8%BC%83%E5%8E%BB%E5%B9%B4%E6%97%A9%E5%85%AD%E5%80%8B%E6%9C%88%E9%81%94%E6%88%90",
+              "title": "會地銷售額突破200億 較去年早六個月達成",
+              "section": "地產新聞",
+              "published_at": "2026-05-17T18:06:00+08:00",
+              "attention_tier": "light",
+              "novelty_score": 5,
+              "relevance_score": 5,
+              "urgency_score": 5,
+              "named_entities": [],
+              "key_points": [],
+              "content_truncated": false,
+              "analysis_method": "bypassed",
+              "model_used": "direct"
             },
             {
               "source_article_id": "4405441",
@@ -2037,15 +2954,13 @@
       "model_used": "meta-llama/llama-4-scout-17b-16e-instruct",
       "sub_batch_count": 5,
       "diagnostics": {
-        "sub_batch_count": 2,
-        "split_reasons": [
-          "pre_send_budget"
-        ],
+        "sub_batch_count": 5,
+        "split_reasons": [],
         "models_attempted": [
           "meta-llama/llama-4-scout-17b-16e-instruct"
         ],
-        "estimated_input_tokens_max": 1396,
-        "serialized_request_bytes_max": 8359,
+        "estimated_input_tokens_max": 626,
+        "serialized_request_bytes_max": 3121,
         "rate_limit_waits": 0,
         "partial_article_count": 0,
         "synthesis_wait_seconds_total": 0.0,
@@ -2054,11 +2969,18 @@
         "synthesis_budget_exhausted": false,
         "degraded_merge_used": false,
         "degraded_merge_reason": "",
-        "synthesis_merge_depth_max": 1,
+        "synthesis_merge_depth_max": 0,
         "model_switches": []
       },
       "error": null
     }
   ],
-  "errors": []
+  "errors": [
+    {
+      "type": "category",
+      "target": "時事脈搏",
+      "message": "Category 時事脈搏 exhausted synthesis wait budget after 1814.4 seconds.",
+      "classification": "unexpected_error"
+    }
+  ]
 }
