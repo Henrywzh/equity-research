@@ -169,8 +169,13 @@ class ReportGenerator:
 
                 <div class="grid">
                     <div class="card card-full">
-                        <h3>Level 1: Market Regime Monitor</h3>
+                        <h3>Level 1: Market Regime Monitor (Offensive vs. Defensive Sectors)</h3>
                         {plots.get('regime', '')}
+                    </div>
+
+                    <div class="card card-full">
+                        <h3>Level 1: Market Breadth Monitor (S&P 500 Equal-Weight vs. Cap-Weight)</h3>
+                        {plots.get('breadth', '')}
                     </div>
 
                     <div class="card">
