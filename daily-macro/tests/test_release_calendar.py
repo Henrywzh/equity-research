@@ -6,6 +6,7 @@ from unittest.mock import patch
 import requests
 
 from daily_macro.release_calendar import (
+    _get_fred_api_key,
     build_release_digest,
     enrich_releases_with_prior_values,
     fetch_warning_releases,
@@ -36,6 +37,9 @@ FOMC_HTML = """
 
 def test_build_release_digest_without_fred_key_keeps_fomc_items():
     with patch.dict("os.environ", {}, clear=True), patch(
+        "daily_macro.release_calendar._load_local_config",
+        return_value={},
+    ), patch(
         "daily_macro.release_calendar.fetch_fomc_events",
         return_value=[
             {
@@ -97,6 +101,11 @@ def test_build_release_digest_merges_fred_and_fomc_items():
 
     assert digest["fetch_status"] == "success"
     assert [item["name"] for item in digest["items"]] == ["Consumer Price Index", "FOMC Meeting (Day 1)"]
+
+
+def test_get_fred_api_key_strips_surrounding_quotes():
+    with patch.dict("os.environ", {"FRED_API_KEY": '"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"'}, clear=True):
+        assert _get_fred_api_key(required=False) == "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
 
 
 def test_parse_fomc_events_from_html_builds_both_days_and_sep_flag():

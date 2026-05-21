@@ -1,10 +1,12 @@
 from __future__ import annotations
 
 import os
+import re
 from datetime import datetime
 
 import requests
 
+from .http import build_session
 from .nowcast_storage import NowcastStorage
 
 
@@ -125,18 +127,22 @@ def fetch_cleveland_fed_nowcasts(url_type: str = "month") -> list[dict]:
 
 
 def fetch_gdpnow_from_fred(api_key: str) -> list[dict]:
-    response = requests.get(
-        f"{FRED_API_URL}/series/observations",
-        params={
-            "api_key": api_key,
-            "series_id": "GDPNOW",
-            "file_type": "json",
-            "sort_order": "desc",
-            "limit": 1,
-        },
-        timeout=10,
-    )
-    response.raise_for_status()
+    session = build_session()
+    try:
+        response = session.get(
+            f"{FRED_API_URL}/series/observations",
+            params={
+                "api_key": api_key,
+                "series_id": "GDPNOW",
+                "file_type": "json",
+                "sort_order": "desc",
+                "limit": 1,
+            },
+            timeout=10,
+        )
+        response.raise_for_status()
+    finally:
+        session.close()
     payload = response.json()
     obs_list = payload.get("observations", [])
     if not obs_list:
@@ -161,6 +167,19 @@ def fetch_gdpnow_from_fred(api_key: str) -> list[dict]:
             "as_of_date": obs["date"],
         }
     ]
+
+
+def _is_transient_http_error(exc: Exception) -> bool:
+    if not isinstance(exc, requests.HTTPError):
+        return False
+    response = exc.response
+    if response is None:
+        return False
+    return response.status_code in {429, 500, 502, 503, 504}
+
+
+def _is_valid_fred_api_key(value: str) -> bool:
+    return bool(re.fullmatch(r"[a-z0-9]{32}", value))
 
 
 def refresh_nowcasts(data_dir: str | None = None) -> dict:
@@ -199,30 +218,28 @@ def refresh_nowcasts(data_dir: str | None = None) -> dict:
     results["cleveland"]["count"] = total_cleveland
 
     # 2. GDPNow
-    api_key = os.environ.get("FRED_API_KEY")
+    from .release_calendar import _get_fred_api_key
+
+    api_key = _get_fred_api_key(required=False)
     if api_key:
+        if not _is_valid_fred_api_key(api_key):
+            results["gdpnow"]["status"] = "failed"
+            results["gdpnow"]["error"] = (
+                "Invalid FRED_API_KEY format. Expected a 32 character lower-case alpha-numeric string."
+            )
+            storage.close()
+            return results
         try:
             gdp_obs = fetch_gdpnow_from_fred(api_key)
             for obs in gdp_obs:
                 storage.upsert_observation(**obs)
             results["gdpnow"]["count"] = len(gdp_obs)
         except Exception as e:
-            results["gdpnow"]["status"] = "failed"
+            results["gdpnow"]["status"] = "partial_failure" if _is_transient_http_error(e) else "failed"
             results["gdpnow"]["error"] = str(e)
     else:
-        # Check local config if env is empty
-        from .release_calendar import _get_fred_api_key
-        try:
-            api_key = _get_fred_api_key(required=False)
-            if api_key:
-                gdp_obs = fetch_gdpnow_from_fred(api_key)
-                for obs in gdp_obs:
-                    storage.upsert_observation(**obs)
-                results["gdpnow"]["count"] = len(gdp_obs)
-                results["gdpnow"]["status"] = "success"
-        except Exception:
-            results["gdpnow"]["status"] = "skipped"
-            results["gdpnow"]["error"] = "Missing FRED_API_KEY"
+        results["gdpnow"]["status"] = "skipped"
+        results["gdpnow"]["error"] = "Missing FRED_API_KEY"
 
     storage.close()
     return results

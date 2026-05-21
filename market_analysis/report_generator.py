@@ -26,6 +26,26 @@ class ReportGenerator:
         }
         .container { max-width: 1300px; margin: 0 auto; padding: 30px; }
         .header { display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 40px; }
+        .button-link {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            padding: 8px 16px;
+            border-radius: 9999px;
+            border: 1px solid var(--border);
+            color: var(--text-dim);
+            text-decoration: none;
+            background: var(--card-bg);
+            font-size: 0.85rem;
+            font-weight: 500;
+            transition: border-color 0.2s ease, color 0.2s ease, transform 0.2s ease;
+        }
+        .button-link:hover {
+            border-color: var(--accent);
+            color: var(--text-main);
+            transform: translateY(-1px);
+        }
         .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
         .card { 
             background: var(--card-bg); 
@@ -133,6 +153,9 @@ class ReportGenerator:
             <div class="container">
                 <div class="header">
                     <div>
+                        <div style="margin-bottom: 16px;">
+                            <a class="button-link" href="index.html">← Back to Hub</a>
+                        </div>
                         <h1 style="margin:0; font-size: 2rem;">Equity Intelligence Hub</h1>
                         <p style="color: var(--text-dim); margin-top:8px;">Market Intelligence & Quantitative Signals</p>
                     </div>

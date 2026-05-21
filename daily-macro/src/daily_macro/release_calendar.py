@@ -410,17 +410,26 @@ def _release_sort_key(item: dict[str, Any]) -> tuple[str, int, int, str]:
 
 def _get_fred_api_key(*, required: bool) -> str:
     config = _load_local_config()
-    value = (os.environ.get(FRED_API_KEY_ENV) or config.get(FRED_API_KEY_ENV) or "").strip()
+    value = _normalize_secret_value(os.environ.get(FRED_API_KEY_ENV) or config.get(FRED_API_KEY_ENV) or "")
     
     # If still empty, check for case variations
     if not value:
-        value = (os.environ.get(FRED_API_KEY_ENV.lower()) or config.get(FRED_API_KEY_ENV.lower()) or "").strip()
+        value = _normalize_secret_value(
+            os.environ.get(FRED_API_KEY_ENV.lower()) or config.get(FRED_API_KEY_ENV.lower()) or ""
+        )
         
     if required and not value:
         raise RuntimeError(
             f"FRED API key not set. Expected {FRED_API_KEY_ENV} in the environment or local .config."
         )
     return value
+
+
+def _normalize_secret_value(value: str) -> str:
+    normalized = value.strip()
+    if len(normalized) >= 2 and normalized[0] == normalized[-1] and normalized[0] in {"'", '"'}:
+        normalized = normalized[1:-1].strip()
+    return normalized
 
 
 def _load_local_config() -> dict[str, str]:

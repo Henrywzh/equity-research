@@ -189,6 +189,22 @@ class CliTests(unittest.TestCase):
         self.assertEqual(payload["latest_report_date"], "2026-04-09")
         mock_build_site.assert_called_once_with(data_dir="/tmp/data", output_dir="/tmp/site")
 
+    def test_nowcasts_partial_failure_returns_zero(self) -> None:
+        with patch(
+            "daily_macro.cli.refresh_nowcasts",
+            return_value={
+                "cleveland": {"count": 1436, "status": "success", "error": []},
+                "gdpnow": {"count": 0, "status": "partial_failure", "error": "HTTP 500"},
+            },
+        ):
+            buffer = io.StringIO()
+            with redirect_stdout(buffer):
+                exit_code = main(["nowcasts"])
+
+        self.assertEqual(exit_code, 0)
+        payload = json.loads(buffer.getvalue())
+        self.assertEqual(payload["gdpnow"]["status"], "partial_failure")
+
     def test_inspect_default_returns_zero_with_empty_db(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
             db_path = f"{tmp}/news.sqlite"
