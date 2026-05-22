@@ -176,14 +176,7 @@ class DataEngine:
         return None
 
     def _candidate_cache_files(self) -> list[Path]:
-        candidates = [self.cache_file]
-        alternates = sorted(
-            (path for path in self.cache_dir.glob("etf_data_*.pkl") if path != self.cache_file),
-            key=lambda path: path.stat().st_mtime,
-            reverse=True,
-        )
-        candidates.extend(alternates)
-        return candidates
+        return [self.cache_file]
 
     def _normalize_cached_frame(self, cache: pd.DataFrame) -> pd.DataFrame:
         frame = cache.copy()
