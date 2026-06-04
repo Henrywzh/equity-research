@@ -1,15 +1,15 @@
 {
   "report_schema_version": 6,
   "report_date": "2026-06-04",
-  "generated_at": "2026-06-04T11:45:05.890821+00:00",
+  "generated_at": "2026-06-04T23:19:08.370689+00:00",
   "source_site": "hkej",
   "status": "partial",
-  "executive_summary": [
+  "executive_summary": [],
+  "legacy_executive_summary": [
     "香港多區氣溫超過35度，上水最高錄得37.2度",
     "政府人員協會要求薪水提升不低於4%以提升士氣",
     "方大6名學者躋身史丹福大學全球前2%頂尖科學家"
   ],
-  "legacy_executive_summary": [],
   "model": {
     "provider": "groq",
     "primary_model": "meta-llama/llama-4-scout-17b-16e-instruct",
@@ -20,15 +20,15 @@
   },
   "model_switches": [],
   "input": {
-    "article_count": 55,
-    "category_count": 8
+    "article_count": 72,
+    "category_count": 9
   },
   "diagnostics": {
-    "rate_limit_wait_count": 2,
-    "rate_limit_wait_seconds_total": 3110.399,
+    "rate_limit_wait_count": 3,
+    "rate_limit_wait_seconds_total": 4665.597,
     "fallback_switch_count": 0,
     "key_rotation_count": 0,
-    "pre_send_split_count": 23,
+    "pre_send_split_count": 17,
     "response_413_split_count": 0,
     "json_repair_retry_count": 0,
     "batch_count": 58,
@@ -44,18 +44,18 @@
     "degraded_merge_count": 0
   },
   "incremental": {
-    "reused_successful_articles": 0,
-    "new_articles_analyzed": 55,
+    "reused_successful_articles": 55,
+    "new_articles_analyzed": 17,
     "retried_previous_day_articles": 0,
     "previous_day_retry_successes": 0
   },
   "daily_stats": {
-    "total_scraped": 55,
-    "analyzed": 55,
+    "total_scraped": 72,
+    "analyzed": 72,
     "success_rate": 100.0
   },
   "macro_release_digest": {
-    "generated_at": "2026-06-04T10:49:52.189683+00:00",
+    "generated_at": "2026-06-04T22:00:18.547339+00:00",
     "window_start": "2026-06-04",
     "window_end": "2026-06-10",
     "fetch_status": "failed",
@@ -67,12 +67,12 @@
   },
   "unresolved_articles": [],
   "totals": {
-    "article_count": 55,
-    "successful_article_analyses": 55,
+    "article_count": 72,
+    "successful_article_analyses": 72,
     "failed_article_analyses": 0,
-    "full_text_article_count": 55,
+    "full_text_article_count": 72,
     "truncated_article_count": 0,
-    "successful_categories": 7,
+    "successful_categories": 8,
     "partial_categories": 1,
     "failed_categories": 0
   },
@@ -80,180 +80,312 @@
   "categories": [
     {
       "category": "國際財經",
-      "article_count": 14,
-      "status": "partial",
+      "article_count": 20,
+      "status": "success",
       "key_developments": [],
       "named_entities": [
         {
-          "name": "馬克龍",
-          "type": "person"
-        },
-        {
-          "name": "OpenAI",
+          "name": "博通",
           "type": "company"
         },
         {
-          "name": "Sam Altman",
-          "type": "person"
-        },
-        {
-          "name": "G7",
-          "type": "organization"
-        },
-        {
-          "name": "軟銀",
+          "name": "美國運通",
           "type": "company"
         },
         {
-          "name": "特朗普",
-          "type": "person"
-        },
-        {
-          "name": "伊朗",
-          "type": "country"
-        },
-        {
-          "name": "英國富時100指數",
-          "type": "index"
-        },
-        {
-          "name": "德國DAX指數",
-          "type": "index"
-        },
-        {
-          "name": "法國CAC 40指數",
-          "type": "index"
-        },
-        {
-          "name": "黃仁勳",
-          "type": "person"
-        },
-        {
-          "name": "Nvidia",
+          "name": "高盛",
           "type": "company"
         },
         {
-          "name": "SK集團",
+          "name": "Pimco",
           "type": "company"
-        },
-        {
-          "name": "崔泰源",
-          "type": "person"
-        },
-        {
-          "name": "現代汽車集團",
-          "type": "company"
-        },
-        {
-          "name": "日經平均指數",
-          "type": "index"
-        },
-        {
-          "name": "南韓首爾綜合指數",
-          "type": "index"
-        },
-        {
-          "name": "台灣加權指數",
-          "type": "index"
-        },
-        {
-          "name": "澳洲普通股指數",
-          "type": "index"
-        },
-        {
-          "name": "聯儲局",
-          "type": "institution"
-        },
-        {
-          "name": "美國",
-          "type": "country"
-        },
-        {
-          "name": "SpaceX",
-          "type": "company"
-        },
-        {
-          "name": "馬斯克",
-          "type": "person"
         },
         {
           "name": "道指",
           "type": "index"
-        },
-        {
-          "name": "Alphabet",
-          "type": "company"
-        },
-        {
-          "name": "Google",
-          "type": "company"
-        },
-        {
-          "name": "IBM",
-          "type": "company"
-        },
-        {
-          "name": "輝達",
-          "type": "company"
-        },
-        {
-          "name": "微軟",
-          "type": "company"
-        },
-        {
-          "name": "亞馬遜",
-          "type": "company"
-        },
-        {
-          "name": "三星電子",
-          "type": "company"
-        },
-        {
-          "name": "SK海力士",
-          "type": "company"
-        },
-        {
-          "name": "南韓",
-          "type": "country"
-        },
-        {
-          "name": "歐股",
-          "type": "index"
-        },
-        {
-          "name": "Zara",
-          "type": "company"
-        },
-        {
-          "name": "Inditex",
-          "type": "company"
-        },
-        {
-          "name": "John Williams",
-          "type": "person"
-        },
-        {
-          "name": "FOMC",
-          "type": "organization"
-        },
-        {
-          "name": "Ray Dalio",
-          "type": "person"
-        },
-        {
-          "name": "Bridgewater",
-          "type": "organization"
-        },
-        {
-          "name": "AI",
-          "type": "other"
-        },
-        {
-          "name": "NVIDIA",
-          "type": "company"
         }
       ],
       "articles": [
+        {
+          "source_article_id": "4424149",
+          "title": "美股走勢丨道指曾飆逾900點 博通拖累納指下跌",
+          "canonical_url": "https://www.hkej.com/instantnews/international/article/4424149/%E7%BE%8E%E8%82%A1%E8%B5%B0%E5%8B%A2%E4%B8%A8%E9%81%93%E6%8C%87%E6%9B%BE%E9%A3%86%E9%80%BE900%E9%BB%9E+%E5%8D%9A%E9%80%9A%E6%8B%96%E7%B4%AF%E7%B4%8D%E6%8C%87%E4%B8%8B%E8%B7%8C",
+          "published_at": "2026-06-04T23:51:00+08:00",
+          "section": "國際財經",
+          "novelty_score": 6,
+          "relevance_score": 8,
+          "urgency_score": 7,
+          "named_entities": [
+            {
+              "name": "黎巴嫩",
+              "type": "country"
+            },
+            {
+              "name": "以色列",
+              "type": "country"
+            },
+            {
+              "name": "博通",
+              "type": "company"
+            },
+            {
+              "name": "美國運通",
+              "type": "company"
+            },
+            {
+              "name": "高盛",
+              "type": "company"
+            }
+          ],
+          "key_points": [
+            "道指一度飆901點，破頂高見51588點，截至本港時間晚上11時41分，道指報51543點，升856點或1.69%；",
+            "博通預料第三財季AI晶片銷售額為160億美元，按年增長2倍，但遜於分析員預期的172億美元，股價一度滑落15.9%；",
+            "美國運通和高盛股價齊升超過4%"
+          ],
+          "content_truncated": false,
+          "original_content_length_chars": 461,
+          "analyzed_content_length_chars": 461,
+          "original_content_token_estimate": 116,
+          "analyzed_content_token_estimate": 116,
+          "truncation_reason": null,
+          "analysis_method": "full_text",
+          "attention_tier": "medium",
+          "theme": "stocks",
+          "attention_reason": "Market movement with specific index mentioned",
+          "must_keep": true,
+          "model_used": "meta-llama/llama-4-scout-17b-16e-instruct",
+          "delayed_retry_attempted": false,
+          "delayed_retry_model_chain": [],
+          "delayed_retry_final_model": null,
+          "error_classification": null,
+          "error": null
+        },
+        {
+          "source_article_id": "4424147",
+          "title": "Pimco警告信用市場持續違約周期已開始",
+          "canonical_url": "https://www.hkej.com/instantnews/international/article/4424147/Pimco%E8%AD%A6%E5%91%8A%E4%BF%A1%E7%94%A8%E5%B8%82%E5%A0%B4%E6%8C%81%E7%BA%8C%E9%81%95%E7%B4%84%E5%91%A8%E6%9C%9F%E5%B7%B2%E9%96%8B%E5%A7%8B",
+          "published_at": "2026-06-04T23:22:00+08:00",
+          "section": "國際財經",
+          "novelty_score": 8,
+          "relevance_score": 9,
+          "urgency_score": 8,
+          "named_entities": [
+            {
+              "name": "Pimco",
+              "type": "company"
+            },
+            {
+              "name": "Daniel Ivascyn",
+              "type": "person"
+            },
+            {
+              "name": "Glendon Capital Management",
+              "type": "company"
+            },
+            {
+              "name": "Holly Kim",
+              "type": "person"
+            }
+          ],
+          "key_points": [
+            "Pimco警告信用市場持續違約周期已開始，市場將面臨更高虧損。",
+            "2021年和2022年依靠廉價借貸融資的槓桿收購項目面臨主要問題。",
+            "巨額資本湧入AI相關基礎設施領域帶來風險和不確定性。"
+          ],
+          "content_truncated": false,
+          "original_content_length_chars": 382,
+          "analyzed_content_length_chars": 382,
+          "original_content_token_estimate": 96,
+          "analyzed_content_token_estimate": 96,
+          "truncation_reason": null,
+          "analysis_method": "full_text",
+          "attention_tier": "high",
+          "theme": "macro",
+          "attention_reason": "Warning on credit market by a major financial institution",
+          "must_keep": true,
+          "model_used": "meta-llama/llama-4-scout-17b-16e-instruct",
+          "delayed_retry_attempted": false,
+          "delayed_retry_model_chain": [],
+          "delayed_retry_final_model": null,
+          "error_classification": null,
+          "error": null
+        },
+        {
+          "source_article_id": "4424144",
+          "title": "格里爾稱強迫勞動關稅有法可依 承諾遵守歐日15%關稅上限",
+          "canonical_url": "https://www.hkej.com/instantnews/international/article/4424144/%E6%A0%BC%E9%87%8C%E7%88%BE%E7%A8%B1%E5%BC%B7%E8%BF%AB%E5%8B%9E%E5%8B%95%E9%97%9C%E7%A8%85%E6%9C%89%E6%B3%95%E5%8F%AF%E4%BE%9D+%E6%89%BF%E8%AB%BE%E9%81%B5%E5%AE%88%E6%AD%90%E6%97%A515%25%E9%97%9C%E7%A8%85%E4%B8%8A%E9%99%90",
+          "published_at": "2026-06-04T23:18:00+08:00",
+          "section": "國際財經",
+          "novelty_score": 6,
+          "relevance_score": 8,
+          "urgency_score": 5,
+          "named_entities": [
+            {
+              "name": "格里爾",
+              "type": "person"
+            },
+            {
+              "name": "歐盟",
+              "type": "organization"
+            },
+            {
+              "name": "日本",
+              "type": "country"
+            }
+          ],
+          "key_points": [
+            "美國貿易代表格里爾表示，美國將遵守與歐盟、日本等國達成的貿易協議中的關稅上限。",
+            "美國計劃針對強迫勞動問題實施的新關稅措施，為遵守這些上限提供了法律依據。",
+            "美國已與歐盟和日本達成協議，將對從這些地區進口的大部分商品徵收的關稅上限設定為15%。"
+          ],
+          "content_truncated": false,
+          "original_content_length_chars": 404,
+          "analyzed_content_length_chars": 404,
+          "original_content_token_estimate": 101,
+          "analyzed_content_token_estimate": 101,
+          "truncation_reason": null,
+          "analysis_method": "full_text",
+          "attention_tier": "medium",
+          "theme": "geopolitics",
+          "attention_reason": "Trade agreement and tariff discussion",
+          "must_keep": true,
+          "model_used": "meta-llama/llama-4-scout-17b-16e-instruct",
+          "delayed_retry_attempted": false,
+          "delayed_retry_model_chain": [],
+          "delayed_retry_final_model": null,
+          "error_classification": null,
+          "error": null
+        },
+        {
+          "source_article_id": "4424145",
+          "title": "美股走勢丨黎巴嫩以色列接近停火 道指飆逾800點",
+          "canonical_url": "https://www.hkej.com/instantnews/international/article/4424145/%E7%BE%8E%E8%82%A1%E8%B5%B0%E5%8B%A2%E4%B8%A8%E9%BB%8E%E5%B7%B4%E5%AB%A9%E4%BB%A5%E8%89%B2%E5%88%97%E6%8E%A5%E8%BF%91%E5%81%9C%E7%81%AB+%E9%81%93%E6%8C%87%E9%A3%86%E9%80%BE800%E9%BB%9E",
+          "published_at": "2026-06-04T23:12:00+08:00",
+          "section": "國際財經",
+          "novelty_score": 4,
+          "relevance_score": 9,
+          "urgency_score": 8,
+          "named_entities": [
+            {
+              "name": "黎巴嫩",
+              "type": "country"
+            },
+            {
+              "name": "以色列",
+              "type": "country"
+            },
+            {
+              "name": "道指",
+              "type": "index"
+            }
+          ],
+          "key_points": [
+            "黎巴嫩與以色列可能快將實現停火，帶動道指飆逾800點。",
+            "截至本港時間晚上11時08分，道指報51526點，升838點或1.67%。",
+            "停火協議仍有暗湧，黎巴嫩真主黨總書記Naim Qasem在一封信中表示，真主黨拒絕接受黎巴嫩和以色列之間直接談判的結果。"
+          ],
+          "content_truncated": false,
+          "original_content_length_chars": 447,
+          "analyzed_content_length_chars": 447,
+          "original_content_token_estimate": 112,
+          "analyzed_content_token_estimate": 112,
+          "truncation_reason": null,
+          "analysis_method": "full_text",
+          "attention_tier": "medium",
+          "theme": "stocks",
+          "attention_reason": "Market movement tied to geopolitical event",
+          "must_keep": true,
+          "model_used": "meta-llama/llama-4-scout-17b-16e-instruct",
+          "delayed_retry_attempted": false,
+          "delayed_retry_model_chain": [],
+          "delayed_retry_final_model": null,
+          "error_classification": null,
+          "error": null
+        },
+        {
+          "source_article_id": "4424022",
+          "title": "美股走勢丨道指早段升逾500點",
+          "canonical_url": "https://www.hkej.com/instantnews/international/article/4424022/%E7%BE%8E%E8%82%A1%E8%B5%B0%E5%8B%A2%E4%B8%A8%E9%81%93%E6%8C%87%E6%97%A9%E6%AE%B5%E5%8D%87%E9%80%BE500%E9%BB%9E",
+          "published_at": "2026-06-04T21:38:00+08:00",
+          "section": "國際財經",
+          "novelty_score": 3,
+          "relevance_score": 8,
+          "urgency_score": 6,
+          "named_entities": [
+            {
+              "name": "美股",
+              "type": "index"
+            },
+            {
+              "name": "道指",
+              "type": "index"
+            }
+          ],
+          "key_points": [
+            "市場憧憬美伊談判有利好消息，道指早段升逾500點。",
+            "截至本港時間晚上9時37分，道指報51217點，升530點或1.05%。",
+            "油價下降，紐約原油期貨現時每桶報92.82美元，跌3.2美元或3.33%。"
+          ],
+          "content_truncated": false,
+          "original_content_length_chars": 175,
+          "analyzed_content_length_chars": 175,
+          "original_content_token_estimate": 44,
+          "analyzed_content_token_estimate": 44,
+          "truncation_reason": null,
+          "analysis_method": "full_text",
+          "attention_tier": "medium",
+          "theme": "stocks",
+          "attention_reason": "Early market movement without significant catalyst",
+          "must_keep": true,
+          "model_used": "meta-llama/llama-4-scout-17b-16e-instruct",
+          "delayed_retry_attempted": false,
+          "delayed_retry_model_chain": [],
+          "delayed_retry_final_model": null,
+          "error_classification": null,
+          "error": null
+        },
+        {
+          "source_article_id": "4423984",
+          "title": "黑石旗艦私募信貸基金首次限制投資者贖回",
+          "canonical_url": "https://www.hkej.com/instantnews/international/article/4423984/%E9%BB%91%E7%9F%B3%E6%97%97%E8%89%A6%E7%A7%81%E5%8B%9F%E4%BF%A1%E8%B2%B8%E5%9F%BA%E9%87%91%E9%A6%96%E6%AC%A1%E9%99%90%E5%88%B6%E6%8A%95%E8%B3%87%E8%80%85%E8%B4%96%E5%9B%9E",
+          "published_at": "2026-06-04T21:26:00+08:00",
+          "section": "國際財經",
+          "novelty_score": 6,
+          "relevance_score": 8,
+          "urgency_score": 7,
+          "named_entities": [
+            {
+              "name": "黑石集團",
+              "type": "company"
+            },
+            {
+              "name": "Blackstone Private Credit Fund",
+              "type": "institution"
+            }
+          ],
+          "key_points": [
+            "黑石集團旗艦私募信貸基金Blackstone Private Credit Fund限制贖回規模至基金總佔有率5%，低於前一季的7.9%。",
+            "該基金規模達790億美元，反映了近期私募信貸市場的贖回壓力。",
+            "黑石此前曾動用高級管理層的個人資金滿足贖回需求。"
+          ],
+          "content_truncated": false,
+          "original_content_length_chars": 310,
+          "analyzed_content_length_chars": 310,
+          "original_content_token_estimate": 78,
+          "analyzed_content_token_estimate": 78,
+          "truncation_reason": null,
+          "analysis_method": "full_text",
+          "attention_tier": "medium",
+          "theme": "macro",
+          "attention_reason": "Private equity credit fund restricts investor withdrawals",
+          "must_keep": true,
+          "model_used": "meta-llama/llama-4-scout-17b-16e-instruct",
+          "delayed_retry_attempted": false,
+          "delayed_retry_model_chain": [],
+          "delayed_retry_final_model": null,
+          "error_classification": null,
+          "error": null
+        },
         {
           "source_article_id": "4422790",
           "title": "馬克龍邀OpenAI阿爾特曼出席G7峰會",
@@ -923,57 +1055,1285 @@
           "error": null
         }
       ],
-      "subgroups": [],
+      "subgroups": [
+        {
+          "title": "股市走勢 & Other News",
+          "theme_rationale": "關注股市市場走勢與相關因素",
+          "article_count": 11,
+          "key_developments": [
+            "道指一度飆901點，破頂高見51588點，截至本港時間晚上11時41分，道指報51543點，升856點或1.69%；",
+            "博通預料第三財季AI晶片銷售額為160億美元，按年增長2倍，但遜於分析員預期的172億美元，股價一度滑落15.9%；",
+            "美國運通和高盛股價齊升超過4%；",
+            "Pimco警告信用市場持續違約周期已開始，市場將面臨更高虧損。"
+          ],
+          "named_entities": [
+            {
+              "name": "博通",
+              "type": "company"
+            },
+            {
+              "name": "美國運通",
+              "type": "company"
+            },
+            {
+              "name": "高盛",
+              "type": "company"
+            },
+            {
+              "name": "Pimco",
+              "type": "company"
+            },
+            {
+              "name": "道指",
+              "type": "index"
+            }
+          ],
+          "articles": [
+            {
+              "source_article_id": "4424149",
+              "title": "美股走勢丨道指曾飆逾900點 博通拖累納指下跌",
+              "canonical_url": "https://www.hkej.com/instantnews/international/article/4424149/%E7%BE%8E%E8%82%A1%E8%B5%B0%E5%8B%A2%E4%B8%A8%E9%81%93%E6%8C%87%E6%9B%BE%E9%A3%86%E9%80%BE900%E9%BB%9E+%E5%8D%9A%E9%80%9A%E6%8B%96%E7%B4%AF%E7%B4%8D%E6%8C%87%E4%B8%8B%E8%B7%8C",
+              "published_at": "2026-06-04T23:51:00+08:00",
+              "section": "國際財經",
+              "novelty_score": 6,
+              "relevance_score": 8,
+              "urgency_score": 7,
+              "named_entities": [
+                {
+                  "name": "黎巴嫩",
+                  "type": "country"
+                },
+                {
+                  "name": "以色列",
+                  "type": "country"
+                },
+                {
+                  "name": "博通",
+                  "type": "company"
+                },
+                {
+                  "name": "美國運通",
+                  "type": "company"
+                },
+                {
+                  "name": "高盛",
+                  "type": "company"
+                }
+              ],
+              "key_points": [
+                "道指一度飆901點，破頂高見51588點，截至本港時間晚上11時41分，道指報51543點，升856點或1.69%；",
+                "博通預料第三財季AI晶片銷售額為160億美元，按年增長2倍，但遜於分析員預期的172億美元，股價一度滑落15.9%；",
+                "美國運通和高盛股價齊升超過4%"
+              ],
+              "content_truncated": false,
+              "original_content_length_chars": 461,
+              "analyzed_content_length_chars": 461,
+              "original_content_token_estimate": 116,
+              "analyzed_content_token_estimate": 116,
+              "truncation_reason": null,
+              "analysis_method": "full_text",
+              "attention_tier": "medium",
+              "theme": "stocks",
+              "attention_reason": "Market movement with specific index mentioned",
+              "must_keep": true,
+              "model_used": "meta-llama/llama-4-scout-17b-16e-instruct",
+              "delayed_retry_attempted": false,
+              "delayed_retry_model_chain": [],
+              "delayed_retry_final_model": null,
+              "error_classification": null,
+              "error": null
+            },
+            {
+              "source_article_id": "4424145",
+              "title": "美股走勢丨黎巴嫩以色列接近停火 道指飆逾800點",
+              "canonical_url": "https://www.hkej.com/instantnews/international/article/4424145/%E7%BE%8E%E8%82%A1%E8%B5%B0%E5%8B%A2%E4%B8%A8%E9%BB%8E%E5%B7%B4%E5%AB%A9%E4%BB%A5%E8%89%B2%E5%88%97%E6%8E%A5%E8%BF%91%E5%81%9C%E7%81%AB+%E9%81%93%E6%8C%87%E9%A3%86%E9%80%BE800%E9%BB%9E",
+              "published_at": "2026-06-04T23:12:00+08:00",
+              "section": "國際財經",
+              "novelty_score": 4,
+              "relevance_score": 9,
+              "urgency_score": 8,
+              "named_entities": [
+                {
+                  "name": "黎巴嫩",
+                  "type": "country"
+                },
+                {
+                  "name": "以色列",
+                  "type": "country"
+                },
+                {
+                  "name": "道指",
+                  "type": "index"
+                }
+              ],
+              "key_points": [
+                "黎巴嫩與以色列可能快將實現停火，帶動道指飆逾800點。",
+                "截至本港時間晚上11時08分，道指報51526點，升838點或1.67%。",
+                "停火協議仍有暗湧，黎巴嫩真主黨總書記Naim Qasem在一封信中表示，真主黨拒絕接受黎巴嫩和以色列之間直接談判的結果。"
+              ],
+              "content_truncated": false,
+              "original_content_length_chars": 447,
+              "analyzed_content_length_chars": 447,
+              "original_content_token_estimate": 112,
+              "analyzed_content_token_estimate": 112,
+              "truncation_reason": null,
+              "analysis_method": "full_text",
+              "attention_tier": "medium",
+              "theme": "stocks",
+              "attention_reason": "Market movement tied to geopolitical event",
+              "must_keep": true,
+              "model_used": "meta-llama/llama-4-scout-17b-16e-instruct",
+              "delayed_retry_attempted": false,
+              "delayed_retry_model_chain": [],
+              "delayed_retry_final_model": null,
+              "error_classification": null,
+              "error": null
+            },
+            {
+              "source_article_id": "4424022",
+              "title": "美股走勢丨道指早段升逾500點",
+              "canonical_url": "https://www.hkej.com/instantnews/international/article/4424022/%E7%BE%8E%E8%82%A1%E8%B5%B0%E5%8B%A2%E4%B8%A8%E9%81%93%E6%8C%87%E6%97%A9%E6%AE%B5%E5%8D%87%E9%80%BE500%E9%BB%9E",
+              "published_at": "2026-06-04T21:38:00+08:00",
+              "section": "國際財經",
+              "novelty_score": 3,
+              "relevance_score": 8,
+              "urgency_score": 6,
+              "named_entities": [
+                {
+                  "name": "美股",
+                  "type": "index"
+                },
+                {
+                  "name": "道指",
+                  "type": "index"
+                }
+              ],
+              "key_points": [
+                "市場憧憬美伊談判有利好消息，道指早段升逾500點。",
+                "截至本港時間晚上9時37分，道指報51217點，升530點或1.05%。",
+                "油價下降，紐約原油期貨現時每桶報92.82美元，跌3.2美元或3.33%。"
+              ],
+              "content_truncated": false,
+              "original_content_length_chars": 175,
+              "analyzed_content_length_chars": 175,
+              "original_content_token_estimate": 44,
+              "analyzed_content_token_estimate": 44,
+              "truncation_reason": null,
+              "analysis_method": "full_text",
+              "attention_tier": "medium",
+              "theme": "stocks",
+              "attention_reason": "Early market movement without significant catalyst",
+              "must_keep": true,
+              "model_used": "meta-llama/llama-4-scout-17b-16e-instruct",
+              "delayed_retry_attempted": false,
+              "delayed_retry_model_chain": [],
+              "delayed_retry_final_model": null,
+              "error_classification": null,
+              "error": null
+            },
+            {
+              "source_article_id": "4424147",
+              "title": "Pimco警告信用市場持續違約周期已開始",
+              "canonical_url": "https://www.hkej.com/instantnews/international/article/4424147/Pimco%E8%AD%A6%E5%91%8A%E4%BF%A1%E7%94%A8%E5%B8%82%E5%A0%B4%E6%8C%81%E7%BA%8C%E9%81%95%E7%B4%84%E5%91%A8%E6%9C%9F%E5%B7%B2%E9%96%8B%E5%A7%8B",
+              "published_at": "2026-06-04T23:22:00+08:00",
+              "section": "國際財經",
+              "novelty_score": 8,
+              "relevance_score": 9,
+              "urgency_score": 8,
+              "named_entities": [
+                {
+                  "name": "Pimco",
+                  "type": "company"
+                },
+                {
+                  "name": "Daniel Ivascyn",
+                  "type": "person"
+                },
+                {
+                  "name": "Glendon Capital Management",
+                  "type": "company"
+                },
+                {
+                  "name": "Holly Kim",
+                  "type": "person"
+                }
+              ],
+              "key_points": [
+                "Pimco警告信用市場持續違約周期已開始，市場將面臨更高虧損。",
+                "2021年和2022年依靠廉價借貸融資的槓桿收購項目面臨主要問題。",
+                "巨額資本湧入AI相關基礎設施領域帶來風險和不確定性。"
+              ],
+              "content_truncated": false,
+              "original_content_length_chars": 382,
+              "analyzed_content_length_chars": 382,
+              "original_content_token_estimate": 96,
+              "analyzed_content_token_estimate": 96,
+              "truncation_reason": null,
+              "analysis_method": "full_text",
+              "attention_tier": "high",
+              "theme": "macro",
+              "attention_reason": "Warning on credit market by a major financial institution",
+              "must_keep": true,
+              "model_used": "meta-llama/llama-4-scout-17b-16e-instruct",
+              "delayed_retry_attempted": false,
+              "delayed_retry_model_chain": [],
+              "delayed_retry_final_model": null,
+              "error_classification": null,
+              "error": null
+            },
+            {
+              "source_article_id": "4424144",
+              "title": "格里爾稱強迫勞動關稅有法可依 承諾遵守歐日15%關稅上限",
+              "canonical_url": "https://www.hkej.com/instantnews/international/article/4424144/%E6%A0%BC%E9%87%8C%E7%88%BE%E7%A8%B1%E5%BC%B7%E8%BF%AB%E5%8B%9E%E5%8B%95%E9%97%9C%E7%A8%85%E6%9C%89%E6%B3%95%E5%8F%AF%E4%BE%9D+%E6%89%BF%E8%AB%BE%E9%81%B5%E5%AE%88%E6%AD%90%E6%97%A515%25%E9%97%9C%E7%A8%85%E4%B8%8A%E9%99%90",
+              "published_at": "2026-06-04T23:18:00+08:00",
+              "section": "國際財經",
+              "novelty_score": 6,
+              "relevance_score": 8,
+              "urgency_score": 5,
+              "named_entities": [
+                {
+                  "name": "格里爾",
+                  "type": "person"
+                },
+                {
+                  "name": "歐盟",
+                  "type": "organization"
+                },
+                {
+                  "name": "日本",
+                  "type": "country"
+                }
+              ],
+              "key_points": [
+                "美國貿易代表格里爾表示，美國將遵守與歐盟、日本等國達成的貿易協議中的關稅上限。",
+                "美國計劃針對強迫勞動問題實施的新關稅措施，為遵守這些上限提供了法律依據。",
+                "美國已與歐盟和日本達成協議，將對從這些地區進口的大部分商品徵收的關稅上限設定為15%。"
+              ],
+              "content_truncated": false,
+              "original_content_length_chars": 404,
+              "analyzed_content_length_chars": 404,
+              "original_content_token_estimate": 101,
+              "analyzed_content_token_estimate": 101,
+              "truncation_reason": null,
+              "analysis_method": "full_text",
+              "attention_tier": "medium",
+              "theme": "geopolitics",
+              "attention_reason": "Trade agreement and tariff discussion",
+              "must_keep": true,
+              "model_used": "meta-llama/llama-4-scout-17b-16e-instruct",
+              "delayed_retry_attempted": false,
+              "delayed_retry_model_chain": [],
+              "delayed_retry_final_model": null,
+              "error_classification": null,
+              "error": null
+            },
+            {
+              "source_article_id": "4422773",
+              "title": "輝達丨黃仁勳據悉明抵南韓 與SK會長等烤肉店聚餐",
+              "canonical_url": "https://www.hkej.com/instantnews/international/article/4422773/%E8%BC%9D%E9%81%94%E4%B8%A8%E9%BB%83%E4%BB%81%E5%8B%B3%E6%93%9A%E6%82%89%E6%98%8E%E6%8A%B5%E5%8D%97%E9%9F%93+%E8%88%87SK%E6%9C%83%E9%95%B7%E7%AD%89%E7%83%A4%E8%82%89%E5%BA%97%E8%81%9A%E9%A4%90",
+              "published_at": "2026-06-04T15:46:00+08:00",
+              "section": "國際財經",
+              "novelty_score": 6,
+              "relevance_score": 7,
+              "urgency_score": 5,
+              "named_entities": [
+                {
+                  "name": "黃仁勳",
+                  "type": "person"
+                },
+                {
+                  "name": "Nvidia",
+                  "type": "company"
+                },
+                {
+                  "name": "SK集團",
+                  "type": "company"
+                },
+                {
+                  "name": "崔泰源",
+                  "type": "person"
+                },
+                {
+                  "name": "現代汽車集團",
+                  "type": "company"
+                }
+              ],
+              "key_points": [
+                "輝達行政總裁黃仁勳計劃於周五下午抵達首爾，開展為期4天的訪問。",
+                "黃仁勳將與SK集團會長崔泰源、現代汽車集團會長鄭義宣等商界高層在韓式烤肉店聚餐。",
+                "黃仁勳下周一將在首爾與南韓人工智能、機器人賽道初創企業高管舉行閉門會議。"
+              ],
+              "content_truncated": false,
+              "original_content_length_chars": 413,
+              "analyzed_content_length_chars": 413,
+              "original_content_token_estimate": 104,
+              "analyzed_content_token_estimate": 104,
+              "truncation_reason": null,
+              "analysis_method": "full_text",
+              "attention_tier": "medium",
+              "theme": "general",
+              "attention_reason": "Default medium attention because the story is relevant but not an obvious top-priority market mover.",
+              "must_keep": false,
+              "model_used": "meta-llama/llama-4-scout-17b-16e-instruct",
+              "delayed_retry_attempted": false,
+              "delayed_retry_model_chain": [],
+              "delayed_retry_final_model": null,
+              "error_classification": null,
+              "error": null
+            },
+            {
+              "source_article_id": "4422790",
+              "title": "馬克龍邀OpenAI阿爾特曼出席G7峰會",
+              "canonical_url": "https://www.hkej.com/instantnews/international/article/4422790/%E9%A6%AC%E5%85%8B%E9%BE%8D%E9%82%80OpenAI%E9%98%BF%E7%88%BE%E7%89%B9%E6%9B%BC%E5%87%BA%E5%B8%ADG7%E5%B3%B0%E6%9C%83",
+              "published_at": "2026-06-04T16:37:00+08:00",
+              "section": "國際財經",
+              "novelty_score": 6,
+              "relevance_score": 8,
+              "urgency_score": 5,
+              "named_entities": [
+                {
+                  "name": "馬克龍",
+                  "type": "person"
+                },
+                {
+                  "name": "OpenAI",
+                  "type": "company"
+                },
+                {
+                  "name": "Sam Altman",
+                  "type": "person"
+                },
+                {
+                  "name": "G7",
+                  "type": "organization"
+                },
+                {
+                  "name": "軟銀",
+                  "type": "company"
+                }
+              ],
+              "key_points": [
+                "法國總統馬克龍邀請OpenAI行政總裁Sam Altman出席G7峰會，討論AI相關議題，包括青少年安全和前沿AI模型的風險。",
+                "G7峰會將於6月15日至17日舉行，人工智能將成為重要議題之一。",
+                "軟銀計劃未來5年投資最多750億歐羅於法國建設AI基礎設施。"
+              ],
+              "content_truncated": false,
+              "original_content_length_chars": 487,
+              "analyzed_content_length_chars": 487,
+              "original_content_token_estimate": 122,
+              "analyzed_content_token_estimate": 122,
+              "truncation_reason": null,
+              "analysis_method": "full_text",
+              "attention_tier": "medium",
+              "theme": "general",
+              "attention_reason": "Default medium attention because the story is relevant but not an obvious top-priority market mover.",
+              "must_keep": false,
+              "model_used": "meta-llama/llama-4-scout-17b-16e-instruct",
+              "delayed_retry_attempted": false,
+              "delayed_retry_model_chain": [],
+              "delayed_retry_final_model": null,
+              "error_classification": null,
+              "error": null
+            },
+            {
+              "source_article_id": "4422448",
+              "title": "美股IPO丨SpaceX發行價每股135美元 擬集資750億",
+              "canonical_url": "https://www.hkej.com/instantnews/international/article/4422448/%E7%BE%8E%E8%82%A1IPO%E4%B8%A8SpaceX%E7%99%BC%E8%A1%8C%E5%83%B9%E6%AF%8F%E8%82%A1135%E7%BE%8E%E5%85%83+%E6%93%AC%E9%9B%86%E8%B3%87750%E5%84%84",
+              "published_at": "2026-06-04T05:56:00+08:00",
+              "section": "國際財經",
+              "novelty_score": 9,
+              "relevance_score": 9,
+              "urgency_score": 8,
+              "named_entities": [
+                {
+                  "name": "SpaceX",
+                  "type": "company"
+                },
+                {
+                  "name": "馬斯克",
+                  "type": "person"
+                }
+              ],
+              "key_points": [
+                "SpaceX將首次公開招股(IPO)發行價定為每股135美元，集資額達750億美元。",
+                "承銷商有權行使超額認購權，以IPO價格額外購買8333萬股股票，總值涉及112億美元。",
+                "SpaceX本次IPO將發售規模定在5.556億股，實現1.77萬億美元市值。"
+              ],
+              "content_truncated": false,
+              "original_content_length_chars": 305,
+              "analyzed_content_length_chars": 305,
+              "original_content_token_estimate": 77,
+              "analyzed_content_token_estimate": 77,
+              "truncation_reason": null,
+              "analysis_method": "full_text",
+              "attention_tier": "high",
+              "theme": "stocks",
+              "attention_reason": "Article discusses SpaceX's IPO and significant fundraising.",
+              "must_keep": true,
+              "model_used": "meta-llama/llama-4-scout-17b-16e-instruct",
+              "delayed_retry_attempted": false,
+              "delayed_retry_model_chain": [],
+              "delayed_retry_final_model": null,
+              "error_classification": null,
+              "error": null
+            },
+            {
+              "source_article_id": "4422443",
+              "title": "美股走勢丨道指尾段挫逾500點 輝達受壓",
+              "canonical_url": "https://www.hkej.com/instantnews/international/article/4422443/%E7%BE%8E%E8%82%A1%E8%B5%B0%E5%8B%A2%E4%B8%A8%E9%81%93%E6%8C%87%E5%B0%BE%E6%AE%B5%E6%8C%AB%E9%80%BE500%E9%BB%9E+%E8%BC%9D%E9%81%94%E5%8F%97%E5%A3%93",
+              "published_at": "2026-06-04T03:34:00+08:00",
+              "section": "國際財經",
+              "novelty_score": 6,
+              "relevance_score": 9,
+              "urgency_score": 8,
+              "named_entities": [
+                {
+                  "name": "IBM",
+                  "type": "company"
+                },
+                {
+                  "name": "輝達",
+                  "type": "company"
+                },
+                {
+                  "name": "微軟",
+                  "type": "company"
+                },
+                {
+                  "name": "亞馬遜",
+                  "type": "company"
+                },
+                {
+                  "name": "美國",
+                  "type": "country"
+                }
+              ],
+              "key_points": [
+                "美股周三下滑，道指尾段跌幅擴大至逾500點。",
+                "納指最多曾挫1.2%，IBM股價回吐6.7%，暫時為表現最差道指成份股。",
+                "輝達倒退3.5%，微軟及亞馬遜都降低逾3%。"
+              ],
+              "content_truncated": false,
+              "original_content_length_chars": 403,
+              "analyzed_content_length_chars": 403,
+              "original_content_token_estimate": 101,
+              "analyzed_content_token_estimate": 101,
+              "truncation_reason": null,
+              "analysis_method": "full_text",
+              "attention_tier": "high",
+              "theme": "stocks",
+              "attention_reason": "US stocks plummet, Dow Jones down over 500 points",
+              "must_keep": true,
+              "model_used": "meta-llama/llama-4-scout-17b-16e-instruct",
+              "delayed_retry_attempted": false,
+              "delayed_retry_model_chain": [],
+              "delayed_retry_final_model": null,
+              "error_classification": null,
+              "error": null
+            },
+            {
+              "source_article_id": "4422442",
+              "title": "爆炒三星及SK海力士槓桿ETF 南韓中年人成生力軍",
+              "canonical_url": "https://www.hkej.com/instantnews/international/article/4422442/%E7%88%86%E7%82%92%E4%B8%89%E6%98%9F%E5%8F%8ASK%E6%B5%B7%E5%8A%9B%E5%A3%AB%E6%A7%93%E6%A1%BFETF+%E5%8D%97%E9%9F%93%E4%B8%AD%E5%B9%B4%E4%BA%BA%E6%88%90%E7%94%9F%E5%8A%9B%E8%BB%8D",
+              "published_at": "2026-06-04T02:55:00+08:00",
+              "section": "國際財經",
+              "novelty_score": 6,
+              "relevance_score": 7,
+              "urgency_score": 5,
+              "named_entities": [
+                {
+                  "name": "三星電子",
+                  "type": "company"
+                },
+                {
+                  "name": "SK海力士",
+                  "type": "company"
+                },
+                {
+                  "name": "南韓",
+                  "type": "country"
+                }
+              ],
+              "key_points": [
+                "南韓40多歲投資者成買入三星電子和SK海力士槓桿ETF主力，人數和投資總額均最高。",
+                "5月27日至6月1日，14種個別股份槓桿產品吸引逾7萬名投資者，總投資額超過3.27萬億韓圜（約167億港元）。",
+                "平均每位投資者的投資額約4623萬韓圜（23.6萬港元）。"
+              ],
+              "content_truncated": false,
+              "original_content_length_chars": 423,
+              "analyzed_content_length_chars": 423,
+              "original_content_token_estimate": 106,
+              "analyzed_content_token_estimate": 106,
+              "truncation_reason": null,
+              "analysis_method": "full_text",
+              "attention_tier": "medium",
+              "theme": "general",
+              "attention_reason": "Default medium attention because the story is relevant but not an obvious top-priority market mover.",
+              "must_keep": false,
+              "model_used": "meta-llama/llama-4-scout-17b-16e-instruct",
+              "delayed_retry_attempted": false,
+              "delayed_retry_model_chain": [],
+              "delayed_retry_final_model": null,
+              "error_classification": null,
+              "error": null
+            },
+            {
+              "source_article_id": "4422435",
+              "title": "AI丨黃仁勳向富豪家族力薦AI:回報瘋狂可觀",
+              "canonical_url": "https://www.hkej.com/instantnews/international/article/4422435/AI%E4%B8%A8%E9%BB%83%E4%BB%81%E5%8B%B3%E5%90%91%E5%AF%8C%E8%B1%AA%E5%AE%B6%E6%97%8F%E5%8A%9B%E8%96%A6AI%3A%E5%9B%9E%E5%A0%B1%E7%98%8B%E7%8B%82%E5%8F%AF%E8%A7%80",
+              "published_at": "2026-06-04T00:45:00+08:00",
+              "section": "國際財經",
+              "novelty_score": 5,
+              "relevance_score": 7,
+              "urgency_score": 6,
+              "named_entities": [
+                {
+                  "name": "黃仁勳",
+                  "type": "person"
+                },
+                {
+                  "name": "NVIDIA",
+                  "type": "company"
+                },
+                {
+                  "name": "AI",
+                  "type": "other"
+                }
+              ],
+              "key_points": [
+                "輝達行政總裁黃仁勳向高淨值投資者表示AI的回報率已徹底重塑，現時回報「瘋狂地可觀」。",
+                "黃仁勳試圖打消市場對AI企業巨額開支及長期盈利能力的疑慮。",
+                "他引用去年同類場合的情形加以對比，稱現在質疑AI回報的人才是「瘋子」。"
+              ],
+              "content_truncated": false,
+              "original_content_length_chars": 376,
+              "analyzed_content_length_chars": 376,
+              "original_content_token_estimate": 94,
+              "analyzed_content_token_estimate": 94,
+              "truncation_reason": null,
+              "analysis_method": "full_text",
+              "attention_tier": "medium",
+              "theme": "general",
+              "attention_reason": "Default medium attention because the story is relevant but not an obvious top-priority market mover.",
+              "must_keep": false,
+              "model_used": "meta-llama/llama-4-scout-17b-16e-instruct",
+              "delayed_retry_attempted": false,
+              "delayed_retry_model_chain": [],
+              "delayed_retry_final_model": null,
+              "error_classification": null,
+              "error": null
+            }
+          ],
+          "model_used": "meta-llama/llama-4-scout-17b-16e-instruct"
+        },
+        {
+          "title": "市場趨勢",
+          "theme_rationale": "關注全球市場動態與經濟指標。",
+          "article_count": 3,
+          "key_developments": [
+            "日經平均指數收市報67470點，跌931點或1.36%，失守68000點。",
+            "黑石集團旗艦私募信貸基金Blackstone Private Credit Fund限制贖回規模至基金總佔有率5%，低於前一季的7.9%。",
+            "美國總統特朗普稱與伊朗談判順利，道指期貨暫報50925點，升122點。",
+            "南韓股市復市跌逾1%，南韓首爾綜合指數收報8636點，跌162點或1.84%。"
+          ],
+          "named_entities": [
+            {
+              "name": "日經平均指數",
+              "type": "index"
+            },
+            {
+              "name": "黑石集團",
+              "type": "company"
+            },
+            {
+              "name": "特朗普",
+              "type": "person"
+            },
+            {
+              "name": "南韓首爾綜合指數",
+              "type": "index"
+            }
+          ],
+          "articles": [
+            {
+              "source_article_id": "4422737",
+              "title": "亞股走勢丨日股收跌1.4% 失68000關",
+              "canonical_url": "https://www.hkej.com/instantnews/international/article/4422737/%E4%BA%9E%E8%82%A1%E8%B5%B0%E5%8B%A2%E4%B8%A8%E6%97%A5%E8%82%A1%E6%94%B6%E8%B7%8C1.4%25+%E5%A4%B168000%E9%97%9C",
+              "published_at": "2026-06-04T15:04:00+08:00",
+              "section": "國際財經",
+              "novelty_score": 4,
+              "relevance_score": 8,
+              "urgency_score": 7,
+              "named_entities": [
+                {
+                  "name": "日經平均指數",
+                  "type": "index"
+                },
+                {
+                  "name": "南韓首爾綜合指數",
+                  "type": "index"
+                },
+                {
+                  "name": "台灣加權指數",
+                  "type": "index"
+                },
+                {
+                  "name": "澳洲普通股指數",
+                  "type": "index"
+                }
+              ],
+              "key_points": [
+                "日經平均指數收市報67470點，跌931點或1.36%，失守68000點。",
+                "南韓股市復市跌逾1%，南韓首爾綜合指數收報8636點，跌162點或1.84%。",
+                "市場擔憂中東戰爭對能源價格的影響，亞太區股市跟隨美股下滑。"
+              ],
+              "content_truncated": false,
+              "original_content_length_chars": 264,
+              "analyzed_content_length_chars": 264,
+              "original_content_token_estimate": 66,
+              "analyzed_content_token_estimate": 66,
+              "truncation_reason": null,
+              "analysis_method": "full_text",
+              "attention_tier": "medium",
+              "theme": "macro",
+              "attention_reason": "Article discusses Asian stock market trends and economic indicators.",
+              "must_keep": true,
+              "model_used": "meta-llama/llama-4-scout-17b-16e-instruct",
+              "delayed_retry_attempted": false,
+              "delayed_retry_model_chain": [],
+              "delayed_retry_final_model": null,
+              "error_classification": null,
+              "error": null
+            },
+            {
+              "source_article_id": "4422783",
+              "title": "歐股早段靠穩 道期漲逾百點",
+              "canonical_url": "https://www.hkej.com/instantnews/international/article/4422783/%E6%AD%90%E8%82%A1%E6%97%A9%E6%AE%B5%E9%9D%A0%E7%A9%A9+%E9%81%93%E6%9C%9F%E6%BC%B2%E9%80%BE%E7%99%BE%E9%BB%9E",
+              "published_at": "2026-06-04T16:03:00+08:00",
+              "section": "國際財經",
+              "novelty_score": 6,
+              "relevance_score": 8,
+              "urgency_score": 7,
+              "named_entities": [
+                {
+                  "name": "特朗普",
+                  "type": "person"
+                },
+                {
+                  "name": "伊朗",
+                  "type": "country"
+                },
+                {
+                  "name": "英國富時100指數",
+                  "type": "index"
+                },
+                {
+                  "name": "德國DAX指數",
+                  "type": "index"
+                },
+                {
+                  "name": "法國CAC 40指數",
+                  "type": "index"
+                }
+              ],
+              "key_points": [
+                "美國總統特朗普稱與伊朗談判順利，歐洲股市早段靠穩。",
+                "截至本港時間下午3時54分，英國富時100指數報10352點，升20點或0.2%；德國DAX指數報24941點，升145點或0.59%；法國CAC 40指數報8212點，升62點或0.77%；意大利富時MIB指數報50238點，升200點或0.4%。",
+                "道指期貨暫報50925點，升122點。"
+              ],
+              "content_truncated": false,
+              "original_content_length_chars": 365,
+              "analyzed_content_length_chars": 365,
+              "original_content_token_estimate": 92,
+              "analyzed_content_token_estimate": 92,
+              "truncation_reason": null,
+              "analysis_method": "full_text",
+              "attention_tier": "high",
+              "theme": "geopolitics",
+              "attention_reason": "High-signal geopolitics headline based on title/summary keywords.",
+              "must_keep": true,
+              "model_used": "meta-llama/llama-4-scout-17b-16e-instruct",
+              "delayed_retry_attempted": false,
+              "delayed_retry_model_chain": [],
+              "delayed_retry_final_model": null,
+              "error_classification": null,
+              "error": null
+            },
+            {
+              "source_article_id": "4423984",
+              "title": "黑石旗艦私募信貸基金首次限制投資者贖回",
+              "canonical_url": "https://www.hkej.com/instantnews/international/article/4423984/%E9%BB%91%E7%9F%B3%E6%97%97%E8%89%A6%E7%A7%81%E5%8B%9F%E4%BF%A1%E8%B2%B8%E5%9F%BA%E9%87%91%E9%A6%96%E6%AC%A1%E9%99%90%E5%88%B6%E6%8A%95%E8%B3%87%E8%80%85%E8%B4%96%E5%9B%9E",
+              "published_at": "2026-06-04T21:26:00+08:00",
+              "section": "國際財經",
+              "novelty_score": 6,
+              "relevance_score": 8,
+              "urgency_score": 7,
+              "named_entities": [
+                {
+                  "name": "黑石集團",
+                  "type": "company"
+                },
+                {
+                  "name": "Blackstone Private Credit Fund",
+                  "type": "institution"
+                }
+              ],
+              "key_points": [
+                "黑石集團旗艦私募信貸基金Blackstone Private Credit Fund限制贖回規模至基金總佔有率5%，低於前一季的7.9%。",
+                "該基金規模達790億美元，反映了近期私募信貸市場的贖回壓力。",
+                "黑石此前曾動用高級管理層的個人資金滿足贖回需求。"
+              ],
+              "content_truncated": false,
+              "original_content_length_chars": 310,
+              "analyzed_content_length_chars": 310,
+              "original_content_token_estimate": 78,
+              "analyzed_content_token_estimate": 78,
+              "truncation_reason": null,
+              "analysis_method": "full_text",
+              "attention_tier": "medium",
+              "theme": "macro",
+              "attention_reason": "Private equity credit fund restricts investor withdrawals",
+              "must_keep": true,
+              "model_used": "meta-llama/llama-4-scout-17b-16e-instruct",
+              "delayed_retry_attempted": false,
+              "delayed_retry_model_chain": [],
+              "delayed_retry_final_model": null,
+              "error_classification": null,
+              "error": null
+            }
+          ],
+          "model_used": "meta-llama/llama-4-scout-17b-16e-instruct"
+        },
+        {
+          "title": "美國宏觀經濟",
+          "theme_rationale": "關注美國經濟整體表現，包括就業市場、通脹等。",
+          "article_count": 3,
+          "key_developments": [
+            "美國近數周就業市場保持穩定，但全國大部分地區通脹持續上升。",
+            "聯儲局褐皮書報告指出，能源價格是推高通脹壓力的主要因素。",
+            "道指周三低開86點後，跌幅輾轉擴大，並以全日最低點數位收市，下瀉逾600點。",
+            "Alphabet宣布，完成金額847.5億美元的集資，多過先前預期的800億美元集資額。"
+          ],
+          "named_entities": [
+            {
+              "name": "聯儲局",
+              "type": "institution"
+            },
+            {
+              "name": "美國",
+              "type": "country"
+            },
+            {
+              "name": "道指",
+              "type": "index"
+            },
+            {
+              "name": "Alphabet",
+              "type": "company"
+            }
+          ],
+          "articles": [
+            {
+              "source_article_id": "4422458",
+              "title": "聯儲局褐皮書:美就業維持穩定 通脹持續走高",
+              "canonical_url": "https://www.hkej.com/instantnews/international/article/4422458/%E8%81%AF%E5%84%B2%E5%B1%80%E8%A4%90%E7%9A%AE%E6%9B%B8%3A%E7%BE%8E%E5%B0%B1%E6%A5%AD%E7%B6%AD%E6%8C%81%E7%A9%A9%E5%AE%9A+%E9%80%9A%E8%84%B9%E6%8C%81%E7%BA%8C%E8%B5%B0%E9%AB%98",
+              "published_at": "2026-06-04T06:20:00+08:00",
+              "section": "國際財經",
+              "novelty_score": 6,
+              "relevance_score": 8,
+              "urgency_score": 7,
+              "named_entities": [
+                {
+                  "name": "聯儲局",
+                  "type": "institution"
+                },
+                {
+                  "name": "美國",
+                  "type": "country"
+                }
+              ],
+              "key_points": [
+                "美國近數周就業市場保持穩定，但全國大部分地區通脹持續上升。",
+                "聯儲局褐皮書報告指出，能源價格是推高通脹壓力的主要因素。",
+                "12個地方聯儲轄區中，有10個轄區的整體經濟活動以輕微至溫和的步伐增長。"
+              ],
+              "content_truncated": false,
+              "original_content_length_chars": 382,
+              "analyzed_content_length_chars": 382,
+              "original_content_token_estimate": 96,
+              "analyzed_content_token_estimate": 96,
+              "truncation_reason": null,
+              "analysis_method": "full_text",
+              "attention_tier": "high",
+              "theme": "macro",
+              "attention_reason": "High-signal macro headline based on title/summary keywords.",
+              "must_keep": true,
+              "model_used": "meta-llama/llama-4-scout-17b-16e-instruct",
+              "delayed_retry_attempted": false,
+              "delayed_retry_model_chain": [],
+              "delayed_retry_final_model": null,
+              "error_classification": null,
+              "error": null
+            },
+            {
+              "source_article_id": "4422446",
+              "title": "美股走勢丨道指收市瀉620點 通脹憂慮升溫",
+              "canonical_url": "https://www.hkej.com/instantnews/international/article/4422446/%E7%BE%8E%E8%82%A1%E8%B5%B0%E5%8B%A2%E4%B8%A8%E9%81%93%E6%8C%87%E6%94%B6%E5%B8%82%E7%80%89620%E9%BB%9E+%E9%80%9A%E8%84%B9%E6%86%82%E6%85%AE%E5%8D%87%E6%BA%AB",
+              "published_at": "2026-06-04T04:36:00+08:00",
+              "section": "國際財經",
+              "novelty_score": 5,
+              "relevance_score": 8,
+              "urgency_score": 9,
+              "named_entities": [
+                {
+                  "name": "道指",
+                  "type": "index"
+                },
+                {
+                  "name": "美國",
+                  "type": "country"
+                }
+              ],
+              "key_points": [
+                "道指周三低開86點後，跌幅輾轉擴大，並以全日最低點數位收市，下瀉逾600點。",
+                "標指亦以緊貼全日低位收市；以科技股為主的納指最多曾挫1.2%。",
+                "Alphabet股價收市反覆回吐0.8%；輝達和微軟都滑落超過3%。"
+              ],
+              "content_truncated": false,
+              "original_content_length_chars": 1491,
+              "analyzed_content_length_chars": 1491,
+              "original_content_token_estimate": 373,
+              "analyzed_content_token_estimate": 373,
+              "truncation_reason": null,
+              "analysis_method": "full_text",
+              "attention_tier": "high",
+              "theme": "macro",
+              "attention_reason": "High-signal macro headline based on title/summary keywords.",
+              "must_keep": true,
+              "model_used": "meta-llama/llama-4-scout-17b-16e-instruct",
+              "delayed_retry_attempted": false,
+              "delayed_retry_model_chain": [],
+              "delayed_retry_final_model": null,
+              "error_classification": null,
+              "error": null
+            },
+            {
+              "source_article_id": "4422444",
+              "title": "Alphabet集資加碼 Gemini 3.5 Pro擬本月發布",
+              "canonical_url": "https://www.hkej.com/instantnews/international/article/4422444/Alphabet%E9%9B%86%E8%B3%87%E5%8A%A0%E7%A2%BC+Gemini+3.5+Pro%E6%93%AC%E6%9C%AC%E6%9C%88%E7%99%BC%E5%B8%83",
+              "published_at": "2026-06-04T03:50:00+08:00",
+              "section": "國際財經",
+              "novelty_score": 7,
+              "relevance_score": 8,
+              "urgency_score": 6,
+              "named_entities": [
+                {
+                  "name": "Alphabet",
+                  "type": "company"
+                },
+                {
+                  "name": "Google",
+                  "type": "company"
+                }
+              ],
+              "key_points": [
+                "Alphabet宣布，完成金額847.5億美元的集資，多過先前預期的800億美元集資額。",
+                "所得資金將用於人工智能(AI)基礎設施擴張。",
+                "新一代大模型Gemini 3.5 Pro預計將於本月正式發布。"
+              ],
+              "content_truncated": false,
+              "original_content_length_chars": 631,
+              "analyzed_content_length_chars": 631,
+              "original_content_token_estimate": 158,
+              "analyzed_content_token_estimate": 158,
+              "truncation_reason": null,
+              "analysis_method": "full_text",
+              "attention_tier": "high",
+              "theme": "macro",
+              "attention_reason": "High-signal macro headline based on title/summary keywords.",
+              "must_keep": true,
+              "model_used": "meta-llama/llama-4-scout-17b-16e-instruct",
+              "delayed_retry_attempted": false,
+              "delayed_retry_model_chain": [],
+              "delayed_retry_final_model": null,
+              "error_classification": null,
+              "error": null
+            }
+          ],
+          "model_used": "meta-llama/llama-4-scout-17b-16e-instruct"
+        },
+        {
+          "title": "市場趨勢",
+          "theme_rationale": "關注全球市場趨勢和經濟形勢",
+          "article_count": 3,
+          "key_developments": [
+            "歐股收市跌0.66%，報621點。",
+            "Zara母公司Inditex第一財季銷售額按年增長5.8%，達到87億歐羅。",
+            "美國擬對60個國家加徵新關稅，市場正在評估相關計劃。",
+            "橋水基金創辦人達里奧稱AI市場已出現泡沫跡象，泡沫最終必將破裂。"
+          ],
+          "named_entities": [
+            {
+              "name": "歐股",
+              "type": "index"
+            },
+            {
+              "name": "Zara",
+              "type": "company"
+            },
+            {
+              "name": "Inditex",
+              "type": "company"
+            },
+            {
+              "name": "Ray Dalio",
+              "type": "person"
+            },
+            {
+              "name": "Bridgewater",
+              "type": "organization"
+            }
+          ],
+          "articles": [
+            {
+              "source_article_id": "4422441",
+              "title": "歐股收市跌0.66% Zara母企首季銷售額升5.8%",
+              "canonical_url": "https://www.hkej.com/instantnews/international/article/4422441/%E6%AD%90%E8%82%A1%E6%94%B6%E5%B8%82%E8%B7%8C0.66%25+Zara%E6%AF%8D%E4%BC%81%E9%A6%96%E5%AD%A3%E9%8A%B7%E5%94%AE%E9%A1%8D%E5%8D%875.8%25",
+              "published_at": "2026-06-04T02:19:00+08:00",
+              "section": "國際財經",
+              "novelty_score": 4,
+              "relevance_score": 8,
+              "urgency_score": 6,
+              "named_entities": [
+                {
+                  "name": "歐股",
+                  "type": "index"
+                },
+                {
+                  "name": "Zara",
+                  "type": "company"
+                },
+                {
+                  "name": "Inditex",
+                  "type": "company"
+                }
+              ],
+              "key_points": [
+                "歐洲股市低開低走，泛歐指數Stoxx 600收市滑落0.66%，報621點。",
+                "Zara母公司Inditex第一財季銷售額按年增長5.8%，達到87億歐羅，純利按年增長5.4%，達到13.8億歐羅。",
+                "美國擬對60個國家加徵新關稅，市場正在評估相關計劃。"
+              ],
+              "content_truncated": false,
+              "original_content_length_chars": 708,
+              "analyzed_content_length_chars": 708,
+              "original_content_token_estimate": 177,
+              "analyzed_content_token_estimate": 177,
+              "truncation_reason": null,
+              "analysis_method": "full_text",
+              "attention_tier": "medium",
+              "theme": "stocks",
+              "attention_reason": "European stocks decline, Zara's parent company sales rise",
+              "must_keep": true,
+              "model_used": "meta-llama/llama-4-scout-17b-16e-instruct",
+              "delayed_retry_attempted": false,
+              "delayed_retry_model_chain": [],
+              "delayed_retry_final_model": null,
+              "error_classification": null,
+              "error": null
+            },
+            {
+              "source_article_id": "4422438",
+              "title": "美國利率丨威廉斯:聯儲局暫沒必要加息或減息",
+              "canonical_url": "https://www.hkej.com/instantnews/international/article/4422438/%E7%BE%8E%E5%9C%8B%E5%88%A9%E7%8E%87%E4%B8%A8%E5%A8%81%E5%BB%89%E6%96%AF%3A%E8%81%AF%E5%84%B2%E5%B1%80%E6%9A%AB%E6%B2%92%E5%BF%85%E8%A6%81%E5%8A%A0%E6%81%AF%E6%88%96%E6%B8%9B%E6%81%AF",
+              "published_at": "2026-06-04T01:36:00+08:00",
+              "section": "國際財經",
+              "novelty_score": 6,
+              "relevance_score": 8,
+              "urgency_score": 5,
+              "named_entities": [
+                {
+                  "name": "John Williams",
+                  "type": "person"
+                },
+                {
+                  "name": "聯儲局",
+                  "type": "institution"
+                },
+                {
+                  "name": "FOMC",
+                  "type": "organization"
+                },
+                {
+                  "name": "美國",
+                  "type": "country"
+                }
+              ],
+              "key_points": [
+                "美國紐約聯儲銀行總裁威廉斯表示，目前認為聯儲局沒必要加息或減息。",
+                "他預計中東戰爭造成的通脹上行風險不會持續太久，美國通脹將在未來兩個月見頂。",
+                "他重申目前看不到明確的利率未來方向，認為沒有必要改變美國的貨幣政策。"
+              ],
+              "content_truncated": false,
+              "original_content_length_chars": 270,
+              "analyzed_content_length_chars": 270,
+              "original_content_token_estimate": 68,
+              "analyzed_content_token_estimate": 68,
+              "truncation_reason": null,
+              "analysis_method": "full_text",
+              "attention_tier": "high",
+              "theme": "macro",
+              "attention_reason": "High-signal macro headline based on title/summary keywords.",
+              "must_keep": true,
+              "model_used": "meta-llama/llama-4-scout-17b-16e-instruct",
+              "delayed_retry_attempted": false,
+              "delayed_retry_model_chain": [],
+              "delayed_retry_final_model": null,
+              "error_classification": null,
+              "error": null
+            },
+            {
+              "source_article_id": "4422436",
+              "title": "AI丨「鱷王」達里奧:泡沫終將破裂",
+              "canonical_url": "https://www.hkej.com/instantnews/international/article/4422436/AI%E4%B8%A8%E3%80%8C%E9%B1%B7%E7%8E%8B%E3%80%8D%E9%81%94%E9%87%8C%E5%A5%A7%3A%E6%B3%A1%E6%B2%AB%E7%B5%82%E5%B0%87%E7%A0%B4%E8%A3%82",
+              "published_at": "2026-06-04T01:06:00+08:00",
+              "section": "國際財經",
+              "novelty_score": 6,
+              "relevance_score": 8,
+              "urgency_score": 7,
+              "named_entities": [
+                {
+                  "name": "Ray Dalio",
+                  "type": "person"
+                },
+                {
+                  "name": "Bridgewater",
+                  "type": "organization"
+                },
+                {
+                  "name": "AI",
+                  "type": "other"
+                }
+              ],
+              "key_points": [
+                "橋水基金創辦人達里奧稱AI市場已出現泡沫跡象，泡沫最終必將破裂。",
+                "達里奧表示投資者對AI公司的盈利能力感到擔憂。",
+                "他認為泡沫破裂的本質是將帳面財富轉化為實際資金的過程。"
+              ],
+              "content_truncated": false,
+              "original_content_length_chars": 350,
+              "analyzed_content_length_chars": 350,
+              "original_content_token_estimate": 88,
+              "analyzed_content_token_estimate": 88,
+              "truncation_reason": null,
+              "analysis_method": "full_text",
+              "attention_tier": "medium",
+              "theme": "macro",
+              "attention_reason": "AI market bubble, Ray Dalio's comments",
+              "must_keep": true,
+              "model_used": "meta-llama/llama-4-scout-17b-16e-instruct",
+              "delayed_retry_attempted": false,
+              "delayed_retry_model_chain": [],
+              "delayed_retry_final_model": null,
+              "error_classification": null,
+              "error": null
+            }
+          ],
+          "model_used": "meta-llama/llama-4-scout-17b-16e-instruct"
+        }
+      ],
       "analysis_profile": "standard",
       "model_used": "meta-llama/llama-4-scout-17b-16e-instruct",
-      "sub_batch_count": 8,
+      "sub_batch_count": 13,
       "diagnostics": {
-        "sub_batch_count": 8,
-        "split_reasons": [
-          "pre_send_budget"
-        ],
+        "sub_batch_count": 13,
+        "split_reasons": [],
         "models_attempted": [
           "meta-llama/llama-4-scout-17b-16e-instruct"
         ],
-        "estimated_input_tokens_max": 1772,
-        "serialized_request_bytes_max": 12039,
-        "rate_limit_waits": 1,
+        "estimated_input_tokens_max": 1594,
+        "serialized_request_bytes_max": 8950,
+        "rate_limit_waits": 0,
         "partial_article_count": 0,
-        "synthesis_wait_seconds_total": 1900.8,
+        "synthesis_wait_seconds_total": 0.0,
         "synthesis_retry_count": 0,
-        "synthesis_retry_skipped_count": 19,
-        "synthesis_budget_exhausted": true,
+        "synthesis_retry_skipped_count": 0,
+        "synthesis_budget_exhausted": false,
         "degraded_merge_used": false,
         "degraded_merge_reason": "",
         "synthesis_merge_depth_max": 0,
         "model_switches": []
       },
-      "error": "Category 國際財經 exhausted synthesis wait budget after 1900.8 seconds."
+      "error": null
     },
     {
       "category": "時事脈搏",
-      "article_count": 11,
+      "article_count": 18,
       "status": "success",
       "key_developments": [],
       "named_entities": [
         {
-          "name": "香港",
-          "type": "country"
+          "name": "李家超",
+          "type": "person"
         },
         {
-          "name": "政府人員協會",
-          "type": "organization"
-        },
-        {
-          "name": "方大",
+          "name": "INTIQUE",
           "type": "company"
         },
         {
-          "name": "史丹福大學",
-          "type": "institution"
+          "name": "香港政府人員協會",
+          "type": "organization"
+        },
+        {
+          "name": "特朗普",
+          "type": "person"
         }
       ],
       "articles": [
+        {
+          "source_article_id": "4424148",
+          "canonical_url": "https://www.hkej.com/instantnews/current/article/4424148/%E7%B5%90%E6%A5%AD%E6%BD%AE%E4%B8%A8%E6%9C%AC%E5%9C%B0%E5%A5%B3%E6%80%A7%E6%99%82%E8%A3%9D%E5%93%81%E7%89%8CINTIQUE%E6%9C%88%E5%BA%95%E7%B5%90%E6%9D%9F%E9%A6%99%E6%B8%AF%E7%87%9F%E9%81%8B",
+          "title": "結業潮丨本地女性時裝品牌INTIQUE月底結束香港營運",
+          "section": "時事脈搏",
+          "published_at": "2026-06-04T23:30:00+08:00",
+          "attention_tier": "light",
+          "novelty_score": 5,
+          "relevance_score": 5,
+          "urgency_score": 5,
+          "named_entities": [],
+          "key_points": [],
+          "content_truncated": false,
+          "analysis_method": "bypassed",
+          "model_used": "direct"
+        },
+        {
+          "source_article_id": "4424075",
+          "canonical_url": "https://www.hkej.com/instantnews/current/article/4424075/%E4%B8%AD%E4%BA%9E%E4%B9%8B%E8%A1%8C%E4%B8%A8%E6%9D%8E%E5%AE%B6%E8%B6%85%3A%E6%B7%B1%E5%8C%96%E9%A6%99%E6%B8%AF%E8%88%87%E7%83%8F%E8%8C%B2%E5%88%A5%E5%85%8B%E8%B2%BF%E6%98%93%E5%92%8C%E6%8A%95%E8%B3%87",
+          "title": "中亞之行丨李家超:深化香港與烏茲別克貿易和投資",
+          "section": "時事脈搏",
+          "published_at": "2026-06-04T22:38:00+08:00",
+          "attention_tier": "light",
+          "novelty_score": 5,
+          "relevance_score": 5,
+          "urgency_score": 5,
+          "named_entities": [],
+          "key_points": [],
+          "content_truncated": false,
+          "analysis_method": "bypassed",
+          "model_used": "direct"
+        },
+        {
+          "source_article_id": "4424039",
+          "title": "中東局勢丨黎巴嫩真主黨拒絕接受黎以談判結果",
+          "canonical_url": "https://www.hkej.com/instantnews/current/article/4424039/%E4%B8%AD%E6%9D%B1%E5%B1%80%E5%8B%A2%E4%B8%A8%E9%BB%8E%E5%B7%B4%E5%AB%A9%E7%9C%9F%E4%B8%BB%E9%BB%A8%E6%8B%92%E7%B5%95%E6%8E%A5%E5%8F%97%E9%BB%8E%E4%BB%A5%E8%AB%87%E5%88%A4%E7%B5%90%E6%9E%9C",
+          "published_at": "2026-06-04T22:22:00+08:00",
+          "section": "時事脈搏",
+          "novelty_score": 6,
+          "relevance_score": 8,
+          "urgency_score": 9,
+          "named_entities": [
+            {
+              "name": "Naim Qasem",
+              "type": "person"
+            },
+            {
+              "name": "黎巴嫩真主黨",
+              "type": "organization"
+            },
+            {
+              "name": "以色列",
+              "type": "country"
+            },
+            {
+              "name": "美國",
+              "type": "country"
+            }
+          ],
+          "key_points": [
+            "黎巴嫩真主黨總書記Naim Qasem拒絕接受黎巴嫩和以色列之間直接談判的結果，稱其為「消滅一部分黎巴嫩人民、奴役其餘人民的路線圖」。",
+            "真主黨與以色列的停火協議可能在24小時內開始實施，但真主黨強調停火必須覆蓋整個黎巴嫩。"
+          ],
+          "content_truncated": false,
+          "original_content_length_chars": 338,
+          "analyzed_content_length_chars": 338,
+          "original_content_token_estimate": 85,
+          "analyzed_content_token_estimate": 85,
+          "truncation_reason": null,
+          "analysis_method": "full_text",
+          "attention_tier": "high",
+          "theme": "geopolitics",
+          "attention_reason": "High-signal geopolitics headline based on title/summary keywords.",
+          "must_keep": true,
+          "model_used": "meta-llama/llama-4-scout-17b-16e-instruct",
+          "delayed_retry_attempted": false,
+          "delayed_retry_model_chain": [],
+          "delayed_retry_final_model": null,
+          "error_classification": null,
+          "error": null
+        },
+        {
+          "source_article_id": "4424046",
+          "canonical_url": "https://www.hkej.com/instantnews/current/article/4424046/%E8%AD%A6%E6%96%B9%E7%B6%AD%E5%9C%92%E5%8A%A0%E5%BC%B7%E8%AD%A6%E6%88%92+%E9%99%B3%E5%AF%B6%E7%91%A9%E9%8A%85%E9%91%BC%E7%81%A3%E8%A2%AB%E5%B8%B6%E8%B5%B0",
+          "title": "警方維園加強警戒 陳寶瑩銅鑼灣被帶走",
+          "section": "時事脈搏",
+          "published_at": "2026-06-04T22:18:00+08:00",
+          "attention_tier": "light",
+          "novelty_score": 5,
+          "relevance_score": 5,
+          "urgency_score": 5,
+          "named_entities": [],
+          "key_points": [],
+          "content_truncated": false,
+          "analysis_method": "bypassed",
+          "model_used": "direct"
+        },
+        {
+          "source_article_id": "4424050",
+          "canonical_url": "https://www.hkej.com/instantnews/current/article/4424050/%E4%B8%AD%E4%BA%9E%E4%B9%8B%E8%A1%8C%E4%B8%A8%E6%9D%8E%E5%AE%B6%E8%B6%85%3A%E9%81%94%E6%88%9096%E4%BB%BD%E5%90%88%E4%BD%9C%E5%8D%94%E8%AD%B0%E5%8F%8A%E5%82%99%E5%BF%98%E9%8C%84+%E7%B8%BD%E5%80%BC%E9%80%BE128%E5%84%84%E5%85%83",
+          "title": "中亞之行丨李家超:達成96份合作協議及備忘錄 總值逾128億元",
+          "section": "時事脈搏",
+          "published_at": "2026-06-04T22:17:00+08:00",
+          "attention_tier": "light",
+          "novelty_score": 5,
+          "relevance_score": 5,
+          "urgency_score": 5,
+          "named_entities": [],
+          "key_points": [],
+          "content_truncated": false,
+          "analysis_method": "bypassed",
+          "model_used": "direct"
+        },
+        {
+          "source_article_id": "4424023",
+          "canonical_url": "https://www.hkej.com/instantnews/current/article/4424023/%E9%A6%AC%E6%99%82%E4%BA%A8%E6%8C%87%E4%B8%AD%E4%BA%9E%E8%A8%AA%E5%95%8F%E6%89%93%E9%96%8B%E5%BE%88%E5%A4%9A%E5%95%86%E6%A9%9F",
+          "title": "馬時亨指中亞訪問打開很多商機",
+          "section": "時事脈搏",
+          "published_at": "2026-06-04T21:58:00+08:00",
+          "attention_tier": "light",
+          "novelty_score": 5,
+          "relevance_score": 5,
+          "urgency_score": 5,
+          "named_entities": [],
+          "key_points": [],
+          "content_truncated": false,
+          "analysis_method": "bypassed",
+          "model_used": "direct"
+        },
+        {
+          "source_article_id": "4423943",
+          "canonical_url": "https://www.hkej.com/instantnews/current/article/4423943/%E9%BB%8E%E5%B7%B4%E5%AB%A9%E7%B8%BD%E7%B5%B1%3A%E9%BB%8E%E4%BB%A5%E5%81%9C%E7%81%AB%E5%8D%94%E8%AD%B0%E7%8D%B2%E6%89%B9%E5%BE%8C24%E5%B0%8F%E6%99%82%E5%85%A7%E5%8F%AF%E5%AF%A6%E6%96%BD",
+          "title": "黎巴嫩總統:黎以停火協議獲批後24小時內可實施",
+          "section": "時事脈搏",
+          "published_at": "2026-06-04T20:40:00+08:00",
+          "attention_tier": "light",
+          "novelty_score": 5,
+          "relevance_score": 5,
+          "urgency_score": 5,
+          "named_entities": [],
+          "key_points": [],
+          "content_truncated": false,
+          "analysis_method": "bypassed",
+          "model_used": "direct"
+        },
         {
           "source_article_id": "4423502",
           "canonical_url": "https://www.hkej.com/instantnews/current/article/4423502/%E6%A5%B5%E7%AB%AF%E9%85%B7%E7%86%B1%E4%B8%A8%E4%B8%8B%E5%8D%88%E5%A4%9A%E5%8D%80%E9%80%BE35%E5%BA%A6+%E4%B8%8A%E6%B0%B4%E6%9C%80%E9%AB%98%E9%8C%8437.2%E5%BA%A6",
@@ -988,7 +2348,10 @@
           "key_points": [],
           "content_truncated": false,
           "analysis_method": "bypassed",
-          "model_used": "direct"
+          "model_used": "direct",
+          "theme": "general",
+          "attention_reason": "Lighter treatment because this story sits in the 時事脈搏 section without strong market-moving signals.",
+          "must_keep": false
         },
         {
           "source_article_id": "4423418",
@@ -1004,7 +2367,10 @@
           "key_points": [],
           "content_truncated": false,
           "analysis_method": "bypassed",
-          "model_used": "direct"
+          "model_used": "direct",
+          "theme": "general",
+          "attention_reason": "Lighter treatment because this story sits in the 時事脈搏 section without strong market-moving signals.",
+          "must_keep": false
         },
         {
           "source_article_id": "4423240",
@@ -1020,7 +2386,10 @@
           "key_points": [],
           "content_truncated": false,
           "analysis_method": "bypassed",
-          "model_used": "direct"
+          "model_used": "direct",
+          "theme": "general",
+          "attention_reason": "Lighter treatment because this story sits in the 時事脈搏 section without strong market-moving signals.",
+          "must_keep": false
         },
         {
           "source_article_id": "4422830",
@@ -1036,7 +2405,10 @@
           "key_points": [],
           "content_truncated": false,
           "analysis_method": "bypassed",
-          "model_used": "direct"
+          "model_used": "direct",
+          "theme": "general",
+          "attention_reason": "Lighter treatment because this story sits in the 時事脈搏 section without strong market-moving signals.",
+          "must_keep": false
         },
         {
           "source_article_id": "4422786",
@@ -1052,7 +2424,10 @@
           "key_points": [],
           "content_truncated": false,
           "analysis_method": "bypassed",
-          "model_used": "direct"
+          "model_used": "direct",
+          "theme": "general",
+          "attention_reason": "Lighter treatment because this story sits in the 時事脈搏 section without strong market-moving signals.",
+          "must_keep": false
         },
         {
           "source_article_id": "4422778",
@@ -1068,7 +2443,10 @@
           "key_points": [],
           "content_truncated": false,
           "analysis_method": "bypassed",
-          "model_used": "direct"
+          "model_used": "direct",
+          "theme": "general",
+          "attention_reason": "Lighter treatment because this story sits in the 時事脈搏 section without strong market-moving signals.",
+          "must_keep": false
         },
         {
           "source_article_id": "4422767",
@@ -1084,7 +2462,10 @@
           "key_points": [],
           "content_truncated": false,
           "analysis_method": "bypassed",
-          "model_used": "direct"
+          "model_used": "direct",
+          "theme": "general",
+          "attention_reason": "Lighter treatment because this story sits in the 時事脈搏 section without strong market-moving signals.",
+          "must_keep": false
         },
         {
           "source_article_id": "4422766",
@@ -1100,7 +2481,10 @@
           "key_points": [],
           "content_truncated": false,
           "analysis_method": "bypassed",
-          "model_used": "direct"
+          "model_used": "direct",
+          "theme": "general",
+          "attention_reason": "Lighter treatment because this story sits in the 時事脈搏 section without strong market-moving signals.",
+          "must_keep": false
         },
         {
           "source_article_id": "4422758",
@@ -1210,54 +2594,37 @@
           "key_points": [],
           "content_truncated": false,
           "analysis_method": "bypassed",
-          "model_used": "direct"
+          "model_used": "direct",
+          "theme": "general",
+          "attention_reason": "Lighter treatment because this story sits in the 時事脈搏 section without strong market-moving signals.",
+          "must_keep": false
         }
       ],
       "subgroups": [
         {
-          "title": "社會新聞 & Other News",
-          "theme_rationale": "報道社會各方面的新聞，包括天氣、公務員加薪、社會事件等。",
-          "article_count": 5,
+          "title": "社會與政治 & Other News",
+          "theme_rationale": "關注社會議題與政治動態",
+          "article_count": 15,
           "key_developments": [
-            "香港多區氣溫超過35度，上水最高錄得37.2度",
-            "政府人員協會要求薪水提升不低於4%以提升士氣",
-            "方大6名學者躋身史丹福大學全球前2%頂尖科學家"
+            "李家超中亞之行達成96份合作協議及備忘錄，總值逾128億元。",
+            "香港政府人員協會強烈要求薪水提升不低於4%，以提升士氣。",
+            "本地女性時裝品牌INTIQUE月底結束香港營運。"
           ],
           "named_entities": [
             {
-              "name": "香港",
-              "type": "country"
+              "name": "李家超",
+              "type": "person"
             },
             {
-              "name": "政府人員協會",
-              "type": "organization"
-            },
-            {
-              "name": "方大",
+              "name": "INTIQUE",
               "type": "company"
             },
             {
-              "name": "史丹福大學",
-              "type": "institution"
+              "name": "香港政府人員協會",
+              "type": "organization"
             }
           ],
           "articles": [
-            {
-              "source_article_id": "4423502",
-              "canonical_url": "https://www.hkej.com/instantnews/current/article/4423502/%E6%A5%B5%E7%AB%AF%E9%85%B7%E7%86%B1%E4%B8%A8%E4%B8%8B%E5%8D%88%E5%A4%9A%E5%8D%80%E9%80%BE35%E5%BA%A6+%E4%B8%8A%E6%B0%B4%E6%9C%80%E9%AB%98%E9%8C%8437.2%E5%BA%A6",
-              "title": "極端酷熱丨下午多區逾35度 上水最高錄37.2度",
-              "section": "時事脈搏",
-              "published_at": "2026-06-04T18:29:00+08:00",
-              "attention_tier": "light",
-              "novelty_score": 5,
-              "relevance_score": 5,
-              "urgency_score": 5,
-              "named_entities": [],
-              "key_points": [],
-              "content_truncated": false,
-              "analysis_method": "bypassed",
-              "model_used": "direct"
-            },
             {
               "source_article_id": "4422830",
               "canonical_url": "https://www.hkej.com/instantnews/current/article/4422830/%E5%85%AC%E5%83%95%E5%8A%A0%E8%96%AA%3F%E4%B8%A8%E6%94%BF%E5%BA%9C%E4%BA%BA%E5%93%A1%E5%8D%94%E6%9C%83%E5%BC%B7%E7%83%88%E8%A6%81%E6%B1%82%E4%B8%8D%E4%BD%8E%E6%96%BC4%25+%E6%8F%90%E5%8D%87%E5%A3%AB%E6%B0%A3",
@@ -1272,7 +2639,10 @@
               "key_points": [],
               "content_truncated": false,
               "analysis_method": "bypassed",
-              "model_used": "direct"
+              "model_used": "direct",
+              "theme": "general",
+              "attention_reason": "Lighter treatment because this story sits in the 時事脈搏 section without strong market-moving signals.",
+              "must_keep": false
             },
             {
               "source_article_id": "4422786",
@@ -1288,7 +2658,193 @@
               "key_points": [],
               "content_truncated": false,
               "analysis_method": "bypassed",
+              "model_used": "direct",
+              "theme": "general",
+              "attention_reason": "Lighter treatment because this story sits in the 時事脈搏 section without strong market-moving signals.",
+              "must_keep": false
+            },
+            {
+              "source_article_id": "4422778",
+              "canonical_url": "https://www.hkej.com/instantnews/current/article/4422778/%E5%8D%81%E4%BA%94%E4%BA%94%E4%B8%A8%E5%A4%8F%E5%AF%B6%E9%BE%8D%E8%A8%AA%E6%A9%AB%E7%90%B4%E7%B2%B5%E6%BE%B3%E6%B7%B1%E5%BA%A6%E5%90%88%E4%BD%9C%E5%8D%80%E5%8F%8A%E7%8F%A0%E6%B5%B7%E5%B8%82%E8%AA%BF%E7%A0%94",
+              "title": "十五五丨夏寶龍訪橫琴粵澳深度合作區及珠海市調研",
+              "section": "時事脈搏",
+              "published_at": "2026-06-04T15:57:00+08:00",
+              "attention_tier": "light",
+              "novelty_score": 5,
+              "relevance_score": 5,
+              "urgency_score": 5,
+              "named_entities": [],
+              "key_points": [],
+              "content_truncated": false,
+              "analysis_method": "bypassed",
+              "model_used": "direct",
+              "theme": "general",
+              "attention_reason": "Lighter treatment because this story sits in the 時事脈搏 section without strong market-moving signals.",
+              "must_keep": false
+            },
+            {
+              "source_article_id": "4424148",
+              "canonical_url": "https://www.hkej.com/instantnews/current/article/4424148/%E7%B5%90%E6%A5%AD%E6%BD%AE%E4%B8%A8%E6%9C%AC%E5%9C%B0%E5%A5%B3%E6%80%A7%E6%99%82%E8%A3%9D%E5%93%81%E7%89%8CINTIQUE%E6%9C%88%E5%BA%95%E7%B5%90%E6%9D%9F%E9%A6%99%E6%B8%AF%E7%87%9F%E9%81%8B",
+              "title": "結業潮丨本地女性時裝品牌INTIQUE月底結束香港營運",
+              "section": "時事脈搏",
+              "published_at": "2026-06-04T23:30:00+08:00",
+              "attention_tier": "light",
+              "novelty_score": 5,
+              "relevance_score": 5,
+              "urgency_score": 5,
+              "named_entities": [],
+              "key_points": [],
+              "content_truncated": false,
+              "analysis_method": "bypassed",
               "model_used": "direct"
+            },
+            {
+              "source_article_id": "4424039",
+              "title": "中東局勢丨黎巴嫩真主黨拒絕接受黎以談判結果",
+              "canonical_url": "https://www.hkej.com/instantnews/current/article/4424039/%E4%B8%AD%E6%9D%B1%E5%B1%80%E5%8B%A2%E4%B8%A8%E9%BB%8E%E5%B7%B4%E5%AB%A9%E7%9C%9F%E4%B8%BB%E9%BB%A8%E6%8B%92%E7%B5%95%E6%8E%A5%E5%8F%97%E9%BB%8E%E4%BB%A5%E8%AB%87%E5%88%A4%E7%B5%90%E6%9E%9C",
+              "published_at": "2026-06-04T22:22:00+08:00",
+              "section": "時事脈搏",
+              "novelty_score": 6,
+              "relevance_score": 8,
+              "urgency_score": 9,
+              "named_entities": [
+                {
+                  "name": "Naim Qasem",
+                  "type": "person"
+                },
+                {
+                  "name": "黎巴嫩真主黨",
+                  "type": "organization"
+                },
+                {
+                  "name": "以色列",
+                  "type": "country"
+                },
+                {
+                  "name": "美國",
+                  "type": "country"
+                }
+              ],
+              "key_points": [
+                "黎巴嫩真主黨總書記Naim Qasem拒絕接受黎巴嫩和以色列之間直接談判的結果，稱其為「消滅一部分黎巴嫩人民、奴役其餘人民的路線圖」。",
+                "真主黨與以色列的停火協議可能在24小時內開始實施，但真主黨強調停火必須覆蓋整個黎巴嫩。"
+              ],
+              "content_truncated": false,
+              "original_content_length_chars": 338,
+              "analyzed_content_length_chars": 338,
+              "original_content_token_estimate": 85,
+              "analyzed_content_token_estimate": 85,
+              "truncation_reason": null,
+              "analysis_method": "full_text",
+              "attention_tier": "high",
+              "theme": "geopolitics",
+              "attention_reason": "High-signal geopolitics headline based on title/summary keywords.",
+              "must_keep": true,
+              "model_used": "meta-llama/llama-4-scout-17b-16e-instruct",
+              "delayed_retry_attempted": false,
+              "delayed_retry_model_chain": [],
+              "delayed_retry_final_model": null,
+              "error_classification": null,
+              "error": null
+            },
+            {
+              "source_article_id": "4424075",
+              "canonical_url": "https://www.hkej.com/instantnews/current/article/4424075/%E4%B8%AD%E4%BA%9E%E4%B9%8B%E8%A1%8C%E4%B8%A8%E6%9D%8E%E5%AE%B6%E8%B6%85%3A%E6%B7%B1%E5%8C%96%E9%A6%99%E6%B8%AF%E8%88%87%E7%83%8F%E8%8C%B2%E5%88%A5%E5%85%8B%E8%B2%BF%E6%98%93%E5%92%8C%E6%8A%95%E8%B3%87",
+              "title": "中亞之行丨李家超:深化香港與烏茲別克貿易和投資",
+              "section": "時事脈搏",
+              "published_at": "2026-06-04T22:38:00+08:00",
+              "attention_tier": "light",
+              "novelty_score": 5,
+              "relevance_score": 5,
+              "urgency_score": 5,
+              "named_entities": [],
+              "key_points": [],
+              "content_truncated": false,
+              "analysis_method": "bypassed",
+              "model_used": "direct"
+            },
+            {
+              "source_article_id": "4424046",
+              "canonical_url": "https://www.hkej.com/instantnews/current/article/4424046/%E8%AD%A6%E6%96%B9%E7%B6%AD%E5%9C%92%E5%8A%A0%E5%BC%B7%E8%AD%A6%E6%88%92+%E9%99%B3%E5%AF%B6%E7%91%A9%E9%8A%85%E9%91%BC%E7%81%A3%E8%A2%AB%E5%B8%B6%E8%B5%B0",
+              "title": "警方維園加強警戒 陳寶瑩銅鑼灣被帶走",
+              "section": "時事脈搏",
+              "published_at": "2026-06-04T22:18:00+08:00",
+              "attention_tier": "light",
+              "novelty_score": 5,
+              "relevance_score": 5,
+              "urgency_score": 5,
+              "named_entities": [],
+              "key_points": [],
+              "content_truncated": false,
+              "analysis_method": "bypassed",
+              "model_used": "direct"
+            },
+            {
+              "source_article_id": "4424050",
+              "canonical_url": "https://www.hkej.com/instantnews/current/article/4424050/%E4%B8%AD%E4%BA%9E%E4%B9%8B%E8%A1%8C%E4%B8%A8%E6%9D%8E%E5%AE%B6%E8%B6%85%3A%E9%81%94%E6%88%9096%E4%BB%BD%E5%90%88%E4%BD%9C%E5%8D%94%E8%AD%B0%E5%8F%8A%E5%82%99%E5%BF%98%E9%8C%84+%E7%B8%BD%E5%80%BC%E9%80%BE128%E5%84%84%E5%85%83",
+              "title": "中亞之行丨李家超:達成96份合作協議及備忘錄 總值逾128億元",
+              "section": "時事脈搏",
+              "published_at": "2026-06-04T22:17:00+08:00",
+              "attention_tier": "light",
+              "novelty_score": 5,
+              "relevance_score": 5,
+              "urgency_score": 5,
+              "named_entities": [],
+              "key_points": [],
+              "content_truncated": false,
+              "analysis_method": "bypassed",
+              "model_used": "direct"
+            },
+            {
+              "source_article_id": "4424023",
+              "canonical_url": "https://www.hkej.com/instantnews/current/article/4424023/%E9%A6%AC%E6%99%82%E4%BA%A8%E6%8C%87%E4%B8%AD%E4%BA%9E%E8%A8%AA%E5%95%8F%E6%89%93%E9%96%8B%E5%BE%88%E5%A4%9A%E5%95%86%E6%A9%9F",
+              "title": "馬時亨指中亞訪問打開很多商機",
+              "section": "時事脈搏",
+              "published_at": "2026-06-04T21:58:00+08:00",
+              "attention_tier": "light",
+              "novelty_score": 5,
+              "relevance_score": 5,
+              "urgency_score": 5,
+              "named_entities": [],
+              "key_points": [],
+              "content_truncated": false,
+              "analysis_method": "bypassed",
+              "model_used": "direct"
+            },
+            {
+              "source_article_id": "4423943",
+              "canonical_url": "https://www.hkej.com/instantnews/current/article/4423943/%E9%BB%8E%E5%B7%B4%E5%AB%A9%E7%B8%BD%E7%B5%B1%3A%E9%BB%8E%E4%BB%A5%E5%81%9C%E7%81%AB%E5%8D%94%E8%AD%B0%E7%8D%B2%E6%89%B9%E5%BE%8C24%E5%B0%8F%E6%99%82%E5%85%A7%E5%8F%AF%E5%AF%A6%E6%96%BD",
+              "title": "黎巴嫩總統:黎以停火協議獲批後24小時內可實施",
+              "section": "時事脈搏",
+              "published_at": "2026-06-04T20:40:00+08:00",
+              "attention_tier": "light",
+              "novelty_score": 5,
+              "relevance_score": 5,
+              "urgency_score": 5,
+              "named_entities": [],
+              "key_points": [],
+              "content_truncated": false,
+              "analysis_method": "bypassed",
+              "model_used": "direct"
+            },
+            {
+              "source_article_id": "4423502",
+              "canonical_url": "https://www.hkej.com/instantnews/current/article/4423502/%E6%A5%B5%E7%AB%AF%E9%85%B7%E7%86%B1%E4%B8%A8%E4%B8%8B%E5%8D%88%E5%A4%9A%E5%8D%80%E9%80%BE35%E5%BA%A6+%E4%B8%8A%E6%B0%B4%E6%9C%80%E9%AB%98%E9%8C%8437.2%E5%BA%A6",
+              "title": "極端酷熱丨下午多區逾35度 上水最高錄37.2度",
+              "section": "時事脈搏",
+              "published_at": "2026-06-04T18:29:00+08:00",
+              "attention_tier": "light",
+              "novelty_score": 5,
+              "relevance_score": 5,
+              "urgency_score": 5,
+              "named_entities": [],
+              "key_points": [],
+              "content_truncated": false,
+              "analysis_method": "bypassed",
+              "model_used": "direct",
+              "theme": "general",
+              "attention_reason": "Lighter treatment because this story sits in the 時事脈搏 section without strong market-moving signals.",
+              "must_keep": false
             },
             {
               "source_article_id": "4423418",
@@ -1304,7 +2860,10 @@
               "key_points": [],
               "content_truncated": false,
               "analysis_method": "bypassed",
-              "model_used": "direct"
+              "model_used": "direct",
+              "theme": "general",
+              "attention_reason": "Lighter treatment because this story sits in the 時事脈搏 section without strong market-moving signals.",
+              "must_keep": false
             },
             {
               "source_article_id": "4423240",
@@ -1320,19 +2879,86 @@
               "key_points": [],
               "content_truncated": false,
               "analysis_method": "bypassed",
-              "model_used": "direct"
+              "model_used": "direct",
+              "theme": "general",
+              "attention_reason": "Lighter treatment because this story sits in the 時事脈搏 section without strong market-moving signals.",
+              "must_keep": false
+            },
+            {
+              "source_article_id": "4422767",
+              "canonical_url": "https://www.hkej.com/instantnews/current/article/4422767/%E4%B8%AD%E9%9F%93%E6%93%9A%E5%A0%B1%E6%93%AC%E6%93%B4%E5%A4%A7%E8%88%AA%E6%AC%8A%E5%AE%89%E6%8E%92+%E6%AF%8F%E5%91%A8%E5%AE%A2%E9%81%8B%E8%88%AA%E7%8F%AD%E5%A2%9E56%E7%8F%AD",
+              "title": "中韓據報擬擴大航權安排 每周客運航班增56班",
+              "section": "時事脈搏",
+              "published_at": "2026-06-04T15:41:00+08:00",
+              "attention_tier": "light",
+              "novelty_score": 5,
+              "relevance_score": 5,
+              "urgency_score": 5,
+              "named_entities": [],
+              "key_points": [],
+              "content_truncated": false,
+              "analysis_method": "bypassed",
+              "model_used": "direct",
+              "theme": "general",
+              "attention_reason": "Lighter treatment because this story sits in the 時事脈搏 section without strong market-moving signals.",
+              "must_keep": false
+            },
+            {
+              "source_article_id": "4422758",
+              "title": "內地票房丨《給阿嬤的情書》收逾15億人民幣 帶動潮汕文旅熱",
+              "canonical_url": "https://www.hkej.com/instantnews/current/article/4422758/%E5%85%A7%E5%9C%B0%E7%A5%A8%E6%88%BF%E4%B8%A8%E3%80%8A%E7%B5%A6%E9%98%BF%E5%AC%A4%E7%9A%84%E6%83%85%E6%9B%B8%E3%80%8B%E6%94%B6%E9%80%BE15%E5%84%84%E4%BA%BA%E6%B0%91%E5%B9%A3+%E5%B8%B6%E5%8B%95%E6%BD%AE%E6%B1%95%E6%96%87%E6%97%85%E7%86%B1",
+              "published_at": "2026-06-04T15:35:00+08:00",
+              "section": "時事脈搏",
+              "novelty_score": 6,
+              "relevance_score": 4,
+              "urgency_score": 3,
+              "named_entities": [
+                {
+                  "name": "給阿嬤的情書",
+                  "type": "other"
+                },
+                {
+                  "name": "汕頭",
+                  "type": "other"
+                },
+                {
+                  "name": "廣東",
+                  "type": "other"
+                }
+              ],
+              "key_points": [
+                "電影《給阿嬤的情書》票房已超15億元人民幣",
+                "汕頭市打造電影主題線路，推動文旅熱潮"
+              ],
+              "content_truncated": false,
+              "original_content_length_chars": 218,
+              "analyzed_content_length_chars": 218,
+              "original_content_token_estimate": 55,
+              "analyzed_content_token_estimate": 55,
+              "truncation_reason": null,
+              "analysis_method": "full_text",
+              "attention_tier": "high",
+              "theme": "macro",
+              "attention_reason": "High-signal macro headline based on title/summary keywords.",
+              "must_keep": true,
+              "model_used": "meta-llama/llama-4-scout-17b-16e-instruct",
+              "delayed_retry_attempted": false,
+              "delayed_retry_model_chain": [],
+              "delayed_retry_final_model": null,
+              "error_classification": null,
+              "error": null
             }
           ],
           "model_used": "meta-llama/llama-4-scout-17b-16e-instruct"
         },
         {
           "title": "國際局勢",
-          "theme_rationale": "關注國際政治和外交事件",
+          "theme_rationale": "包含與國際政治、經濟相關的新聞",
           "article_count": 3,
           "key_developments": [
-            "以色列總理內塔尼亞胡回應特朗普評價，強調雙方關係融洽",
+            "內塔尼亞胡回應特朗普評價，強調雙方關係融洽",
             "伊朗警告若以色列襲擊黎巴嫩首都，將堅決回擊",
-            "英國皇家海軍直升機墜毀致3人死亡"
+            "英國皇家海軍直升機墜毀 致3人死亡"
           ],
           "named_entities": [
             {
@@ -1353,6 +2979,25 @@
             }
           ],
           "articles": [
+            {
+              "source_article_id": "4422766",
+              "canonical_url": "https://www.hkej.com/instantnews/current/article/4422766/%E7%B4%90%E8%A5%BF%E8%98%AD%E5%9B%9B%E8%AD%B0%E5%93%A1%E7%A6%81%E5%85%A5%E5%A2%83%E4%B8%A8%E5%8C%97%E4%BA%AC%3A%E5%9C%A8%E5%8F%B0%E7%81%A3%E5%95%8F%E9%A1%8C%E4%B8%8A%E8%B6%8A%E7%95%8C%E5%BF%85%E4%BB%98%E5%87%BA%E4%BB%A3%E5%83%B9",
+              "title": "紐西蘭四議員禁入境丨北京:在台灣問題上越界必付出代價",
+              "section": "時事脈搏",
+              "published_at": "2026-06-04T15:40:00+08:00",
+              "attention_tier": "light",
+              "novelty_score": 5,
+              "relevance_score": 5,
+              "urgency_score": 5,
+              "named_entities": [],
+              "key_points": [],
+              "content_truncated": false,
+              "analysis_method": "bypassed",
+              "model_used": "direct",
+              "theme": "general",
+              "attention_reason": "Lighter treatment because this story sits in the 時事脈搏 section without strong market-moving signals.",
+              "must_keep": false
+            },
             {
               "source_article_id": "4422738",
               "title": "中東局勢丨遭特朗普罵瘋了？內塔尼亞胡:雙方總能化解分歧",
@@ -1403,22 +3048,6 @@
               "error": null
             },
             {
-              "source_article_id": "4422766",
-              "canonical_url": "https://www.hkej.com/instantnews/current/article/4422766/%E7%B4%90%E8%A5%BF%E8%98%AD%E5%9B%9B%E8%AD%B0%E5%93%A1%E7%A6%81%E5%85%A5%E5%A2%83%E4%B8%A8%E5%8C%97%E4%BA%AC%3A%E5%9C%A8%E5%8F%B0%E7%81%A3%E5%95%8F%E9%A1%8C%E4%B8%8A%E8%B6%8A%E7%95%8C%E5%BF%85%E4%BB%98%E5%87%BA%E4%BB%A3%E5%83%B9",
-              "title": "紐西蘭四議員禁入境丨北京:在台灣問題上越界必付出代價",
-              "section": "時事脈搏",
-              "published_at": "2026-06-04T15:40:00+08:00",
-              "attention_tier": "light",
-              "novelty_score": 5,
-              "relevance_score": 5,
-              "urgency_score": 5,
-              "named_entities": [],
-              "key_points": [],
-              "content_truncated": false,
-              "analysis_method": "bypassed",
-              "model_used": "direct"
-            },
-            {
               "source_article_id": "4422437",
               "canonical_url": "https://www.hkej.com/instantnews/current/article/4422437/%E8%8B%B1%E5%9C%8B%E7%9A%87%E5%AE%B6%E6%B5%B7%E8%BB%8D%E7%9B%B4%E5%8D%87%E6%A9%9F%E5%A2%9C%E6%AF%80+%E8%87%B43%E4%BA%BA%E6%AD%BB%E4%BA%A1",
               "title": "英國皇家海軍直升機墜毀 致3人死亡",
@@ -1432,115 +3061,10 @@
               "key_points": [],
               "content_truncated": false,
               "analysis_method": "bypassed",
-              "model_used": "direct"
-            }
-          ],
-          "model_used": "meta-llama/llama-4-scout-17b-16e-instruct"
-        },
-        {
-          "title": "經濟動態",
-          "theme_rationale": "聚焦經濟和商業相關新聞",
-          "article_count": 3,
-          "key_developments": [
-            "電影《給阿嬤的情書》票房已超15億元人民幣",
-            "汕頭市打造電影主題線路，推動文旅熱潮",
-            "中韓擬擴大航權安排，每周客運航班增56班"
-          ],
-          "named_entities": [
-            {
-              "name": "給阿嬤的情書",
-              "type": "other"
-            },
-            {
-              "name": "汕頭",
-              "type": "other"
-            },
-            {
-              "name": "廣東",
-              "type": "other"
-            },
-            {
-              "name": "中韓",
-              "type": "country"
-            }
-          ],
-          "articles": [
-            {
-              "source_article_id": "4422778",
-              "canonical_url": "https://www.hkej.com/instantnews/current/article/4422778/%E5%8D%81%E4%BA%94%E4%BA%94%E4%B8%A8%E5%A4%8F%E5%AF%B6%E9%BE%8D%E8%A8%AA%E6%A9%AB%E7%90%B4%E7%B2%B5%E6%BE%B3%E6%B7%B1%E5%BA%A6%E5%90%88%E4%BD%9C%E5%8D%80%E5%8F%8A%E7%8F%A0%E6%B5%B7%E5%B8%82%E8%AA%BF%E7%A0%94",
-              "title": "十五五丨夏寶龍訪橫琴粵澳深度合作區及珠海市調研",
-              "section": "時事脈搏",
-              "published_at": "2026-06-04T15:57:00+08:00",
-              "attention_tier": "light",
-              "novelty_score": 5,
-              "relevance_score": 5,
-              "urgency_score": 5,
-              "named_entities": [],
-              "key_points": [],
-              "content_truncated": false,
-              "analysis_method": "bypassed",
-              "model_used": "direct"
-            },
-            {
-              "source_article_id": "4422767",
-              "canonical_url": "https://www.hkej.com/instantnews/current/article/4422767/%E4%B8%AD%E9%9F%93%E6%93%9A%E5%A0%B1%E6%93%AC%E6%93%B4%E5%A4%A7%E8%88%AA%E6%AC%8A%E5%AE%89%E6%8E%92+%E6%AF%8F%E5%91%A8%E5%AE%A2%E9%81%8B%E8%88%AA%E7%8F%AD%E5%A2%9E56%E7%8F%AD",
-              "title": "中韓據報擬擴大航權安排 每周客運航班增56班",
-              "section": "時事脈搏",
-              "published_at": "2026-06-04T15:41:00+08:00",
-              "attention_tier": "light",
-              "novelty_score": 5,
-              "relevance_score": 5,
-              "urgency_score": 5,
-              "named_entities": [],
-              "key_points": [],
-              "content_truncated": false,
-              "analysis_method": "bypassed",
-              "model_used": "direct"
-            },
-            {
-              "source_article_id": "4422758",
-              "title": "內地票房丨《給阿嬤的情書》收逾15億人民幣 帶動潮汕文旅熱",
-              "canonical_url": "https://www.hkej.com/instantnews/current/article/4422758/%E5%85%A7%E5%9C%B0%E7%A5%A8%E6%88%BF%E4%B8%A8%E3%80%8A%E7%B5%A6%E9%98%BF%E5%AC%A4%E7%9A%84%E6%83%85%E6%9B%B8%E3%80%8B%E6%94%B6%E9%80%BE15%E5%84%84%E4%BA%BA%E6%B0%91%E5%B9%A3+%E5%B8%B6%E5%8B%95%E6%BD%AE%E6%B1%95%E6%96%87%E6%97%85%E7%86%B1",
-              "published_at": "2026-06-04T15:35:00+08:00",
-              "section": "時事脈搏",
-              "novelty_score": 6,
-              "relevance_score": 4,
-              "urgency_score": 3,
-              "named_entities": [
-                {
-                  "name": "給阿嬤的情書",
-                  "type": "other"
-                },
-                {
-                  "name": "汕頭",
-                  "type": "other"
-                },
-                {
-                  "name": "廣東",
-                  "type": "other"
-                }
-              ],
-              "key_points": [
-                "電影《給阿嬤的情書》票房已超15億元人民幣",
-                "汕頭市打造電影主題線路，推動文旅熱潮"
-              ],
-              "content_truncated": false,
-              "original_content_length_chars": 218,
-              "analyzed_content_length_chars": 218,
-              "original_content_token_estimate": 55,
-              "analyzed_content_token_estimate": 55,
-              "truncation_reason": null,
-              "analysis_method": "full_text",
-              "attention_tier": "high",
-              "theme": "macro",
-              "attention_reason": "High-signal macro headline based on title/summary keywords.",
-              "must_keep": true,
-              "model_used": "meta-llama/llama-4-scout-17b-16e-instruct",
-              "delayed_retry_attempted": false,
-              "delayed_retry_model_chain": [],
-              "delayed_retry_final_model": null,
-              "error_classification": null,
-              "error": null
+              "model_used": "direct",
+              "theme": "general",
+              "attention_reason": "Lighter treatment because this story sits in the 時事脈搏 section without strong market-moving signals.",
+              "must_keep": false
             }
           ],
           "model_used": "meta-llama/llama-4-scout-17b-16e-instruct"
@@ -1548,17 +3072,15 @@
       ],
       "analysis_profile": "light",
       "model_used": "meta-llama/llama-4-scout-17b-16e-instruct",
-      "sub_batch_count": 4,
+      "sub_batch_count": 9,
       "diagnostics": {
-        "sub_batch_count": 1,
-        "split_reasons": [
-          "pre_send_budget"
-        ],
+        "sub_batch_count": 9,
+        "split_reasons": [],
         "models_attempted": [
           "meta-llama/llama-4-scout-17b-16e-instruct"
         ],
-        "estimated_input_tokens_max": 1348,
-        "serialized_request_bytes_max": 6035,
+        "estimated_input_tokens_max": 1434,
+        "serialized_request_bytes_max": 6398,
         "rate_limit_waits": 0,
         "partial_article_count": 0,
         "synthesis_wait_seconds_total": 0.0,
@@ -1580,7 +3102,7 @@
         "香港銀行公會組織的海外代表團訪問泰國，深化區域金融合作。",
         "昇世集團在香港推出旗艦信託服務品牌昇世信託，專為高淨值人士及家族辦公室服務。",
         "BoC Pay+開通鐵路12306等內地App付款功能，拓展支付場景。",
-        "瑞銀亞太區研究部總監連沛堃指出，投資者關注的大方向是多元化配置，分散地緣政治等造成的投資風險。"
+        "恒指夜市期指收報25312點，跌179點，較昨日恒指收市25633點，低水321點。"
       ],
       "named_entities": [
         {
@@ -1596,8 +3118,8 @@
           "type": "other"
         },
         {
-          "name": "瑞銀",
-          "type": "company"
+          "name": "恒指",
+          "type": "index"
         }
       ],
       "articles": [
@@ -1919,7 +3441,7 @@
             "香港銀行公會組織的海外代表團訪問泰國，深化區域金融合作。",
             "昇世集團在香港推出旗艦信託服務品牌昇世信託，專為高淨值人士及家族辦公室服務。",
             "BoC Pay+開通鐵路12306等內地App付款功能，拓展支付場景。",
-            "瑞銀亞太區研究部總監連沛堃指出，投資者關注的大方向是多元化配置，分散地緣政治等造成的投資風險。"
+            "恒指夜市期指收報25312點，跌179點，較昨日恒指收市25633點，低水321點。"
           ],
           "named_entities": [
             {
@@ -1935,8 +3457,8 @@
               "type": "other"
             },
             {
-              "name": "瑞銀",
-              "type": "company"
+              "name": "恒指",
+              "type": "index"
             }
           ],
           "articles": [
@@ -2254,17 +3776,13 @@
       ],
       "analysis_profile": "standard",
       "model_used": "meta-llama/llama-4-scout-17b-16e-instruct",
-      "sub_batch_count": 3,
+      "sub_batch_count": 1,
       "diagnostics": {
-        "sub_batch_count": 2,
-        "split_reasons": [
-          "pre_send_budget"
-        ],
-        "models_attempted": [
-          "meta-llama/llama-4-scout-17b-16e-instruct"
-        ],
-        "estimated_input_tokens_max": 1683,
-        "serialized_request_bytes_max": 10855,
+        "sub_batch_count": 1,
+        "split_reasons": [],
+        "models_attempted": [],
+        "estimated_input_tokens_max": 0,
+        "serialized_request_bytes_max": 0,
         "rate_limit_waits": 0,
         "partial_article_count": 0,
         "synthesis_wait_seconds_total": 0.0,
@@ -2280,12 +3798,14 @@
     },
     {
       "category": "港股直擊",
-      "article_count": 1,
+      "article_count": 2,
       "status": "success",
       "key_developments": [
-        "恒指跌379點，失守10天線（25443點）。",
+        "恒指夜期報25167點，升76點或0.3%，夜市期貨成交12886張。",
+        "港股今日續跌，恒指跌379點，失守10天線（25443點）。",
         "成交額2702.3億元，北水淨流出3.15億元。",
-        "騰訊跌1.6%，報459元；阿里巴巴跌2.4%，報123.5元。"
+        "騰訊跌1.6%，報459元；阿里巴巴跌2.4%，報123.5元。",
+        "恒指夜期低水86點，6月夜期最高見25289點，與日間期指收市相比上升198點。"
       ],
       "named_entities": [
         {
@@ -2299,9 +3819,59 @@
         {
           "name": "阿里巴巴",
           "type": "company"
+        },
+        {
+          "name": "港股",
+          "type": "other"
+        },
+        {
+          "name": "百度",
+          "type": "company"
         }
       ],
       "articles": [
+        {
+          "source_article_id": "4424104",
+          "title": "恒指夜期丨報25167 升76點",
+          "canonical_url": "https://www.hkej.com/instantnews/stock/article/4424104/%E6%81%92%E6%8C%87%E5%A4%9C%E6%9C%9F%E4%B8%A8%E5%A0%B125167+%E5%8D%8776%E9%BB%9E",
+          "published_at": "2026-06-04T22:41:00+08:00",
+          "section": "港股直擊",
+          "novelty_score": 4,
+          "relevance_score": 7,
+          "urgency_score": 5,
+          "named_entities": [
+            {
+              "name": "恒指",
+              "type": "index"
+            },
+            {
+              "name": "港股",
+              "type": "other"
+            }
+          ],
+          "key_points": [
+            "截至晚上約10時38分，6月期指夜市最新報25167點，升76點或0.3%。",
+            "夜市期貨成交12886張，國指期貨現時報8486點，升33點或0.39%。",
+            "恒指夜期低水86點，6月夜期最高見25289點，與日間期指收市相比上升198點。"
+          ],
+          "content_truncated": false,
+          "original_content_length_chars": 197,
+          "analyzed_content_length_chars": 197,
+          "original_content_token_estimate": 50,
+          "analyzed_content_token_estimate": 50,
+          "truncation_reason": null,
+          "analysis_method": "full_text",
+          "attention_tier": "medium",
+          "theme": "stocks",
+          "attention_reason": "The article reports a minor change in the Hang Seng Index futures.",
+          "must_keep": true,
+          "model_used": "meta-llama/llama-4-scout-17b-16e-instruct",
+          "delayed_retry_attempted": false,
+          "delayed_retry_model_chain": [],
+          "delayed_retry_final_model": null,
+          "error_classification": null,
+          "error": null
+        },
         {
           "source_article_id": "4422813",
           "title": "港股走勢丨恒指埋單跌379點失10天線 北水走資",
@@ -2361,9 +3931,10 @@
         {
           "title": "港股直擊 overview",
           "theme_rationale": "Single subgroup because the category size did not require thematic splitting.",
-          "article_count": 1,
+          "article_count": 2,
           "key_developments": [
-            "恒指跌379點，失守10天線（25443點）。",
+            "恒指夜期報25167點，升76點或0.3%，夜市期貨成交12886張。",
+            "港股今日續跌，恒指跌379點，失守10天線（25443點）。",
             "成交額2702.3億元，北水淨流出3.15億元。",
             "騰訊跌1.6%，報459元；阿里巴巴跌2.4%，報123.5元。"
           ],
@@ -2379,9 +3950,59 @@
             {
               "name": "阿里巴巴",
               "type": "company"
+            },
+            {
+              "name": "港股",
+              "type": "other"
+            },
+            {
+              "name": "百度",
+              "type": "company"
             }
           ],
           "articles": [
+            {
+              "source_article_id": "4424104",
+              "title": "恒指夜期丨報25167 升76點",
+              "canonical_url": "https://www.hkej.com/instantnews/stock/article/4424104/%E6%81%92%E6%8C%87%E5%A4%9C%E6%9C%9F%E4%B8%A8%E5%A0%B125167+%E5%8D%8776%E9%BB%9E",
+              "published_at": "2026-06-04T22:41:00+08:00",
+              "section": "港股直擊",
+              "novelty_score": 4,
+              "relevance_score": 7,
+              "urgency_score": 5,
+              "named_entities": [
+                {
+                  "name": "恒指",
+                  "type": "index"
+                },
+                {
+                  "name": "港股",
+                  "type": "other"
+                }
+              ],
+              "key_points": [
+                "截至晚上約10時38分，6月期指夜市最新報25167點，升76點或0.3%。",
+                "夜市期貨成交12886張，國指期貨現時報8486點，升33點或0.39%。",
+                "恒指夜期低水86點，6月夜期最高見25289點，與日間期指收市相比上升198點。"
+              ],
+              "content_truncated": false,
+              "original_content_length_chars": 197,
+              "analyzed_content_length_chars": 197,
+              "original_content_token_estimate": 50,
+              "analyzed_content_token_estimate": 50,
+              "truncation_reason": null,
+              "analysis_method": "full_text",
+              "attention_tier": "medium",
+              "theme": "stocks",
+              "attention_reason": "The article reports a minor change in the Hang Seng Index futures.",
+              "must_keep": true,
+              "model_used": "meta-llama/llama-4-scout-17b-16e-instruct",
+              "delayed_retry_attempted": false,
+              "delayed_retry_model_chain": [],
+              "delayed_retry_final_model": null,
+              "error_classification": null,
+              "error": null
+            },
             {
               "source_article_id": "4422813",
               "title": "港股走勢丨恒指埋單跌379點失10天線 北水走資",
@@ -2442,15 +4063,15 @@
       ],
       "analysis_profile": "standard",
       "model_used": "meta-llama/llama-4-scout-17b-16e-instruct",
-      "sub_batch_count": 2,
+      "sub_batch_count": 3,
       "diagnostics": {
-        "sub_batch_count": 1,
+        "sub_batch_count": 3,
         "split_reasons": [],
         "models_attempted": [
           "meta-llama/llama-4-scout-17b-16e-instruct"
         ],
-        "estimated_input_tokens_max": 860,
-        "serialized_request_bytes_max": 5088,
+        "estimated_input_tokens_max": 635,
+        "serialized_request_bytes_max": 3635,
         "rate_limit_waits": 0,
         "partial_article_count": 0,
         "synthesis_wait_seconds_total": 0.0,
@@ -2468,27 +4089,32 @@
       "category": "中國財經",
       "article_count": 7,
       "status": "success",
-      "key_developments": [],
+      "key_developments": [
+        "人民幣兌美元收跌48點子，創一周低",
+        "美國商務部發布新指南，阻止高端晶片流向中國，中國商務部表示嚴重損害中國企業利益",
+        "國內汽、柴油價格每噸分別下調525元、505元人民幣",
+        "A股市場下跌，滬指收跌26點，止兩連升"
+      ],
       "named_entities": [
         {
-          "name": "何咏前",
-          "type": "person"
+          "name": "人民幣",
+          "type": "other"
         },
         {
           "name": "美國商務部",
           "type": "institution"
         },
         {
-          "name": "輝達",
-          "type": "company"
-        },
-        {
-          "name": "超微",
-          "type": "company"
-        },
-        {
           "name": "中國",
           "type": "country"
+        },
+        {
+          "name": "鴻海科技集團",
+          "type": "company"
+        },
+        {
+          "name": "英特爾",
+          "type": "company"
         }
       ],
       "articles": [
@@ -2498,7 +4124,7 @@
           "title": "人民幣走勢丨CNY收跌48點子 創一周低",
           "section": "中國財經",
           "published_at": "2026-06-04T17:50:00+08:00",
-          "attention_tier": "light",
+          "attention_tier": "medium",
           "novelty_score": 5,
           "relevance_score": 5,
           "urgency_score": 5,
@@ -2506,7 +4132,10 @@
           "key_points": [],
           "content_truncated": false,
           "analysis_method": "bypassed",
-          "model_used": "direct"
+          "model_used": "direct",
+          "theme": "macro",
+          "attention_reason": "High-signal macro headline based on title/summary keywords.",
+          "must_keep": true
         },
         {
           "source_article_id": "4422782",
@@ -2676,7 +4305,7 @@
           "title": "A股走勢丨滬指收跌26點 止兩連升",
           "section": "中國財經",
           "published_at": "2026-06-04T15:26:00+08:00",
-          "attention_tier": "light",
+          "attention_tier": "medium",
           "novelty_score": 5,
           "relevance_score": 5,
           "urgency_score": 5,
@@ -2684,7 +4313,10 @@
           "key_points": [],
           "content_truncated": false,
           "analysis_method": "bypassed",
-          "model_used": "direct"
+          "model_used": "direct",
+          "theme": "macro",
+          "attention_reason": "High-signal macro headline based on title/summary keywords.",
+          "must_keep": true
         },
         {
           "source_article_id": "4422746",
@@ -2781,38 +4413,57 @@
       ],
       "subgroups": [
         {
-          "title": "Geopolitics & Trade",
-          "theme_rationale": "Articles discussing international relations, trade tensions, and their impacts.",
-          "article_count": 2,
+          "title": "Combined Market Overview",
+          "theme_rationale": "Consolidated smaller themes for brevity.",
+          "article_count": 7,
           "key_developments": [
-            "美國商務部發布新指南，阻止高端晶片流向中國，中國商務部發言人何咏前表示嚴重損害中國企業利益。",
-            "歐盟擬推新對華貿易限制工具，中國外交部發言人毛寧表示違背經濟規律。",
-            "中國商務部呼籲美國停止對華歧視性措施，維護全球產業鏈供應鏈穩定。",
-            "美國試圖堵住漏洞，阻止企業向中國實體出口最先進晶片，包括輝達和超微的產品。"
+            "人民幣兌美元收跌48點子，創一周低",
+            "美國商務部發布新指南，阻止高端晶片流向中國，中國商務部表示嚴重損害中國企業利益",
+            "國內汽、柴油價格每噸分別下調525元、505元人民幣",
+            "A股市場下跌，滬指收跌26點，止兩連升"
           ],
           "named_entities": [
             {
-              "name": "何咏前",
-              "type": "person"
+              "name": "人民幣",
+              "type": "other"
             },
             {
               "name": "美國商務部",
               "type": "institution"
             },
             {
-              "name": "輝達",
-              "type": "company"
-            },
-            {
-              "name": "超微",
-              "type": "company"
-            },
-            {
               "name": "中國",
               "type": "country"
+            },
+            {
+              "name": "鴻海科技集團",
+              "type": "company"
+            },
+            {
+              "name": "英特爾",
+              "type": "company"
             }
           ],
           "articles": [
+            {
+              "source_article_id": "4423210",
+              "canonical_url": "https://www.hkej.com/instantnews/china/article/4423210/%E4%BA%BA%E6%B0%91%E5%B9%A3%E8%B5%B0%E5%8B%A2%E4%B8%A8CNY%E6%94%B6%E8%B7%8C48%E9%BB%9E%E5%AD%90+%E5%89%B5%E4%B8%80%E5%91%A8%E4%BD%8E",
+              "title": "人民幣走勢丨CNY收跌48點子 創一周低",
+              "section": "中國財經",
+              "published_at": "2026-06-04T17:50:00+08:00",
+              "attention_tier": "medium",
+              "novelty_score": 5,
+              "relevance_score": 5,
+              "urgency_score": 5,
+              "named_entities": [],
+              "key_points": [],
+              "content_truncated": false,
+              "analysis_method": "bypassed",
+              "model_used": "direct",
+              "theme": "macro",
+              "attention_reason": "High-signal macro headline based on title/summary keywords.",
+              "must_keep": true
+            },
             {
               "source_article_id": "4422782",
               "title": "中美貿易丨美阻高端晶片流向中國 商務部:嚴重損害中企利益",
@@ -2920,43 +4571,7 @@
               "delayed_retry_final_model": null,
               "error_classification": null,
               "error": null
-            }
-          ],
-          "model_used": "meta-llama/llama-4-scout-17b-16e-instruct"
-        },
-        {
-          "title": "Market Trends & Stocks",
-          "theme_rationale": "Articles covering stock market movements, company performances, and technological advancements.",
-          "article_count": 3,
-          "key_developments": [
-            "鴻海科技集團與英特爾合作開發新一代AI基礎建設、邊緣人工智能和Physical AI生態系。",
-            "雙方將共同開發機櫃級AI基礎設施解決方案，涵蓋以Intel Xeon處理器為基礎的機櫃與AI加速器架構。",
-            "劉揚偉與崔泰源討論AI伺服器、AI數據中心及能源解決方案等領域的合作機會。",
-            "豆包計劃推出付費專業版，以滿足專業人群的生產力需求"
-          ],
-          "named_entities": [
-            {
-              "name": "鴻海科技集團",
-              "type": "company"
             },
-            {
-              "name": "英特爾",
-              "type": "company"
-            },
-            {
-              "name": "劉揚偉",
-              "type": "person"
-            },
-            {
-              "name": "陳立武",
-              "type": "person"
-            },
-            {
-              "name": "SK集團",
-              "type": "company"
-            }
-          ],
-          "articles": [
             {
               "source_article_id": "4422763",
               "title": "AI丨鴻海夥英特爾全方位拓展AI 涵蓋新一代晶片等",
@@ -3012,22 +4627,6 @@
               "error": null
             },
             {
-              "source_article_id": "4422748",
-              "canonical_url": "https://www.hkej.com/instantnews/china/article/4422748/A%E8%82%A1%E8%B5%B0%E5%8B%A2%E4%B8%A8%E6%BB%AC%E6%8C%87%E6%94%B6%E8%B7%8C26%E9%BB%9E+%E6%AD%A2%E5%85%A9%E9%80%A3%E5%8D%87",
-              "title": "A股走勢丨滬指收跌26點 止兩連升",
-              "section": "中國財經",
-              "published_at": "2026-06-04T15:26:00+08:00",
-              "attention_tier": "light",
-              "novelty_score": 5,
-              "relevance_score": 5,
-              "urgency_score": 5,
-              "named_entities": [],
-              "key_points": [],
-              "content_truncated": false,
-              "analysis_method": "bypassed",
-              "model_used": "direct"
-            },
-            {
               "source_article_id": "4422434",
               "title": "AI丨字節跳動旗下豆包擬推出付費專業版",
               "canonical_url": "https://www.hkej.com/instantnews/china/article/4422434/AI%E4%B8%A8%E5%AD%97%E7%AF%80%E8%B7%B3%E5%8B%95%E6%97%97%E4%B8%8B%E8%B1%86%E5%8C%85%E6%93%AC%E6%8E%A8%E5%87%BA%E4%BB%98%E8%B2%BB%E5%B0%88%E6%A5%AD%E7%89%88",
@@ -3068,50 +4667,14 @@
               "delayed_retry_final_model": null,
               "error_classification": null,
               "error": null
-            }
-          ],
-          "model_used": "meta-llama/llama-4-scout-17b-16e-instruct"
-        },
-        {
-          "title": "Economy & Finance",
-          "theme_rationale": "Articles focusing on economic indicators, financial market updates, and commodity prices.",
-          "article_count": 2,
-          "key_developments": [
-            "人民幣兌美元收跌48點子，創一周低",
-            "內地成品油價格下調，國內汽、柴油價格每噸分別下調525元、505元人民幣",
-            "發改委要求確保市場穩定供應，嚴格執行國家價格政策",
-            "國際市場原油價格震盪下行後近日有所回升"
-          ],
-          "named_entities": [
-            {
-              "name": "人民幣",
-              "type": "asset"
             },
             {
-              "name": "發改委",
-              "type": "institution"
-            },
-            {
-              "name": "中石油",
-              "type": "company"
-            },
-            {
-              "name": "中石化",
-              "type": "company"
-            },
-            {
-              "name": "中海油",
-              "type": "company"
-            }
-          ],
-          "articles": [
-            {
-              "source_article_id": "4423210",
-              "canonical_url": "https://www.hkej.com/instantnews/china/article/4423210/%E4%BA%BA%E6%B0%91%E5%B9%A3%E8%B5%B0%E5%8B%A2%E4%B8%A8CNY%E6%94%B6%E8%B7%8C48%E9%BB%9E%E5%AD%90+%E5%89%B5%E4%B8%80%E5%91%A8%E4%BD%8E",
-              "title": "人民幣走勢丨CNY收跌48點子 創一周低",
+              "source_article_id": "4422748",
+              "canonical_url": "https://www.hkej.com/instantnews/china/article/4422748/A%E8%82%A1%E8%B5%B0%E5%8B%A2%E4%B8%A8%E6%BB%AC%E6%8C%87%E6%94%B6%E8%B7%8C26%E9%BB%9E+%E6%AD%A2%E5%85%A9%E9%80%A3%E5%8D%87",
+              "title": "A股走勢丨滬指收跌26點 止兩連升",
               "section": "中國財經",
-              "published_at": "2026-06-04T17:50:00+08:00",
-              "attention_tier": "light",
+              "published_at": "2026-06-04T15:26:00+08:00",
+              "attention_tier": "medium",
               "novelty_score": 5,
               "relevance_score": 5,
               "urgency_score": 5,
@@ -3119,7 +4682,10 @@
               "key_points": [],
               "content_truncated": false,
               "analysis_method": "bypassed",
-              "model_used": "direct"
+              "model_used": "direct",
+              "theme": "macro",
+              "attention_reason": "High-signal macro headline based on title/summary keywords.",
+              "must_keep": true
             },
             {
               "source_article_id": "4422746",
@@ -3177,16 +4743,216 @@
       ],
       "analysis_profile": "standard",
       "model_used": "meta-llama/llama-4-scout-17b-16e-instruct",
-      "sub_batch_count": 6,
+      "sub_batch_count": 3,
       "diagnostics": {
         "sub_batch_count": 3,
+        "split_reasons": [],
+        "models_attempted": [],
+        "estimated_input_tokens_max": 0,
+        "serialized_request_bytes_max": 0,
+        "rate_limit_waits": 0,
+        "partial_article_count": 0,
+        "synthesis_wait_seconds_total": 0.0,
+        "synthesis_retry_count": 0,
+        "synthesis_retry_skipped_count": 0,
+        "synthesis_budget_exhausted": false,
+        "degraded_merge_used": false,
+        "degraded_merge_reason": "",
+        "synthesis_merge_depth_max": 0,
+        "model_switches": []
+      },
+      "error": null
+    },
+    {
+      "category": "即巿股評",
+      "article_count": 1,
+      "status": "success",
+      "key_developments": [
+        "恒生指數急跌1.48%，收報25253.40點。",
+        "友邦股價急跌6.7%，國內監管機構收緊跨境證券期貨基金經營活動實施方案，市場擔憂影響香港保險業務。",
+        "油價急升至每桶97美元，市場憂慮通脹復燃，投資者擔心央行或延後降息甚至重啟加息。"
+      ],
+      "named_entities": [
+        {
+          "name": "梁健雄",
+          "type": "person"
+        },
+        {
+          "name": "友邦",
+          "type": "company"
+        },
+        {
+          "name": "高盛",
+          "type": "company"
+        },
+        {
+          "name": "恒生指數",
+          "type": "index"
+        },
+        {
+          "name": "伊朗",
+          "type": "country"
+        }
+      ],
+      "articles": [
+        {
+          "source_article_id": "4424006",
+          "title": "炒股讀心丨港股受內外夾擊急回吐",
+          "canonical_url": "https://www.hkej.com/instantnews/market/article/4424006/%E7%82%92%E8%82%A1%E8%AE%80%E5%BF%83%E4%B8%A8%E6%B8%AF%E8%82%A1%E5%8F%97%E5%85%A7%E5%A4%96%E5%A4%BE%E6%93%8A%E6%80%A5%E5%9B%9E%E5%90%90",
+          "published_at": "2026-06-04T21:31:00+08:00",
+          "section": "即巿股評",
+          "novelty_score": 6,
+          "relevance_score": 8,
+          "urgency_score": 7,
+          "named_entities": [
+            {
+              "name": "梁健雄",
+              "type": "person"
+            },
+            {
+              "name": "友邦",
+              "type": "company"
+            },
+            {
+              "name": "高盛",
+              "type": "company"
+            },
+            {
+              "name": "恒生指數",
+              "type": "index"
+            },
+            {
+              "name": "伊朗",
+              "type": "country"
+            }
+          ],
+          "key_points": [
+            "港股市場本周經歷劇烈波動，恒生指數一度急跌，市場情緒受地緣政治風險、國際大行報告和國內監管政策收緊的影響。",
+            "油價急升至每桶97美元，市場憂慮通脹復燃，投資者擔心央行或延後降息甚至重啟加息。",
+            "友邦股價急跌6.7%，國內監管機構收緊跨境證券期貨基金經營活動實施方案，市場擔憂影響香港保險業務。"
+          ],
+          "content_truncated": false,
+          "original_content_length_chars": 959,
+          "analyzed_content_length_chars": 959,
+          "original_content_token_estimate": 240,
+          "analyzed_content_token_estimate": 240,
+          "truncation_reason": null,
+          "analysis_method": "full_text",
+          "attention_tier": "medium",
+          "theme": "general",
+          "attention_reason": "Default medium attention because the story is relevant but not an obvious top-priority market mover.",
+          "must_keep": false,
+          "model_used": "meta-llama/llama-4-scout-17b-16e-instruct",
+          "delayed_retry_attempted": false,
+          "delayed_retry_model_chain": [],
+          "delayed_retry_final_model": null,
+          "error_classification": null,
+          "error": null
+        }
+      ],
+      "subgroups": [
+        {
+          "title": "即巿股評 overview",
+          "theme_rationale": "Single subgroup because the category size did not require thematic splitting.",
+          "article_count": 1,
+          "key_developments": [
+            "恒生指數急跌1.48%，收報25253.40點。",
+            "友邦股價急跌6.7%，國內監管機構收緊跨境證券期貨基金經營活動實施方案，市場擔憂影響香港保險業務。",
+            "油價急升至每桶97美元，市場憂慮通脹復燃，投資者擔心央行或延後降息甚至重啟加息。"
+          ],
+          "named_entities": [
+            {
+              "name": "梁健雄",
+              "type": "person"
+            },
+            {
+              "name": "友邦",
+              "type": "company"
+            },
+            {
+              "name": "高盛",
+              "type": "company"
+            },
+            {
+              "name": "恒生指數",
+              "type": "index"
+            },
+            {
+              "name": "伊朗",
+              "type": "country"
+            }
+          ],
+          "articles": [
+            {
+              "source_article_id": "4424006",
+              "title": "炒股讀心丨港股受內外夾擊急回吐",
+              "canonical_url": "https://www.hkej.com/instantnews/market/article/4424006/%E7%82%92%E8%82%A1%E8%AE%80%E5%BF%83%E4%B8%A8%E6%B8%AF%E8%82%A1%E5%8F%97%E5%85%A7%E5%A4%96%E5%A4%BE%E6%93%8A%E6%80%A5%E5%9B%9E%E5%90%90",
+              "published_at": "2026-06-04T21:31:00+08:00",
+              "section": "即巿股評",
+              "novelty_score": 6,
+              "relevance_score": 8,
+              "urgency_score": 7,
+              "named_entities": [
+                {
+                  "name": "梁健雄",
+                  "type": "person"
+                },
+                {
+                  "name": "友邦",
+                  "type": "company"
+                },
+                {
+                  "name": "高盛",
+                  "type": "company"
+                },
+                {
+                  "name": "恒生指數",
+                  "type": "index"
+                },
+                {
+                  "name": "伊朗",
+                  "type": "country"
+                }
+              ],
+              "key_points": [
+                "港股市場本周經歷劇烈波動，恒生指數一度急跌，市場情緒受地緣政治風險、國際大行報告和國內監管政策收緊的影響。",
+                "油價急升至每桶97美元，市場憂慮通脹復燃，投資者擔心央行或延後降息甚至重啟加息。",
+                "友邦股價急跌6.7%，國內監管機構收緊跨境證券期貨基金經營活動實施方案，市場擔憂影響香港保險業務。"
+              ],
+              "content_truncated": false,
+              "original_content_length_chars": 959,
+              "analyzed_content_length_chars": 959,
+              "original_content_token_estimate": 240,
+              "analyzed_content_token_estimate": 240,
+              "truncation_reason": null,
+              "analysis_method": "full_text",
+              "attention_tier": "medium",
+              "theme": "general",
+              "attention_reason": "Default medium attention because the story is relevant but not an obvious top-priority market mover.",
+              "must_keep": false,
+              "model_used": "meta-llama/llama-4-scout-17b-16e-instruct",
+              "delayed_retry_attempted": false,
+              "delayed_retry_model_chain": [],
+              "delayed_retry_final_model": null,
+              "error_classification": null,
+              "error": null
+            }
+          ],
+          "model_used": "meta-llama/llama-4-scout-17b-16e-instruct"
+        }
+      ],
+      "analysis_profile": "standard",
+      "model_used": "meta-llama/llama-4-scout-17b-16e-instruct",
+      "sub_batch_count": 2,
+      "diagnostics": {
+        "sub_batch_count": 1,
         "split_reasons": [],
         "models_attempted": [
           "meta-llama/llama-4-scout-17b-16e-instruct"
         ],
-        "estimated_input_tokens_max": 1691,
-        "serialized_request_bytes_max": 7935,
-        "rate_limit_waits": 1,
+        "estimated_input_tokens_max": 826,
+        "serialized_request_bytes_max": 5888,
+        "rate_limit_waits": 0,
         "partial_article_count": 0,
         "synthesis_wait_seconds_total": 0.0,
         "synthesis_retry_count": 0,
@@ -3201,8 +4967,8 @@
     },
     {
       "category": "重要通告",
-      "article_count": 3,
-      "status": "success",
+      "article_count": 5,
+      "status": "partial",
       "key_developments": [
         "中國海外發展5月合約物業銷售金額約272.91億元，按年上升14.4%，銷售面積約90.55萬平方米，按年上升10.5%。",
         "廸生創建全年業績股東應佔溢利2.49億元，按年增長25.72%，每股盈利64.5仙。",
@@ -3233,6 +4999,90 @@
         }
       ],
       "articles": [
+        {
+          "source_article_id": "4424096",
+          "title": "新股IPO丨天辰生物超購4761倍 龍豐一手中籤率5%",
+          "canonical_url": "https://www.hkej.com/instantnews/announcement/article/4424096/%E6%96%B0%E8%82%A1IPO%E4%B8%A8%E5%A4%A9%E8%BE%B0%E7%94%9F%E7%89%A9%E8%B6%85%E8%B3%BC4761%E5%80%8D+%E9%BE%8D%E8%B1%90%E4%B8%80%E6%89%8B%E4%B8%AD%E7%B1%A4%E7%8E%875%25",
+          "published_at": "2026-06-04T22:49:00+08:00",
+          "section": "重要通告",
+          "novelty_score": 6,
+          "relevance_score": 8,
+          "urgency_score": 7,
+          "named_entities": [
+            {
+              "name": "天辰生物",
+              "type": "company"
+            },
+            {
+              "name": "龍豐集團",
+              "type": "company"
+            },
+            {
+              "name": "大金重工",
+              "type": "company"
+            }
+          ],
+          "key_points": [
+            "天辰生物(01779) IPO定價96.06元，公開發售部分獲超額認購4761.58倍，中籤率2%。",
+            "龍豐集團(02290) IPO定價5.18元，中籤率5%。",
+            "大金重工(01081) IPO定價66.4元，公開發售部分獲超額認購133.39倍。"
+          ],
+          "content_truncated": false,
+          "original_content_length_chars": 256,
+          "analyzed_content_length_chars": 256,
+          "original_content_token_estimate": 64,
+          "analyzed_content_token_estimate": 64,
+          "truncation_reason": null,
+          "analysis_method": "full_text",
+          "attention_tier": "high",
+          "theme": "stocks",
+          "attention_reason": "IPO and stock market performance",
+          "must_keep": true,
+          "model_used": "meta-llama/llama-4-scout-17b-16e-instruct",
+          "delayed_retry_attempted": false,
+          "delayed_retry_model_chain": [],
+          "delayed_retry_final_model": null,
+          "error_classification": null,
+          "error": null
+        },
+        {
+          "source_article_id": "4424068",
+          "title": "綠城中國首五個月銷售金額跌26%",
+          "canonical_url": "https://www.hkej.com/instantnews/announcement/article/4424068/%E7%B6%A0%E5%9F%8E%E4%B8%AD%E5%9C%8B%E9%A6%96%E4%BA%94%E5%80%8B%E6%9C%88%E9%8A%B7%E5%94%AE%E9%87%91%E9%A1%8D%E8%B7%8C26%25",
+          "published_at": "2026-06-04T22:29:00+08:00",
+          "section": "重要通告",
+          "novelty_score": 4,
+          "relevance_score": 7,
+          "urgency_score": 5,
+          "named_entities": [
+            {
+              "name": "給城中國",
+              "type": "company"
+            }
+          ],
+          "key_points": [
+            "給城中國带年26%25的同比年金額下降到485億元",
+            "同比年25.8%25的合同期售小顎金額",
+            "給城中國的合同期售小顎面積下降17.78%25至148万平方粽"
+          ],
+          "content_truncated": false,
+          "original_content_length_chars": 242,
+          "analyzed_content_length_chars": 242,
+          "original_content_token_estimate": 61,
+          "analyzed_content_token_estimate": 61,
+          "truncation_reason": null,
+          "analysis_method": "full_text",
+          "attention_tier": "medium",
+          "theme": "property",
+          "attention_reason": "Sales performance of a major property company",
+          "must_keep": true,
+          "model_used": "meta-llama/llama-4-scout-17b-16e-instruct",
+          "delayed_retry_attempted": false,
+          "delayed_retry_model_chain": [],
+          "delayed_retry_final_model": null,
+          "error_classification": null,
+          "error": null
+        },
         {
           "source_article_id": "4423286",
           "title": "中國海外發展5月銷售額升14%",
@@ -3560,16 +5410,16 @@
       "model_used": "meta-llama/llama-4-scout-17b-16e-instruct",
       "sub_batch_count": 3,
       "diagnostics": {
-        "sub_batch_count": 2,
+        "sub_batch_count": 3,
         "split_reasons": [],
         "models_attempted": [
           "meta-llama/llama-4-scout-17b-16e-instruct"
         ],
-        "estimated_input_tokens_max": 932,
-        "serialized_request_bytes_max": 4680,
-        "rate_limit_waits": 0,
+        "estimated_input_tokens_max": 751,
+        "serialized_request_bytes_max": 3917,
+        "rate_limit_waits": 1,
         "partial_article_count": 0,
-        "synthesis_wait_seconds_total": 0.0,
+        "synthesis_wait_seconds_total": 1987.2,
         "synthesis_retry_count": 0,
         "synthesis_retry_skipped_count": 0,
         "synthesis_budget_exhausted": false,
@@ -3578,7 +5428,7 @@
         "synthesis_merge_depth_max": 0,
         "model_switches": []
       },
-      "error": null
+      "error": "Category 重要通告 exhausted synthesis wait budget after 1987.2 seconds."
     },
     {
       "category": "地產新聞",
@@ -3741,7 +5591,10 @@
           "key_points": [],
           "content_truncated": false,
           "analysis_method": "bypassed",
-          "model_used": "direct"
+          "model_used": "direct",
+          "theme": "property",
+          "attention_reason": "Lighter treatment because this story sits in the 地產新聞 section without strong market-moving signals.",
+          "must_keep": false
         },
         {
           "source_article_id": "4422791",
@@ -4030,7 +5883,7 @@
       "subgroups": [
         {
           "title": "市場成交動向 & Other News",
-          "theme_rationale": "關注香港地產市場最新成交情況，包括二手樓買賣和租賃市場。",
+          "theme_rationale": "關注香港地產市場最新成交情況，包括買賣和租賃。",
           "article_count": 7,
           "key_developments": [
             "康樂園複式戶以1230萬元沽出，實用呎價約11861元，原業主於今年3月以1138萬元購入單位，持貨約3個月，現轉手賬面獲利約92萬元，單位期內升值約8%。",
@@ -4230,7 +6083,10 @@
               "key_points": [],
               "content_truncated": false,
               "analysis_method": "bypassed",
-              "model_used": "direct"
+              "model_used": "direct",
+              "theme": "property",
+              "attention_reason": "Lighter treatment because this story sits in the 地產新聞 section without strong market-moving signals.",
+              "must_keep": false
             },
             {
               "source_article_id": "4422775",
@@ -4319,7 +6175,7 @@
         },
         {
           "title": "二手市場動向",
-          "theme_rationale": "報道二手物業的買賣、租賃、價格走勢等市場動態",
+          "theme_rationale": "報道二手樓宇的買賣、租賃和價格走勢。",
           "article_count": 4,
           "key_developments": [
             "SEASONS PLACE一房單位持貨兩年獲利87萬元",
@@ -4511,18 +6367,13 @@
       ],
       "analysis_profile": "light",
       "model_used": "meta-llama/llama-4-scout-17b-16e-instruct",
-      "sub_batch_count": 7,
+      "sub_batch_count": 4,
       "diagnostics": {
-        "sub_batch_count": 3,
-        "split_reasons": [
-          "pre_send_budget"
-        ],
-        "models_attempted": [
-          "meta-llama/llama-4-scout-17b-16e-instruct",
-          "qwen/qwen3-32b"
-        ],
-        "estimated_input_tokens_max": 1575,
-        "serialized_request_bytes_max": 8853,
+        "sub_batch_count": 4,
+        "split_reasons": [],
+        "models_attempted": [],
+        "estimated_input_tokens_max": 0,
+        "serialized_request_bytes_max": 0,
         "rate_limit_waits": 0,
         "partial_article_count": 0,
         "synthesis_wait_seconds_total": 0.0,
@@ -4531,7 +6382,7 @@
         "synthesis_budget_exhausted": false,
         "degraded_merge_used": false,
         "degraded_merge_reason": "",
-        "synthesis_merge_depth_max": 1,
+        "synthesis_merge_depth_max": 0,
         "model_switches": []
       },
       "error": null
@@ -4702,7 +6553,7 @@
       "model_used": "meta-llama/llama-4-scout-17b-16e-instruct",
       "sub_batch_count": 2,
       "diagnostics": {
-        "sub_batch_count": 1,
+        "sub_batch_count": 2,
         "split_reasons": [],
         "models_attempted": [
           "meta-llama/llama-4-scout-17b-16e-instruct"
@@ -4726,8 +6577,8 @@
   "errors": [
     {
       "type": "category",
-      "target": "國際財經",
-      "message": "Category 國際財經 exhausted synthesis wait budget after 1900.8 seconds.",
+      "target": "重要通告",
+      "message": "Category 重要通告 exhausted synthesis wait budget after 1987.2 seconds.",
       "classification": "unexpected_error"
     }
   ]
