@@ -1,15 +1,15 @@
 {
   "report_schema_version": 6,
   "report_date": "2026-06-05",
-  "generated_at": "2026-06-05T11:54:27.547661+00:00",
+  "generated_at": "2026-06-05T22:48:23.204224+00:00",
   "source_site": "hkej",
-  "status": "success",
-  "executive_summary": [
+  "status": "partial",
+  "executive_summary": [],
+  "legacy_executive_summary": [
     "歐洲股市反覆回升，泛歐指數Stoxx 600收市反彈0.52%，報624點。",
     "阿克曼沽售環球音樂股份，預計獲利6億美元。",
     "Quantinuum IPO開報68美元，較招股價60美元高13.3%。"
   ],
-  "legacy_executive_summary": [],
   "model": {
     "provider": "groq",
     "primary_model": "meta-llama/llama-4-scout-17b-16e-instruct",
@@ -20,18 +20,18 @@
   },
   "model_switches": [],
   "input": {
-    "article_count": 41,
-    "category_count": 5
+    "article_count": 54,
+    "category_count": 6
   },
   "diagnostics": {
     "rate_limit_wait_count": 2,
-    "rate_limit_wait_seconds_total": 3196.798,
+    "rate_limit_wait_seconds_total": 3110.399,
     "fallback_switch_count": 0,
     "key_rotation_count": 0,
-    "pre_send_split_count": 8,
+    "pre_send_split_count": 15,
     "response_413_split_count": 0,
     "json_repair_retry_count": 0,
-    "batch_count": 53,
+    "batch_count": 45,
     "failed_batch_count": 0,
     "delayed_retry_candidate_count": 0,
     "delayed_retry_attempted_count": 0,
@@ -40,22 +40,22 @@
     "high_medium_unresolved_count": 0,
     "light_unresolved_count": 0,
     "delayed_retry_skipped_final_model_count": 0,
-    "synthesis_budget_exhausted_count": 0,
+    "synthesis_budget_exhausted_count": 1,
     "degraded_merge_count": 0
   },
   "incremental": {
-    "reused_successful_articles": 0,
-    "new_articles_analyzed": 41,
+    "reused_successful_articles": 41,
+    "new_articles_analyzed": 13,
     "retried_previous_day_articles": 0,
     "previous_day_retry_successes": 0
   },
   "daily_stats": {
-    "total_scraped": 41,
-    "analyzed": 41,
+    "total_scraped": 54,
+    "analyzed": 54,
     "success_rate": 100.0
   },
   "macro_release_digest": {
-    "generated_at": "2026-06-05T10:59:07.393302+00:00",
+    "generated_at": "2026-06-05T21:55:50.270837+00:00",
     "window_start": "2026-06-05",
     "window_end": "2026-06-11",
     "fetch_status": "failed",
@@ -67,21 +67,21 @@
   },
   "unresolved_articles": [],
   "totals": {
-    "article_count": 41,
-    "successful_article_analyses": 41,
+    "article_count": 54,
+    "successful_article_analyses": 54,
     "failed_article_analyses": 0,
-    "full_text_article_count": 41,
+    "full_text_article_count": 54,
     "truncated_article_count": 0,
     "successful_categories": 5,
-    "partial_categories": 0,
+    "partial_categories": 1,
     "failed_categories": 0
   },
   "market_context": [],
   "categories": [
     {
       "category": "國際財經",
-      "article_count": 9,
-      "status": "success",
+      "article_count": 14,
+      "status": "partial",
       "key_developments": [],
       "named_entities": [
         {
@@ -106,6 +106,239 @@
         }
       ],
       "articles": [
+        {
+          "source_article_id": "4425491",
+          "title": "黃仁勳:為南韓帶來輝達四項新業務",
+          "canonical_url": "https://www.hkej.com/instantnews/international/article/4425491/%E9%BB%83%E4%BB%81%E5%8B%B3%3A%E7%82%BA%E5%8D%97%E9%9F%93%E5%B8%B6%E4%BE%86%E8%BC%9D%E9%81%94%E5%9B%9B%E9%A0%85%E6%96%B0%E6%A5%AD%E5%8B%99",
+          "published_at": "2026-06-05T23:23:00+08:00",
+          "section": "國際財經",
+          "novelty_score": 6,
+          "relevance_score": 8,
+          "urgency_score": 5,
+          "named_entities": [
+            {
+              "name": "黃仁勳",
+              "type": "person"
+            },
+            {
+              "name": "Nvidia",
+              "type": "company"
+            },
+            {
+              "name": "SK集團",
+              "type": "company"
+            },
+            {
+              "name": "LG集團",
+              "type": "company"
+            },
+            {
+              "name": "NAVER集團",
+              "type": "company"
+            }
+          ],
+          "key_points": [
+            "黃仁勳為南韓帶來輝達四項新業務，包括Vera Rubin、Vera中央處理器、RTX Spark和Jetson Thor。",
+            "輝達計劃在韓新建AI技術中心項目，招聘南韓AI技術研究工程師、機器人工程技術人員。",
+            "這些新業務規模很大，將使南韓變得非常忙碌。"
+          ],
+          "content_truncated": false,
+          "original_content_length_chars": 328,
+          "analyzed_content_length_chars": 328,
+          "original_content_token_estimate": 82,
+          "analyzed_content_token_estimate": 82,
+          "truncation_reason": null,
+          "analysis_method": "full_text",
+          "attention_tier": "medium",
+          "theme": "stocks",
+          "attention_reason": "Article mentions business expansion but lacks specific market-moving data.",
+          "must_keep": true,
+          "model_used": "meta-llama/llama-4-scout-17b-16e-instruct",
+          "delayed_retry_attempted": false,
+          "delayed_retry_model_chain": [],
+          "delayed_retry_final_model": null,
+          "error_classification": null,
+          "error": null
+        },
+        {
+          "source_article_id": "4425490",
+          "title": "美股走勢丨市場猜測聯儲局轉向加息 道指跌逾100點",
+          "canonical_url": "https://www.hkej.com/instantnews/international/article/4425490/%E7%BE%8E%E8%82%A1%E8%B5%B0%E5%8B%A2%E4%B8%A8%E5%B8%82%E5%A0%B4%E7%8C%9C%E6%B8%AC%E8%81%AF%E5%84%B2%E5%B1%80%E8%BD%89%E5%90%91%E5%8A%A0%E6%81%AF+%E9%81%93%E6%8C%87%E8%B7%8C%E9%80%BE100%E9%BB%9E",
+          "published_at": "2026-06-05T23:19:00+08:00",
+          "section": "國際財經",
+          "novelty_score": 4,
+          "relevance_score": 9,
+          "urgency_score": 8,
+          "named_entities": [
+            {
+              "name": "美國",
+              "type": "country"
+            },
+            {
+              "name": "聯儲局",
+              "type": "institution"
+            }
+          ],
+          "key_points": [
+            "美國5月非農就業職位增加17.2萬個，遠超預期的8.5萬個，道指跌逾100點。",
+            "市場猜測聯儲局可能轉向加息，拖累股市下跌。",
+            "截至本港時間晚上11時10分，道指報51404點，跌157點或0.3%。"
+          ],
+          "content_truncated": false,
+          "original_content_length_chars": 535,
+          "analyzed_content_length_chars": 535,
+          "original_content_token_estimate": 134,
+          "analyzed_content_token_estimate": 134,
+          "truncation_reason": null,
+          "analysis_method": "full_text",
+          "attention_tier": "medium",
+          "theme": "macro",
+          "attention_reason": "Article mentions market speculation about a potential shift in interest rates by the Fed.",
+          "must_keep": true,
+          "model_used": "meta-llama/llama-4-scout-17b-16e-instruct",
+          "delayed_retry_attempted": false,
+          "delayed_retry_model_chain": [],
+          "delayed_retry_final_model": null,
+          "error_classification": null,
+          "error": null
+        },
+        {
+          "source_article_id": "4425481",
+          "title": "特朗普:就業報告強勁 股市理應上漲",
+          "canonical_url": "https://www.hkej.com/instantnews/international/article/4425481/%E7%89%B9%E6%9C%97%E6%99%AE%3A%E5%B0%B1%E6%A5%AD%E5%A0%B1%E5%91%8A%E5%BC%B7%E5%8B%81+%E8%82%A1%E5%B8%82%E7%90%86%E6%87%89%E4%B8%8A%E6%BC%B2",
+          "published_at": "2026-06-05T23:01:00+08:00",
+          "section": "國際財經",
+          "novelty_score": 3,
+          "relevance_score": 7,
+          "urgency_score": 6,
+          "named_entities": [
+            {
+              "name": "特朗普",
+              "type": "person"
+            },
+            {
+              "name": "美國",
+              "type": "country"
+            }
+          ],
+          "key_points": [
+            "美國5月非農就業職位增加17.2萬個，遠超預期的8.5萬個，特朗普稱股市理應上漲。",
+            "白宮經濟委員會主任哈塞特表示，投資者對聯儲局加息的判斷是錯誤的。"
+          ],
+          "content_truncated": false,
+          "original_content_length_chars": 300,
+          "analyzed_content_length_chars": 300,
+          "original_content_token_estimate": 75,
+          "analyzed_content_token_estimate": 75,
+          "truncation_reason": null,
+          "analysis_method": "full_text",
+          "attention_tier": "medium",
+          "theme": "general",
+          "attention_reason": "Default medium attention because the story is relevant but not an obvious top-priority market mover.",
+          "must_keep": false,
+          "model_used": "meta-llama/llama-4-scout-17b-16e-instruct",
+          "delayed_retry_attempted": false,
+          "delayed_retry_model_chain": [],
+          "delayed_retry_final_model": null,
+          "error_classification": null,
+          "error": null
+        },
+        {
+          "source_article_id": "4425279",
+          "title": "美國5月非農職位增17.2萬個 遠超預期",
+          "canonical_url": "https://www.hkej.com/instantnews/international/article/4425279/%E7%BE%8E%E5%9C%8B5%E6%9C%88%E9%9D%9E%E8%BE%B2%E8%81%B7%E4%BD%8D%E5%A2%9E17.2%E8%90%AC%E5%80%8B+%E9%81%A0%E8%B6%85%E9%A0%90%E6%9C%9F",
+          "published_at": "2026-06-05T20:35:00+08:00",
+          "section": "國際財經",
+          "novelty_score": 8,
+          "relevance_score": 9,
+          "urgency_score": 9,
+          "named_entities": [
+            {
+              "name": "美國",
+              "type": "country"
+            },
+            {
+              "name": "美國勞工部",
+              "type": "institution"
+            }
+          ],
+          "key_points": [
+            "美國5月非農就業職位增加17.2萬個，遠超預期的8.5萬個。",
+            "美國5月失業率為4.3%，符合市場預期。",
+            "平均時薪按月增加0.3%，每周平均工時為34.3小時。"
+          ],
+          "content_truncated": false,
+          "original_content_length_chars": 166,
+          "analyzed_content_length_chars": 166,
+          "original_content_token_estimate": 42,
+          "analyzed_content_token_estimate": 42,
+          "truncation_reason": null,
+          "analysis_method": "full_text",
+          "attention_tier": "high",
+          "theme": "macro",
+          "attention_reason": "Article reports on significant employment data beating expectations.",
+          "must_keep": true,
+          "model_used": "meta-llama/llama-4-scout-17b-16e-instruct",
+          "delayed_retry_attempted": false,
+          "delayed_retry_model_chain": [],
+          "delayed_retry_final_model": null,
+          "error_classification": null,
+          "error": null
+        },
+        {
+          "source_article_id": "4424810",
+          "title": "SpaceX IPO丨據報禁止內地及香港投資者認購",
+          "canonical_url": "https://www.hkej.com/instantnews/international/article/4424810/SpaceX+IPO%E4%B8%A8%E6%93%9A%E5%A0%B1%E7%A6%81%E6%AD%A2%E5%85%A7%E5%9C%B0%E5%8F%8A%E9%A6%99%E6%B8%AF%E6%8A%95%E8%B3%87%E8%80%85%E8%AA%8D%E8%B3%BC",
+          "published_at": "2026-06-05T18:21:00+08:00",
+          "section": "國際財經",
+          "novelty_score": 6,
+          "relevance_score": 8,
+          "urgency_score": 7,
+          "named_entities": [
+            {
+              "name": "Elon Musk",
+              "type": "person"
+            },
+            {
+              "name": "SpaceX",
+              "type": "company"
+            },
+            {
+              "name": "香港",
+              "type": "country"
+            },
+            {
+              "name": "中國",
+              "type": "country"
+            },
+            {
+              "name": "美國",
+              "type": "country"
+            }
+          ],
+          "key_points": [
+            "SpaceX的IPO計劃擬發售5.556億股，基本集資規模750億美元。",
+            "由於監管和合規風險，香港和中國的投資者被禁止參與此次發行。",
+            "SpaceX預期上市市值1.77萬億美元，AI部門收入至2030年能達到3220億美元。"
+          ],
+          "content_truncated": false,
+          "original_content_length_chars": 574,
+          "analyzed_content_length_chars": 574,
+          "original_content_token_estimate": 144,
+          "analyzed_content_token_estimate": 144,
+          "truncation_reason": null,
+          "analysis_method": "full_text",
+          "attention_tier": "medium",
+          "theme": "stocks",
+          "attention_reason": "Article discusses IPO restrictions for certain investors.",
+          "must_keep": true,
+          "model_used": "meta-llama/llama-4-scout-17b-16e-instruct",
+          "delayed_retry_attempted": false,
+          "delayed_retry_model_chain": [],
+          "delayed_retry_final_model": null,
+          "error_classification": null,
+          "error": null
+        },
         {
           "source_article_id": "4424810",
           "title": "內地及香港投資者據報被禁參與SpaceX IPO",
@@ -1045,20 +1278,18 @@
       ],
       "analysis_profile": "standard",
       "model_used": "meta-llama/llama-4-scout-17b-16e-instruct",
-      "sub_batch_count": 9,
+      "sub_batch_count": 5,
       "diagnostics": {
-        "sub_batch_count": 7,
-        "split_reasons": [
-          "pre_send_budget"
-        ],
+        "sub_batch_count": 5,
+        "split_reasons": [],
         "models_attempted": [
           "meta-llama/llama-4-scout-17b-16e-instruct"
         ],
-        "estimated_input_tokens_max": 1591,
-        "serialized_request_bytes_max": 8189,
-        "rate_limit_waits": 1,
+        "estimated_input_tokens_max": 1344,
+        "serialized_request_bytes_max": 7694,
+        "rate_limit_waits": 0,
         "partial_article_count": 0,
-        "synthesis_wait_seconds_total": 1641.599,
+        "synthesis_wait_seconds_total": 0.0,
         "synthesis_retry_count": 0,
         "synthesis_retry_skipped_count": 0,
         "synthesis_budget_exhausted": false,
@@ -1067,24 +1298,16 @@
         "synthesis_merge_depth_max": 0,
         "model_switches": []
       },
-      "error": null
+      "error": "Category 國際財經 exhausted synthesis wait budget after 1900.8 seconds."
     },
     {
       "category": "時事脈搏",
-      "article_count": 11,
+      "article_count": 17,
       "status": "success",
-      "key_developments": [
-        "伊朗伊斯蘭革命衞隊表示，以色列必須立即停止對黎巴嫩人民的襲擊",
-        "IAEA報告指出，伊朗濃縮鈾庫存估計數字與先前報告保持不變，但仍有疑慮伊朗可能存在未申報的核材料和核子活動。",
-        "美國加州高中畢業禮後發生槍擊案 1人死3傷"
-      ],
+      "key_developments": [],
       "named_entities": [
         {
           "name": "伊朗",
-          "type": "country"
-        },
-        {
-          "name": "以色列",
           "type": "country"
         },
         {
@@ -1092,11 +1315,173 @@
           "type": "country"
         },
         {
-          "name": "IAEA",
-          "type": "organization"
+          "name": "以色列",
+          "type": "country"
+        },
+        {
+          "name": "香港",
+          "type": "country"
         }
       ],
       "articles": [
+        {
+          "source_article_id": "4425492",
+          "title": "中東局勢丨美軍否認阿曼灣軍艦遭伊朗射擊",
+          "canonical_url": "https://www.hkej.com/instantnews/current/article/4425492/%E4%B8%AD%E6%9D%B1%E5%B1%80%E5%8B%A2%E4%B8%A8%E7%BE%8E%E8%BB%8D%E5%90%A6%E8%AA%8D%E9%98%BF%E6%9B%BC%E7%81%A3%E8%BB%8D%E8%89%A6%E9%81%AD%E4%BC%8A%E6%9C%97%E5%B0%84%E6%93%8A",
+          "published_at": "2026-06-05T23:30:00+08:00",
+          "section": "時事脈搏",
+          "novelty_score": 6,
+          "relevance_score": 8,
+          "urgency_score": 9,
+          "named_entities": [
+            {
+              "name": "伊朗",
+              "type": "country"
+            },
+            {
+              "name": "美國",
+              "type": "country"
+            },
+            {
+              "name": "美軍中央司令部",
+              "type": "organization"
+            }
+          ],
+          "key_points": [
+            "伊朗國家媒體報道伊朗海軍向阿曼灣的美軍艦發射警告性導彈和無人機，但美軍中央司令部否認。",
+            "事件發生在阿曼灣，美軍艦是否受影響及伊朗行動是否升級成更大衝突值得關注。"
+          ],
+          "content_truncated": false,
+          "original_content_length_chars": 135,
+          "analyzed_content_length_chars": 135,
+          "original_content_token_estimate": 34,
+          "analyzed_content_token_estimate": 34,
+          "truncation_reason": null,
+          "analysis_method": "full_text",
+          "attention_tier": "high",
+          "theme": "geopolitics",
+          "attention_reason": "High-signal geopolitics headline based on title/summary keywords.",
+          "must_keep": true,
+          "model_used": "meta-llama/llama-4-scout-17b-16e-instruct",
+          "delayed_retry_attempted": false,
+          "delayed_retry_model_chain": [],
+          "delayed_retry_final_model": null,
+          "error_classification": null,
+          "error": null
+        },
+        {
+          "source_article_id": "4425467",
+          "canonical_url": "https://www.hkej.com/instantnews/current/article/4425467/%E5%BE%8B%E5%B8%AB%E5%8A%A9%E9%84%92%E5%AE%B6%E6%88%90%E6%8A%95%E8%A8%B4%E4%BF%A1%E6%94%9C%E9%9B%A2%E7%9B%A3%E7%8D%84%E6%A1%88+%E7%B5%82%E6%A5%B5%E4%B8%8A%E8%A8%B4%E9%81%AD%E9%A7%81%E5%9B%9E",
+          "title": "律師助鄒家成投訴信攜離監獄案 終極上訴遭駁回",
+          "section": "時事脈搏",
+          "published_at": "2026-06-05T22:56:00+08:00",
+          "attention_tier": "light",
+          "novelty_score": 5,
+          "relevance_score": 5,
+          "urgency_score": 5,
+          "named_entities": [],
+          "key_points": [],
+          "content_truncated": false,
+          "analysis_method": "bypassed",
+          "model_used": "direct"
+        },
+        {
+          "source_article_id": "4425452",
+          "canonical_url": "https://www.hkej.com/instantnews/current/article/4425452/%E7%96%91%E6%83%A1%E6%84%8F%E7%A0%B4%E5%A3%9E%E7%92%B0%E5%A2%83%E8%A1%9E%E7%94%9F+%E8%AD%A6%E6%96%B9%E6%8B%98%E4%B8%80%E7%94%B7%E5%AD%90",
+          "title": "疑惡意破壞環境衞生 警方拘一男子",
+          "section": "時事脈搏",
+          "published_at": "2026-06-05T22:48:00+08:00",
+          "attention_tier": "light",
+          "novelty_score": 5,
+          "relevance_score": 5,
+          "urgency_score": 5,
+          "named_entities": [],
+          "key_points": [],
+          "content_truncated": false,
+          "analysis_method": "bypassed",
+          "model_used": "direct"
+        },
+        {
+          "source_article_id": "4425413",
+          "title": "中東局勢丨黎巴嫩總統不接受伊朗把該國當談判籌碼",
+          "canonical_url": "https://www.hkej.com/instantnews/current/article/4425413/%E4%B8%AD%E6%9D%B1%E5%B1%80%E5%8B%A2%E4%B8%A8%E9%BB%8E%E5%B7%B4%E5%AB%A9%E7%B8%BD%E7%B5%B1%E4%B8%8D%E6%8E%A5%E5%8F%97%E4%BC%8A%E6%9C%97%E6%8A%8A%E8%A9%B2%E5%9C%8B%E7%95%B6%E8%AB%87%E5%88%A4%E7%B1%8C%E7%A2%BC",
+          "published_at": "2026-06-05T22:33:00+08:00",
+          "section": "時事脈搏",
+          "novelty_score": 5,
+          "relevance_score": 7,
+          "urgency_score": 8,
+          "named_entities": [
+            {
+              "name": "黎巴嫩",
+              "type": "country"
+            },
+            {
+              "name": "伊朗",
+              "type": "country"
+            },
+            {
+              "name": "以色列",
+              "type": "country"
+            },
+            {
+              "name": "真主黨",
+              "type": "organization"
+            }
+          ],
+          "key_points": [
+            "黎巴嫩總統奧恩表示，不接受伊朗把黎巴嫩當作談判籌碼。",
+            "奧恩強調與以色列對話是解決當前局勢的關鍵。"
+          ],
+          "content_truncated": false,
+          "original_content_length_chars": 377,
+          "analyzed_content_length_chars": 377,
+          "original_content_token_estimate": 95,
+          "analyzed_content_token_estimate": 95,
+          "truncation_reason": null,
+          "analysis_method": "full_text",
+          "attention_tier": "high",
+          "theme": "geopolitics",
+          "attention_reason": "High-signal geopolitics headline based on title/summary keywords.",
+          "must_keep": true,
+          "model_used": "meta-llama/llama-4-scout-17b-16e-instruct",
+          "delayed_retry_attempted": false,
+          "delayed_retry_model_chain": [],
+          "delayed_retry_final_model": null,
+          "error_classification": null,
+          "error": null
+        },
+        {
+          "source_article_id": "4425414",
+          "canonical_url": "https://www.hkej.com/instantnews/current/article/4425414/%E6%B6%89%E4%B9%9D%E5%B7%B4%E4%B8%8A%E5%B1%A4%E4%BC%B8%E6%89%8B%E9%9D%9E%E7%A6%AE%E5%89%8D%E5%BA%A7%E5%A5%B3%E5%AD%B8%E7%94%9F+65%E6%AD%B2%E7%94%B7%E5%AD%90%E6%B8%AF%E7%8F%A0%E6%BE%B3%E5%8F%A3%E5%B2%B8%E8%A2%AB%E6%8D%95",
+          "title": "涉九巴上層伸手非禮前座女學生 65歲男子港珠澳口岸被捕",
+          "section": "時事脈搏",
+          "published_at": "2026-06-05T22:28:00+08:00",
+          "attention_tier": "light",
+          "novelty_score": 5,
+          "relevance_score": 5,
+          "urgency_score": 5,
+          "named_entities": [],
+          "key_points": [],
+          "content_truncated": false,
+          "analysis_method": "bypassed",
+          "model_used": "direct"
+        },
+        {
+          "source_article_id": "4425384",
+          "canonical_url": "https://www.hkej.com/instantnews/current/article/4425384/%E5%A4%A9%E6%96%87%E5%8F%B0%3A%E6%9C%AA%E4%BE%86%E4%B8%80%E5%85%A9%E5%B0%8F%E6%99%82%E6%9C%AC%E6%B8%AF%E5%BB%A3%E6%B3%9B%E5%9C%B0%E5%8D%80%E6%88%96%E5%8F%97%E5%A4%A7%E9%9B%A8%E5%BD%B1%E9%9F%BF",
+          "title": "天文台:未來一兩小時本港廣泛地區或受大雨影響",
+          "section": "時事脈搏",
+          "published_at": "2026-06-05T22:05:00+08:00",
+          "attention_tier": "light",
+          "novelty_score": 5,
+          "relevance_score": 5,
+          "urgency_score": 5,
+          "named_entities": [],
+          "key_points": [],
+          "content_truncated": false,
+          "analysis_method": "bypassed",
+          "model_used": "direct"
+        },
         {
           "source_article_id": "4424908",
           "canonical_url": "https://www.hkej.com/instantnews/current/article/4424908/17%E6%AD%B2%E7%94%B7%E7%AB%A5%E6%9F%93%E4%B9%99%E6%B5%81%E4%BD%B5%E7%99%BC%E5%9A%B4%E9%87%8D%E8%82%BA%E7%82%8E%E5%8F%8A%E4%BC%91%E5%85%8B+%E6%83%85%E6%B3%81%E5%8D%B1%E6%AE%86",
@@ -1111,7 +1496,10 @@
           "key_points": [],
           "content_truncated": false,
           "analysis_method": "bypassed",
-          "model_used": "direct"
+          "model_used": "direct",
+          "theme": "general",
+          "attention_reason": "Lighter treatment because this story sits in the 時事脈搏 section without strong market-moving signals.",
+          "must_keep": false
         },
         {
           "source_article_id": "4424774",
@@ -1127,7 +1515,10 @@
           "key_points": [],
           "content_truncated": false,
           "analysis_method": "bypassed",
-          "model_used": "direct"
+          "model_used": "direct",
+          "theme": "general",
+          "attention_reason": "Lighter treatment because this story sits in the 時事脈搏 section without strong market-moving signals.",
+          "must_keep": false
         },
         {
           "source_article_id": "4424687",
@@ -1143,7 +1534,10 @@
           "key_points": [],
           "content_truncated": false,
           "analysis_method": "bypassed",
-          "model_used": "direct"
+          "model_used": "direct",
+          "theme": "general",
+          "attention_reason": "Lighter treatment because this story sits in the 時事脈搏 section without strong market-moving signals.",
+          "must_keep": false
         },
         {
           "source_article_id": "4424668",
@@ -1159,7 +1553,10 @@
           "key_points": [],
           "content_truncated": false,
           "analysis_method": "bypassed",
-          "model_used": "direct"
+          "model_used": "direct",
+          "theme": "general",
+          "attention_reason": "Lighter treatment because this story sits in the 時事脈搏 section without strong market-moving signals.",
+          "must_keep": false
         },
         {
           "source_article_id": "4424640",
@@ -1175,7 +1572,10 @@
           "key_points": [],
           "content_truncated": false,
           "analysis_method": "bypassed",
-          "model_used": "direct"
+          "model_used": "direct",
+          "theme": "general",
+          "attention_reason": "Lighter treatment because this story sits in the 時事脈搏 section without strong market-moving signals.",
+          "must_keep": false
         },
         {
           "source_article_id": "4424536",
@@ -1191,7 +1591,10 @@
           "key_points": [],
           "content_truncated": false,
           "analysis_method": "bypassed",
-          "model_used": "direct"
+          "model_used": "direct",
+          "theme": "general",
+          "attention_reason": "Lighter treatment because this story sits in the 時事脈搏 section without strong market-moving signals.",
+          "must_keep": false
         },
         {
           "source_article_id": "4424407",
@@ -1207,7 +1610,10 @@
           "key_points": [],
           "content_truncated": false,
           "analysis_method": "bypassed",
-          "model_used": "direct"
+          "model_used": "direct",
+          "theme": "general",
+          "attention_reason": "Lighter treatment because this story sits in the 時事脈搏 section without strong market-moving signals.",
+          "must_keep": false
         },
         {
           "source_article_id": "4424161",
@@ -1321,7 +1727,10 @@
           "key_points": [],
           "content_truncated": false,
           "analysis_method": "bypassed",
-          "model_used": "direct"
+          "model_used": "direct",
+          "theme": "general",
+          "attention_reason": "Lighter treatment because this story sits in the 時事脈搏 section without strong market-moving signals.",
+          "must_keep": false
         },
         {
           "source_article_id": "4424150",
@@ -1337,18 +1746,21 @@
           "key_points": [],
           "content_truncated": false,
           "analysis_method": "bypassed",
-          "model_used": "direct"
+          "model_used": "direct",
+          "theme": "general",
+          "attention_reason": "Lighter treatment because this story sits in the 時事脈搏 section without strong market-moving signals.",
+          "must_keep": false
         }
       ],
       "subgroups": [
         {
-          "title": "社會新聞 & Other News",
-          "theme_rationale": "與社會民生相關的新聞事件",
-          "article_count": 11,
+          "title": "General News & Other News",
+          "theme_rationale": "Articles covering general news and current events",
+          "article_count": 14,
           "key_developments": [
-            "伊朗伊斯蘭革命衞隊表示，以色列必須立即停止對黎巴嫩人民的襲擊",
-            "IAEA報告指出，伊朗濃縮鈾庫存估計數字與先前報告保持不變，但仍有疑慮伊朗可能存在未申報的核材料和核子活動。",
-            "美國加州高中畢業禮後發生槍擊案 1人死3傷"
+            "伊朗濃縮鈾庫存估計數字與先前報告保持不變，但仍有疑慮伊朗可能存在未申報的核材料和核子活動。",
+            "港股市場下跌，恆生指數（^HSI）報24961.95點，跌幅1.15%。",
+            "黎巴嫩總統奧恩表示，不接受伊朗把黎巴嫩當作談判籌碼。"
           ],
           "named_entities": [
             {
@@ -1356,19 +1768,76 @@
               "type": "country"
             },
             {
-              "name": "以色列",
-              "type": "country"
-            },
-            {
               "name": "黎巴嫩",
               "type": "country"
             },
             {
-              "name": "IAEA",
-              "type": "organization"
+              "name": "以色列",
+              "type": "country"
+            },
+            {
+              "name": "香港",
+              "type": "country"
             }
           ],
           "articles": [
+            {
+              "source_article_id": "4424687",
+              "canonical_url": "https://www.hkej.com/instantnews/current/article/4424687/%E5%A4%A9%E6%96%87%E5%8F%B0%E6%96%99%E6%9C%AC%E6%B8%AF%E7%9F%AD%E6%9C%9F%E5%85%A7%E6%88%96%E5%8F%97%E5%86%B0%E9%9B%B9%E5%BD%B1%E9%9F%BF",
+              "title": "天文台料本港短期內或受冰雹影響",
+              "section": "時事脈搏",
+              "published_at": "2026-06-05T17:28:00+08:00",
+              "attention_tier": "light",
+              "novelty_score": 5,
+              "relevance_score": 5,
+              "urgency_score": 5,
+              "named_entities": [],
+              "key_points": [],
+              "content_truncated": false,
+              "analysis_method": "bypassed",
+              "model_used": "direct",
+              "theme": "general",
+              "attention_reason": "Lighter treatment because this story sits in the 時事脈搏 section without strong market-moving signals.",
+              "must_keep": false
+            },
+            {
+              "source_article_id": "4424668",
+              "canonical_url": "https://www.hkej.com/instantnews/current/article/4424668/%E7%89%B9%E9%A6%96%E4%B8%AD%E4%BA%9E%E8%A1%8C%E4%B8%A8%E9%A6%99%E6%B8%AF%E4%BB%A3%E8%A1%A8%E5%9C%98%E8%88%87%E7%83%8F%E8%8C%B2%E5%88%A5%E5%85%8B%E8%B3%87%E8%A8%8A%E7%A7%91%E6%8A%80%E5%9C%92%E7%B0%BD%E7%BD%B2%E5%90%88%E4%BD%9C%E5%82%99%E5%BF%98%E9%8C%84",
+              "title": "特首中亞行丨香港代表團與烏茲別克資訊科技園簽署合作備忘錄",
+              "section": "時事脈搏",
+              "published_at": "2026-06-05T17:27:00+08:00",
+              "attention_tier": "light",
+              "novelty_score": 5,
+              "relevance_score": 5,
+              "urgency_score": 5,
+              "named_entities": [],
+              "key_points": [],
+              "content_truncated": false,
+              "analysis_method": "bypassed",
+              "model_used": "direct",
+              "theme": "general",
+              "attention_reason": "Lighter treatment because this story sits in the 時事脈搏 section without strong market-moving signals.",
+              "must_keep": false
+            },
+            {
+              "source_article_id": "4424640",
+              "canonical_url": "https://www.hkej.com/instantnews/current/article/4424640/%E3%80%8A%E7%B5%A6%E9%98%BF%E5%AC%A4%E7%9A%84%E6%83%85%E6%9B%B8%E3%80%8B6.18%E9%A6%99%E6%B8%AF%E4%B8%8A%E6%98%A0",
+              "title": "《給阿嬤的情書》6.18香港上映",
+              "section": "時事脈搏",
+              "published_at": "2026-06-05T17:16:00+08:00",
+              "attention_tier": "light",
+              "novelty_score": 5,
+              "relevance_score": 5,
+              "urgency_score": 5,
+              "named_entities": [],
+              "key_points": [],
+              "content_truncated": false,
+              "analysis_method": "bypassed",
+              "model_used": "direct",
+              "theme": "general",
+              "attention_reason": "Lighter treatment because this story sits in the 時事脈搏 section without strong market-moving signals.",
+              "must_keep": false
+            },
             {
               "source_article_id": "4424536",
               "canonical_url": "https://www.hkej.com/instantnews/current/article/4424536/%E5%AE%8F%E7%A6%8F%E8%8B%91%E4%B8%A8%E7%AC%AC%E4%BA%94%E8%BC%AA%E8%81%BD%E8%AD%89%E6%9C%83%E6%9C%AC%E6%9C%8822%E8%87%B325%E6%97%A5%E8%88%89%E8%A1%8C+%E4%B8%8B%E5%91%A8%E4%B8%80%E8%B5%B7%E7%B6%B2%E4%B8%8A%E9%A0%90%E7%B4%84%E6%97%81%E8%81%BD",
@@ -1383,31 +1852,18 @@
               "key_points": [],
               "content_truncated": false,
               "analysis_method": "bypassed",
-              "model_used": "direct"
+              "model_used": "direct",
+              "theme": "general",
+              "attention_reason": "Lighter treatment because this story sits in the 時事脈搏 section without strong market-moving signals.",
+              "must_keep": false
             },
             {
-              "source_article_id": "4424407",
-              "canonical_url": "https://www.hkej.com/instantnews/current/article/4424407/%E5%8B%9E%E7%A6%8F%E5%B1%80%E5%AE%A3%E5%B8%83%E4%B8%8D%E5%AF%A6%E6%96%BD%E4%BA%8C%E5%85%83%E5%84%AA%E6%83%A0%E8%A8%88%E5%8A%83%E9%99%90%E7%A8%8B%E6%96%B9%E6%A1%88",
-              "title": "勞福局宣布不實施二元優惠計劃限程方案",
+              "source_article_id": "4425492",
+              "title": "中東局勢丨美軍否認阿曼灣軍艦遭伊朗射擊",
+              "canonical_url": "https://www.hkej.com/instantnews/current/article/4425492/%E4%B8%AD%E6%9D%B1%E5%B1%80%E5%8B%A2%E4%B8%A8%E7%BE%8E%E8%BB%8D%E5%90%A6%E8%AA%8D%E9%98%BF%E6%9B%BC%E7%81%A3%E8%BB%8D%E8%89%A6%E9%81%AD%E4%BC%8A%E6%9C%97%E5%B0%84%E6%93%8A",
+              "published_at": "2026-06-05T23:30:00+08:00",
               "section": "時事脈搏",
-              "published_at": "2026-06-05T15:54:00+08:00",
-              "attention_tier": "light",
-              "novelty_score": 5,
-              "relevance_score": 5,
-              "urgency_score": 5,
-              "named_entities": [],
-              "key_points": [],
-              "content_truncated": false,
-              "analysis_method": "bypassed",
-              "model_used": "direct"
-            },
-            {
-              "source_article_id": "4424158",
-              "title": "中東局勢丨伊朗革命衞隊:以色列須立即停止襲擊黎巴嫩",
-              "canonical_url": "https://www.hkej.com/instantnews/current/article/4424158/%E4%B8%AD%E6%9D%B1%E5%B1%80%E5%8B%A2%E4%B8%A8%E4%BC%8A%E6%9C%97%E9%9D%A9%E5%91%BD%E8%A1%9E%E9%9A%8A%3A%E4%BB%A5%E8%89%B2%E5%88%97%E9%A0%88%E7%AB%8B%E5%8D%B3%E5%81%9C%E6%AD%A2%E8%A5%B2%E6%93%8A%E9%BB%8E%E5%B7%B4%E5%AB%A9",
-              "published_at": "2026-06-05T01:59:00+08:00",
-              "section": "時事脈搏",
-              "novelty_score": 7,
+              "novelty_score": 6,
               "relevance_score": 8,
               "urgency_score": 9,
               "named_entities": [
@@ -1416,27 +1872,23 @@
                   "type": "country"
                 },
                 {
-                  "name": "以色列",
+                  "name": "美國",
                   "type": "country"
                 },
                 {
-                  "name": "黎巴嫩",
-                  "type": "country"
-                },
-                {
-                  "name": "真主黨",
+                  "name": "美軍中央司令部",
                   "type": "organization"
                 }
               ],
               "key_points": [
-                "伊朗伊斯蘭革命衞隊表示，以色列必須立即停止對黎巴嫩人民的襲擊，迅速撤出被佔領的黎巴嫩領土，並承認黎巴嫩領土完整。",
-                "黎巴嫩和以色列同意有條件停火，條件是真主黨停止襲擊，並將其武裝人員撤出黎巴嫩南部與以色列接壤的地區。"
+                "伊朗國家媒體報道伊朗海軍向阿曼灣的美軍艦發射警告性導彈和無人機，但美軍中央司令部否認。",
+                "事件發生在阿曼灣，美軍艦是否受影響及伊朗行動是否升級成更大衝突值得關注。"
               ],
               "content_truncated": false,
-              "original_content_length_chars": 339,
-              "analyzed_content_length_chars": 339,
-              "original_content_token_estimate": 85,
-              "analyzed_content_token_estimate": 85,
+              "original_content_length_chars": 135,
+              "analyzed_content_length_chars": 135,
+              "original_content_token_estimate": 34,
+              "analyzed_content_token_estimate": 34,
               "truncation_reason": null,
               "analysis_method": "full_text",
               "attention_tier": "high",
@@ -1451,11 +1903,60 @@
               "error": null
             },
             {
-              "source_article_id": "4424156",
-              "canonical_url": "https://www.hkej.com/instantnews/current/article/4424156/%E7%BE%8E%E5%9C%8B%E5%8A%A0%E5%B7%9E%E9%AB%98%E4%B8%AD%E7%95%A2%E6%A5%AD%E7%A6%AE%E5%BE%8C%E7%99%BC%E7%94%9F%E6%A7%8D%E6%93%8A%E6%A1%88+1%E4%BA%BA%E6%AD%BB3%E5%82%B7",
-              "title": "美國加州高中畢業禮後發生槍擊案 1人死3傷",
+              "source_article_id": "4425413",
+              "title": "中東局勢丨黎巴嫩總統不接受伊朗把該國當談判籌碼",
+              "canonical_url": "https://www.hkej.com/instantnews/current/article/4425413/%E4%B8%AD%E6%9D%B1%E5%B1%80%E5%8B%A2%E4%B8%A8%E9%BB%8E%E5%B7%B4%E5%AB%A9%E7%B8%BD%E7%B5%B1%E4%B8%8D%E6%8E%A5%E5%8F%97%E4%BC%8A%E6%9C%97%E6%8A%8A%E8%A9%B2%E5%9C%8B%E7%95%B6%E8%AB%87%E5%88%A4%E7%B1%8C%E7%A2%BC",
+              "published_at": "2026-06-05T22:33:00+08:00",
               "section": "時事脈搏",
-              "published_at": "2026-06-05T01:29:00+08:00",
+              "novelty_score": 5,
+              "relevance_score": 7,
+              "urgency_score": 8,
+              "named_entities": [
+                {
+                  "name": "黎巴嫩",
+                  "type": "country"
+                },
+                {
+                  "name": "伊朗",
+                  "type": "country"
+                },
+                {
+                  "name": "以色列",
+                  "type": "country"
+                },
+                {
+                  "name": "真主黨",
+                  "type": "organization"
+                }
+              ],
+              "key_points": [
+                "黎巴嫩總統奧恩表示，不接受伊朗把黎巴嫩當作談判籌碼。",
+                "奧恩強調與以色列對話是解決當前局勢的關鍵。"
+              ],
+              "content_truncated": false,
+              "original_content_length_chars": 377,
+              "analyzed_content_length_chars": 377,
+              "original_content_token_estimate": 95,
+              "analyzed_content_token_estimate": 95,
+              "truncation_reason": null,
+              "analysis_method": "full_text",
+              "attention_tier": "high",
+              "theme": "geopolitics",
+              "attention_reason": "High-signal geopolitics headline based on title/summary keywords.",
+              "must_keep": true,
+              "model_used": "meta-llama/llama-4-scout-17b-16e-instruct",
+              "delayed_retry_attempted": false,
+              "delayed_retry_model_chain": [],
+              "delayed_retry_final_model": null,
+              "error_classification": null,
+              "error": null
+            },
+            {
+              "source_article_id": "4425467",
+              "canonical_url": "https://www.hkej.com/instantnews/current/article/4425467/%E5%BE%8B%E5%B8%AB%E5%8A%A9%E9%84%92%E5%AE%B6%E6%88%90%E6%8A%95%E8%A8%B4%E4%BF%A1%E6%94%9C%E9%9B%A2%E7%9B%A3%E7%8D%84%E6%A1%88+%E7%B5%82%E6%A5%B5%E4%B8%8A%E8%A8%B4%E9%81%AD%E9%A7%81%E5%9B%9E",
+              "title": "律師助鄒家成投訴信攜離監獄案 終極上訴遭駁回",
+              "section": "時事脈搏",
+              "published_at": "2026-06-05T22:56:00+08:00",
               "attention_tier": "light",
               "novelty_score": 5,
               "relevance_score": 5,
@@ -1467,11 +1968,11 @@
               "model_used": "direct"
             },
             {
-              "source_article_id": "4424150",
-              "canonical_url": "https://www.hkej.com/instantnews/current/article/4424150/%E8%AD%A6%E6%96%B9%E9%8A%85%E9%91%BC%E7%81%A3%E4%B8%80%E5%B8%B6%E6%88%AA%E6%9F%A57%E4%BA%BA+%E6%B6%89%E5%AB%8C%E4%BD%9C%E5%87%BA%E6%93%BE%E4%BA%82%E7%A7%A9%E5%BA%8F%E8%A1%8C%E7%82%BA",
-              "title": "警方銅鑼灣一帶截查7人 涉嫌作出擾亂秩序行為",
+              "source_article_id": "4425452",
+              "canonical_url": "https://www.hkej.com/instantnews/current/article/4425452/%E7%96%91%E6%83%A1%E6%84%8F%E7%A0%B4%E5%A3%9E%E7%92%B0%E5%A2%83%E8%A1%9E%E7%94%9F+%E8%AD%A6%E6%96%B9%E6%8B%98%E4%B8%80%E7%94%B7%E5%AD%90",
+              "title": "疑惡意破壞環境衞生 警方拘一男子",
               "section": "時事脈搏",
-              "published_at": "2026-06-05T00:20:00+08:00",
+              "published_at": "2026-06-05T22:48:00+08:00",
               "attention_tier": "light",
               "novelty_score": 5,
               "relevance_score": 5,
@@ -1483,27 +1984,11 @@
               "model_used": "direct"
             },
             {
-              "source_article_id": "4424774",
-              "canonical_url": "https://www.hkej.com/instantnews/current/article/4424774/%E5%A4%A9%E6%B0%A3%E4%B8%A8%E5%A4%A9%E6%96%87%E5%8F%B0%E6%96%99%E6%9C%AA%E4%BE%86%E4%B8%80%E5%85%A9%E5%B0%8F%E6%99%82%E6%9C%AC%E6%B8%AF%E9%83%A8%E5%88%86%E5%9C%B0%E5%8D%80%E9%9B%A8%E5%8B%A2%E9%A0%97%E5%A4%A7",
-              "title": "天氣丨天文台料未來一兩小時本港部分地區雨勢頗大",
+              "source_article_id": "4425414",
+              "canonical_url": "https://www.hkej.com/instantnews/current/article/4425414/%E6%B6%89%E4%B9%9D%E5%B7%B4%E4%B8%8A%E5%B1%A4%E4%BC%B8%E6%89%8B%E9%9D%9E%E7%A6%AE%E5%89%8D%E5%BA%A7%E5%A5%B3%E5%AD%B8%E7%94%9F+65%E6%AD%B2%E7%94%B7%E5%AD%90%E6%B8%AF%E7%8F%A0%E6%BE%B3%E5%8F%A3%E5%B2%B8%E8%A2%AB%E6%8D%95",
+              "title": "涉九巴上層伸手非禮前座女學生 65歲男子港珠澳口岸被捕",
               "section": "時事脈搏",
-              "published_at": "2026-06-05T17:54:00+08:00",
-              "attention_tier": "light",
-              "novelty_score": 5,
-              "relevance_score": 5,
-              "urgency_score": 5,
-              "named_entities": [],
-              "key_points": [],
-              "content_truncated": false,
-              "analysis_method": "bypassed",
-              "model_used": "direct"
-            },
-            {
-              "source_article_id": "4424687",
-              "canonical_url": "https://www.hkej.com/instantnews/current/article/4424687/%E5%A4%A9%E6%96%87%E5%8F%B0%E6%96%99%E6%9C%AC%E6%B8%AF%E7%9F%AD%E6%9C%9F%E5%85%A7%E6%88%96%E5%8F%97%E5%86%B0%E9%9B%B9%E5%BD%B1%E9%9F%BF",
-              "title": "天文台料本港短期內或受冰雹影響",
-              "section": "時事脈搏",
-              "published_at": "2026-06-05T17:28:00+08:00",
+              "published_at": "2026-06-05T22:28:00+08:00",
               "attention_tier": "light",
               "novelty_score": 5,
               "relevance_score": 5,
@@ -1528,14 +2013,17 @@
               "key_points": [],
               "content_truncated": false,
               "analysis_method": "bypassed",
-              "model_used": "direct"
+              "model_used": "direct",
+              "theme": "general",
+              "attention_reason": "Lighter treatment because this story sits in the 時事脈搏 section without strong market-moving signals.",
+              "must_keep": false
             },
             {
-              "source_article_id": "4424668",
-              "canonical_url": "https://www.hkej.com/instantnews/current/article/4424668/%E7%89%B9%E9%A6%96%E4%B8%AD%E4%BA%9E%E8%A1%8C%E4%B8%A8%E9%A6%99%E6%B8%AF%E4%BB%A3%E8%A1%A8%E5%9C%98%E8%88%87%E7%83%8F%E8%8C%B2%E5%88%A5%E5%85%8B%E8%B3%87%E8%A8%8A%E7%A7%91%E6%8A%80%E5%9C%92%E7%B0%BD%E7%BD%B2%E5%90%88%E4%BD%9C%E5%82%99%E5%BF%98%E9%8C%84",
-              "title": "特首中亞行丨香港代表團與烏茲別克資訊科技園簽署合作備忘錄",
+              "source_article_id": "4425384",
+              "canonical_url": "https://www.hkej.com/instantnews/current/article/4425384/%E5%A4%A9%E6%96%87%E5%8F%B0%3A%E6%9C%AA%E4%BE%86%E4%B8%80%E5%85%A9%E5%B0%8F%E6%99%82%E6%9C%AC%E6%B8%AF%E5%BB%A3%E6%B3%9B%E5%9C%B0%E5%8D%80%E6%88%96%E5%8F%97%E5%A4%A7%E9%9B%A8%E5%BD%B1%E9%9F%BF",
+              "title": "天文台:未來一兩小時本港廣泛地區或受大雨影響",
               "section": "時事脈搏",
-              "published_at": "2026-06-05T17:27:00+08:00",
+              "published_at": "2026-06-05T22:05:00+08:00",
               "attention_tier": "light",
               "novelty_score": 5,
               "relevance_score": 5,
@@ -1547,11 +2035,11 @@
               "model_used": "direct"
             },
             {
-              "source_article_id": "4424640",
-              "canonical_url": "https://www.hkej.com/instantnews/current/article/4424640/%E3%80%8A%E7%B5%A6%E9%98%BF%E5%AC%A4%E7%9A%84%E6%83%85%E6%9B%B8%E3%80%8B6.18%E9%A6%99%E6%B8%AF%E4%B8%8A%E6%98%A0",
-              "title": "《給阿嬤的情書》6.18香港上映",
+              "source_article_id": "4424774",
+              "canonical_url": "https://www.hkej.com/instantnews/current/article/4424774/%E5%A4%A9%E6%B0%A3%E4%B8%A8%E5%A4%A9%E6%96%87%E5%8F%B0%E6%96%99%E6%9C%AA%E4%BE%86%E4%B8%80%E5%85%A9%E5%B0%8F%E6%99%82%E6%9C%AC%E6%B8%AF%E9%83%A8%E5%88%86%E5%9C%B0%E5%8D%80%E9%9B%A8%E5%8B%A2%E9%A0%97%E5%A4%A7",
+              "title": "天氣丨天文台料未來一兩小時本港部分地區雨勢頗大",
               "section": "時事脈搏",
-              "published_at": "2026-06-05T17:16:00+08:00",
+              "published_at": "2026-06-05T17:54:00+08:00",
               "attention_tier": "light",
               "novelty_score": 5,
               "relevance_score": 5,
@@ -1560,7 +2048,10 @@
               "key_points": [],
               "content_truncated": false,
               "analysis_method": "bypassed",
-              "model_used": "direct"
+              "model_used": "direct",
+              "theme": "general",
+              "attention_reason": "Lighter treatment because this story sits in the 時事脈搏 section without strong market-moving signals.",
+              "must_keep": false
             },
             {
               "source_article_id": "4424161",
@@ -1610,6 +2101,143 @@
               "delayed_retry_final_model": null,
               "error_classification": null,
               "error": null
+            },
+            {
+              "source_article_id": "4424158",
+              "title": "中東局勢丨伊朗革命衞隊:以色列須立即停止襲擊黎巴嫩",
+              "canonical_url": "https://www.hkej.com/instantnews/current/article/4424158/%E4%B8%AD%E6%9D%B1%E5%B1%80%E5%8B%A2%E4%B8%A8%E4%BC%8A%E6%9C%97%E9%9D%A9%E5%91%BD%E8%A1%9E%E9%9A%8A%3A%E4%BB%A5%E8%89%B2%E5%88%97%E9%A0%88%E7%AB%8B%E5%8D%B3%E5%81%9C%E6%AD%A2%E8%A5%B2%E6%93%8A%E9%BB%8E%E5%B7%B4%E5%AB%A9",
+              "published_at": "2026-06-05T01:59:00+08:00",
+              "section": "時事脈搏",
+              "novelty_score": 7,
+              "relevance_score": 8,
+              "urgency_score": 9,
+              "named_entities": [
+                {
+                  "name": "伊朗",
+                  "type": "country"
+                },
+                {
+                  "name": "以色列",
+                  "type": "country"
+                },
+                {
+                  "name": "黎巴嫩",
+                  "type": "country"
+                },
+                {
+                  "name": "真主黨",
+                  "type": "organization"
+                }
+              ],
+              "key_points": [
+                "伊朗伊斯蘭革命衞隊表示，以色列必須立即停止對黎巴嫩人民的襲擊，迅速撤出被佔領的黎巴嫩領土，並承認黎巴嫩領土完整。",
+                "黎巴嫩和以色列同意有條件停火，條件是真主黨停止襲擊，並將其武裝人員撤出黎巴嫩南部與以色列接壤的地區。"
+              ],
+              "content_truncated": false,
+              "original_content_length_chars": 339,
+              "analyzed_content_length_chars": 339,
+              "original_content_token_estimate": 85,
+              "analyzed_content_token_estimate": 85,
+              "truncation_reason": null,
+              "analysis_method": "full_text",
+              "attention_tier": "high",
+              "theme": "geopolitics",
+              "attention_reason": "High-signal geopolitics headline based on title/summary keywords.",
+              "must_keep": true,
+              "model_used": "meta-llama/llama-4-scout-17b-16e-instruct",
+              "delayed_retry_attempted": false,
+              "delayed_retry_model_chain": [],
+              "delayed_retry_final_model": null,
+              "error_classification": null,
+              "error": null
+            }
+          ],
+          "model_used": "meta-llama/llama-4-scout-17b-16e-instruct"
+        },
+        {
+          "title": "Local News",
+          "theme_rationale": "Articles related to local events and incidents",
+          "article_count": 3,
+          "key_developments": [
+            "The Labour Affairs Bureau announced that it will not implement the Second Phase of the Two-Tier Taxi Scheme.",
+            "A shooting occurred at a high school graduation party in California, USA, resulting in 1 death and 3 injuries.",
+            "Police in Hong Kong intercepted 7 people in Causeway Bay for suspected disorderly conduct."
+          ],
+          "named_entities": [
+            {
+              "name": "Labour Affairs Bureau",
+              "type": "institution"
+            },
+            {
+              "name": "California",
+              "type": "country"
+            },
+            {
+              "name": "Hong Kong",
+              "type": "country"
+            },
+            {
+              "name": "Causeway Bay",
+              "type": "other"
+            }
+          ],
+          "articles": [
+            {
+              "source_article_id": "4424407",
+              "canonical_url": "https://www.hkej.com/instantnews/current/article/4424407/%E5%8B%9E%E7%A6%8F%E5%B1%80%E5%AE%A3%E5%B8%83%E4%B8%8D%E5%AF%A6%E6%96%BD%E4%BA%8C%E5%85%83%E5%84%AA%E6%83%A0%E8%A8%88%E5%8A%83%E9%99%90%E7%A8%8B%E6%96%B9%E6%A1%88",
+              "title": "勞福局宣布不實施二元優惠計劃限程方案",
+              "section": "時事脈搏",
+              "published_at": "2026-06-05T15:54:00+08:00",
+              "attention_tier": "light",
+              "novelty_score": 5,
+              "relevance_score": 5,
+              "urgency_score": 5,
+              "named_entities": [],
+              "key_points": [],
+              "content_truncated": false,
+              "analysis_method": "bypassed",
+              "model_used": "direct",
+              "theme": "general",
+              "attention_reason": "Lighter treatment because this story sits in the 時事脈搏 section without strong market-moving signals.",
+              "must_keep": false
+            },
+            {
+              "source_article_id": "4424156",
+              "canonical_url": "https://www.hkej.com/instantnews/current/article/4424156/%E7%BE%8E%E5%9C%8B%E5%8A%A0%E5%B7%9E%E9%AB%98%E4%B8%AD%E7%95%A2%E6%A5%AD%E7%A6%AE%E5%BE%8C%E7%99%BC%E7%94%9F%E6%A7%8D%E6%93%8A%E6%A1%88+1%E4%BA%BA%E6%AD%BB3%E5%82%B7",
+              "title": "美國加州高中畢業禮後發生槍擊案 1人死3傷",
+              "section": "時事脈搏",
+              "published_at": "2026-06-05T01:29:00+08:00",
+              "attention_tier": "light",
+              "novelty_score": 5,
+              "relevance_score": 5,
+              "urgency_score": 5,
+              "named_entities": [],
+              "key_points": [],
+              "content_truncated": false,
+              "analysis_method": "bypassed",
+              "model_used": "direct",
+              "theme": "general",
+              "attention_reason": "Lighter treatment because this story sits in the 時事脈搏 section without strong market-moving signals.",
+              "must_keep": false
+            },
+            {
+              "source_article_id": "4424150",
+              "canonical_url": "https://www.hkej.com/instantnews/current/article/4424150/%E8%AD%A6%E6%96%B9%E9%8A%85%E9%91%BC%E7%81%A3%E4%B8%80%E5%B8%B6%E6%88%AA%E6%9F%A57%E4%BA%BA+%E6%B6%89%E5%AB%8C%E4%BD%9C%E5%87%BA%E6%93%BE%E4%BA%82%E7%A7%A9%E5%BA%8F%E8%A1%8C%E7%82%BA",
+              "title": "警方銅鑼灣一帶截查7人 涉嫌作出擾亂秩序行為",
+              "section": "時事脈搏",
+              "published_at": "2026-06-05T00:20:00+08:00",
+              "attention_tier": "light",
+              "novelty_score": 5,
+              "relevance_score": 5,
+              "urgency_score": 5,
+              "named_entities": [],
+              "key_points": [],
+              "content_truncated": false,
+              "analysis_method": "bypassed",
+              "model_used": "direct",
+              "theme": "general",
+              "attention_reason": "Lighter treatment because this story sits in the 時事脈搏 section without strong market-moving signals.",
+              "must_keep": false
             }
           ],
           "model_used": "meta-llama/llama-4-scout-17b-16e-instruct"
@@ -1617,17 +2245,17 @@
       ],
       "analysis_profile": "light",
       "model_used": "meta-llama/llama-4-scout-17b-16e-instruct",
-      "sub_batch_count": 4,
+      "sub_batch_count": 9,
       "diagnostics": {
-        "sub_batch_count": 1,
+        "sub_batch_count": 9,
         "split_reasons": [
           "pre_send_budget"
         ],
         "models_attempted": [
           "meta-llama/llama-4-scout-17b-16e-instruct"
         ],
-        "estimated_input_tokens_max": 1377,
-        "serialized_request_bytes_max": 6352,
+        "estimated_input_tokens_max": 1242,
+        "serialized_request_bytes_max": 5647,
         "rate_limit_waits": 0,
         "partial_article_count": 0,
         "synthesis_wait_seconds_total": 0.0,
@@ -1652,20 +2280,20 @@
           "type": "institution"
         },
         {
-          "name": "金管局",
-          "type": "institution"
-        },
-        {
           "name": "楊慧明",
           "type": "person"
+        },
+        {
+          "name": "天辰生物",
+          "type": "company"
         },
         {
           "name": "恒指",
           "type": "index"
         },
         {
-          "name": "港股",
-          "type": "organization"
+          "name": "盧金榮",
+          "type": "person"
         }
       ],
       "articles": [
@@ -1940,14 +2568,14 @@
       ],
       "subgroups": [
         {
-          "title": "金融監管與政策",
-          "theme_rationale": "與金融監管、政策和法律相關的文章",
-          "article_count": 2,
+          "title": "金融市場動態",
+          "theme_rationale": "與金融市場相關的新股上市、股票市場表現和金融監管動態。",
+          "article_count": 4,
           "key_developments": [
-            "證監會與金管局計劃在明年3月1日起實施場外衍生工具結算規則修訂。",
-            "修訂內容包括將《結算規則》下每年的計算期間標準化，以提高操作效率。",
             "證監會擴大上市結構性基金範圍，納入高流通量香港上市股票作為標的。",
-            "個股槓桿及反向產品管理資產急增逾302倍，日均成交額增136倍。"
+            "個股槓桿及反向產品管理資產急增逾302倍，日均成交額增136倍。",
+            "天辰生物收市價131.8元，較招股價96.06元升37.21%，一手賬面賺1787元。",
+            "恒指夜期收报25158点，升67点，较昨日恒指收市25253点低水95点。"
           ],
           "named_entities": [
             {
@@ -1955,57 +2583,19 @@
               "type": "institution"
             },
             {
-              "name": "金管局",
-              "type": "institution"
-            },
-            {
               "name": "楊慧明",
               "type": "person"
+            },
+            {
+              "name": "天辰生物",
+              "type": "company"
+            },
+            {
+              "name": "恒指",
+              "type": "index"
             }
           ],
           "articles": [
-            {
-              "source_article_id": "4424608",
-              "title": "證監會與金管局將就場外衍生工具結算規則修訂立法",
-              "canonical_url": "https://www.hkej.com/instantnews/hongkong/article/4424608/%E8%AD%89%E7%9B%A3%E6%9C%83%E8%88%87%E9%87%91%E7%AE%A1%E5%B1%80%E5%B0%87%E5%B0%B1%E5%A0%B4%E5%A4%96%E8%A1%8D%E7%94%9F%E5%B7%A5%E5%85%B7%E7%B5%90%E7%AE%97%E8%A6%8F%E5%89%87%E4%BF%AE%E8%A8%82%E7%AB%8B%E6%B3%95",
-              "published_at": "2026-06-05T17:14:00+08:00",
-              "section": "香港財經",
-              "novelty_score": 4,
-              "relevance_score": 8,
-              "urgency_score": 6,
-              "named_entities": [
-                {
-                  "name": "證監會",
-                  "type": "institution"
-                },
-                {
-                  "name": "金管局",
-                  "type": "institution"
-                }
-              ],
-              "key_points": [
-                "證監會與金管局就場外衍生工具結算規則修訂立法，計劃在明年3月1日起實施。",
-                "修訂內容包括將《結算規則》下每年的計算期間標準化，以提高操作效率。",
-                "市場參與者廣泛支持相關建議，認為有助於內部規劃和結算責任明確。"
-              ],
-              "content_truncated": false,
-              "original_content_length_chars": 333,
-              "analyzed_content_length_chars": 333,
-              "original_content_token_estimate": 84,
-              "analyzed_content_token_estimate": 84,
-              "truncation_reason": null,
-              "analysis_method": "full_text",
-              "attention_tier": "medium",
-              "theme": "general",
-              "attention_reason": "Default medium attention because the story is relevant but not an obvious top-priority market mover.",
-              "must_keep": false,
-              "model_used": "meta-llama/llama-4-scout-17b-16e-instruct",
-              "delayed_retry_attempted": false,
-              "delayed_retry_model_chain": [],
-              "delayed_retry_final_model": null,
-              "error_classification": null,
-              "error": null
-            },
             {
               "source_article_id": "4424811",
               "title": "證監會擴大上市結構性基金範圍",
@@ -2040,80 +2630,6 @@
               "attention_tier": "high",
               "theme": "stocks",
               "attention_reason": "Article discusses expansion of listing rules for structured funds.",
-              "must_keep": true,
-              "model_used": "meta-llama/llama-4-scout-17b-16e-instruct",
-              "delayed_retry_attempted": false,
-              "delayed_retry_model_chain": [],
-              "delayed_retry_final_model": null,
-              "error_classification": null,
-              "error": null
-            }
-          ],
-          "model_used": "meta-llama/llama-4-scout-17b-16e-instruct"
-        },
-        {
-          "title": "市場動態與投資",
-          "theme_rationale": "涵蓋市場趨勢、投資和股票市場動態的文章",
-          "article_count": 3,
-          "key_developments": [
-            "恒指夜期收报25158点，较昨日恒指收市25253点低水95点。",
-            "天辰生物收市价131.8元，较招股价96.06元升37.21%，一手账面赚1787元。",
-            "龙丰集团收报2.81元，跌45.75%，一手500股账面蚀1185元。",
-            "港股市场成交量方面，恒指夜期成交量为19024张。"
-          ],
-          "named_entities": [
-            {
-              "name": "恒指",
-              "type": "index"
-            },
-            {
-              "name": "港股",
-              "type": "organization"
-            },
-            {
-              "name": "天辰生物",
-              "type": "company"
-            },
-            {
-              "name": "龙丰集团",
-              "type": "company"
-            }
-          ],
-          "articles": [
-            {
-              "source_article_id": "4424163",
-              "title": "恒指夜期丨收報25158 低水95點",
-              "canonical_url": "https://www.hkej.com/instantnews/hongkong/article/4424163/%E6%81%92%E6%8C%87%E5%A4%9C%E6%9C%9F%E4%B8%A8%E6%94%B6%E5%A0%B125158+%E4%BD%8E%E6%B0%B495%E9%BB%9E",
-              "published_at": "2026-06-05T03:25:00+08:00",
-              "section": "香港財經",
-              "novelty_score": 4,
-              "relevance_score": 7,
-              "urgency_score": 5,
-              "named_entities": [
-                {
-                  "name": "恒指",
-                  "type": "index"
-                },
-                {
-                  "name": "港股",
-                  "type": "organization"
-                }
-              ],
-              "key_points": [
-                "恒指夜期收报25158点，升67点，较昨日恒指收市25253点低水95点。",
-                "成交量为19024张。",
-                "国指夜期收报8482点，较昨日国指收市低水20点。"
-              ],
-              "content_truncated": false,
-              "original_content_length_chars": 101,
-              "analyzed_content_length_chars": 101,
-              "original_content_token_estimate": 26,
-              "analyzed_content_token_estimate": 26,
-              "truncation_reason": null,
-              "analysis_method": "full_text",
-              "attention_tier": "medium",
-              "theme": "stocks",
-              "attention_reason": "The article reports on the closing price of Hang Seng Index futures, which is a routine market update.",
               "must_keep": true,
               "model_used": "meta-llama/llama-4-scout-17b-16e-instruct",
               "delayed_retry_attempted": false,
@@ -2169,6 +2685,126 @@
               "error": null
             },
             {
+              "source_article_id": "4424163",
+              "title": "恒指夜期丨收報25158 低水95點",
+              "canonical_url": "https://www.hkej.com/instantnews/hongkong/article/4424163/%E6%81%92%E6%8C%87%E5%A4%9C%E6%9C%9F%E4%B8%A8%E6%94%B6%E5%A0%B125158+%E4%BD%8E%E6%B0%B495%E9%BB%9E",
+              "published_at": "2026-06-05T03:25:00+08:00",
+              "section": "香港財經",
+              "novelty_score": 4,
+              "relevance_score": 7,
+              "urgency_score": 5,
+              "named_entities": [
+                {
+                  "name": "恒指",
+                  "type": "index"
+                },
+                {
+                  "name": "港股",
+                  "type": "organization"
+                }
+              ],
+              "key_points": [
+                "恒指夜期收报25158点，升67点，较昨日恒指收市25253点低水95点。",
+                "成交量为19024张。",
+                "国指夜期收报8482点，较昨日国指收市低水20点。"
+              ],
+              "content_truncated": false,
+              "original_content_length_chars": 101,
+              "analyzed_content_length_chars": 101,
+              "original_content_token_estimate": 26,
+              "analyzed_content_token_estimate": 26,
+              "truncation_reason": null,
+              "analysis_method": "full_text",
+              "attention_tier": "medium",
+              "theme": "stocks",
+              "attention_reason": "The article reports on the closing price of Hang Seng Index futures, which is a routine market update.",
+              "must_keep": true,
+              "model_used": "meta-llama/llama-4-scout-17b-16e-instruct",
+              "delayed_retry_attempted": false,
+              "delayed_retry_model_chain": [],
+              "delayed_retry_final_model": null,
+              "error_classification": null,
+              "error": null
+            },
+            {
+              "source_article_id": "4424608",
+              "title": "證監會與金管局將就場外衍生工具結算規則修訂立法",
+              "canonical_url": "https://www.hkej.com/instantnews/hongkong/article/4424608/%E8%AD%89%E7%9B%A3%E6%9C%83%E8%88%87%E9%87%91%E7%AE%A1%E5%B1%80%E5%B0%87%E5%B0%B1%E5%A0%B4%E5%A4%96%E8%A1%8D%E7%94%9F%E5%B7%A5%E5%85%B7%E7%B5%90%E7%AE%97%E8%A6%8F%E5%89%87%E4%BF%AE%E8%A8%82%E7%AB%8B%E6%B3%95",
+              "published_at": "2026-06-05T17:14:00+08:00",
+              "section": "香港財經",
+              "novelty_score": 4,
+              "relevance_score": 8,
+              "urgency_score": 6,
+              "named_entities": [
+                {
+                  "name": "證監會",
+                  "type": "institution"
+                },
+                {
+                  "name": "金管局",
+                  "type": "institution"
+                }
+              ],
+              "key_points": [
+                "證監會與金管局就場外衍生工具結算規則修訂立法，計劃在明年3月1日起實施。",
+                "修訂內容包括將《結算規則》下每年的計算期間標準化，以提高操作效率。",
+                "市場參與者廣泛支持相關建議，認為有助於內部規劃和結算責任明確。"
+              ],
+              "content_truncated": false,
+              "original_content_length_chars": 333,
+              "analyzed_content_length_chars": 333,
+              "original_content_token_estimate": 84,
+              "analyzed_content_token_estimate": 84,
+              "truncation_reason": null,
+              "analysis_method": "full_text",
+              "attention_tier": "medium",
+              "theme": "general",
+              "attention_reason": "Default medium attention because the story is relevant but not an obvious top-priority market mover.",
+              "must_keep": false,
+              "model_used": "meta-llama/llama-4-scout-17b-16e-instruct",
+              "delayed_retry_attempted": false,
+              "delayed_retry_model_chain": [],
+              "delayed_retry_final_model": null,
+              "error_classification": null,
+              "error": null
+            }
+          ],
+          "model_used": "meta-llama/llama-4-scout-17b-16e-instruct"
+        },
+        {
+          "title": "商業與貿易",
+          "theme_rationale": "關於商業活動、貿易合作和零售市場的最新動態。",
+          "article_count": 2,
+          "key_developments": [
+            "廠商會會長盧金榮隨行政長官李家超率領的商貿代表團訪問中亞，簽署合作備忘錄深化投資與商業合作。",
+            "香港及內地企業可發揮「併船出海」的協同效應，優化供應鏈布局和拓展貿易市場。",
+            "京東MALL灣仔店將於6月18日至21日開業，佔地約3萬方呎，主打3C數碼、智能家電與家居產品。",
+            "未來3年計劃在香港開設6至8家門店，優先布局沙田、旺角、屯門等。"
+          ],
+          "named_entities": [
+            {
+              "name": "盧金榮",
+              "type": "person"
+            },
+            {
+              "name": "李家超",
+              "type": "person"
+            },
+            {
+              "name": "廠商會",
+              "type": "organization"
+            },
+            {
+              "name": "京東MALL",
+              "type": "company"
+            },
+            {
+              "name": "香港",
+              "type": "country"
+            }
+          ],
+          "articles": [
+            {
               "source_article_id": "4424888",
               "title": "中亞之行丨廠商會:香港及內地企業可發揮「併船出海」協同效應",
               "canonical_url": "https://www.hkej.com/instantnews/hongkong/article/4424888/%E4%B8%AD%E4%BA%9E%E4%B9%8B%E8%A1%8C%E4%B8%A8%E5%BB%A0%E5%95%86%E6%9C%83%3A%E9%A6%99%E6%B8%AF%E5%8F%8A%E5%85%A7%E5%9C%B0%E4%BC%81%E6%A5%AD%E5%8F%AF%E7%99%BC%E6%8F%AE%E3%80%8C%E4%BD%B5%E8%88%B9%E5%87%BA%E6%B5%B7%E3%80%8D%E5%8D%94%E5%90%8C%E6%95%88%E6%87%89",
@@ -2221,31 +2857,7 @@
               "delayed_retry_final_model": null,
               "error_classification": null,
               "error": null
-            }
-          ],
-          "model_used": "meta-llama/llama-4-scout-17b-16e-instruct"
-        },
-        {
-          "title": "商業與零售發展",
-          "theme_rationale": "關注商業運營、零售市場和企業動態的文章",
-          "article_count": 1,
-          "key_developments": [
-            "京東MALL灣仔店將於6月18日開業，佔地約3萬方呎。",
-            "未來3年計劃在香港開設6至8家門店。",
-            "京東MALL首次將沉浸式潮購模式引入香港。",
-            "門店優先布局沙田、旺角、屯門等。"
-          ],
-          "named_entities": [
-            {
-              "name": "京東MALL",
-              "type": "company"
             },
-            {
-              "name": "香港",
-              "type": "country"
-            }
-          ],
-          "articles": [
             {
               "source_article_id": "4424657",
               "title": "京東MALL灣仔店6.18開業 未來3年香港開6至8家門店",
@@ -2294,15 +2906,177 @@
       ],
       "analysis_profile": "standard",
       "model_used": "meta-llama/llama-4-scout-17b-16e-instruct",
-      "sub_batch_count": 8,
+      "sub_batch_count": 2,
       "diagnostics": {
-        "sub_batch_count": 5,
+        "sub_batch_count": 2,
+        "split_reasons": [],
+        "models_attempted": [],
+        "estimated_input_tokens_max": 0,
+        "serialized_request_bytes_max": 0,
+        "rate_limit_waits": 0,
+        "partial_article_count": 0,
+        "synthesis_wait_seconds_total": 0.0,
+        "synthesis_retry_count": 0,
+        "synthesis_retry_skipped_count": 0,
+        "synthesis_budget_exhausted": false,
+        "degraded_merge_used": false,
+        "degraded_merge_reason": "",
+        "synthesis_merge_depth_max": 0,
+        "model_switches": []
+      },
+      "error": null
+    },
+    {
+      "category": "港股直擊",
+      "article_count": 1,
+      "status": "success",
+      "key_developments": [
+        "恒指夜期報24741點，跌147點或0.59%，成交9574張。",
+        "夜期低水221點，國指期貨報8358點，跌50點或0.6%。",
+        "与日间期指收市相比，夜期曾低见24735点，下跌153点。",
+        "港股市场整体下跌，恒生指数（^HSI）现报24961.95点，跌幅1.15%。"
+      ],
+      "named_entities": [
+        {
+          "name": "恒指",
+          "type": "index"
+        },
+        {
+          "name": "港股",
+          "type": "other"
+        },
+        {
+          "name": "^HSI",
+          "type": "index"
+        }
+      ],
+      "articles": [
+        {
+          "source_article_id": "4425434",
+          "title": "恒指夜期丨報24741 跌147點",
+          "canonical_url": "https://www.hkej.com/instantnews/stock/article/4425434/%E6%81%92%E6%8C%87%E5%A4%9C%E6%9C%9F%E4%B8%A8%E5%A0%B124741+%E8%B7%8C147%E9%BB%9E",
+          "published_at": "2026-06-05T22:36:00+08:00",
+          "section": "港股直擊",
+          "novelty_score": 4,
+          "relevance_score": 7,
+          "urgency_score": 5,
+          "named_entities": [
+            {
+              "name": "恒指",
+              "type": "index"
+            },
+            {
+              "name": "港股",
+              "type": "other"
+            }
+          ],
+          "key_points": [
+            "恒指夜期報24741點，跌147點或0.59%，成交9574張。",
+            "夜期低水221點，國指期貨報8358點，跌50點或0.6%。",
+            "與日間期指收市相比，夜期曾低見24735點，下跌153點。"
+          ],
+          "content_truncated": false,
+          "original_content_length_chars": 198,
+          "analyzed_content_length_chars": 198,
+          "original_content_token_estimate": 50,
+          "analyzed_content_token_estimate": 50,
+          "truncation_reason": null,
+          "analysis_method": "full_text",
+          "attention_tier": "medium",
+          "theme": "stocks",
+          "attention_reason": "The article reports a minor decline in the Hang Seng Index futures.",
+          "must_keep": true,
+          "model_used": "meta-llama/llama-4-scout-17b-16e-instruct",
+          "delayed_retry_attempted": false,
+          "delayed_retry_model_chain": [],
+          "delayed_retry_final_model": null,
+          "error_classification": null,
+          "error": null
+        }
+      ],
+      "subgroups": [
+        {
+          "title": "港股直擊 overview",
+          "theme_rationale": "Single subgroup because the category size did not require thematic splitting.",
+          "article_count": 1,
+          "key_developments": [
+            "恒指夜期報24741點，跌147點或0.59%，成交9574張。",
+            "夜期低水221點，國指期貨報8358點，跌50點或0.6%。",
+            "与日间期指收市相比，夜期曾低见24735点，下跌153点。",
+            "港股市场整体下跌，恒生指数（^HSI）现报24961.95点，跌幅1.15%。"
+          ],
+          "named_entities": [
+            {
+              "name": "恒指",
+              "type": "index"
+            },
+            {
+              "name": "港股",
+              "type": "other"
+            },
+            {
+              "name": "^HSI",
+              "type": "index"
+            }
+          ],
+          "articles": [
+            {
+              "source_article_id": "4425434",
+              "title": "恒指夜期丨報24741 跌147點",
+              "canonical_url": "https://www.hkej.com/instantnews/stock/article/4425434/%E6%81%92%E6%8C%87%E5%A4%9C%E6%9C%9F%E4%B8%A8%E5%A0%B124741+%E8%B7%8C147%E9%BB%9E",
+              "published_at": "2026-06-05T22:36:00+08:00",
+              "section": "港股直擊",
+              "novelty_score": 4,
+              "relevance_score": 7,
+              "urgency_score": 5,
+              "named_entities": [
+                {
+                  "name": "恒指",
+                  "type": "index"
+                },
+                {
+                  "name": "港股",
+                  "type": "other"
+                }
+              ],
+              "key_points": [
+                "恒指夜期報24741點，跌147點或0.59%，成交9574張。",
+                "夜期低水221點，國指期貨報8358點，跌50點或0.6%。",
+                "與日間期指收市相比，夜期曾低見24735點，下跌153點。"
+              ],
+              "content_truncated": false,
+              "original_content_length_chars": 198,
+              "analyzed_content_length_chars": 198,
+              "original_content_token_estimate": 50,
+              "analyzed_content_token_estimate": 50,
+              "truncation_reason": null,
+              "analysis_method": "full_text",
+              "attention_tier": "medium",
+              "theme": "stocks",
+              "attention_reason": "The article reports a minor decline in the Hang Seng Index futures.",
+              "must_keep": true,
+              "model_used": "meta-llama/llama-4-scout-17b-16e-instruct",
+              "delayed_retry_attempted": false,
+              "delayed_retry_model_chain": [],
+              "delayed_retry_final_model": null,
+              "error_classification": null,
+              "error": null
+            }
+          ],
+          "model_used": "meta-llama/llama-4-scout-17b-16e-instruct"
+        }
+      ],
+      "analysis_profile": "standard",
+      "model_used": "meta-llama/llama-4-scout-17b-16e-instruct",
+      "sub_batch_count": 2,
+      "diagnostics": {
+        "sub_batch_count": 1,
         "split_reasons": [],
         "models_attempted": [
           "meta-llama/llama-4-scout-17b-16e-instruct"
         ],
-        "estimated_input_tokens_max": 1572,
-        "serialized_request_bytes_max": 7455,
+        "estimated_input_tokens_max": 635,
+        "serialized_request_bytes_max": 3636,
         "rate_limit_waits": 0,
         "partial_article_count": 0,
         "synthesis_wait_seconds_total": 0.0,
@@ -2318,21 +3092,16 @@
     },
     {
       "category": "中國財經",
-      "article_count": 7,
+      "article_count": 8,
       "status": "success",
       "key_developments": [
-        "國務院辦公廳發布指導意見，嚴厲打擊私募基金違規募集、侵佔挪用等行為。",
-        "人民幣兌美元收升56點子，受偏結滙需求支撐。",
-        "丁向群被任命為國家金融監督管理總局局長，成為該機構首位女性一把手。",
-        "雙滙豬肉產品被曝出抗生素嚴重超標近38倍，國務院食安辦成立工作組督導查處。"
+        "中國證監會處罰3家線上券商總計超過3.3億美元的罰款",
+        "丁向群被任命為國家金融監督管理總局局長，成為該機構首位女性一把手",
+        "聞泰科技已針對安世荷蘭的不當干預，正式在中國啟動法律程序，向廣東東莞市中級人民法院起訴安世荷蘭"
       ],
       "named_entities": [
         {
-          "name": "國務院",
-          "type": "organization"
-        },
-        {
-          "name": "國家金融監督管理總局",
+          "name": "中國證監會",
           "type": "organization"
         },
         {
@@ -2340,15 +3109,73 @@
           "type": "person"
         },
         {
-          "name": "私募投資基金",
-          "type": "other"
+          "name": "國家金融監督管理總局",
+          "type": "organization"
         },
         {
-          "name": "雙滙",
+          "name": "聞泰科技",
+          "type": "company"
+        },
+        {
+          "name": "安世荷蘭",
           "type": "company"
         }
       ],
       "articles": [
+        {
+          "source_article_id": "4425364",
+          "title": "中國多家銀行據報上調美元存款利率 分析:冀減慢人民幣升值",
+          "canonical_url": "https://www.hkej.com/instantnews/china/article/4425364/%E4%B8%AD%E5%9C%8B%E5%A4%9A%E5%AE%B6%E9%8A%80%E8%A1%8C%E6%93%9A%E5%A0%B1%E4%B8%8A%E8%AA%BF%E7%BE%8E%E5%85%83%E5%AD%98%E6%AC%BE%E5%88%A9%E7%8E%87+%E5%88%86%E6%9E%90%3A%E5%86%80%E6%B8%9B%E6%85%A2%E4%BA%BA%E6%B0%91%E5%B9%A3%E5%8D%87%E5%80%BC",
+          "published_at": "2026-06-05T22:03:00+08:00",
+          "section": "中國財經",
+          "novelty_score": 6,
+          "relevance_score": 8,
+          "urgency_score": 7,
+          "named_entities": [
+            {
+              "name": "中國",
+              "type": "country"
+            },
+            {
+              "name": "國有銀行",
+              "type": "organization"
+            },
+            {
+              "name": "人民銀行",
+              "type": "institution"
+            },
+            {
+              "name": "Gary Ng",
+              "type": "person"
+            },
+            {
+              "name": "法盛",
+              "type": "organization"
+            }
+          ],
+          "key_points": [
+            "中國多家銀行上調美元存款利率至3.61%，與美國有擔保隔夜融資利率持平。",
+            "人民幣兌美元滙率已上漲逾3%，或損害出口競爭力。",
+            "此次調整標誌着2023年實施的美元存款利率上限政策的放寬。"
+          ],
+          "content_truncated": false,
+          "original_content_length_chars": 582,
+          "analyzed_content_length_chars": 582,
+          "original_content_token_estimate": 146,
+          "analyzed_content_token_estimate": 146,
+          "truncation_reason": null,
+          "analysis_method": "full_text",
+          "attention_tier": "medium",
+          "theme": "macro",
+          "attention_reason": "Article discusses China's banks adjusting USD deposit rates, which relates to macro-economic policy.",
+          "must_keep": true,
+          "model_used": "meta-llama/llama-4-scout-17b-16e-instruct",
+          "delayed_retry_attempted": false,
+          "delayed_retry_model_chain": [],
+          "delayed_retry_final_model": null,
+          "error_classification": null,
+          "error": null
+        },
         {
           "source_article_id": "4424779",
           "title": "國務院:嚴厲打擊私募基金違規募集及侵佔挪用",
@@ -2555,7 +3382,7 @@
           "title": "人民幣走勢丨CNY收升56點子 受偏結滙需求支撐",
           "section": "中國財經",
           "published_at": "2026-06-05T17:28:00+08:00",
-          "attention_tier": "light",
+          "attention_tier": "medium",
           "novelty_score": 5,
           "relevance_score": 5,
           "urgency_score": 5,
@@ -2563,7 +3390,10 @@
           "key_points": [],
           "content_truncated": false,
           "analysis_method": "bypassed",
-          "model_used": "direct"
+          "model_used": "direct",
+          "theme": "macro",
+          "attention_reason": "High-signal macro headline based on title/summary keywords.",
+          "must_keep": true
         },
         {
           "source_article_id": "4424496",
@@ -2666,20 +3496,15 @@
         {
           "title": "Combined Market Overview",
           "theme_rationale": "Consolidated smaller themes for brevity.",
-          "article_count": 7,
+          "article_count": 8,
           "key_developments": [
-            "國務院辦公廳發布指導意見，嚴厲打擊私募基金違規募集、侵佔挪用等行為。",
-            "人民幣兌美元收升56點子，受偏結滙需求支撐。",
-            "丁向群被任命為國家金融監督管理總局局長，成為該機構首位女性一把手。",
-            "雙滙豬肉產品被曝出抗生素嚴重超標近38倍，國務院食安辦成立工作組督導查處。"
+            "中國證監會處罰3家線上券商總計超過3.3億美元的罰款",
+            "丁向群被任命為國家金融監督管理總局局長，成為該機構首位女性一把手",
+            "聞泰科技已針對安世荷蘭的不當干預，正式在中國啟動法律程序，向廣東東莞市中級人民法院起訴安世荷蘭"
           ],
           "named_entities": [
             {
-              "name": "國務院",
-              "type": "organization"
-            },
-            {
-              "name": "國家金融監督管理總局",
+              "name": "中國證監會",
               "type": "organization"
             },
             {
@@ -2687,11 +3512,15 @@
               "type": "person"
             },
             {
-              "name": "私募投資基金",
-              "type": "other"
+              "name": "國家金融監督管理總局",
+              "type": "organization"
             },
             {
-              "name": "雙滙",
+              "name": "聞泰科技",
+              "type": "company"
+            },
+            {
+              "name": "安世荷蘭",
               "type": "company"
             }
           ],
@@ -2847,6 +3676,60 @@
               "error": null
             },
             {
+              "source_article_id": "4425364",
+              "title": "中國多家銀行據報上調美元存款利率 分析:冀減慢人民幣升值",
+              "canonical_url": "https://www.hkej.com/instantnews/china/article/4425364/%E4%B8%AD%E5%9C%8B%E5%A4%9A%E5%AE%B6%E9%8A%80%E8%A1%8C%E6%93%9A%E5%A0%B1%E4%B8%8A%E8%AA%BF%E7%BE%8E%E5%85%83%E5%AD%98%E6%AC%BE%E5%88%A9%E7%8E%87+%E5%88%86%E6%9E%90%3A%E5%86%80%E6%B8%9B%E6%85%A2%E4%BA%BA%E6%B0%91%E5%B9%A3%E5%8D%87%E5%80%BC",
+              "published_at": "2026-06-05T22:03:00+08:00",
+              "section": "中國財經",
+              "novelty_score": 6,
+              "relevance_score": 8,
+              "urgency_score": 7,
+              "named_entities": [
+                {
+                  "name": "中國",
+                  "type": "country"
+                },
+                {
+                  "name": "國有銀行",
+                  "type": "organization"
+                },
+                {
+                  "name": "人民銀行",
+                  "type": "institution"
+                },
+                {
+                  "name": "Gary Ng",
+                  "type": "person"
+                },
+                {
+                  "name": "法盛",
+                  "type": "organization"
+                }
+              ],
+              "key_points": [
+                "中國多家銀行上調美元存款利率至3.61%，與美國有擔保隔夜融資利率持平。",
+                "人民幣兌美元滙率已上漲逾3%，或損害出口競爭力。",
+                "此次調整標誌着2023年實施的美元存款利率上限政策的放寬。"
+              ],
+              "content_truncated": false,
+              "original_content_length_chars": 582,
+              "analyzed_content_length_chars": 582,
+              "original_content_token_estimate": 146,
+              "analyzed_content_token_estimate": 146,
+              "truncation_reason": null,
+              "analysis_method": "full_text",
+              "attention_tier": "medium",
+              "theme": "macro",
+              "attention_reason": "Article discusses China's banks adjusting USD deposit rates, which relates to macro-economic policy.",
+              "must_keep": true,
+              "model_used": "meta-llama/llama-4-scout-17b-16e-instruct",
+              "delayed_retry_attempted": false,
+              "delayed_retry_model_chain": [],
+              "delayed_retry_final_model": null,
+              "error_classification": null,
+              "error": null
+            },
+            {
               "source_article_id": "4424669",
               "title": "雙滙豬肉抗生素超標近38倍 國務院食安辦設工作組督導查處",
               "canonical_url": "https://www.hkej.com/instantnews/china/article/4424669/%E9%9B%99%E6%BB%99%E8%B1%AC%E8%82%89%E6%8A%97%E7%94%9F%E7%B4%A0%E8%B6%85%E6%A8%99%E8%BF%9138%E5%80%8D+%E5%9C%8B%E5%8B%99%E9%99%A2%E9%A3%9F%E5%AE%89%E8%BE%A6%E8%A8%AD%E5%B7%A5%E4%BD%9C%E7%B5%84%E7%9D%A3%E5%B0%8E%E6%9F%A5%E8%99%95",
@@ -2897,22 +3780,6 @@
               "error": null
             },
             {
-              "source_article_id": "4424685",
-              "canonical_url": "https://www.hkej.com/instantnews/china/article/4424685/%E4%BA%BA%E6%B0%91%E5%B9%A3%E8%B5%B0%E5%8B%A2%E4%B8%A8CNY%E6%94%B6%E5%8D%8756%E9%BB%9E%E5%AD%90+%E5%8F%97%E5%81%8F%E7%B5%90%E6%BB%99%E9%9C%80%E6%B1%82%E6%94%AF%E6%92%90",
-              "title": "人民幣走勢丨CNY收升56點子 受偏結滙需求支撐",
-              "section": "中國財經",
-              "published_at": "2026-06-05T17:28:00+08:00",
-              "attention_tier": "light",
-              "novelty_score": 5,
-              "relevance_score": 5,
-              "urgency_score": 5,
-              "named_entities": [],
-              "key_points": [],
-              "content_truncated": false,
-              "analysis_method": "bypassed",
-              "model_used": "direct"
-            },
-            {
               "source_article_id": "4424364",
               "title": "銀行業傳推遲在華活動 內地整治跨境投資",
               "canonical_url": "https://www.hkej.com/instantnews/china/article/4424364/%E9%8A%80%E8%A1%8C%E6%A5%AD%E5%82%B3%E6%8E%A8%E9%81%B2%E5%9C%A8%E8%8F%AF%E6%B4%BB%E5%8B%95+%E5%85%A7%E5%9C%B0%E6%95%B4%E6%B2%BB%E8%B7%A8%E5%A2%83%E6%8A%95%E8%B3%87",
@@ -2961,6 +3828,25 @@
               "delayed_retry_final_model": null,
               "error_classification": null,
               "error": null
+            },
+            {
+              "source_article_id": "4424685",
+              "canonical_url": "https://www.hkej.com/instantnews/china/article/4424685/%E4%BA%BA%E6%B0%91%E5%B9%A3%E8%B5%B0%E5%8B%A2%E4%B8%A8CNY%E6%94%B6%E5%8D%8756%E9%BB%9E%E5%AD%90+%E5%8F%97%E5%81%8F%E7%B5%90%E6%BB%99%E9%9C%80%E6%B1%82%E6%94%AF%E6%92%90",
+              "title": "人民幣走勢丨CNY收升56點子 受偏結滙需求支撐",
+              "section": "中國財經",
+              "published_at": "2026-06-05T17:28:00+08:00",
+              "attention_tier": "medium",
+              "novelty_score": 5,
+              "relevance_score": 5,
+              "urgency_score": 5,
+              "named_entities": [],
+              "key_points": [],
+              "content_truncated": false,
+              "analysis_method": "bypassed",
+              "model_used": "direct",
+              "theme": "macro",
+              "attention_reason": "High-signal macro headline based on title/summary keywords.",
+              "must_keep": true
             },
             {
               "source_article_id": "4424496",
@@ -3014,19 +3900,16 @@
       ],
       "analysis_profile": "standard",
       "model_used": "meta-llama/llama-4-scout-17b-16e-instruct",
-      "sub_batch_count": 7,
+      "sub_batch_count": 5,
       "diagnostics": {
-        "sub_batch_count": 4,
-        "split_reasons": [
-          "pre_send_budget"
-        ],
+        "sub_batch_count": 5,
+        "split_reasons": [],
         "models_attempted": [
-          "meta-llama/llama-4-scout-17b-16e-instruct",
-          "qwen/qwen3-32b"
+          "meta-llama/llama-4-scout-17b-16e-instruct"
         ],
-        "estimated_input_tokens_max": 1558,
-        "serialized_request_bytes_max": 9430,
-        "rate_limit_waits": 1,
+        "estimated_input_tokens_max": 773,
+        "serialized_request_bytes_max": 5081,
+        "rate_limit_waits": 0,
         "partial_article_count": 0,
         "synthesis_wait_seconds_total": 0.0,
         "synthesis_retry_count": 0,
@@ -3034,7 +3917,7 @@
         "synthesis_budget_exhausted": false,
         "degraded_merge_used": false,
         "degraded_merge_reason": "",
-        "synthesis_merge_depth_max": 1,
+        "synthesis_merge_depth_max": 0,
         "model_switches": []
       },
       "error": null
@@ -3045,7 +3928,7 @@
       "status": "success",
       "key_developments": [
         "新世界發展夥拍港鐵合作發展的沙田大圍站上蓋發展項目柏傲莊第3期柏傲莊III售出2伙，合共套現5868.2萬元。",
-        "信置及中電集團合作發展的St. George's Mansions以2510萬港元售出2房間隔單位，實用呎價32853元",
+        "CCL丨二手樓價指數反彈 今年暫升近一成",
         "恒地夥拍希慎興業、帝國集團和市區重建局的紅磡首岸第4期，提供264個單位，設有2房至3房戶型。"
       ],
       "named_entities": [
@@ -3062,7 +3945,7 @@
           "type": "asset"
         },
         {
-          "name": "信置",
+          "name": "恒地",
           "type": "company"
         }
       ],
@@ -3380,7 +4263,10 @@
           "key_points": [],
           "content_truncated": false,
           "analysis_method": "bypassed",
-          "model_used": "direct"
+          "model_used": "direct",
+          "theme": "property",
+          "attention_reason": "Lighter treatment because this story sits in the 地產新聞 section without strong market-moving signals.",
+          "must_keep": false
         }
       ],
       "subgroups": [
@@ -3390,7 +4276,7 @@
           "article_count": 8,
           "key_developments": [
             "新世界發展夥拍港鐵合作發展的沙田大圍站上蓋發展項目柏傲莊第3期柏傲莊III售出2伙，合共套現5868.2萬元。",
-            "信置及中電集團合作發展的St. George's Mansions以2510萬港元售出2房間隔單位，實用呎價32853元",
+            "CCL丨二手樓價指數反彈 今年暫升近一成",
             "恒地夥拍希慎興業、帝國集團和市區重建局的紅磡首岸第4期，提供264個單位，設有2房至3房戶型。"
           ],
           "named_entities": [
@@ -3407,7 +4293,7 @@
               "type": "asset"
             },
             {
-              "name": "信置",
+              "name": "恒地",
               "type": "company"
             }
           ],
@@ -3725,7 +4611,10 @@
               "key_points": [],
               "content_truncated": false,
               "analysis_method": "bypassed",
-              "model_used": "direct"
+              "model_used": "direct",
+              "theme": "property",
+              "attention_reason": "Lighter treatment because this story sits in the 地產新聞 section without strong market-moving signals.",
+              "must_keep": false
             }
           ],
           "model_used": "meta-llama/llama-4-scout-17b-16e-instruct"
@@ -3733,18 +4622,13 @@
       ],
       "analysis_profile": "light",
       "model_used": "meta-llama/llama-4-scout-17b-16e-instruct",
-      "sub_batch_count": 6,
+      "sub_batch_count": 3,
       "diagnostics": {
         "sub_batch_count": 3,
-        "split_reasons": [
-          "pre_send_budget"
-        ],
-        "models_attempted": [
-          "meta-llama/llama-4-scout-17b-16e-instruct",
-          "qwen/qwen3-32b"
-        ],
-        "estimated_input_tokens_max": 1498,
-        "serialized_request_bytes_max": 8652,
+        "split_reasons": [],
+        "models_attempted": [],
+        "estimated_input_tokens_max": 0,
+        "serialized_request_bytes_max": 0,
         "rate_limit_waits": 0,
         "partial_article_count": 0,
         "synthesis_wait_seconds_total": 0.0,
@@ -3753,11 +4637,18 @@
         "synthesis_budget_exhausted": false,
         "degraded_merge_used": false,
         "degraded_merge_reason": "",
-        "synthesis_merge_depth_max": 1,
+        "synthesis_merge_depth_max": 0,
         "model_switches": []
       },
       "error": null
     }
   ],
-  "errors": []
+  "errors": [
+    {
+      "type": "category",
+      "target": "國際財經",
+      "message": "Category 國際財經 exhausted synthesis wait budget after 1900.8 seconds.",
+      "classification": "unexpected_error"
+    }
+  ]
 }
