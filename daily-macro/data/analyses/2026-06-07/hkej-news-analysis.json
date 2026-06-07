@@ -1,15 +1,15 @@
 {
   "report_schema_version": 6,
   "report_date": "2026-06-07",
-  "generated_at": "2026-06-07T10:35:18.750454+00:00",
+  "generated_at": "2026-06-07T22:14:52.642295+00:00",
   "source_site": "hkej",
-  "status": "success",
-  "executive_summary": [
+  "status": "partial",
+  "executive_summary": [],
+  "legacy_executive_summary": [
     "韓圜兌美元滙率一度跌破1550，創2009年以來最弱水平。",
     "OPEC今日舉行第41次部長級網上會議，討論7月進一步增產以抑壓因中東戰事令油價持續飆升問題。",
     "SpaceX IPO吸引約1500億美元資金認購，超額認購1倍。"
   ],
-  "legacy_executive_summary": [],
   "model": {
     "provider": "groq",
     "primary_model": "meta-llama/llama-4-scout-17b-16e-instruct",
@@ -20,18 +20,18 @@
   },
   "model_switches": [],
   "input": {
-    "article_count": 34,
+    "article_count": 40,
     "category_count": 5
   },
   "diagnostics": {
     "rate_limit_wait_count": 1,
-    "rate_limit_wait_seconds_total": 1641.599,
+    "rate_limit_wait_seconds_total": 1814.4,
     "fallback_switch_count": 0,
     "key_rotation_count": 0,
     "pre_send_split_count": 6,
     "response_413_split_count": 0,
     "json_repair_retry_count": 0,
-    "batch_count": 33,
+    "batch_count": 22,
     "failed_batch_count": 0,
     "delayed_retry_candidate_count": 0,
     "delayed_retry_attempted_count": 0,
@@ -40,22 +40,22 @@
     "high_medium_unresolved_count": 0,
     "light_unresolved_count": 0,
     "delayed_retry_skipped_final_model_count": 0,
-    "synthesis_budget_exhausted_count": 0,
+    "synthesis_budget_exhausted_count": 1,
     "degraded_merge_count": 0
   },
   "incremental": {
-    "reused_successful_articles": 0,
-    "new_articles_analyzed": 34,
+    "reused_successful_articles": 34,
+    "new_articles_analyzed": 6,
     "retried_previous_day_articles": 0,
     "previous_day_retry_successes": 0
   },
   "daily_stats": {
-    "total_scraped": 34,
-    "analyzed": 34,
+    "total_scraped": 40,
+    "analyzed": 40,
     "success_rate": 100.0
   },
   "macro_release_digest": {
-    "generated_at": "2026-06-07T10:07:26.495054+00:00",
+    "generated_at": "2026-06-07T21:44:20.518994+00:00",
     "window_start": "2026-06-07",
     "window_end": "2026-06-13",
     "fetch_status": "failed",
@@ -67,13 +67,13 @@
   },
   "unresolved_articles": [],
   "totals": {
-    "article_count": 34,
-    "successful_article_analyses": 34,
+    "article_count": 40,
+    "successful_article_analyses": 40,
     "failed_article_analyses": 0,
-    "full_text_article_count": 34,
+    "full_text_article_count": 40,
     "truncated_article_count": 0,
-    "successful_categories": 5,
-    "partial_categories": 0,
+    "successful_categories": 4,
+    "partial_categories": 1,
     "failed_categories": 0
   },
   "market_context": [],
@@ -85,8 +85,8 @@
       "key_developments": [
         "韓圜兌美元滙率一度跌破1550，創2009年以來最弱水平。",
         "OPEC今日舉行第41次部長級網上會議，討論7月進一步增產以抑壓因中東戰事令油價持續飆升問題。",
-        "SpaceX IPO吸引約1500億美元資金認購，超額認購1倍。",
-        "紐約期油上周五每桶報90.54美元，今年以來暫累升約57%。"
+        "紐約期油上周五每桶報90.54美元，今年以來暫累升約57%，布蘭特期油報93.09美元，今年以來累升逾52.9%。",
+        "SpaceX IPO吸引約1500億美元資金認購，超額認購1倍。"
       ],
       "named_entities": [
         {
@@ -104,10 +104,6 @@
         {
           "name": "SpaceX",
           "type": "company"
-        },
-        {
-          "name": "美元",
-          "type": "other"
         }
       ],
       "articles": [
@@ -320,8 +316,8 @@
           "key_developments": [
             "韓圜兌美元滙率一度跌破1550，創2009年以來最弱水平。",
             "OPEC今日舉行第41次部長級網上會議，討論7月進一步增產以抑壓因中東戰事令油價持續飆升問題。",
-            "SpaceX IPO吸引約1500億美元資金認購，超額認購1倍。",
-            "紐約期油上周五每桶報90.54美元，今年以來暫累升約57%。"
+            "紐約期油上周五每桶報90.54美元，今年以來暫累升約57%，布蘭特期油報93.09美元，今年以來累升逾52.9%。",
+            "SpaceX IPO吸引約1500億美元資金認購，超額認購1倍。"
           ],
           "named_entities": [
             {
@@ -339,10 +335,6 @@
             {
               "name": "SpaceX",
               "type": "company"
-            },
-            {
-              "name": "美元",
-              "type": "other"
             }
           ],
           "articles": [
@@ -552,15 +544,13 @@
       ],
       "analysis_profile": "standard",
       "model_used": "meta-llama/llama-4-scout-17b-16e-instruct",
-      "sub_batch_count": 5,
+      "sub_batch_count": 1,
       "diagnostics": {
-        "sub_batch_count": 4,
+        "sub_batch_count": 1,
         "split_reasons": [],
-        "models_attempted": [
-          "meta-llama/llama-4-scout-17b-16e-instruct"
-        ],
-        "estimated_input_tokens_max": 1281,
-        "serialized_request_bytes_max": 6158,
+        "models_attempted": [],
+        "estimated_input_tokens_max": 0,
+        "serialized_request_bytes_max": 0,
         "rate_limit_waits": 0,
         "partial_article_count": 0,
         "synthesis_wait_seconds_total": 0.0,
@@ -576,16 +566,16 @@
     },
     {
       "category": "時事脈搏",
-      "article_count": 19,
+      "article_count": 22,
       "status": "success",
       "key_developments": [],
       "named_entities": [
         {
-          "name": "美國",
+          "name": "伊朗",
           "type": "country"
         },
         {
-          "name": "伊朗",
+          "name": "美國",
           "type": "country"
         },
         {
@@ -598,6 +588,54 @@
         }
       ],
       "articles": [
+        {
+          "source_article_id": "4425597",
+          "canonical_url": "https://www.hkej.com/instantnews/current/article/4425597/%E7%AB%8B%E6%B3%95%E6%9C%83%E5%91%A8%E4%B8%80%E4%B8%AD%E5%8D%88%E5%8A%A0%E6%9C%83+%E6%96%99%E6%B6%89%E5%9C%8B%E5%AE%89%E8%AD%B0%E9%A1%8C",
+          "title": "立法會周一中午加會 料涉國安議題",
+          "section": "時事脈搏",
+          "published_at": "2026-06-07T22:50:00+08:00",
+          "attention_tier": "light",
+          "novelty_score": 5,
+          "relevance_score": 5,
+          "urgency_score": 5,
+          "named_entities": [],
+          "key_points": [],
+          "content_truncated": false,
+          "analysis_method": "bypassed",
+          "model_used": "direct"
+        },
+        {
+          "source_article_id": "4425593",
+          "canonical_url": "https://www.hkej.com/instantnews/current/article/4425593/%E9%9B%99%E9%9D%9E%E5%AC%B0%E8%85%A6%E7%99%B1%E6%A1%88%E4%B8%A8%E9%86%AB%E5%A7%94%E6%9C%83%E6%8A%BC%E5%BE%8C%E8%87%B37%E6%9C%885%E6%97%A5%E8%A3%81%E6%B1%BA",
+          "title": "雙非嬰腦癱案丨醫委會押後至7月5日裁決",
+          "section": "時事脈搏",
+          "published_at": "2026-06-07T20:00:00+08:00",
+          "attention_tier": "light",
+          "novelty_score": 5,
+          "relevance_score": 5,
+          "urgency_score": 5,
+          "named_entities": [],
+          "key_points": [],
+          "content_truncated": false,
+          "analysis_method": "bypassed",
+          "model_used": "direct"
+        },
+        {
+          "source_article_id": "4425579",
+          "canonical_url": "https://www.hkej.com/instantnews/current/article/4425579/%E6%B8%AF%E7%94%A2%E8%88%AA%E5%A4%A9%E5%93%A1%E4%B8%A8%E7%A5%9E23%E4%B9%98%E7%B5%84%E7%A9%A9%E6%AD%A5%E6%8E%A8%E9%80%B2%E5%9C%A8%E8%BB%8C%E5%B7%A5%E4%BD%9C",
+          "title": "港產航天員丨神23乘組穩步推進在軌工作",
+          "section": "時事脈搏",
+          "published_at": "2026-06-07T18:23:00+08:00",
+          "attention_tier": "light",
+          "novelty_score": 5,
+          "relevance_score": 5,
+          "urgency_score": 5,
+          "named_entities": [],
+          "key_points": [],
+          "content_truncated": false,
+          "analysis_method": "bypassed",
+          "model_used": "direct"
+        },
         {
           "source_article_id": "4425578",
           "canonical_url": "https://www.hkej.com/instantnews/current/article/4425578/%E5%A4%A9%E6%96%87%E5%8F%B0%E6%8C%87%E4%BB%8A%E6%99%9A%E8%87%B3%E5%91%A8%E4%BA%8C%E5%88%9D%E6%99%82%E5%A4%A9%E6%B0%A3%E4%B8%8D%E7%A9%A9+%E6%88%96%E7%99%BC%E6%9A%B4%E9%9B%A8%E8%AD%A6%E5%91%8A",
@@ -612,7 +650,10 @@
           "key_points": [],
           "content_truncated": false,
           "analysis_method": "bypassed",
-          "model_used": "direct"
+          "model_used": "direct",
+          "theme": "general",
+          "attention_reason": "Lighter treatment because this story sits in the 時事脈搏 section without strong market-moving signals.",
+          "must_keep": false
         },
         {
           "source_article_id": "4425576",
@@ -628,7 +669,10 @@
           "key_points": [],
           "content_truncated": false,
           "analysis_method": "bypassed",
-          "model_used": "direct"
+          "model_used": "direct",
+          "theme": "general",
+          "attention_reason": "Lighter treatment because this story sits in the 時事脈搏 section without strong market-moving signals.",
+          "must_keep": false
         },
         {
           "source_article_id": "4425575",
@@ -644,7 +688,10 @@
           "key_points": [],
           "content_truncated": false,
           "analysis_method": "bypassed",
-          "model_used": "direct"
+          "model_used": "direct",
+          "theme": "general",
+          "attention_reason": "Lighter treatment because this story sits in the 時事脈搏 section without strong market-moving signals.",
+          "must_keep": false
         },
         {
           "source_article_id": "4425574",
@@ -660,7 +707,10 @@
           "key_points": [],
           "content_truncated": false,
           "analysis_method": "bypassed",
-          "model_used": "direct"
+          "model_used": "direct",
+          "theme": "general",
+          "attention_reason": "Lighter treatment because this story sits in the 時事脈搏 section without strong market-moving signals.",
+          "must_keep": false
         },
         {
           "source_article_id": "4425572",
@@ -676,7 +726,10 @@
           "key_points": [],
           "content_truncated": false,
           "analysis_method": "bypassed",
-          "model_used": "direct"
+          "model_used": "direct",
+          "theme": "general",
+          "attention_reason": "Lighter treatment because this story sits in the 時事脈搏 section without strong market-moving signals.",
+          "must_keep": false
         },
         {
           "source_article_id": "4425569",
@@ -692,7 +745,10 @@
           "key_points": [],
           "content_truncated": false,
           "analysis_method": "bypassed",
-          "model_used": "direct"
+          "model_used": "direct",
+          "theme": "general",
+          "attention_reason": "Lighter treatment because this story sits in the 時事脈搏 section without strong market-moving signals.",
+          "must_keep": false
         },
         {
           "source_article_id": "4425563",
@@ -708,7 +764,10 @@
           "key_points": [],
           "content_truncated": false,
           "analysis_method": "bypassed",
-          "model_used": "direct"
+          "model_used": "direct",
+          "theme": "general",
+          "attention_reason": "Lighter treatment because this story sits in the 時事脈搏 section without strong market-moving signals.",
+          "must_keep": false
         },
         {
           "source_article_id": "4425560",
@@ -769,7 +828,10 @@
           "key_points": [],
           "content_truncated": false,
           "analysis_method": "bypassed",
-          "model_used": "direct"
+          "model_used": "direct",
+          "theme": "general",
+          "attention_reason": "Lighter treatment because this story sits in the 時事脈搏 section without strong market-moving signals.",
+          "must_keep": false
         },
         {
           "source_article_id": "4425556",
@@ -785,7 +847,10 @@
           "key_points": [],
           "content_truncated": false,
           "analysis_method": "bypassed",
-          "model_used": "direct"
+          "model_used": "direct",
+          "theme": "general",
+          "attention_reason": "Lighter treatment because this story sits in the 時事脈搏 section without strong market-moving signals.",
+          "must_keep": false
         },
         {
           "source_article_id": "4425555",
@@ -801,7 +866,10 @@
           "key_points": [],
           "content_truncated": false,
           "analysis_method": "bypassed",
-          "model_used": "direct"
+          "model_used": "direct",
+          "theme": "general",
+          "attention_reason": "Lighter treatment because this story sits in the 時事脈搏 section without strong market-moving signals.",
+          "must_keep": false
         },
         {
           "source_article_id": "4425554",
@@ -817,7 +885,10 @@
           "key_points": [],
           "content_truncated": false,
           "analysis_method": "bypassed",
-          "model_used": "direct"
+          "model_used": "direct",
+          "theme": "general",
+          "attention_reason": "Lighter treatment because this story sits in the 時事脈搏 section without strong market-moving signals.",
+          "must_keep": false
         },
         {
           "source_article_id": "4425553",
@@ -833,7 +904,10 @@
           "key_points": [],
           "content_truncated": false,
           "analysis_method": "bypassed",
-          "model_used": "direct"
+          "model_used": "direct",
+          "theme": "general",
+          "attention_reason": "Lighter treatment because this story sits in the 時事脈搏 section without strong market-moving signals.",
+          "must_keep": false
         },
         {
           "source_article_id": "4425551",
@@ -894,7 +968,10 @@
           "key_points": [],
           "content_truncated": false,
           "analysis_method": "bypassed",
-          "model_used": "direct"
+          "model_used": "direct",
+          "theme": "general",
+          "attention_reason": "Lighter treatment because this story sits in the 時事脈搏 section without strong market-moving signals.",
+          "must_keep": false
         },
         {
           "source_article_id": "4425548",
@@ -910,7 +987,10 @@
           "key_points": [],
           "content_truncated": false,
           "analysis_method": "bypassed",
-          "model_used": "direct"
+          "model_used": "direct",
+          "theme": "general",
+          "attention_reason": "Lighter treatment because this story sits in the 時事脈搏 section without strong market-moving signals.",
+          "must_keep": false
         },
         {
           "source_article_id": "4425546",
@@ -926,7 +1006,10 @@
           "key_points": [],
           "content_truncated": false,
           "analysis_method": "bypassed",
-          "model_used": "direct"
+          "model_used": "direct",
+          "theme": "general",
+          "attention_reason": "Lighter treatment because this story sits in the 時事脈搏 section without strong market-moving signals.",
+          "must_keep": false
         },
         {
           "source_article_id": "4425547",
@@ -942,7 +1025,10 @@
           "key_points": [],
           "content_truncated": false,
           "analysis_method": "bypassed",
-          "model_used": "direct"
+          "model_used": "direct",
+          "theme": "general",
+          "attention_reason": "Lighter treatment because this story sits in the 時事脈搏 section without strong market-moving signals.",
+          "must_keep": false
         },
         {
           "source_article_id": "4425544",
@@ -958,18 +1044,303 @@
           "key_points": [],
           "content_truncated": false,
           "analysis_method": "bypassed",
-          "model_used": "direct"
+          "model_used": "direct",
+          "theme": "general",
+          "attention_reason": "Lighter treatment because this story sits in the 時事脈搏 section without strong market-moving signals.",
+          "must_keep": false
         }
       ],
       "subgroups": [
         {
-          "title": "國際局勢 & Other News",
-          "theme_rationale": "關注國際事件和局勢發展",
+          "title": "國際事件 & Other News",
+          "theme_rationale": "包含國際政治、社會事件等",
           "article_count": 12,
+          "key_developments": [
+            "伊朗國家足球隊15名人員被拒入境美國",
+            "美國俄亥俄州發生槍擊多人受傷",
+            "金與正:北韓絕不放棄核國家地位"
+          ],
+          "named_entities": [
+            {
+              "name": "伊朗",
+              "type": "country"
+            },
+            {
+              "name": "美國",
+              "type": "country"
+            },
+            {
+              "name": "俄亥俄州",
+              "type": "other"
+            },
+            {
+              "name": "北韓",
+              "type": "country"
+            }
+          ],
+          "articles": [
+            {
+              "source_article_id": "4425551",
+              "title": "世界盃丨伊朗國足據報15人員被拒入境美國",
+              "canonical_url": "https://www.hkej.com/instantnews/current/article/4425551/%E4%B8%96%E7%95%8C%E7%9B%83%E4%B8%A8%E4%BC%8A%E6%9C%97%E5%9C%8B%E8%B6%B3%E6%93%9A%E5%A0%B115%E4%BA%BA%E5%93%A1%E8%A2%AB%E6%8B%92%E5%85%A5%E5%A2%83%E7%BE%8E%E5%9C%8B+",
+              "published_at": "2026-06-07T10:45:00+08:00",
+              "section": "時事脈搏",
+              "novelty_score": 4,
+              "relevance_score": 5,
+              "urgency_score": 6,
+              "named_entities": [
+                {
+                  "name": "伊朗",
+                  "type": "country"
+                },
+                {
+                  "name": "美國",
+                  "type": "country"
+                },
+                {
+                  "name": "墨西哥",
+                  "type": "country"
+                }
+              ],
+              "key_points": [
+                "伊朗國家足球隊前往墨西哥參與世界盃決賽周賽事。",
+                "包括足協主席、副主席等15名人員被拒入境美國。"
+              ],
+              "content_truncated": false,
+              "original_content_length_chars": 278,
+              "analyzed_content_length_chars": 278,
+              "original_content_token_estimate": 70,
+              "analyzed_content_token_estimate": 70,
+              "truncation_reason": null,
+              "analysis_method": "full_text",
+              "attention_tier": "high",
+              "theme": "geopolitics",
+              "attention_reason": "High-signal geopolitics headline based on title/summary keywords.",
+              "must_keep": true,
+              "model_used": "meta-llama/llama-4-scout-17b-16e-instruct",
+              "delayed_retry_attempted": false,
+              "delayed_retry_model_chain": [],
+              "delayed_retry_final_model": null,
+              "error_classification": null,
+              "error": null
+            },
+            {
+              "source_article_id": "4425548",
+              "canonical_url": "https://www.hkej.com/instantnews/current/article/4425548/%E7%BE%8E%E5%9C%8B%E5%A4%A7%E5%AD%B8%E7%94%9F%E8%88%87%E5%AE%B6%E4%BA%BA%E9%81%8A%E6%97%A5%E5%A4%B1%E8%B8%AA%E9%80%BE1%E5%91%A8+%E4%BA%AC%E9%83%BD%E9%83%8A%E5%A4%96%E5%B0%8B%E7%8D%B2%E9%81%BA%E9%AB%94",
+              "title": "美國大學生與家人遊日失踪逾1周 京都郊外尋獲遺體",
+              "section": "時事脈搏",
+              "published_at": "2026-06-07T10:13:00+08:00",
+              "attention_tier": "light",
+              "novelty_score": 5,
+              "relevance_score": 5,
+              "urgency_score": 5,
+              "named_entities": [],
+              "key_points": [],
+              "content_truncated": false,
+              "analysis_method": "bypassed",
+              "model_used": "direct",
+              "theme": "general",
+              "attention_reason": "Lighter treatment because this story sits in the 時事脈搏 section without strong market-moving signals.",
+              "must_keep": false
+            },
+            {
+              "source_article_id": "4425546",
+              "canonical_url": "https://www.hkej.com/instantnews/current/article/4425546/%E6%A7%8D%E6%93%8A%E4%B8%A8%E7%BE%8E%E5%9C%8B%E4%BF%84%E4%BA%A5%E4%BF%84%E5%B7%9E%E7%99%BC%E7%94%9F%E6%A7%8D%E6%93%8A%E5%A4%9A%E4%BA%BA%E5%8F%97%E5%82%B7",
+              "title": "槍擊丨美國俄亥俄州發生槍擊多人受傷",
+              "section": "時事脈搏",
+              "published_at": "2026-06-07T09:52:00+08:00",
+              "attention_tier": "light",
+              "novelty_score": 5,
+              "relevance_score": 5,
+              "urgency_score": 5,
+              "named_entities": [],
+              "key_points": [],
+              "content_truncated": false,
+              "analysis_method": "bypassed",
+              "model_used": "direct",
+              "theme": "general",
+              "attention_reason": "Lighter treatment because this story sits in the 時事脈搏 section without strong market-moving signals.",
+              "must_keep": false
+            },
+            {
+              "source_article_id": "4425547",
+              "canonical_url": "https://www.hkej.com/instantnews/current/article/4425547/%E9%87%91%E8%88%87%E6%AD%A3%3A%E5%8C%97%E9%9F%93%E7%B5%95%E4%B8%8D%E6%94%BE%E6%A3%84%E6%A0%B8%E5%9C%8B%E5%AE%B6%E5%9C%B0%E4%BD%8D",
+              "title": "金與正:北韓絕不放棄核國家地位",
+              "section": "時事脈搏",
+              "published_at": "2026-06-07T09:42:00+08:00",
+              "attention_tier": "light",
+              "novelty_score": 5,
+              "relevance_score": 5,
+              "urgency_score": 5,
+              "named_entities": [],
+              "key_points": [],
+              "content_truncated": false,
+              "analysis_method": "bypassed",
+              "model_used": "direct",
+              "theme": "general",
+              "attention_reason": "Lighter treatment because this story sits in the 時事脈搏 section without strong market-moving signals.",
+              "must_keep": false
+            },
+            {
+              "source_article_id": "4425544",
+              "canonical_url": "https://www.hkej.com/instantnews/current/article/4425544/%E5%A4%A9%E6%B0%A3%E4%B8%A8%E5%A4%9A%E9%9B%B2%E6%9C%89%E5%B9%BE%E9%99%A3%E9%A9%9F%E9%9B%A8+%E6%9C%80%E9%AB%98%E6%B0%A3%E6%BA%AB%E7%B4%8431%E5%BA%A6",
+              "title": "天氣丨多雲有幾陣驟雨 最高氣溫約31度",
+              "section": "時事脈搏",
+              "published_at": "2026-06-07T09:11:00+08:00",
+              "attention_tier": "light",
+              "novelty_score": 5,
+              "relevance_score": 5,
+              "urgency_score": 5,
+              "named_entities": [],
+              "key_points": [],
+              "content_truncated": false,
+              "analysis_method": "bypassed",
+              "model_used": "direct",
+              "theme": "general",
+              "attention_reason": "Lighter treatment because this story sits in the 時事脈搏 section without strong market-moving signals.",
+              "must_keep": false
+            },
+            {
+              "source_article_id": "4425576",
+              "canonical_url": "https://www.hkej.com/instantnews/current/article/4425576/%E7%BE%8E%E9%98%B2%E9%95%B7%E6%89%B9%E6%AD%90%E6%B4%B2%E7%A7%BB%E6%B0%91%E6%94%BF%E7%AD%96+%E6%8C%87%E4%B8%8D%E5%90%8C%E5%8D%B1%E9%9A%AA%E6%84%8F%E8%AD%98%E5%BD%A2%E6%85%8B%E4%BA%BA%E5%A3%AB%E6%B9%A7%E5%85%A5",
+              "title": "美防長批歐洲移民政策 指不同危險意識形態人士湧入",
+              "section": "時事脈搏",
+              "published_at": "2026-06-07T16:57:00+08:00",
+              "attention_tier": "light",
+              "novelty_score": 5,
+              "relevance_score": 5,
+              "urgency_score": 5,
+              "named_entities": [],
+              "key_points": [],
+              "content_truncated": false,
+              "analysis_method": "bypassed",
+              "model_used": "direct",
+              "theme": "general",
+              "attention_reason": "Lighter treatment because this story sits in the 時事脈搏 section without strong market-moving signals.",
+              "must_keep": false
+            },
+            {
+              "source_article_id": "4425579",
+              "canonical_url": "https://www.hkej.com/instantnews/current/article/4425579/%E6%B8%AF%E7%94%A2%E8%88%AA%E5%A4%A9%E5%93%A1%E4%B8%A8%E7%A5%9E23%E4%B9%98%E7%B5%84%E7%A9%A9%E6%AD%A5%E6%8E%A8%E9%80%B2%E5%9C%A8%E8%BB%8C%E5%B7%A5%E4%BD%9C",
+              "title": "港產航天員丨神23乘組穩步推進在軌工作",
+              "section": "時事脈搏",
+              "published_at": "2026-06-07T18:23:00+08:00",
+              "attention_tier": "light",
+              "novelty_score": 5,
+              "relevance_score": 5,
+              "urgency_score": 5,
+              "named_entities": [],
+              "key_points": [],
+              "content_truncated": false,
+              "analysis_method": "bypassed",
+              "model_used": "direct"
+            },
+            {
+              "source_article_id": "4425572",
+              "canonical_url": "https://www.hkej.com/instantnews/current/article/4425572/%E9%83%AD%E4%BF%8A%E5%B3%AF%E7%B1%B2%E5%B9%B4%E8%BC%95%E4%BA%BA%E7%94%A8%E8%A1%8C%E5%8B%95%E6%88%90%E7%82%BA%E5%BB%BA%E8%A8%AD%E7%A4%BE%E6%9C%83%E6%96%B0%E5%8A%9B%E9%87%8F",
+              "title": "郭俊峯籲年輕人用行動成為建設社會新力量",
+              "section": "時事脈搏",
+              "published_at": "2026-06-07T15:28:00+08:00",
+              "attention_tier": "light",
+              "novelty_score": 5,
+              "relevance_score": 5,
+              "urgency_score": 5,
+              "named_entities": [],
+              "key_points": [],
+              "content_truncated": false,
+              "analysis_method": "bypassed",
+              "model_used": "direct",
+              "theme": "general",
+              "attention_reason": "Lighter treatment because this story sits in the 時事脈搏 section without strong market-moving signals.",
+              "must_keep": false
+            },
+            {
+              "source_article_id": "4425574",
+              "canonical_url": "https://www.hkej.com/instantnews/current/article/4425574/%E8%B2%BF%E7%99%BC%E5%B1%8060%E5%91%A8%E5%B9%B4%E5%9B%9B%E4%BD%8D%E5%89%8D%E4%B8%BB%E5%B8%AD%E8%AB%96%E5%A3%87+%E9%A6%AC%E6%99%82%E4%BA%A8%3A%E6%9C%80%E9%9B%A3%E9%82%80%E8%AB%8B%E5%90%B3%E5%85%89%E6%AD%A3",
+              "title": "貿發局60周年四位前主席論壇 馬時亨:最難邀請吳光正",
+              "section": "時事脈搏",
+              "published_at": "2026-06-07T16:04:00+08:00",
+              "attention_tier": "light",
+              "novelty_score": 5,
+              "relevance_score": 5,
+              "urgency_score": 5,
+              "named_entities": [],
+              "key_points": [],
+              "content_truncated": false,
+              "analysis_method": "bypassed",
+              "model_used": "direct",
+              "theme": "general",
+              "attention_reason": "Lighter treatment because this story sits in the 時事脈搏 section without strong market-moving signals.",
+              "must_keep": false
+            },
+            {
+              "source_article_id": "4425555",
+              "canonical_url": "https://www.hkej.com/instantnews/current/article/4425555/%E6%B8%AF%E5%8F%A3%E7%A4%BE%E5%8D%80%E7%B3%BB%E7%B5%B1%E5%B7%B2%E6%9C%89%E9%80%BE6000%E4%BC%81%E6%A5%AD%E7%99%BB%E8%A8%98%E4%BD%BF%E7%94%A8",
+              "title": "港口社區系統已有逾6000企業登記使用",
+              "section": "時事脈搏",
+              "published_at": "2026-06-07T11:38:00+08:00",
+              "attention_tier": "light",
+              "novelty_score": 5,
+              "relevance_score": 5,
+              "urgency_score": 5,
+              "named_entities": [],
+              "key_points": [],
+              "content_truncated": false,
+              "analysis_method": "bypassed",
+              "model_used": "direct",
+              "theme": "general",
+              "attention_reason": "Lighter treatment because this story sits in the 時事脈搏 section without strong market-moving signals.",
+              "must_keep": false
+            },
+            {
+              "source_article_id": "4425554",
+              "canonical_url": "https://www.hkej.com/instantnews/current/article/4425554/%E6%9E%97%E5%A4%A9%E7%A6%8F%3A%E4%B8%AD%E4%BA%9E%E6%88%96%E5%8F%AF%E6%88%90%E4%BA%9E%E6%B4%B2%E8%88%87%E6%AD%90%E6%B4%B2%E8%B2%A8%E9%81%8B%E9%87%8D%E8%A6%81%E6%A8%9E%E7%B4%90",
+              "title": "林天福:中亞或可成亞洲與歐洲貨運重要樞紐",
+              "section": "時事脈搏",
+              "published_at": "2026-06-07T11:21:00+08:00",
+              "attention_tier": "light",
+              "novelty_score": 5,
+              "relevance_score": 5,
+              "urgency_score": 5,
+              "named_entities": [],
+              "key_points": [],
+              "content_truncated": false,
+              "analysis_method": "bypassed",
+              "model_used": "direct",
+              "theme": "general",
+              "attention_reason": "Lighter treatment because this story sits in the 時事脈搏 section without strong market-moving signals.",
+              "must_keep": false
+            },
+            {
+              "source_article_id": "4425550",
+              "canonical_url": "https://www.hkej.com/instantnews/current/article/4425550/%E7%88%86%E7%B2%97%E6%A0%A1%E9%95%B7%E8%A2%AB%E7%82%92+%E6%9D%8E%E5%8D%93%E8%88%88%3A%E5%B7%B2%E5%A7%94%E8%A8%97%E5%BE%8B%E5%B8%AB%E9%87%90%E6%B8%85%E6%AC%8A%E7%9B%8A+",
+              "title": "爆粗校長被炒 李卓興:已委託律師釐清權益",
+              "section": "時事脈搏",
+              "published_at": "2026-06-07T10:28:00+08:00",
+              "attention_tier": "light",
+              "novelty_score": 5,
+              "relevance_score": 5,
+              "urgency_score": 5,
+              "named_entities": [],
+              "key_points": [],
+              "content_truncated": false,
+              "analysis_method": "bypassed",
+              "model_used": "direct",
+              "theme": "general",
+              "attention_reason": "Lighter treatment because this story sits in the 時事脈搏 section without strong market-moving signals.",
+              "must_keep": false
+            }
+          ],
+          "model_used": "meta-llama/llama-4-scout-17b-16e-instruct"
+        },
+        {
+          "title": "國際時事",
+          "theme_rationale": "與國際政治、經濟相關的新聞",
+          "article_count": 4,
           "key_developments": [
             "美軍周日凌晨擊落兩架伊朗的攻擊無人機，是美軍連續第二日採取類似行動。",
             "伊朗革命衞隊向美軍在中東地區的軍事目標發射導彈還擊。",
-            "伊朗國家足球隊15名人員被拒入境美國"
+            "金正恩視察軍需企業，指示導彈產量提升至2.5倍"
           ],
           "named_entities": [
             {
@@ -977,8 +1348,16 @@
               "type": "country"
             },
             {
+              "name": "以色列",
+              "type": "country"
+            },
+            {
               "name": "伊朗",
               "type": "country"
+            },
+            {
+              "name": "金正恩",
+              "type": "person"
             }
           ],
           "articles": [
@@ -1041,14 +1420,82 @@
               "key_points": [],
               "content_truncated": false,
               "analysis_method": "bypassed",
-              "model_used": "direct"
+              "model_used": "direct",
+              "theme": "general",
+              "attention_reason": "Lighter treatment because this story sits in the 時事脈搏 section without strong market-moving signals.",
+              "must_keep": false
             },
             {
-              "source_article_id": "4425559",
-              "canonical_url": "https://www.hkej.com/instantnews/current/article/4425559/%E6%A7%8D%E6%93%8A%E4%B8%A8%E7%BE%8E%E5%9C%8B%E4%BF%84%E4%BA%A5%E4%BF%84%E5%B7%9E%E6%A7%8D%E6%93%8A%E4%BA%8B%E4%BB%B6%E6%9C%80%E5%B0%9112%E4%BA%BA%E5%82%B7",
-              "title": "槍擊丨美國俄亥俄州槍擊事件最少12人傷",
+              "source_article_id": "4425569",
+              "canonical_url": "https://www.hkej.com/instantnews/current/article/4425569/%E5%8D%97%E9%9F%93%E7%A4%BA%E5%A8%81%E8%80%85%E5%8C%85%E5%9C%8D%E9%BB%9E%E7%A5%A8%E4%B8%AD%E5%BF%83+%E8%A6%81%E6%B1%82%E5%9C%B0%E6%96%B9%E9%81%B8%E8%88%89%E9%87%8D%E9%81%B8",
+              "title": "南韓示威者包圍點票中心 要求地方選舉重選",
               "section": "時事脈搏",
-              "published_at": "2026-06-07T12:21:00+08:00",
+              "published_at": "2026-06-07T14:58:00+08:00",
+              "attention_tier": "light",
+              "novelty_score": 5,
+              "relevance_score": 5,
+              "urgency_score": 5,
+              "named_entities": [],
+              "key_points": [],
+              "content_truncated": false,
+              "analysis_method": "bypassed",
+              "model_used": "direct",
+              "theme": "general",
+              "attention_reason": "Lighter treatment because this story sits in the 時事脈搏 section without strong market-moving signals.",
+              "must_keep": false
+            },
+            {
+              "source_article_id": "4425575",
+              "canonical_url": "https://www.hkej.com/instantnews/current/article/4425575/%E5%A4%A9%E6%B0%A3%E4%B8%A8%E8%A5%BF%E8%B2%A2%E4%B8%8B%E5%8D%88%E9%8C%84%E9%80%BE50%E6%AF%AB%E7%B1%B3%E9%9B%A8%E9%87%8F+%E6%98%8E%E6%97%A5%E6%96%99%E5%A4%9A%E9%9B%B2%E6%9C%89%E9%A9%9F%E9%9B%A8",
+              "title": "天氣丨西貢下午錄逾50毫米雨量 明日料多雲有驟雨",
+              "section": "時事脈搏",
+              "published_at": "2026-06-07T16:26:00+08:00",
+              "attention_tier": "light",
+              "novelty_score": 5,
+              "relevance_score": 5,
+              "urgency_score": 5,
+              "named_entities": [],
+              "key_points": [],
+              "content_truncated": false,
+              "analysis_method": "bypassed",
+              "model_used": "direct",
+              "theme": "general",
+              "attention_reason": "Lighter treatment because this story sits in the 時事脈搏 section without strong market-moving signals.",
+              "must_keep": false
+            }
+          ],
+          "model_used": "meta-llama/llama-4-scout-17b-16e-instruct"
+        },
+        {
+          "title": "社會新聞",
+          "theme_rationale": "與社會民生相關的新聞事件",
+          "article_count": 3,
+          "key_developments": [
+            "Legislative Council to hold an additional meeting on Monday at noon, likely to discuss national security issues.",
+            "The Medical Council has postponed the decision on the 'double non-local' infant cerebral palsy case to July 5.",
+            "The Observatory warned of unstable weather tonight and tomorrow, with a possibility of issuing a rainstorm warning."
+          ],
+          "named_entities": [
+            {
+              "name": "Legislative Council",
+              "type": "institution"
+            },
+            {
+              "name": "Medical Council",
+              "type": "institution"
+            },
+            {
+              "name": "Observatory",
+              "type": "institution"
+            }
+          ],
+          "articles": [
+            {
+              "source_article_id": "4425597",
+              "canonical_url": "https://www.hkej.com/instantnews/current/article/4425597/%E7%AB%8B%E6%B3%95%E6%9C%83%E5%91%A8%E4%B8%80%E4%B8%AD%E5%8D%88%E5%8A%A0%E6%9C%83+%E6%96%99%E6%B6%89%E5%9C%8B%E5%AE%89%E8%AD%B0%E9%A1%8C",
+              "title": "立法會周一中午加會 料涉國安議題",
+              "section": "時事脈搏",
+              "published_at": "2026-06-07T22:50:00+08:00",
               "attention_tier": "light",
               "novelty_score": 5,
               "relevance_score": 5,
@@ -1060,11 +1507,11 @@
               "model_used": "direct"
             },
             {
-              "source_article_id": "4425569",
-              "canonical_url": "https://www.hkej.com/instantnews/current/article/4425569/%E5%8D%97%E9%9F%93%E7%A4%BA%E5%A8%81%E8%80%85%E5%8C%85%E5%9C%8D%E9%BB%9E%E7%A5%A8%E4%B8%AD%E5%BF%83+%E8%A6%81%E6%B1%82%E5%9C%B0%E6%96%B9%E9%81%B8%E8%88%89%E9%87%8D%E9%81%B8",
-              "title": "南韓示威者包圍點票中心 要求地方選舉重選",
+              "source_article_id": "4425593",
+              "canonical_url": "https://www.hkej.com/instantnews/current/article/4425593/%E9%9B%99%E9%9D%9E%E5%AC%B0%E8%85%A6%E7%99%B1%E6%A1%88%E4%B8%A8%E9%86%AB%E5%A7%94%E6%9C%83%E6%8A%BC%E5%BE%8C%E8%87%B37%E6%9C%885%E6%97%A5%E8%A3%81%E6%B1%BA",
+              "title": "雙非嬰腦癱案丨醫委會押後至7月5日裁決",
               "section": "時事脈搏",
-              "published_at": "2026-06-07T14:58:00+08:00",
+              "published_at": "2026-06-07T20:00:00+08:00",
               "attention_tier": "light",
               "novelty_score": 5,
               "relevance_score": 5,
@@ -1089,160 +1536,22 @@
               "key_points": [],
               "content_truncated": false,
               "analysis_method": "bypassed",
-              "model_used": "direct"
-            },
-            {
-              "source_article_id": "4425575",
-              "canonical_url": "https://www.hkej.com/instantnews/current/article/4425575/%E5%A4%A9%E6%B0%A3%E4%B8%A8%E8%A5%BF%E8%B2%A2%E4%B8%8B%E5%8D%88%E9%8C%84%E9%80%BE50%E6%AF%AB%E7%B1%B3%E9%9B%A8%E9%87%8F+%E6%98%8E%E6%97%A5%E6%96%99%E5%A4%9A%E9%9B%B2%E6%9C%89%E9%A9%9F%E9%9B%A8",
-              "title": "天氣丨西貢下午錄逾50毫米雨量 明日料多雲有驟雨",
-              "section": "時事脈搏",
-              "published_at": "2026-06-07T16:26:00+08:00",
-              "attention_tier": "light",
-              "novelty_score": 5,
-              "relevance_score": 5,
-              "urgency_score": 5,
-              "named_entities": [],
-              "key_points": [],
-              "content_truncated": false,
-              "analysis_method": "bypassed",
-              "model_used": "direct"
-            },
-            {
-              "source_article_id": "4425576",
-              "canonical_url": "https://www.hkej.com/instantnews/current/article/4425576/%E7%BE%8E%E9%98%B2%E9%95%B7%E6%89%B9%E6%AD%90%E6%B4%B2%E7%A7%BB%E6%B0%91%E6%94%BF%E7%AD%96+%E6%8C%87%E4%B8%8D%E5%90%8C%E5%8D%B1%E9%9A%AA%E6%84%8F%E8%AD%98%E5%BD%A2%E6%85%8B%E4%BA%BA%E5%A3%AB%E6%B9%A7%E5%85%A5",
-              "title": "美防長批歐洲移民政策 指不同危險意識形態人士湧入",
-              "section": "時事脈搏",
-              "published_at": "2026-06-07T16:57:00+08:00",
-              "attention_tier": "light",
-              "novelty_score": 5,
-              "relevance_score": 5,
-              "urgency_score": 5,
-              "named_entities": [],
-              "key_points": [],
-              "content_truncated": false,
-              "analysis_method": "bypassed",
-              "model_used": "direct"
-            },
-            {
-              "source_article_id": "4425574",
-              "canonical_url": "https://www.hkej.com/instantnews/current/article/4425574/%E8%B2%BF%E7%99%BC%E5%B1%8060%E5%91%A8%E5%B9%B4%E5%9B%9B%E4%BD%8D%E5%89%8D%E4%B8%BB%E5%B8%AD%E8%AB%96%E5%A3%87+%E9%A6%AC%E6%99%82%E4%BA%A8%3A%E6%9C%80%E9%9B%A3%E9%82%80%E8%AB%8B%E5%90%B3%E5%85%89%E6%AD%A3",
-              "title": "貿發局60周年四位前主席論壇 馬時亨:最難邀請吳光正",
-              "section": "時事脈搏",
-              "published_at": "2026-06-07T16:04:00+08:00",
-              "attention_tier": "light",
-              "novelty_score": 5,
-              "relevance_score": 5,
-              "urgency_score": 5,
-              "named_entities": [],
-              "key_points": [],
-              "content_truncated": false,
-              "analysis_method": "bypassed",
-              "model_used": "direct"
-            },
-            {
-              "source_article_id": "4425572",
-              "canonical_url": "https://www.hkej.com/instantnews/current/article/4425572/%E9%83%AD%E4%BF%8A%E5%B3%AF%E7%B1%B2%E5%B9%B4%E8%BC%95%E4%BA%BA%E7%94%A8%E8%A1%8C%E5%8B%95%E6%88%90%E7%82%BA%E5%BB%BA%E8%A8%AD%E7%A4%BE%E6%9C%83%E6%96%B0%E5%8A%9B%E9%87%8F",
-              "title": "郭俊峯籲年輕人用行動成為建設社會新力量",
-              "section": "時事脈搏",
-              "published_at": "2026-06-07T15:28:00+08:00",
-              "attention_tier": "light",
-              "novelty_score": 5,
-              "relevance_score": 5,
-              "urgency_score": 5,
-              "named_entities": [],
-              "key_points": [],
-              "content_truncated": false,
-              "analysis_method": "bypassed",
-              "model_used": "direct"
-            },
-            {
-              "source_article_id": "4425551",
-              "title": "世界盃丨伊朗國足據報15人員被拒入境美國",
-              "canonical_url": "https://www.hkej.com/instantnews/current/article/4425551/%E4%B8%96%E7%95%8C%E7%9B%83%E4%B8%A8%E4%BC%8A%E6%9C%97%E5%9C%8B%E8%B6%B3%E6%93%9A%E5%A0%B115%E4%BA%BA%E5%93%A1%E8%A2%AB%E6%8B%92%E5%85%A5%E5%A2%83%E7%BE%8E%E5%9C%8B+",
-              "published_at": "2026-06-07T10:45:00+08:00",
-              "section": "時事脈搏",
-              "novelty_score": 4,
-              "relevance_score": 5,
-              "urgency_score": 6,
-              "named_entities": [
-                {
-                  "name": "伊朗",
-                  "type": "country"
-                },
-                {
-                  "name": "美國",
-                  "type": "country"
-                },
-                {
-                  "name": "墨西哥",
-                  "type": "country"
-                }
-              ],
-              "key_points": [
-                "伊朗國家足球隊前往墨西哥參與世界盃決賽周賽事。",
-                "包括足協主席、副主席等15名人員被拒入境美國。"
-              ],
-              "content_truncated": false,
-              "original_content_length_chars": 278,
-              "analyzed_content_length_chars": 278,
-              "original_content_token_estimate": 70,
-              "analyzed_content_token_estimate": 70,
-              "truncation_reason": null,
-              "analysis_method": "full_text",
-              "attention_tier": "high",
-              "theme": "geopolitics",
-              "attention_reason": "High-signal geopolitics headline based on title/summary keywords.",
-              "must_keep": true,
-              "model_used": "meta-llama/llama-4-scout-17b-16e-instruct",
-              "delayed_retry_attempted": false,
-              "delayed_retry_model_chain": [],
-              "delayed_retry_final_model": null,
-              "error_classification": null,
-              "error": null
-            },
-            {
-              "source_article_id": "4425554",
-              "canonical_url": "https://www.hkej.com/instantnews/current/article/4425554/%E6%9E%97%E5%A4%A9%E7%A6%8F%3A%E4%B8%AD%E4%BA%9E%E6%88%96%E5%8F%AF%E6%88%90%E4%BA%9E%E6%B4%B2%E8%88%87%E6%AD%90%E6%B4%B2%E8%B2%A8%E9%81%8B%E9%87%8D%E8%A6%81%E6%A8%9E%E7%B4%90",
-              "title": "林天福:中亞或可成亞洲與歐洲貨運重要樞紐",
-              "section": "時事脈搏",
-              "published_at": "2026-06-07T11:21:00+08:00",
-              "attention_tier": "light",
-              "novelty_score": 5,
-              "relevance_score": 5,
-              "urgency_score": 5,
-              "named_entities": [],
-              "key_points": [],
-              "content_truncated": false,
-              "analysis_method": "bypassed",
-              "model_used": "direct"
-            },
-            {
-              "source_article_id": "4425544",
-              "canonical_url": "https://www.hkej.com/instantnews/current/article/4425544/%E5%A4%A9%E6%B0%A3%E4%B8%A8%E5%A4%9A%E9%9B%B2%E6%9C%89%E5%B9%BE%E9%99%A3%E9%A9%9F%E9%9B%A8+%E6%9C%80%E9%AB%98%E6%B0%A3%E6%BA%AB%E7%B4%8431%E5%BA%A6",
-              "title": "天氣丨多雲有幾陣驟雨 最高氣溫約31度",
-              "section": "時事脈搏",
-              "published_at": "2026-06-07T09:11:00+08:00",
-              "attention_tier": "light",
-              "novelty_score": 5,
-              "relevance_score": 5,
-              "urgency_score": 5,
-              "named_entities": [],
-              "key_points": [],
-              "content_truncated": false,
-              "analysis_method": "bypassed",
-              "model_used": "direct"
+              "model_used": "direct",
+              "theme": "general",
+              "attention_reason": "Lighter treatment because this story sits in the 時事脈搏 section without strong market-moving signals.",
+              "must_keep": false
             }
           ],
           "model_used": "meta-llama/llama-4-scout-17b-16e-instruct"
         },
         {
-          "title": "國際新聞",
-          "theme_rationale": "國際新聞相關報導",
-          "article_count": 4,
+          "title": "社會事件",
+          "theme_rationale": "與社會熱點事件相關",
+          "article_count": 3,
           "key_developments": [
-            "美國俄亥俄州發生槍擊事件，多人受傷",
-            "北韓領導人金與正表示絕不放棄核國家地位",
-            "美國大學生與家人遊日失踪，遺體在京都郊外被發現"
+            "美國俄亥俄州發生槍擊事件，至少12人受傷",
+            "全國高考開考，1290萬考生報考",
+            "比特幣價格上漲至62682.35美元，漲幅2.98%"
           ],
           "named_entities": [
             {
@@ -1254,21 +1563,17 @@
               "type": "other"
             },
             {
-              "name": "北韓",
-              "type": "country"
-            },
-            {
-              "name": "金與正",
-              "type": "person"
+              "name": "比特幣",
+              "type": "asset"
             }
           ],
           "articles": [
             {
-              "source_article_id": "4425548",
-              "canonical_url": "https://www.hkej.com/instantnews/current/article/4425548/%E7%BE%8E%E5%9C%8B%E5%A4%A7%E5%AD%B8%E7%94%9F%E8%88%87%E5%AE%B6%E4%BA%BA%E9%81%8A%E6%97%A5%E5%A4%B1%E8%B8%AA%E9%80%BE1%E5%91%A8+%E4%BA%AC%E9%83%BD%E9%83%8A%E5%A4%96%E5%B0%8B%E7%8D%B2%E9%81%BA%E9%AB%94",
-              "title": "美國大學生與家人遊日失踪逾1周 京都郊外尋獲遺體",
+              "source_article_id": "4425559",
+              "canonical_url": "https://www.hkej.com/instantnews/current/article/4425559/%E6%A7%8D%E6%93%8A%E4%B8%A8%E7%BE%8E%E5%9C%8B%E4%BF%84%E4%BA%A5%E4%BF%84%E5%B7%9E%E6%A7%8D%E6%93%8A%E4%BA%8B%E4%BB%B6%E6%9C%80%E5%B0%9112%E4%BA%BA%E5%82%B7",
+              "title": "槍擊丨美國俄亥俄州槍擊事件最少12人傷",
               "section": "時事脈搏",
-              "published_at": "2026-06-07T10:13:00+08:00",
+              "published_at": "2026-06-07T12:21:00+08:00",
               "attention_tier": "light",
               "novelty_score": 5,
               "relevance_score": 5,
@@ -1277,83 +1582,11 @@
               "key_points": [],
               "content_truncated": false,
               "analysis_method": "bypassed",
-              "model_used": "direct"
+              "model_used": "direct",
+              "theme": "general",
+              "attention_reason": "Lighter treatment because this story sits in the 時事脈搏 section without strong market-moving signals.",
+              "must_keep": false
             },
-            {
-              "source_article_id": "4425546",
-              "canonical_url": "https://www.hkej.com/instantnews/current/article/4425546/%E6%A7%8D%E6%93%8A%E4%B8%A8%E7%BE%8E%E5%9C%8B%E4%BF%84%E4%BA%A5%E4%BF%84%E5%B7%9E%E7%99%BC%E7%94%9F%E6%A7%8D%E6%93%8A%E5%A4%9A%E4%BA%BA%E5%8F%97%E5%82%B7",
-              "title": "槍擊丨美國俄亥俄州發生槍擊多人受傷",
-              "section": "時事脈搏",
-              "published_at": "2026-06-07T09:52:00+08:00",
-              "attention_tier": "light",
-              "novelty_score": 5,
-              "relevance_score": 5,
-              "urgency_score": 5,
-              "named_entities": [],
-              "key_points": [],
-              "content_truncated": false,
-              "analysis_method": "bypassed",
-              "model_used": "direct"
-            },
-            {
-              "source_article_id": "4425547",
-              "canonical_url": "https://www.hkej.com/instantnews/current/article/4425547/%E9%87%91%E8%88%87%E6%AD%A3%3A%E5%8C%97%E9%9F%93%E7%B5%95%E4%B8%8D%E6%94%BE%E6%A3%84%E6%A0%B8%E5%9C%8B%E5%AE%B6%E5%9C%B0%E4%BD%8D",
-              "title": "金與正:北韓絕不放棄核國家地位",
-              "section": "時事脈搏",
-              "published_at": "2026-06-07T09:42:00+08:00",
-              "attention_tier": "light",
-              "novelty_score": 5,
-              "relevance_score": 5,
-              "urgency_score": 5,
-              "named_entities": [],
-              "key_points": [],
-              "content_truncated": false,
-              "analysis_method": "bypassed",
-              "model_used": "direct"
-            },
-            {
-              "source_article_id": "4425550",
-              "canonical_url": "https://www.hkej.com/instantnews/current/article/4425550/%E7%88%86%E7%B2%97%E6%A0%A1%E9%95%B7%E8%A2%AB%E7%82%92+%E6%9D%8E%E5%8D%93%E8%88%88%3A%E5%B7%B2%E5%A7%94%E8%A8%97%E5%BE%8B%E5%B8%AB%E9%87%90%E6%B8%85%E6%AC%8A%E7%9B%8A+",
-              "title": "爆粗校長被炒 李卓興:已委託律師釐清權益",
-              "section": "時事脈搏",
-              "published_at": "2026-06-07T10:28:00+08:00",
-              "attention_tier": "light",
-              "novelty_score": 5,
-              "relevance_score": 5,
-              "urgency_score": 5,
-              "named_entities": [],
-              "key_points": [],
-              "content_truncated": false,
-              "analysis_method": "bypassed",
-              "model_used": "direct"
-            }
-          ],
-          "model_used": "meta-llama/llama-4-scout-17b-16e-instruct"
-        },
-        {
-          "title": "社會動態",
-          "theme_rationale": "關注國內社會議題和動態的新聞",
-          "article_count": 3,
-          "key_developments": [
-            "全國高考開考，1290萬考生報考",
-            "港口社區系統已有逾6000企業登記使用",
-            "雙非嬰腦癱案今結案陳詞"
-          ],
-          "named_entities": [
-            {
-              "name": "全國高考",
-              "type": "institution"
-            },
-            {
-              "name": "港口社區系統",
-              "type": "organization"
-            },
-            {
-              "name": "陳詞",
-              "type": "person"
-            }
-          ],
-          "articles": [
             {
               "source_article_id": "4425556",
               "canonical_url": "https://www.hkej.com/instantnews/current/article/4425556/%E9%9B%99%E9%9D%9E%E5%AC%B0%E8%85%A6%E7%99%B1%E6%A1%88%E4%BB%8A%E7%B5%90%E6%A1%88%E9%99%B3%E8%A9%9E",
@@ -1368,23 +1601,10 @@
               "key_points": [],
               "content_truncated": false,
               "analysis_method": "bypassed",
-              "model_used": "direct"
-            },
-            {
-              "source_article_id": "4425555",
-              "canonical_url": "https://www.hkej.com/instantnews/current/article/4425555/%E6%B8%AF%E5%8F%A3%E7%A4%BE%E5%8D%80%E7%B3%BB%E7%B5%B1%E5%B7%B2%E6%9C%89%E9%80%BE6000%E4%BC%81%E6%A5%AD%E7%99%BB%E8%A8%98%E4%BD%BF%E7%94%A8",
-              "title": "港口社區系統已有逾6000企業登記使用",
-              "section": "時事脈搏",
-              "published_at": "2026-06-07T11:38:00+08:00",
-              "attention_tier": "light",
-              "novelty_score": 5,
-              "relevance_score": 5,
-              "urgency_score": 5,
-              "named_entities": [],
-              "key_points": [],
-              "content_truncated": false,
-              "analysis_method": "bypassed",
-              "model_used": "direct"
+              "model_used": "direct",
+              "theme": "general",
+              "attention_reason": "Lighter treatment because this story sits in the 時事脈搏 section without strong market-moving signals.",
+              "must_keep": false
             },
             {
               "source_article_id": "4425553",
@@ -1400,7 +1620,10 @@
               "key_points": [],
               "content_truncated": false,
               "analysis_method": "bypassed",
-              "model_used": "direct"
+              "model_used": "direct",
+              "theme": "general",
+              "attention_reason": "Lighter treatment because this story sits in the 時事脈搏 section without strong market-moving signals.",
+              "must_keep": false
             }
           ],
           "model_used": "meta-llama/llama-4-scout-17b-16e-instruct"
@@ -1408,26 +1631,24 @@
       ],
       "analysis_profile": "light",
       "model_used": "meta-llama/llama-4-scout-17b-16e-instruct",
-      "sub_batch_count": 6,
+      "sub_batch_count": 8,
       "diagnostics": {
-        "sub_batch_count": 1,
-        "split_reasons": [
-          "pre_send_budget"
-        ],
+        "sub_batch_count": 8,
+        "split_reasons": [],
         "models_attempted": [
           "meta-llama/llama-4-scout-17b-16e-instruct"
         ],
-        "estimated_input_tokens_max": 1354,
-        "serialized_request_bytes_max": 5964,
-        "rate_limit_waits": 1,
+        "estimated_input_tokens_max": 1144,
+        "serialized_request_bytes_max": 7022,
+        "rate_limit_waits": 0,
         "partial_article_count": 0,
-        "synthesis_wait_seconds_total": 1641.599,
+        "synthesis_wait_seconds_total": 0.0,
         "synthesis_retry_count": 0,
         "synthesis_retry_skipped_count": 0,
         "synthesis_budget_exhausted": false,
         "degraded_merge_used": false,
         "degraded_merge_reason": "",
-        "synthesis_merge_depth_max": 1,
+        "synthesis_merge_depth_max": 0,
         "model_switches": []
       },
       "error": null
@@ -1444,11 +1665,11 @@
       ],
       "named_entities": [
         {
-          "name": "李家超",
+          "name": "馬時亨",
           "type": "person"
         },
         {
-          "name": "馬時亨",
+          "name": "李家超",
           "type": "person"
         },
         {
@@ -1456,12 +1677,12 @@
           "type": "country"
         },
         {
-          "name": "阿斯塔納國際金融中心",
-          "type": "institution"
+          "name": "貿發局",
+          "type": "organization"
         },
         {
-          "name": "烏茲別克",
-          "type": "country"
+          "name": "陳茂波",
+          "type": "person"
         }
       ],
       "articles": [
@@ -1628,11 +1849,11 @@
           ],
           "named_entities": [
             {
-              "name": "李家超",
+              "name": "馬時亨",
               "type": "person"
             },
             {
-              "name": "馬時亨",
+              "name": "李家超",
               "type": "person"
             },
             {
@@ -1640,12 +1861,12 @@
               "type": "country"
             },
             {
-              "name": "阿斯塔納國際金融中心",
-              "type": "institution"
+              "name": "貿發局",
+              "type": "organization"
             },
             {
-              "name": "烏茲別克",
-              "type": "country"
+              "name": "陳茂波",
+              "type": "person"
             }
           ],
           "articles": [
@@ -1804,15 +2025,13 @@
       ],
       "analysis_profile": "standard",
       "model_used": "meta-llama/llama-4-scout-17b-16e-instruct",
-      "sub_batch_count": 3,
+      "sub_batch_count": 1,
       "diagnostics": {
-        "sub_batch_count": 2,
+        "sub_batch_count": 1,
         "split_reasons": [],
-        "models_attempted": [
-          "meta-llama/llama-4-scout-17b-16e-instruct"
-        ],
-        "estimated_input_tokens_max": 1073,
-        "serialized_request_bytes_max": 6944,
+        "models_attempted": [],
+        "estimated_input_tokens_max": 0,
+        "serialized_request_bytes_max": 0,
         "rate_limit_waits": 0,
         "partial_article_count": 0,
         "synthesis_wait_seconds_total": 0.0,
@@ -1828,14 +2047,23 @@
     },
     {
       "category": "中國財經",
-      "article_count": 1,
+      "article_count": 2,
       "status": "success",
       "key_developments": [
+        "中國國家副主席韓正訪白羅斯，強調加強政策對接和產業合作。",
         "中國外滙儲備連升兩個月，5月底規模約34422億美元，較4月底上升317億美元，升幅0.93%。",
         "人民銀行連續19個月增加黃金儲備，5月底黃金儲備為7496萬盎斯，按月增32萬盎斯。",
-        "國家外滙管理局表示，內地經濟保持穩中有進發展態勢，為外滙儲備規模保持基本穩定提供支撐。"
+        "韓正歡迎白羅斯持續拓展對華貿易合作，促進中歐班列發展。"
       ],
       "named_entities": [
+        {
+          "name": "韓正",
+          "type": "person"
+        },
+        {
+          "name": "白羅斯",
+          "type": "country"
+        },
         {
           "name": "中國",
           "type": "country"
@@ -1847,13 +2075,55 @@
         {
           "name": "國家外滙管理局",
           "type": "institution"
-        },
-        {
-          "name": "黃金",
-          "type": "asset"
         }
       ],
       "articles": [
+        {
+          "source_article_id": "4425590",
+          "title": "韓正:歡迎白羅斯持續拓展對華貿易合作",
+          "canonical_url": "https://www.hkej.com/instantnews/china/article/4425590/%E9%9F%93%E6%AD%A3%3A%E6%AD%A1%E8%BF%8E%E7%99%BD%E7%BE%85%E6%96%AF%E6%8C%81%E7%BA%8C%E6%8B%93%E5%B1%95%E5%B0%8D%E8%8F%AF%E8%B2%BF%E6%98%93%E5%90%88%E4%BD%9C",
+          "published_at": "2026-06-07T19:25:00+08:00",
+          "section": "中國財經",
+          "novelty_score": 4,
+          "relevance_score": 6,
+          "urgency_score": 3,
+          "named_entities": [
+            {
+              "name": "韓正",
+              "type": "person"
+            },
+            {
+              "name": "白羅斯",
+              "type": "country"
+            },
+            {
+              "name": "中國",
+              "type": "country"
+            }
+          ],
+          "key_points": [
+            "中國國家副主席韓正訪白羅斯，強調加強政策對接和產業合作。",
+            "韓正歡迎白羅斯持續拓展對華貿易合作，促進中歐班列發展。",
+            "雙方目標是擴大貿易規模，培育數字經濟新業態。"
+          ],
+          "content_truncated": false,
+          "original_content_length_chars": 253,
+          "analyzed_content_length_chars": 253,
+          "original_content_token_estimate": 64,
+          "analyzed_content_token_estimate": 64,
+          "truncation_reason": null,
+          "analysis_method": "full_text",
+          "attention_tier": "medium",
+          "theme": "general",
+          "attention_reason": "Default medium attention because the story is relevant but not an obvious top-priority market mover.",
+          "must_keep": false,
+          "model_used": "meta-llama/llama-4-scout-17b-16e-instruct",
+          "delayed_retry_attempted": false,
+          "delayed_retry_model_chain": [],
+          "delayed_retry_final_model": null,
+          "error_classification": null,
+          "error": null
+        },
         {
           "source_article_id": "4425549",
           "title": "內地外滙儲備連升兩個月 連續19個月增持黃金",
@@ -1909,13 +2179,22 @@
         {
           "title": "中國財經 overview",
           "theme_rationale": "Single subgroup because the category size did not require thematic splitting.",
-          "article_count": 1,
+          "article_count": 2,
           "key_developments": [
+            "中國國家副主席韓正訪白羅斯，強調加強政策對接和產業合作。",
             "中國外滙儲備連升兩個月，5月底規模約34422億美元，較4月底上升317億美元，升幅0.93%。",
             "人民銀行連續19個月增加黃金儲備，5月底黃金儲備為7496萬盎斯，按月增32萬盎斯。",
-            "國家外滙管理局表示，內地經濟保持穩中有進發展態勢，為外滙儲備規模保持基本穩定提供支撐。"
+            "韓正歡迎白羅斯持續拓展對華貿易合作，促進中歐班列發展。"
           ],
           "named_entities": [
+            {
+              "name": "韓正",
+              "type": "person"
+            },
+            {
+              "name": "白羅斯",
+              "type": "country"
+            },
             {
               "name": "中國",
               "type": "country"
@@ -1927,13 +2206,55 @@
             {
               "name": "國家外滙管理局",
               "type": "institution"
-            },
-            {
-              "name": "黃金",
-              "type": "asset"
             }
           ],
           "articles": [
+            {
+              "source_article_id": "4425590",
+              "title": "韓正:歡迎白羅斯持續拓展對華貿易合作",
+              "canonical_url": "https://www.hkej.com/instantnews/china/article/4425590/%E9%9F%93%E6%AD%A3%3A%E6%AD%A1%E8%BF%8E%E7%99%BD%E7%BE%85%E6%96%AF%E6%8C%81%E7%BA%8C%E6%8B%93%E5%B1%95%E5%B0%8D%E8%8F%AF%E8%B2%BF%E6%98%93%E5%90%88%E4%BD%9C",
+              "published_at": "2026-06-07T19:25:00+08:00",
+              "section": "中國財經",
+              "novelty_score": 4,
+              "relevance_score": 6,
+              "urgency_score": 3,
+              "named_entities": [
+                {
+                  "name": "韓正",
+                  "type": "person"
+                },
+                {
+                  "name": "白羅斯",
+                  "type": "country"
+                },
+                {
+                  "name": "中國",
+                  "type": "country"
+                }
+              ],
+              "key_points": [
+                "中國國家副主席韓正訪白羅斯，強調加強政策對接和產業合作。",
+                "韓正歡迎白羅斯持續拓展對華貿易合作，促進中歐班列發展。",
+                "雙方目標是擴大貿易規模，培育數字經濟新業態。"
+              ],
+              "content_truncated": false,
+              "original_content_length_chars": 253,
+              "analyzed_content_length_chars": 253,
+              "original_content_token_estimate": 64,
+              "analyzed_content_token_estimate": 64,
+              "truncation_reason": null,
+              "analysis_method": "full_text",
+              "attention_tier": "medium",
+              "theme": "general",
+              "attention_reason": "Default medium attention because the story is relevant but not an obvious top-priority market mover.",
+              "must_keep": false,
+              "model_used": "meta-llama/llama-4-scout-17b-16e-instruct",
+              "delayed_retry_attempted": false,
+              "delayed_retry_model_chain": [],
+              "delayed_retry_final_model": null,
+              "error_classification": null,
+              "error": null
+            },
             {
               "source_article_id": "4425549",
               "title": "內地外滙儲備連升兩個月 連續19個月增持黃金",
@@ -1990,15 +2311,15 @@
       ],
       "analysis_profile": "standard",
       "model_used": "meta-llama/llama-4-scout-17b-16e-instruct",
-      "sub_batch_count": 2,
+      "sub_batch_count": 3,
       "diagnostics": {
-        "sub_batch_count": 1,
+        "sub_batch_count": 3,
         "split_reasons": [],
         "models_attempted": [
           "meta-llama/llama-4-scout-17b-16e-instruct"
         ],
-        "estimated_input_tokens_max": 656,
-        "serialized_request_bytes_max": 3962,
+        "estimated_input_tokens_max": 669,
+        "serialized_request_bytes_max": 3569,
         "rate_limit_waits": 0,
         "partial_article_count": 0,
         "synthesis_wait_seconds_total": 0.0,
@@ -2014,8 +2335,8 @@
     },
     {
       "category": "地產新聞",
-      "article_count": 7,
-      "status": "success",
+      "article_count": 9,
+      "status": "partial",
       "key_developments": [],
       "named_entities": [
         {
@@ -2036,6 +2357,88 @@
         }
       ],
       "articles": [
+        {
+          "source_article_id": "4425568",
+          "title": "太古城三房18年獲利1030萬",
+          "canonical_url": "https://www.hkej.com/instantnews/property/article/4425568/%E5%A4%AA%E5%8F%A4%E5%9F%8E%E4%B8%89%E6%88%BF18%E5%B9%B4%E7%8D%B2%E5%88%A91030%E8%90%AC",
+          "published_at": "2026-06-07T18:30:00+08:00",
+          "section": "二手市場",
+          "novelty_score": 4,
+          "relevance_score": 7,
+          "urgency_score": 3,
+          "named_entities": [
+            {
+              "name": "太古城",
+              "type": "other"
+            },
+            {
+              "name": "美聯物業",
+              "type": "company"
+            }
+          ],
+          "key_points": [
+            "太古城碧藤閣低層B室以2030萬元成交，實用呎價約19333元。",
+            "原業主持貨18年，賬面獲利約1030萬元，物業期內升值約1.03倍。"
+          ],
+          "content_truncated": false,
+          "original_content_length_chars": 176,
+          "analyzed_content_length_chars": 176,
+          "original_content_token_estimate": 44,
+          "analyzed_content_token_estimate": 44,
+          "truncation_reason": null,
+          "analysis_method": "full_text",
+          "attention_tier": "medium",
+          "theme": "general",
+          "attention_reason": "Default medium attention because the story is relevant but not an obvious top-priority market mover.",
+          "must_keep": false,
+          "model_used": "meta-llama/llama-4-scout-17b-16e-instruct",
+          "delayed_retry_attempted": false,
+          "delayed_retry_model_chain": [],
+          "delayed_retry_final_model": null,
+          "error_classification": null,
+          "error": null
+        },
+        {
+          "source_article_id": "4425580",
+          "title": "銀湖．天峰兩房17年升值1.25倍",
+          "canonical_url": "https://www.hkej.com/instantnews/property/article/4425580/%E9%8A%80%E6%B9%96%EF%BC%8E%E5%A4%A9%E5%B3%B0%E5%85%A9%E6%88%BF17%E5%B9%B4%E5%8D%87%E5%80%BC1.25%E5%80%8D",
+          "published_at": "2026-06-07T18:08:00+08:00",
+          "section": "二手市場",
+          "novelty_score": 4,
+          "relevance_score": 7,
+          "urgency_score": 3,
+          "named_entities": [
+            {
+              "name": "銀湖．天峰",
+              "type": "other"
+            },
+            {
+              "name": "中原地產",
+              "type": "company"
+            }
+          ],
+          "key_points": [
+            "銀湖．天峰8座中層G室以828萬元易手，實用呎價15305元。",
+            "原業主持貨17年，賬面獲利約460萬元或1.25倍。"
+          ],
+          "content_truncated": false,
+          "original_content_length_chars": 162,
+          "analyzed_content_length_chars": 162,
+          "original_content_token_estimate": 41,
+          "analyzed_content_token_estimate": 41,
+          "truncation_reason": null,
+          "analysis_method": "full_text",
+          "attention_tier": "medium",
+          "theme": "general",
+          "attention_reason": "Default medium attention because the story is relevant but not an obvious top-priority market mover.",
+          "must_keep": false,
+          "model_used": "meta-llama/llama-4-scout-17b-16e-instruct",
+          "delayed_retry_attempted": false,
+          "delayed_retry_model_chain": [],
+          "delayed_retry_final_model": null,
+          "error_classification": null,
+          "error": null
+        },
         {
           "source_article_id": "4425571",
           "title": "囍逸一房持貨10年僅賺61萬",
@@ -2678,18 +3081,15 @@
       ],
       "analysis_profile": "light",
       "model_used": "meta-llama/llama-4-scout-17b-16e-instruct",
-      "sub_batch_count": 6,
+      "sub_batch_count": 2,
       "diagnostics": {
-        "sub_batch_count": 3,
-        "split_reasons": [
-          "pre_send_budget"
-        ],
+        "sub_batch_count": 2,
+        "split_reasons": [],
         "models_attempted": [
-          "meta-llama/llama-4-scout-17b-16e-instruct",
-          "qwen/qwen3-32b"
+          "meta-llama/llama-4-scout-17b-16e-instruct"
         ],
-        "estimated_input_tokens_max": 1600,
-        "serialized_request_bytes_max": 9482,
+        "estimated_input_tokens_max": 813,
+        "serialized_request_bytes_max": 4231,
         "rate_limit_waits": 0,
         "partial_article_count": 0,
         "synthesis_wait_seconds_total": 0.0,
@@ -2701,8 +3101,15 @@
         "synthesis_merge_depth_max": 0,
         "model_switches": []
       },
-      "error": null
+      "error": "Category 地產新聞 exhausted synthesis wait budget after 1814.4 seconds."
     }
   ],
-  "errors": []
+  "errors": [
+    {
+      "type": "category",
+      "target": "地產新聞",
+      "message": "Category 地產新聞 exhausted synthesis wait budget after 1814.4 seconds.",
+      "classification": "unexpected_error"
+    }
+  ]
 }
