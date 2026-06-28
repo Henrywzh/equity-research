@@ -401,6 +401,37 @@ class AnalysisTests(unittest.TestCase):
         self.assertEqual(rejected["meta-llama/llama-4-scout-17b-16e-instruct"], "preview_model_disallowed")
         self.assertEqual(rejected["llama-3.3-70b-versatile"], "model_not_active")
 
+    def test_resolver_fallback_avoids_preview_when_all_rate_limited(self) -> None:
+        # When every production model is rate-limited past the cap and nothing
+        # scores, the resolver must fall back to an eligible production model,
+        # NOT model_chain[0] which is the preview Scout model the policy forbids.
+        resolver = ModelResolver(
+            active_model_ids={
+                "meta-llama/llama-4-scout-17b-16e-instruct",
+                "llama-3.1-8b-instant",
+            },
+            model_policy="production_only",
+            max_wait_seconds=20.0,
+        )
+        chain = [
+            ModelConfig("meta-llama/llama-4-scout-17b-16e-instruct"),  # preview, chain head
+            ModelConfig("llama-3.1-8b-instant"),  # production
+        ]
+
+        selected = resolver.resolve(
+            LLMTask.ARTICLE_ANALYSIS,
+            chain,
+            estimated_input_tokens=100,
+            requested_output_tokens=100,
+            rate_limit_waits={"llama-3.1-8b-instant": 9999.0},  # over the cap
+        )
+
+        self.assertEqual(selected.model.model_id, "llama-3.1-8b-instant")
+        reasons = {item["model_id"]: item["reason"] for item in selected.rejections}
+        self.assertEqual(
+            reasons["meta-llama/llama-4-scout-17b-16e-instruct"], "preview_model_disallowed"
+        )
+
     def test_model_resolver_prefers_different_models_for_routing_and_top_alerts(self) -> None:
         resolver = ModelResolver(
             active_model_ids={"llama-3.1-8b-instant", "llama-3.3-70b-versatile", "openai/gpt-oss-20b"},

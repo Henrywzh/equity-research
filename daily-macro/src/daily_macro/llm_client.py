@@ -15,6 +15,7 @@ import logging
 import math
 import os
 import random
+import re
 import threading
 import time
 from dataclasses import dataclass, field
@@ -125,6 +126,7 @@ class ModelResolver:
         task_preferences = self.task_preferences(task_value)
         rejections: list[dict[str, str]] = []
         scored: list[tuple[float, int, ModelConfig, float]] = []
+        wait_eligible: list[tuple[float, int, ModelConfig]] = []
         rate_limit_waits = rate_limit_waits or {}
 
         for index, model in enumerate(model_chain):
@@ -146,6 +148,10 @@ class ModelResolver:
                 rejections.append({"model_id": model.model_id, "reason": "output_limit_exceeded"})
                 continue
             wait_seconds = rate_limit_waits.get(model.model_id, 0.0)
+            # Passed every hard constraint (policy, active, json, context,
+            # output). Remember it as a fallback that respects those constraints
+            # even if its wait exceeds the cap.
+            wait_eligible.append((wait_seconds, index, model))
             if wait_seconds > self.max_wait_seconds:
                 rejections.append({"model_id": model.model_id, "reason": "rate_limit_wait_too_long"})
                 continue
@@ -164,7 +170,26 @@ class ModelResolver:
             _score, _index, model, wait_seconds = scored[0]
             return ModelSelection(model=model, rejections=rejections, avoided_wait_seconds=max(rate_limit_waits.get(preferred_model_id or "", 0.0) - wait_seconds, 0.0))
 
+        # Nothing scored within the wait cap. Prefer a model that satisfies every
+        # hard constraint (policy/active/context/output) and just has a long
+        # wait — the governor now caps the actual sleep — over silently
+        # returning model_chain[0], which may be a preview model the policy
+        # forbids or one whose context window can't fit the request.
+        if wait_eligible:
+            wait_eligible.sort(key=lambda item: (item[0], item[1]))
+            wait_seconds, _index, model = wait_eligible[0]
+            return ModelSelection(model=model, rejections=rejections, avoided_wait_seconds=0.0)
+
+        # Truly no eligible model (e.g. request too large for every context
+        # window, or no active production model). Fall back to the chain head as
+        # a last resort so the caller can surface a meaningful error.
         fallback = model_chain[0]
+        LOGGER.warning(
+            "Model resolver found no eligible model for task %s; falling back to %s. Rejections: %s",
+            task_value,
+            fallback.model_id,
+            rejections,
+        )
         return ModelSelection(model=fallback, rejections=rejections, avoided_wait_seconds=0.0)
 
 
@@ -291,8 +316,19 @@ def _classify_exception(exc: Exception) -> str:
 # ---------------------------------------------------------------------------
 
 
+# CJK ideographs, kana, and full-width punctuation tokenize at roughly one
+# token per character for the llama/Qwen tokenizers we target, unlike latin
+# text which averages ~4 chars/token. HKEJ content is predominantly Chinese, so
+# a flat len/4 heuristic undercounts by ~4x and lets oversized requests through.
+_CJK_RE = re.compile(r"[　-〿㐀-䶿一-鿿豈-﫿＀-￯]")
+
+
 def _estimate_tokens(text: str) -> int:
-    return math.ceil(len(text) / 4)
+    if not text:
+        return 0
+    cjk_chars = len(_CJK_RE.findall(text))
+    other_chars = len(text) - cjk_chars
+    return math.ceil(cjk_chars + other_chars / 4)
 
 
 def _estimate_messages_tokens(messages: list[dict[str, Any]]) -> int:

@@ -91,6 +91,18 @@ def test_request_timeouts_respect_env(monkeypatch):
     assert llm_client._llm_request_timeouts() == (5.0, 30.0, 90.0)
 
 
+def test_estimate_tokens_counts_cjk_per_char():
+    # CJK characters count ~1 token each; latin text ~4 chars/token.
+    assert llm_client._estimate_tokens("中文字符測試") == 6  # 6 CJK chars
+    assert llm_client._estimate_tokens("abcd") == 1  # 4 latin chars / 4
+    assert llm_client._estimate_tokens("") == 0
+    # Mixed: 4 CJK + 8 latin -> 4 + ceil(8/4) = 6
+    assert llm_client._estimate_tokens("關稅政策ABCDEFGH") == 6
+    # CJK estimate must exceed the old flat len/4 for Chinese text.
+    zh = "中美貿易談判最新進展，市場關注關稅政策變化。" * 5
+    assert llm_client._estimate_tokens(zh) > len(zh) // 4 * 2
+
+
 def test_request_timeouts_floor_deadline_to_connect_plus_read(monkeypatch):
     monkeypatch.setenv("DAILY_MACRO_LLM_CONNECT_TIMEOUT_SECONDS", "10")
     monkeypatch.setenv("DAILY_MACRO_LLM_READ_TIMEOUT_SECONDS", "60")
