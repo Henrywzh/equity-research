@@ -146,6 +146,7 @@ def _build_article_batch_messages(category_name: str, batch_articles: list[dict[
                             "analysis_method": article["analysis_method"],
                             "attention_tier": article.get("attention_tier"),
                             "theme": article.get("theme"),
+                            "research_lane": article.get("research_lane"),
                             "must_keep": article.get("must_keep"),
                         }
                         for article in batch_articles

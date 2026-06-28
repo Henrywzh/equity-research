@@ -77,8 +77,11 @@ from .types import (  # noqa: E402
 from .llm_client import (  # noqa: E402
     RateLimitGovernor,
     AnalysisRuntime,
+    LLMTask,
+    ModelResolver,
     load_groq_api_keys,
     load_groq_api_key,
+    load_active_groq_model_ids,
     _build_groq_session,
     _build_provider_session,
     _load_model_api_key,
@@ -191,8 +194,11 @@ def run_analysis(
         "market_snapshots": [],
         "macro_release_digest": {},
         "top_alerts": [],
+        "validation_issues": [],
+        "theme_memory": {},
         "report": {},
         "total_scraped_articles": total_scraped_articles,
+        "data_dir": resolved_data_dir,
     }
     final_state = graph.invoke(state)
     report = final_state["report"]
@@ -215,6 +221,8 @@ def _build_analysis_graph():
     graph.add_node("route_attention", _graph_route_attention)
     graph.add_node("analyze_today", _graph_analyze_today)
     graph.add_node("retry_previous_day", _graph_retry_previous_day)
+    graph.add_node("validate_outputs", _graph_validate_outputs)
+    graph.add_node("update_theme_memory", _graph_update_theme_memory)
     graph.add_node("summarize_top_alerts", _graph_summarize_top_alerts)
     graph.add_node("finalize", _graph_finalize)
     graph.add_edge(START, "initialize")
@@ -222,7 +230,9 @@ def _build_analysis_graph():
     graph.add_edge("fetch_market_data", "route_attention")
     graph.add_edge("route_attention", "analyze_today")
     graph.add_edge("analyze_today", "retry_previous_day")
-    graph.add_edge("retry_previous_day", "summarize_top_alerts")
+    graph.add_edge("retry_previous_day", "validate_outputs")
+    graph.add_edge("validate_outputs", "update_theme_memory")
+    graph.add_edge("update_theme_memory", "summarize_top_alerts")
     graph.add_edge("summarize_top_alerts", "finalize")
     graph.add_edge("finalize", END)
     return graph.compile()
@@ -239,10 +249,12 @@ def _graph_initialize(state: AnalysisGraphState) -> AnalysisGraphState:
             # Backward-compatible shim for tests and older single-key call sites.
             groq_keys = [load_groq_api_key()]
         LOGGER.info("Loaded %d Groq API key(s).", len(groq_keys))
+        active_model_ids = load_active_groq_model_ids(groq_keys[0])
         runtime = AnalysisRuntime(
             groq_api_keys=groq_keys,
             governor=RateLimitGovernor(),
             model_chain=[ModelConfig(PRIMARY_MODEL_ID), *(ModelConfig(model_id) for model_id in FALLBACK_MODEL_IDS)],
+            resolver=ModelResolver(active_model_ids=active_model_ids),
             delayed_retry_final_model=ModelConfig(
                 DELAYED_RETRY_FINAL_MODEL_ID,
                 provider="openai",
@@ -334,6 +346,34 @@ def _graph_retry_previous_day(state: AnalysisGraphState) -> AnalysisGraphState:
     finally:
         if runtime is not None:
             runtime.close_sessions()
+    return state
+
+
+def _graph_validate_outputs(state: AnalysisGraphState) -> AnalysisGraphState:
+    issues: list[dict[str, Any]] = []
+    for category in state.get("category_reports") or []:
+        for article in category.get("articles") or []:
+            if article.get("error"):
+                continue
+            key = article.get("source_article_id") or article.get("canonical_url")
+            if not key:
+                issues.append({"type": "article_validation", "category": category.get("category"), "reason": "missing_article_identifier"})
+            if article.get("model_used") != "direct" and not article.get("key_points"):
+                issues.append({"type": "article_validation", "category": category.get("category"), "reason": "missing_key_points", "target": key})
+            if str(article.get("research_lane") or "").strip() == "":
+                article["research_lane"] = _infer_research_lane(article)
+    state["validation_issues"] = issues
+    if issues and state.get("runtime") is not None:
+        state["runtime"].diagnostics.degraded_mode_count += 1
+    return state
+
+
+def _graph_update_theme_memory(state: AnalysisGraphState) -> AnalysisGraphState:
+    data_dir = state.get("data_dir")
+    if data_dir is None:
+        return state
+    memory = _update_theme_memory_file(Path(data_dir), state["target_date"], state.get("category_reports") or [])
+    state["theme_memory"] = memory
     return state
 
 
@@ -442,6 +482,8 @@ def _graph_finalize(state: AnalysisGraphState) -> AnalysisGraphState:
         macro_release_digest=state.get("macro_release_digest"),
         legacy_executive_summary=state.get("legacy_executive_summary"),
         newly_analyzed_keys=state.get("newly_analyzed_keys"),
+        validation_issues=state.get("validation_issues"),
+        theme_memory=state.get("theme_memory"),
     )
     _write_report(state["report_path"], report)
     state["report"] = report
@@ -510,6 +552,7 @@ def _prepare_single_article(article: dict[str, Any]) -> dict[str, Any]:
         "truncation_reason": selected["truncation_reason"],
         "attention_tier": attention["attention_tier"],
         "theme": attention["theme"],
+        "research_lane": attention["research_lane"],
         "attention_reason": attention["attention_reason"],
         "must_keep": attention["must_keep"],
     }
@@ -559,6 +602,7 @@ def _heuristic_attention_metadata(article: dict[str, Any]) -> dict[str, Any]:
     return {
         "attention_tier": tier,
         "theme": matched_theme,
+        "research_lane": _infer_research_lane({"theme": matched_theme, "attention_tier": tier, "article_section": section, "title": title}),
         "attention_reason": reason,
         "must_keep": must_keep,
     }
@@ -570,6 +614,7 @@ def _normalize_attention_metadata(metadata: dict[str, Any], article: dict[str, A
     if attention_tier not in ATTENTION_TIERS:
         attention_tier = heuristic["attention_tier"]
     theme = str(metadata.get("theme") or heuristic["theme"]).strip().lower() or heuristic["theme"]
+    research_lane = str(metadata.get("research_lane") or heuristic.get("research_lane") or "").strip() or _infer_research_lane({**article, "theme": theme, "attention_tier": attention_tier})
     attention_reason = str(metadata.get("attention_reason") or heuristic["attention_reason"]).strip() or heuristic["attention_reason"]
     must_keep_value = metadata.get("must_keep")
     if isinstance(must_keep_value, bool):
@@ -583,6 +628,7 @@ def _normalize_attention_metadata(metadata: dict[str, Any], article: dict[str, A
     return {
         "attention_tier": attention_tier,
         "theme": theme,
+        "research_lane": research_lane,
         "attention_reason": attention_reason,
         "must_keep": must_keep,
     }
@@ -735,6 +781,7 @@ def _route_batch_recursive(
         estimated_input_tokens=estimated_input_tokens,
         serialized_request_bytes=request_bytes,
         content_shrunk=False,
+        llm_task=LLMTask.ROUTING.value,
     )
 
     try:
@@ -1020,6 +1067,8 @@ def _finalize_report(
     macro_release_digest: dict[str, Any] | None = None,
     legacy_executive_summary: list[str] | None = None,
     newly_analyzed_keys: set[tuple[str | None, str]] | None = None,
+    validation_issues: list[dict[str, Any]] | None = None,
+    theme_memory: dict[str, Any] | None = None,
 ) -> dict[str, Any]:
     # Flag new articles
     if newly_analyzed_keys:
@@ -1054,7 +1103,8 @@ def _finalize_report(
         "generated_at": datetime.now().astimezone().isoformat(),
         "source_site": source_site,
         "status": status,
-        "executive_summary": top_alerts,
+        "executive_summary": _format_top_alerts_for_legacy(top_alerts),
+        "executive_summary_structured": _normalize_top_alerts(top_alerts, {}),
         "legacy_executive_summary": legacy_executive_summary or [],
         "model": {
             "provider": DEFAULT_PROVIDER,
@@ -1074,6 +1124,8 @@ def _finalize_report(
             "success_rate": round((input_article_count / max(total_scraped_count, 1)) * 100, 1) if total_scraped_count > 0 else 0,
         },
         "macro_release_digest": macro_release_digest or {},
+        "validation_issues": validation_issues or [],
+        "theme_memory": theme_memory or {},
         "unresolved_articles": unresolved_articles,
         "totals": {
             "article_count": len(all_articles),
@@ -1116,6 +1168,30 @@ def _collect_report_errors(category_reports: list[dict[str, Any]]) -> list[dict[
     return errors
 
 
+def _format_top_alerts_for_legacy(top_alerts: list[Any]) -> list[str]:
+    formatted: list[str] = []
+    for alert in top_alerts:
+        if isinstance(alert, str):
+            formatted.append(alert)
+            continue
+        if not isinstance(alert, dict):
+            continue
+        summary = str(alert.get("summary") or "").strip()
+        if not summary:
+            continue
+        sources = alert.get("source_articles") if isinstance(alert.get("source_articles"), list) else []
+        first_source = sources[0] if sources and isinstance(sources[0], dict) else None
+        if first_source:
+            title = str(first_source.get("title") or "").strip()
+            date = str(first_source.get("date") or "").strip()
+            url = str(first_source.get("url") or "").strip()
+            if title and date and url:
+                formatted.append(f"{summary} ({title} | {date}) {{{url}}}")
+                continue
+        formatted.append(summary)
+    return formatted
+
+
 def _collect_unresolved_articles(category_reports: list[dict[str, Any]]) -> list[dict[str, Any]]:
     unresolved: list[dict[str, Any]] = []
     for category in category_reports:
@@ -1153,6 +1229,8 @@ def _collect_unresolved_articles(category_reports: list[dict[str, Any]]) -> list
 
 def _category_error_classification(category: dict[str, Any]) -> str:
     message = str(category.get("error") or "")
+    if "synthesis wait budget" in message or "synthesis retry budget" in message:
+        return "synthesis_budget_exhausted"
     if "413" in message:
         return "payload_too_large"
     if category.get("status") == "failed":
@@ -1246,6 +1324,10 @@ def _analyze_category(
                 "section": article.get("section"),
                 "published_at": article.get("published_at"),
                 "attention_tier": "light",
+                "theme": article.get("theme"),
+                "research_lane": article.get("research_lane") or "low_relevance",
+                "attention_reason": article.get("attention_reason"),
+                "must_keep": article.get("must_keep"),
                 "novelty_score": 5,
                 "relevance_score": 5,
                 "urgency_score": 5,
@@ -1318,6 +1400,9 @@ def _analyze_category(
         LOGGER.info("Category %s failed.", category_name)
     else:
         LOGGER.info("Category %s completed successfully.", category_name)
+
+    diagnostics.sub_batch_count = sub_batch_count
+    diagnostics.partial_article_count = sum(1 for article in article_results if article.get("error"))
 
     return (
         {
@@ -1886,6 +1971,7 @@ def _invoke_article_batch(
         estimated_input_tokens=estimated_input_tokens,
         serialized_request_bytes=_estimate_request_payload_bytes(active_model.model_id, messages, active_model.max_completion_tokens),
         content_shrunk=content_shrunk,
+        llm_task=LLMTask.ARTICLE_ANALYSIS.value,
     )
     return _invoke_json_with_retry(runtime, messages, estimated_input_tokens, context, model_override=model_override)
 
@@ -2020,6 +2106,7 @@ def _assign_article_subgroups(
         estimated_input_tokens=estimated_input_tokens,
         serialized_request_bytes=serialized_bytes,
         content_shrunk=False,
+        llm_task=LLMTask.CATEGORY_SYNTHESIS.value,
     )
 
     try:
@@ -2234,6 +2321,7 @@ def _invoke_synthesis_batch(
         estimated_input_tokens=estimated_input_tokens,
         serialized_request_bytes=_estimate_request_payload_bytes(active_model.model_id, messages, active_model.max_completion_tokens),
         content_shrunk=False,
+        llm_task=LLMTask.CATEGORY_SYNTHESIS.value,
     )
     return _invoke_json_with_retry(runtime, messages, estimated_input_tokens, context, model_override=model_override)
 
@@ -2371,6 +2459,7 @@ def _article_to_synthesis_item(article: dict[str, Any]) -> dict[str, Any]:
         "published_at": article["published_at"],
         "attention_tier": article.get("attention_tier"),
         "theme": article.get("theme"),
+        "research_lane": article.get("research_lane"),
         "must_keep": article.get("must_keep"),
         "scores": {
             "novelty_score": article["novelty_score"],
@@ -2391,6 +2480,7 @@ def _article_to_grouping_item(article: dict[str, Any]) -> dict[str, Any]:
         "published_at": article["published_at"],
         "attention_tier": article.get("attention_tier"),
         "theme": article.get("theme"),
+        "research_lane": article.get("research_lane"),
         "must_keep": article.get("must_keep"),
         "attention_reason": article.get("attention_reason"),
         "scores": {
@@ -2708,6 +2798,7 @@ def _merge_batch_article_results(
                 "analysis_method": article.get("analysis_method"),
                 "attention_tier": article.get("attention_tier"),
                 "theme": article.get("theme"),
+                "research_lane": article.get("research_lane"),
                 "attention_reason": article.get("attention_reason"),
                 "must_keep": article.get("must_keep"),
                 "model_used": model_used,
@@ -2766,6 +2857,7 @@ def _build_failed_article_result(
         "analysis_method": article.get("analysis_method"),
         "attention_tier": article.get("attention_tier"),
         "theme": article.get("theme"),
+        "research_lane": article.get("research_lane"),
         "attention_reason": article.get("attention_reason"),
         "must_keep": article.get("must_keep"),
         "model_used": model_used,
@@ -2849,6 +2941,8 @@ def _build_empty_report(
             "previous_day_retry_successes": 0,
         },
         "macro_release_digest": macro_release_digest or {},
+        "validation_issues": [],
+        "theme_memory": {},
         "totals": {
             "article_count": 0,
             "successful_article_analyses": 0,
@@ -2905,6 +2999,7 @@ def _clone_prepared_article(article: dict[str, Any]) -> dict[str, Any]:
         "truncation_reason": article.get("truncation_reason"),
         "attention_tier": article.get("attention_tier"),
         "theme": article.get("theme"),
+        "research_lane": article.get("research_lane"),
         "attention_reason": article.get("attention_reason"),
         "must_keep": article.get("must_keep"),
     }
@@ -2986,6 +3081,83 @@ def _article_group_key(article: dict[str, Any]) -> str:
     return str(article.get("canonical_url") or "").strip()
 
 
+def _infer_research_lane(article: dict[str, Any]) -> str:
+    theme = str(article.get("theme") or "").lower()
+    tier = str(article.get("attention_tier") or "").lower()
+    section = str(article.get("article_section") or article.get("section") or "")
+    title = str(article.get("title") or "").lower()
+    haystack = f"{theme} {section} {title}"
+    if tier == "light":
+        return "low_relevance"
+    if theme == "geopolitics":
+        return "geopolitical_risk"
+    if theme == "macro":
+        if any(word in haystack for word in ("oil", "brent", "gold", "copper", "commodity", "油", "金", "銅")):
+            return "commodities"
+        return "macro_policy"
+    if theme == "property":
+        return "hk_china_equity"
+    if theme == "stocks" or any(name in section for name in ("港股", "中國財經", "香港財經", "即巿股評")):
+        return "hk_china_equity"
+    if any(word in haystack for word in ("業績", "盈利", "guidance", "earnings", "profit")):
+        return "company_specific"
+    return "general_research"
+
+
+def _theme_memory_file(data_dir: Path) -> Path:
+    return data_dir / "theme_memory.json"
+
+
+def _update_theme_memory_file(
+    data_dir: Path,
+    target_date: str,
+    category_reports: list[dict[str, Any]],
+) -> dict[str, Any]:
+    path = _theme_memory_file(data_dir)
+    try:
+        memory = json.loads(path.read_text(encoding="utf-8")) if path.exists() else {"themes": {}}
+    except (OSError, json.JSONDecodeError):
+        memory = {"themes": {}}
+    themes = memory.setdefault("themes", {})
+    today_counts: dict[str, int] = defaultdict(int)
+    today_articles: dict[str, list[str]] = defaultdict(list)
+
+    for category in category_reports:
+        for article in category.get("articles") or []:
+            if article.get("error"):
+                continue
+            theme = str(article.get("theme") or article.get("research_lane") or "general").strip() or "general"
+            lane = str(article.get("research_lane") or _infer_research_lane(article))
+            key = f"{lane}:{theme}"
+            article_id = str(article.get("source_article_id") or article.get("canonical_url") or "")
+            today_counts[key] += 1
+            if article_id:
+                today_articles[key].append(article_id)
+
+    for key, count in today_counts.items():
+        existing = themes.get(key) if isinstance(themes.get(key), dict) else {}
+        previous_count = int(existing.get("last_count") or 0)
+        related = list(dict.fromkeys([*(existing.get("related_articles") or []), *today_articles[key]]))[-50:]
+        themes[key] = {
+            "theme": key.split(":", 1)[1],
+            "research_lane": key.split(":", 1)[0],
+            "first_seen": existing.get("first_seen") or target_date,
+            "last_updated": target_date,
+            "related_articles": related,
+            "trend": "strengthening" if count > previous_count else "unchanged",
+            "confidence": round(min(0.95, 0.55 + 0.05 * count), 2),
+            "last_count": count,
+        }
+
+    memory["last_updated"] = target_date
+    try:
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_text(json.dumps(memory, ensure_ascii=False, indent=2), encoding="utf-8")
+    except OSError as exc:
+        LOGGER.warning("Could not write theme memory at %s: %s", path, exc)
+    return memory
+
+
 def _build_market_context_for_report(snapshots: list[dict[str, Any]]) -> list[dict[str, Any]]:
     from .market import build_market_context_for_report
 
@@ -2998,67 +3170,138 @@ def _generate_top_alerts(
     developments: list[dict[str, Any]],
     article_metadata: dict[str, dict[str, str]],
     is_incremental: bool = False,
-) -> list[str]:
-    """Uses LLM to pick exactly 3 most critical macro-moving developments."""
-    import json
-
-    morning_briefing = "morning briefing" if not is_incremental else "INTRA-DAY UPDATE session"
-    system_prompt = (
-        f"You are a Chief Investment Officer. Your task is to pick the 3 most critical news developments "
-        f"from the following list for a {morning_briefing}. Your goal is high 'Alpha' — prioritize events "
-        "that have the greatest macro impact, structural significance, or immediate market urgency.\n\n"
-        "Guidelines:\n"
-        "1. Pick EXACTLY 3 developments. If fewer than 3 are significant, pick the best available.\n"
-        "2. Ensure each alert includes specific data (prices, % changes, specific figures) referenced in the news.\n"
-        "3. Do not invent causal links; only cite the facts and their significance.\n"
-        "4. Your output must be a valid JSON object with a single key 'top_alerts' containing a list of strings. "
-        "Each string must end with the exact source article title, full date/time, and URL in the following format: (Article Title | YYYY-MM-DD HH:MM) {URL}."
+) -> list[dict[str, Any]]:
+    """Use the shared LLM path to select 1-3 structured top alerts."""
+    briefing_style = os.environ.get("DAILY_MACRO_BRIEFING_STYLE") or "CIO briefing"
+    session_label = "intraday update" if is_incremental else "morning briefing"
+    messages = [
+        {
+            "role": "system",
+            "content": (
+                f"You are preparing a {briefing_style} for a {session_label}. "
+                "Return one valid JSON object only. Pick 1 to 3 genuinely important developments; fewer than 3 is allowed. "
+                "Do not invent causal links or source ids."
+            ),
+        },
+        {
+            "role": "user",
+            "content": json.dumps(
+                {
+                    "task": "Select the highest-value macro/equity alerts from pre-synthesized developments.",
+                    "required_schema": {
+                        "top_alerts": [
+                            {
+                                "summary": "one concise alert",
+                                "why_it_matters": "specific market or portfolio implication",
+                                "affected_assets": ["asset, index, FX pair, sector, or ticker"],
+                                "time_horizon": "intraday|1w|1m|structural",
+                                "confidence": "number from 0.0 to 1.0",
+                                "source_article_ids": ["ids from ref_ids only"],
+                            }
+                        ]
+                    },
+                    "rules": [
+                        "Return 1 to 3 alerts.",
+                        "Use source_article_ids from the provided ref_ids only.",
+                        "Prefer developments with concrete market, macro, or asset-price implications.",
+                    ],
+                    "market_context": market_context,
+                    "developments": developments,
+                    "article_metadata": article_metadata,
+                },
+                ensure_ascii=False,
+            ),
+        },
+    ]
+    estimated_input_tokens = _estimate_messages_tokens(messages)
+    active_model = runtime.current_model
+    context = BatchContext(
+        category_name="top_alerts",
+        batch_kind="top_alerts",
+        batch_label="top",
+        article_count=len(developments),
+        estimated_input_tokens=estimated_input_tokens,
+        serialized_request_bytes=_estimate_request_payload_bytes(active_model.model_id, messages, active_model.max_completion_tokens),
+        content_shrunk=False,
+        llm_task=LLMTask.TOP_ALERTS.value,
     )
-
-    user_payload = {
-        "market_context": market_context,
-        "developments": developments,
-    }
-
     try:
-        model = runtime.primary_model
-        api_url = model.api_url or GROQ_CHAT_COMPLETIONS_URL
-        session = runtime.get_session_for_model(model)
-        
-        response = session.post(
-            api_url,
-            json={
-                "model": model.model_id,
-                "messages": [
-                    {"role": "system", "content": system_prompt},
-                    {"role": "user", "content": json.dumps(user_payload, ensure_ascii=False)},
-                ],
-                "response_format": {"type": "json_object"},
-                "temperature": 0.1,
-            },
-            timeout=30,
-        )
-        response.raise_for_status()
-        data = response.json()
-        content = data["choices"][0]["message"]["content"]
-        parsed = _parse_json_content(content)
-        alerts_data = list(parsed.get("top_alerts") or [])[:3]
-        
-        results: list[str] = []
-        for item in alerts_data:
-            summary_text = str(item.get("summary") or "").strip()
-            ref_id = str(item.get("ref_id") or "").strip()
-            meta = article_metadata.get(ref_id)
-            if meta and summary_text:
-                title = meta["title"]
-                date = meta["date"]
-                url = meta["url"]
-                results.append(f"{summary_text} ({title} | {date}) {{{url}}}")
-            elif summary_text:
-                results.append(summary_text)
-        
-        return results
+        payload, _model_used = _invoke_json_with_retry(runtime, messages, estimated_input_tokens, context)
+        alerts = _normalize_top_alerts(payload.get("top_alerts") or [], article_metadata)
+        if alerts:
+            return alerts
     except Exception as e:
         LOGGER.warning("Alert generation LLM call failed: %s", e)
-        # Simple fallback: pick first 3 from input if LLM fails
-        return [d["text"] for d in developments[:3]]
+    runtime.diagnostics.degraded_mode_count += 1
+    return _fallback_top_alerts(developments, article_metadata)
+
+
+def _normalize_top_alerts(alerts_data: Any, article_metadata: dict[str, dict[str, str]]) -> list[dict[str, Any]]:
+    if not isinstance(alerts_data, list):
+        return []
+    alerts: list[dict[str, Any]] = []
+    for raw in alerts_data[:3]:
+        if isinstance(raw, str):
+            raw = {"summary": raw}
+        if not isinstance(raw, dict):
+            continue
+        summary = str(raw.get("summary") or "").strip()
+        if not summary:
+            continue
+        raw_ids = raw.get("source_article_ids")
+        if raw_ids is None and raw.get("ref_id"):
+            raw_ids = [raw.get("ref_id")]
+        source_ids = [str(item).strip() for item in (raw_ids if isinstance(raw_ids, list) else []) if str(item).strip()]
+        source_articles = [
+            {
+                "source_article_id": source_id,
+                "title": str(article_metadata.get(source_id, {}).get("title") or ""),
+                "date": str(article_metadata.get(source_id, {}).get("date") or ""),
+                "url": str(article_metadata.get(source_id, {}).get("url") or ""),
+            }
+            for source_id in source_ids
+            if source_id in article_metadata
+        ]
+        if not source_articles and isinstance(raw.get("source_articles"), list):
+            source_articles = [item for item in raw.get("source_articles") if isinstance(item, dict)]
+        try:
+            confidence = float(raw.get("confidence", 0.5))
+        except (TypeError, ValueError):
+            confidence = 0.5
+        alerts.append(
+            {
+                "summary": summary,
+                "why_it_matters": str(raw.get("why_it_matters") or "").strip(),
+                "affected_assets": _normalize_string_list(raw.get("affected_assets"), limit=8),
+                "time_horizon": str(raw.get("time_horizon") or "1w").strip() or "1w",
+                "confidence": max(0.0, min(1.0, confidence)),
+                "source_article_ids": source_ids,
+                "source_articles": source_articles,
+            }
+        )
+    return alerts
+
+
+def _fallback_top_alerts(
+    developments: list[dict[str, Any]],
+    article_metadata: dict[str, dict[str, str]],
+) -> list[dict[str, Any]]:
+    fallback: list[dict[str, Any]] = []
+    for development in developments[:3]:
+        ref_ids = [str(item).strip() for item in development.get("ref_ids", []) if str(item).strip()]
+        fallback.extend(
+            _normalize_top_alerts(
+                [
+                    {
+                        "summary": str(development.get("text") or "").strip(),
+                        "why_it_matters": "Selected by deterministic fallback after alert generation degraded.",
+                        "affected_assets": [],
+                        "time_horizon": "1w",
+                        "confidence": 0.4,
+                        "source_article_ids": ref_ids,
+                    }
+                ],
+                article_metadata,
+            )
+        )
+    return fallback[:3]
