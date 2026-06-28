@@ -1,0 +1,124 @@
+{
+  "_comment": "Curated model overrides for daily-macro selection. Seeded from MODEL_CATALOG + Groq published limits. task_scores are quality priors per task (0-1). limits are declared rpm/rpd/tpm/tpd (used by Step 2 budget enforcement; recorded but not enforced in Step 1). Editing this file is a config change - no code edit required.",
+  "models": {
+    "openai/gpt-oss-120b": {
+      "lifecycle": "production",
+      "kind": "chat",
+      "context_window": 131072,
+      "max_output_tokens": 8192,
+      "supports_json": true,
+      "max_completion_tokens": 2048,
+      "task_scores": {
+        "routing": 0.55,
+        "article_analysis": 0.90,
+        "category_synthesis": 0.96,
+        "top_alerts": 0.98,
+        "json_repair": 0.55,
+        "critic": 0.96
+      },
+      "limits": { "rpm": 30, "rpd": 1000, "tpm": 8000, "tpd": 200000 }
+    },
+    "llama-3.3-70b-versatile": {
+      "lifecycle": "production",
+      "kind": "chat",
+      "context_window": 131072,
+      "max_output_tokens": 8192,
+      "supports_json": true,
+      "max_completion_tokens": 2048,
+      "task_scores": {
+        "routing": 0.65,
+        "article_analysis": 0.82,
+        "category_synthesis": 0.86,
+        "top_alerts": 0.84,
+        "json_repair": 0.70,
+        "critic": 0.84
+      },
+      "limits": { "rpm": 30, "rpd": 1000, "tpm": 12000, "tpd": 100000 }
+    },
+    "openai/gpt-oss-20b": {
+      "lifecycle": "production",
+      "kind": "chat",
+      "context_window": 131072,
+      "max_output_tokens": 8192,
+      "supports_json": true,
+      "max_completion_tokens": 2048,
+      "task_scores": {
+        "routing": 0.70,
+        "article_analysis": 0.86,
+        "category_synthesis": 0.88,
+        "top_alerts": 0.92,
+        "json_repair": 0.74,
+        "critic": 0.90
+      },
+      "limits": { "rpm": 30, "rpd": 1000, "tpm": 8000, "tpd": 200000 }
+    },
+    "qwen/qwen3.6-27b": {
+      "lifecycle": "production",
+      "kind": "chat",
+      "context_window": 131072,
+      "max_output_tokens": 8192,
+      "supports_json": true,
+      "max_completion_tokens": 2048,
+      "task_scores": {
+        "routing": 0.62,
+        "article_analysis": 0.78,
+        "category_synthesis": 0.80,
+        "top_alerts": 0.76,
+        "json_repair": 0.66,
+        "critic": 0.78
+      },
+      "limits": { "rpm": 30, "rpd": 1000, "tpm": 8000, "tpd": 200000 }
+    },
+    "qwen/qwen3-32b": {
+      "lifecycle": "preview",
+      "kind": "chat",
+      "context_window": 131072,
+      "max_output_tokens": 8192,
+      "supports_json": true,
+      "max_completion_tokens": 1536,
+      "task_scores": {
+        "routing": 0.60,
+        "article_analysis": 0.72,
+        "category_synthesis": 0.74,
+        "top_alerts": 0.70,
+        "json_repair": 0.65,
+        "critic": 0.70
+      },
+      "limits": { "rpm": 60, "rpd": 1000, "tpm": 6000, "tpd": 500000 }
+    },
+    "meta-llama/llama-4-scout-17b-16e-instruct": {
+      "lifecycle": "preview",
+      "kind": "chat",
+      "context_window": 131072,
+      "max_output_tokens": 8192,
+      "supports_json": true,
+      "max_completion_tokens": 1536,
+      "task_scores": {
+        "routing": 0.45,
+        "article_analysis": 0.70,
+        "category_synthesis": 0.70,
+        "top_alerts": 0.65,
+        "json_repair": 0.45,
+        "critic": 0.65
+      },
+      "limits": { "rpm": 30, "rpd": 1000, "tpm": 30000, "tpd": 500000 }
+    },
+    "llama-3.1-8b-instant": {
+      "lifecycle": "production",
+      "kind": "chat",
+      "context_window": 131072,
+      "max_output_tokens": 8192,
+      "supports_json": true,
+      "max_completion_tokens": 1200,
+      "task_scores": {
+        "routing": 0.95,
+        "article_analysis": 0.55,
+        "category_synthesis": 0.40,
+        "top_alerts": 0.30,
+        "json_repair": 0.95,
+        "critic": 0.35
+      },
+      "limits": { "rpm": 30, "rpd": 14400, "tpm": 6000, "tpd": 500000 }
+    }
+  }
+}

@@ -72,6 +72,19 @@ class ModelSelection:
 
 DEFAULT_MAX_LLM_WAIT_SECONDS = 45.0
 
+# Tasks whose output quality most benefits from the strongest models; these may
+# select premium models. All other (high-volume) tasks reserve premium capacity
+# so bulk work cannot starve synthesis/alerts of the scarce, low-throughput
+# high-quality models.
+HIGH_VALUE_TASKS = frozenset({"category_synthesis", "top_alerts", "critic"})
+# A model counts as "premium" (reserved) when it is strong at synthesis. Derived
+# from scores so newly released large models are reserved automatically.
+PREMIUM_SYNTHESIS_THRESHOLD = 0.85
+# Score penalty applied to a premium model on a bulk task: large enough that any
+# non-premium model with headroom outranks it, small enough that a premium model
+# is still chosen over sleeping on a rate-limited one.
+PREMIUM_BULK_PENALTY = 0.6
+
 
 def _resolve_max_wait_seconds(explicit: float | None = None) -> float:
     """Resolve the rate-limit wait cap shared by the resolver and governor.
@@ -124,6 +137,7 @@ class ModelResolver:
     ) -> ModelSelection:
         task_value = task.value if isinstance(task, LLMTask) else str(task)
         task_preferences = self.task_preferences(task_value)
+        is_high_value = task_value in HIGH_VALUE_TASKS
         rejections: list[dict[str, str]] = []
         scored: list[tuple[float, int, ModelConfig, float]] = []
         wait_eligible: list[tuple[float, int, ModelConfig]] = []
@@ -163,7 +177,23 @@ class ModelResolver:
                 preference_bonus = max(0.0, 0.35 - task_preferences.index(model.model_id) * 0.03)
             wait_penalty = min(wait_seconds / max(self.max_wait_seconds, 1.0), 1.0) * 0.4
             order_penalty = index * 0.01
-            scored.append((task_score + preferred_bonus + preference_bonus - wait_penalty - order_penalty, index, model, wait_seconds))
+            # Reserve premium models for high-value tasks: penalize them on bulk
+            # tasks so any non-premium model with headroom outranks them, keeping
+            # bulk work off the scarce high-quality models. The penalty is soft —
+            # a premium model is still chosen over sleeping on a rate-limited one,
+            # and an explicit env preference is exempt.
+            reservation_penalty = 0.0
+            is_premium = capability.task_scores.get("category_synthesis", 0.0) >= PREMIUM_SYNTHESIS_THRESHOLD
+            if is_premium and not is_high_value and model.model_id not in task_preferences:
+                reservation_penalty = PREMIUM_BULK_PENALTY
+            scored.append(
+                (
+                    task_score + preferred_bonus + preference_bonus - wait_penalty - order_penalty - reservation_penalty,
+                    index,
+                    model,
+                    wait_seconds,
+                )
+            )
 
         if scored:
             scored.sort(key=lambda item: item[0], reverse=True)
@@ -838,6 +868,27 @@ class AnalysisRuntime:
     def reset_model_for_category(self) -> None:
         self.current_model_index = 0
 
+    def evict_model(self, model_id: str) -> bool:
+        """Drop a decommissioned/unavailable model from the pool for this run.
+
+        Returns False (and keeps the model) if it is the only one left, so the
+        pool is never emptied. The resolver re-resolves over the reduced chain on
+        the next attempt.
+        """
+        if len(self.model_chain) <= 1:
+            return False
+        index = next((i for i, m in enumerate(self.model_chain) if m.model_id == model_id), None)
+        if index is None:
+            return False
+        self.model_chain.pop(index)
+        if self.current_model_index >= len(self.model_chain):
+            self.current_model_index = len(self.model_chain) - 1
+        if self.resolver is not None and self.resolver.active_model_ids is not None:
+            self.resolver.active_model_ids.discard(model_id)
+        self.diagnostics.fallback_switch_count += 1
+        LOGGER.info("Evicted model %s from the pool; %d remain.", model_id, len(self.model_chain))
+        return True
+
     def get_category_diagnostics(self, category_name: str) -> CategoryDiagnostics:
         return self.category_diagnostics.setdefault(category_name, CategoryDiagnostics())
 
@@ -1205,6 +1256,28 @@ def _chat_completion(
                 delay_seconds,
             )
             continue
+
+        if response.status_code in {400, 404}:
+            # A 404 (model gone) or a 400 on an already-minimal request (≤1 item,
+            # so it cannot be split smaller) means the model is rejecting our
+            # request shape, not that the request is too big. Evict it for this
+            # run and re-resolve onto a working model instead of failing. A 400
+            # on a multi-item batch is treated as oversized and falls through to
+            # the split/retry path below.
+            minimal_request = attempt_context.article_count <= 1
+            if (response.status_code == 404 or minimal_request) and model_override is None:
+                LOGGER.warning(
+                    "Model %s rejected request (HTTP %s) for category %s batch=%s; evicting and re-resolving.",
+                    model.model_id,
+                    response.status_code,
+                    attempt_context.category_name,
+                    attempt_context.batch_label,
+                )
+                if runtime.evict_model(model.model_id):
+                    runtime.diagnostics.model_decommissioned_count += 1
+                    runtime.current_key_index = 0
+                    session = runtime.get_session_for_model(runtime.current_model)
+                    continue
 
         response.raise_for_status()
         payload = response.json()

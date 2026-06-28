@@ -20,8 +20,11 @@ from daily_macro.analysis import (
     select_content_for_analysis,
 )
 from daily_macro.llm_client import ModelResolver, LLMTask, load_active_groq_model_ids
+from daily_macro.model_catalog import get_capability
+from daily_macro.model_registry import ModelPool
 from daily_macro.models import ArticleDetails
 from daily_macro.storage import Storage
+from daily_macro.types import FALLBACK_MODEL_IDS, PRIMARY_MODEL_ID
 
 
 class _FakeResponse:
@@ -62,6 +65,19 @@ class AnalysisTests(unittest.TestCase):
         self.data_dir = self.root / "data"
         self.db_path = self.data_dir / "news.sqlite"
         self.storage = Storage(self.db_path)
+        # Pin a deterministic, network-free model pool mirroring the legacy chain
+        # so these tests exercise batching/rate-limit/synthesis logic without
+        # hitting the live /models endpoint. Dynamic pool/routing behavior is
+        # covered separately in test_model_registry.py.
+        legacy_ids = [PRIMARY_MODEL_ID, *FALLBACK_MODEL_IDS]
+        legacy_pool = ModelPool(
+            models=[ModelConfig(model_id) for model_id in legacy_ids],
+            capabilities={model_id: get_capability(model_id) for model_id in legacy_ids},
+            active_ids=set(legacy_ids),
+        )
+        pool_patch = patch("daily_macro.analysis.build_model_pool", return_value=legacy_pool)
+        pool_patch.start()
+        self.addCleanup(pool_patch.stop)
 
     def tearDown(self) -> None:
         self.storage.close()

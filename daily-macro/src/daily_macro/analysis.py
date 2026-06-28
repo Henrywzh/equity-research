@@ -81,7 +81,6 @@ from .llm_client import (  # noqa: E402
     ModelResolver,
     load_groq_api_keys,
     load_groq_api_key,
-    load_active_groq_model_ids,
     _build_groq_session,
     _build_provider_session,
     _load_model_api_key,
@@ -107,6 +106,8 @@ from .prompts import (  # noqa: E402
     _build_synthesis_messages,
     _build_grouping_messages,
 )
+
+from .model_registry import build_model_pool  # noqa: E402
 
 # ---------------------------------------------------------------------------
 # Patch AnalysisRuntime methods to look up helpers through this module's
@@ -249,12 +250,13 @@ def _graph_initialize(state: AnalysisGraphState) -> AnalysisGraphState:
             # Backward-compatible shim for tests and older single-key call sites.
             groq_keys = [load_groq_api_key()]
         LOGGER.info("Loaded %d Groq API key(s).", len(groq_keys))
-        active_model_ids = load_active_groq_model_ids(groq_keys[0])
+        pool = build_model_pool(groq_keys, data_dir=state.get("data_dir"))
+        fallback_chain = [ModelConfig(PRIMARY_MODEL_ID), *(ModelConfig(model_id) for model_id in FALLBACK_MODEL_IDS)]
         runtime = AnalysisRuntime(
             groq_api_keys=groq_keys,
             governor=RateLimitGovernor(),
-            model_chain=[ModelConfig(PRIMARY_MODEL_ID), *(ModelConfig(model_id) for model_id in FALLBACK_MODEL_IDS)],
-            resolver=ModelResolver(active_model_ids=active_model_ids),
+            model_chain=pool.models or fallback_chain,
+            resolver=ModelResolver(active_model_ids=pool.active_ids, capabilities=pool.capabilities),
             delayed_retry_final_model=ModelConfig(
                 DELAYED_RETRY_FINAL_MODEL_ID,
                 provider="openai",
