@@ -1,15 +1,15 @@
 {
   "report_schema_version": 6,
   "report_date": "2026-06-28",
-  "generated_at": "2026-06-28T11:08:37.662658+00:00",
+  "generated_at": "2026-06-28T22:29:32.234344+00:00",
   "source_site": "hkej",
   "status": "success",
-  "executive_summary": [
+  "executive_summary": [],
+  "legacy_executive_summary": [
     "巴基斯坦南部準軍事部隊設施遭襲擊，造成最少3名安全部隊人員死亡，4人受傷。",
     "港燈董事總經理鄭祖瀛表示，若中東未能恢復出口天然氣，燃料費難以回落。",
     "韓日重申致力實現朝鮮半島無核化，恢復聯合搜救演習。"
   ],
-  "legacy_executive_summary": [],
   "model": {
     "provider": "groq",
     "primary_model": "meta-llama/llama-4-scout-17b-16e-instruct",
@@ -20,18 +20,18 @@
   },
   "model_switches": [],
   "input": {
-    "article_count": 29,
-    "category_count": 4
+    "article_count": 44,
+    "category_count": 6
   },
   "diagnostics": {
-    "rate_limit_wait_count": 1,
-    "rate_limit_wait_seconds_total": 4147.197,
+    "rate_limit_wait_count": 2,
+    "rate_limit_wait_seconds_total": 3110.399,
     "fallback_switch_count": 0,
     "key_rotation_count": 0,
-    "pre_send_split_count": 8,
+    "pre_send_split_count": 13,
     "response_413_split_count": 0,
     "json_repair_retry_count": 0,
-    "batch_count": 25,
+    "batch_count": 37,
     "failed_batch_count": 0,
     "delayed_retry_candidate_count": 0,
     "delayed_retry_attempted_count": 0,
@@ -44,18 +44,18 @@
     "degraded_merge_count": 0
   },
   "incremental": {
-    "reused_successful_articles": 0,
-    "new_articles_analyzed": 29,
+    "reused_successful_articles": 29,
+    "new_articles_analyzed": 15,
     "retried_previous_day_articles": 0,
     "previous_day_retry_successes": 0
   },
   "daily_stats": {
-    "total_scraped": 29,
-    "analyzed": 29,
+    "total_scraped": 44,
+    "analyzed": 44,
     "success_rate": 100.0
   },
   "macro_release_digest": {
-    "generated_at": "2026-06-28T09:59:02.327162+00:00",
+    "generated_at": "2026-06-28T21:37:14.679066+00:00",
     "window_start": "2026-06-28",
     "window_end": "2026-07-04",
     "fetch_status": "failed",
@@ -67,41 +67,485 @@
   },
   "unresolved_articles": [],
   "totals": {
-    "article_count": 29,
-    "successful_article_analyses": 29,
+    "article_count": 44,
+    "successful_article_analyses": 44,
     "failed_article_analyses": 0,
-    "full_text_article_count": 29,
+    "full_text_article_count": 44,
     "truncated_article_count": 0,
-    "successful_categories": 4,
+    "successful_categories": 6,
     "partial_categories": 0,
     "failed_categories": 0
   },
   "market_context": [],
   "categories": [
     {
+      "category": "國際財經",
+      "article_count": 1,
+      "status": "success",
+      "key_developments": [
+        "韓國總統李在明將於周一(29日)公布大規模投資計劃，金額有望超過1000萬億韓圜。",
+        "投資計劃涵蓋全羅道、忠清道、慶尚道，未來十年將有重大資金投入。",
+        "三星電子會長李在鎔、SK集團會長崔泰源將出席相關活動。"
+      ],
+      "named_entities": [
+        {
+          "name": "李在明",
+          "type": "person"
+        },
+        {
+          "name": "三星電子",
+          "type": "company"
+        },
+        {
+          "name": "SK集團",
+          "type": "company"
+        },
+        {
+          "name": "韓國",
+          "type": "country"
+        }
+      ],
+      "articles": [
+        {
+          "source_article_id": "4442425",
+          "title": "李在明周一夥三星及SK公布大規模投資計劃",
+          "canonical_url": "https://www.hkej.com/instantnews/international/article/4442425/%E6%9D%8E%E5%9C%A8%E6%98%8E%E5%91%A8%E4%B8%80%E5%A4%A5%E4%B8%89%E6%98%9F%E5%8F%8ASK%E5%85%AC%E5%B8%83%E5%A4%A7%E8%A6%8F%E6%A8%A1%E6%8A%95%E8%B3%87%E8%A8%88%E5%8A%83",
+          "published_at": "2026-06-28T21:46:00+08:00",
+          "section": "國際財經",
+          "novelty_score": 6,
+          "relevance_score": 8,
+          "urgency_score": 5,
+          "named_entities": [
+            {
+              "name": "李在明",
+              "type": "person"
+            },
+            {
+              "name": "三星電子",
+              "type": "company"
+            },
+            {
+              "name": "SK海力士",
+              "type": "company"
+            },
+            {
+              "name": "韓國",
+              "type": "country"
+            }
+          ],
+          "key_points": [
+            "韓國總統李在明將於周一(29日)公布大規模投資計劃，金額有望超過1000萬億韓圜。",
+            "投資計劃涵蓋全羅道、忠清道、慶尚道，未來十年將有重大資金投入。",
+            "三星電子會長李在鎔、SK集團會長崔泰源將出席相關活動。"
+          ],
+          "content_truncated": false,
+          "original_content_length_chars": 228,
+          "analyzed_content_length_chars": 228,
+          "original_content_token_estimate": 57,
+          "analyzed_content_token_estimate": 57,
+          "truncation_reason": null,
+          "analysis_method": "full_text",
+          "attention_tier": "medium",
+          "theme": "general",
+          "attention_reason": "Default medium attention because the story is relevant but not an obvious top-priority market mover.",
+          "must_keep": false,
+          "model_used": "meta-llama/llama-4-scout-17b-16e-instruct",
+          "delayed_retry_attempted": false,
+          "delayed_retry_model_chain": [],
+          "delayed_retry_final_model": null,
+          "error_classification": null,
+          "error": null
+        }
+      ],
+      "subgroups": [
+        {
+          "title": "國際財經 overview",
+          "theme_rationale": "Single subgroup because the category size did not require thematic splitting.",
+          "article_count": 1,
+          "key_developments": [
+            "韓國總統李在明將於周一(29日)公布大規模投資計劃，金額有望超過1000萬億韓圜。",
+            "投資計劃涵蓋全羅道、忠清道、慶尚道，未來十年將有重大資金投入。",
+            "三星電子會長李在鎔、SK集團會長崔泰源將出席相關活動。"
+          ],
+          "named_entities": [
+            {
+              "name": "李在明",
+              "type": "person"
+            },
+            {
+              "name": "三星電子",
+              "type": "company"
+            },
+            {
+              "name": "SK集團",
+              "type": "company"
+            },
+            {
+              "name": "韓國",
+              "type": "country"
+            }
+          ],
+          "articles": [
+            {
+              "source_article_id": "4442425",
+              "title": "李在明周一夥三星及SK公布大規模投資計劃",
+              "canonical_url": "https://www.hkej.com/instantnews/international/article/4442425/%E6%9D%8E%E5%9C%A8%E6%98%8E%E5%91%A8%E4%B8%80%E5%A4%A5%E4%B8%89%E6%98%9F%E5%8F%8ASK%E5%85%AC%E5%B8%83%E5%A4%A7%E8%A6%8F%E6%A8%A1%E6%8A%95%E8%B3%87%E8%A8%88%E5%8A%83",
+              "published_at": "2026-06-28T21:46:00+08:00",
+              "section": "國際財經",
+              "novelty_score": 6,
+              "relevance_score": 8,
+              "urgency_score": 5,
+              "named_entities": [
+                {
+                  "name": "李在明",
+                  "type": "person"
+                },
+                {
+                  "name": "三星電子",
+                  "type": "company"
+                },
+                {
+                  "name": "SK海力士",
+                  "type": "company"
+                },
+                {
+                  "name": "韓國",
+                  "type": "country"
+                }
+              ],
+              "key_points": [
+                "韓國總統李在明將於周一(29日)公布大規模投資計劃，金額有望超過1000萬億韓圜。",
+                "投資計劃涵蓋全羅道、忠清道、慶尚道，未來十年將有重大資金投入。",
+                "三星電子會長李在鎔、SK集團會長崔泰源將出席相關活動。"
+              ],
+              "content_truncated": false,
+              "original_content_length_chars": 228,
+              "analyzed_content_length_chars": 228,
+              "original_content_token_estimate": 57,
+              "analyzed_content_token_estimate": 57,
+              "truncation_reason": null,
+              "analysis_method": "full_text",
+              "attention_tier": "medium",
+              "theme": "general",
+              "attention_reason": "Default medium attention because the story is relevant but not an obvious top-priority market mover.",
+              "must_keep": false,
+              "model_used": "meta-llama/llama-4-scout-17b-16e-instruct",
+              "delayed_retry_attempted": false,
+              "delayed_retry_model_chain": [],
+              "delayed_retry_final_model": null,
+              "error_classification": null,
+              "error": null
+            }
+          ],
+          "model_used": "meta-llama/llama-4-scout-17b-16e-instruct"
+        }
+      ],
+      "analysis_profile": "standard",
+      "model_used": "meta-llama/llama-4-scout-17b-16e-instruct",
+      "sub_batch_count": 2,
+      "diagnostics": {
+        "sub_batch_count": 1,
+        "split_reasons": [],
+        "models_attempted": [
+          "meta-llama/llama-4-scout-17b-16e-instruct"
+        ],
+        "estimated_input_tokens_max": 667,
+        "serialized_request_bytes_max": 3559,
+        "rate_limit_waits": 0,
+        "partial_article_count": 0,
+        "synthesis_wait_seconds_total": 0.0,
+        "synthesis_retry_count": 0,
+        "synthesis_retry_skipped_count": 0,
+        "synthesis_budget_exhausted": false,
+        "degraded_merge_used": false,
+        "degraded_merge_reason": "",
+        "synthesis_merge_depth_max": 0,
+        "model_switches": []
+      },
+      "error": null
+    },
+    {
       "category": "時事脈搏",
-      "article_count": 19,
+      "article_count": 31,
       "status": "success",
       "key_developments": [],
       "named_entities": [
         {
-          "name": "巴基斯坦",
+          "name": "警察招募",
+          "type": "other"
+        },
+        {
+          "name": "歐洲",
+          "type": "other"
+        },
+        {
+          "name": "伊朗",
           "type": "country"
         },
         {
-          "name": "巴基斯坦塔利班",
-          "type": "organization"
-        },
-        {
-          "name": "韓日",
-          "type": "country"
-        },
-        {
-          "name": "港燈",
-          "type": "company"
+          "name": "霍爾木茲海峽",
+          "type": "other"
         }
       ],
       "articles": [
+        {
+          "source_article_id": "4442426",
+          "canonical_url": "https://www.hkej.com/instantnews/current/article/4442426/%E6%AD%90%E6%B4%B2%E7%86%B1%E6%B5%AA%E4%B8%A8%E4%B8%96%E8%A1%9E%3A%E9%80%BE1300%E5%AE%97%E8%B6%85%E9%A1%8D%E6%AD%BB%E4%BA%A1+%E8%88%87%E9%AB%98%E6%BA%AB%E5%A4%A9%E6%B0%A3%E6%9C%89%E9%97%9C",
+          "title": "歐洲熱浪丨世衞:逾1300宗超額死亡 與高溫天氣有關",
+          "section": "時事脈搏",
+          "published_at": "2026-06-28T22:00:00+08:00",
+          "attention_tier": "light",
+          "novelty_score": 5,
+          "relevance_score": 5,
+          "urgency_score": 5,
+          "named_entities": [],
+          "key_points": [],
+          "content_truncated": false,
+          "analysis_method": "bypassed",
+          "model_used": "direct"
+        },
+        {
+          "source_article_id": "4442424",
+          "canonical_url": "https://www.hkej.com/instantnews/current/article/4442424/%E8%AD%A6%E5%AF%9F%E6%8B%9B%E5%8B%9F%E6%97%A5%E6%94%B61028%E4%BB%BD%E6%8A%95%E8%80%83%E7%94%B3%E8%AB%8B+%E6%AD%B7%E4%BE%86%E6%9C%80%E5%A4%9A",
+          "title": "警察招募日收1028份投考申請 歷來最多",
+          "section": "時事脈搏",
+          "published_at": "2026-06-28T21:27:00+08:00",
+          "attention_tier": "light",
+          "novelty_score": 5,
+          "relevance_score": 5,
+          "urgency_score": 5,
+          "named_entities": [],
+          "key_points": [],
+          "content_truncated": false,
+          "analysis_method": "bypassed",
+          "model_used": "direct"
+        },
+        {
+          "source_article_id": "4442422",
+          "canonical_url": "https://www.hkej.com/instantnews/current/article/4442422/AI%E7%A6%81%E6%AF%92%E7%89%87%E4%B8%8B%E6%9E%B6%E4%B8%A8%E6%87%B2%E6%95%99%E7%BD%B2%E6%89%BF%E8%AA%8D%E6%9C%89%E4%B8%8D%E8%B6%B3%E4%B9%8B%E8%99%95+%E7%A8%B1%E4%B8%8D%E6%B6%89%E9%A1%8D%E5%A4%96%E5%85%AC%E5%B8%91",
+          "title": "AI禁毒片下架丨懲教署承認有不足之處 稱不涉額外公帑",
+          "section": "時事脈搏",
+          "published_at": "2026-06-28T21:05:00+08:00",
+          "attention_tier": "light",
+          "novelty_score": 5,
+          "relevance_score": 5,
+          "urgency_score": 5,
+          "named_entities": [],
+          "key_points": [],
+          "content_truncated": false,
+          "analysis_method": "bypassed",
+          "model_used": "direct"
+        },
+        {
+          "source_article_id": "4442420",
+          "title": "中東局勢丨伊朗外長:管理和恢復霍爾木茲海峽交通由伊朗負責",
+          "canonical_url": "https://www.hkej.com/instantnews/current/article/4442420/%E4%B8%AD%E6%9D%B1%E5%B1%80%E5%8B%A2%E4%B8%A8%E4%BC%8A%E6%9C%97%E5%A4%96%E9%95%B7%3A%E7%AE%A1%E7%90%86%E5%92%8C%E6%81%A2%E5%BE%A9%E9%9C%8D%E7%88%BE%E6%9C%A8%E8%8C%B2%E6%B5%B7%E5%B3%BD%E4%BA%A4%E9%80%9A%E7%94%B1%E4%BC%8A%E6%9C%97%E8%B2%A0%E8%B2%AC",
+          "published_at": "2026-06-28T20:50:00+08:00",
+          "section": "時事脈搏",
+          "novelty_score": 6,
+          "relevance_score": 8,
+          "urgency_score": 9,
+          "named_entities": [
+            {
+              "name": "伊朗",
+              "type": "country"
+            },
+            {
+              "name": "阿拉格齊",
+              "type": "person"
+            },
+            {
+              "name": "美國",
+              "type": "country"
+            },
+            {
+              "name": "以色列",
+              "type": "country"
+            }
+          ],
+          "key_points": [
+            "伊朗外長阿拉格齊表示，管理和全面恢復霍爾木茲海峽的交通是伊朗的責任。",
+            "任何干涉霍爾木茲海峽管理的做法都違反了伊朗和美國的諒解備忘錄。"
+          ],
+          "content_truncated": false,
+          "original_content_length_chars": 378,
+          "analyzed_content_length_chars": 378,
+          "original_content_token_estimate": 95,
+          "analyzed_content_token_estimate": 95,
+          "truncation_reason": null,
+          "analysis_method": "full_text",
+          "attention_tier": "high",
+          "theme": "geopolitics",
+          "attention_reason": "High-signal geopolitics headline based on title/summary keywords.",
+          "must_keep": true,
+          "model_used": "meta-llama/llama-4-scout-17b-16e-instruct",
+          "delayed_retry_attempted": false,
+          "delayed_retry_model_chain": [],
+          "delayed_retry_final_model": null,
+          "error_classification": null,
+          "error": null
+        },
+        {
+          "source_article_id": "4442419",
+          "canonical_url": "https://www.hkej.com/instantnews/current/article/4442419/%E6%B0%B8%E6%98%8E%E9%A6%99%E6%B8%AF%E5%9C%8B%E9%9A%9B%E9%BE%8D%E8%88%9F%E9%82%80%E8%AB%8B%E8%B3%BD%E9%96%89%E5%B9%95+%E6%B0%A3%E6%B0%9B%E7%86%B1%E7%83%88%E5%B1%95%E7%8F%BE%E7%9B%9B%E4%BA%8B%E9%A2%A8%E9%87%87",
+          "title": "永明香港國際龍舟邀請賽閉幕 氣氛熱烈展現盛事風采",
+          "section": "時事脈搏",
+          "published_at": "2026-06-28T20:28:00+08:00",
+          "attention_tier": "light",
+          "novelty_score": 5,
+          "relevance_score": 5,
+          "urgency_score": 5,
+          "named_entities": [],
+          "key_points": [],
+          "content_truncated": false,
+          "analysis_method": "bypassed",
+          "model_used": "direct"
+        },
+        {
+          "source_article_id": "4442418",
+          "canonical_url": "https://www.hkej.com/instantnews/current/article/4442418/%E4%B9%9D%E9%BE%8D%E5%9F%8E%E6%B3%95%E9%99%A2%E5%A4%96%E5%B0%8F%E5%B7%B4%E5%89%B7%E4%B8%8A%E8%A1%8C%E4%BA%BA%E8%B7%AF+%E7%94%B7%E9%80%94%E4%BA%BA%E9%80%81%E9%99%A2%E6%90%B6%E6%95%91%E5%BE%8C%E4%B8%8D%E6%B2%BB",
+          "title": "九龍城法院外小巴剷上行人路 男途人送院搶救後不治",
+          "section": "時事脈搏",
+          "published_at": "2026-06-28T20:04:00+08:00",
+          "attention_tier": "light",
+          "novelty_score": 5,
+          "relevance_score": 5,
+          "urgency_score": 5,
+          "named_entities": [],
+          "key_points": [],
+          "content_truncated": false,
+          "analysis_method": "bypassed",
+          "model_used": "direct"
+        },
+        {
+          "source_article_id": "4442416",
+          "title": "伊朗外長:外部勢力干預霍爾木茲海峽會帶來局勢升級風險",
+          "canonical_url": "https://www.hkej.com/instantnews/current/article/4442416/%E4%BC%8A%E6%9C%97%E5%A4%96%E9%95%B7%3A%E5%A4%96%E9%83%A8%E5%8B%A2%E5%8A%9B%E5%B9%B2%E9%A0%90%E9%9C%8D%E7%88%BE%E6%9C%A8%E8%8C%B2%E6%B5%B7%E5%B3%BD%E6%9C%83%E5%B8%B6%E4%BE%86%E5%B1%80%E5%8B%A2%E5%8D%87%E7%B4%9A%E9%A2%A8%E9%9A%AA",
+          "published_at": "2026-06-28T19:43:00+08:00",
+          "section": "時事脈搏",
+          "novelty_score": 5,
+          "relevance_score": 8,
+          "urgency_score": 9,
+          "named_entities": [
+            {
+              "name": "伊朗",
+              "type": "country"
+            },
+            {
+              "name": "阿拉格齊",
+              "type": "person"
+            },
+            {
+              "name": "伊拉克",
+              "type": "country"
+            },
+            {
+              "name": "美國",
+              "type": "country"
+            }
+          ],
+          "key_points": [
+            "伊朗外長阿拉格齊表示，伊朗對霍爾木茲海峽恢復通行負有全部責任。",
+            "外部勢力干預霍爾木茲海峽會帶來局勢升級風險。"
+          ],
+          "content_truncated": false,
+          "original_content_length_chars": 409,
+          "analyzed_content_length_chars": 409,
+          "original_content_token_estimate": 103,
+          "analyzed_content_token_estimate": 103,
+          "truncation_reason": null,
+          "analysis_method": "full_text",
+          "attention_tier": "high",
+          "theme": "geopolitics",
+          "attention_reason": "High-signal geopolitics headline based on title/summary keywords.",
+          "must_keep": true,
+          "model_used": "meta-llama/llama-4-scout-17b-16e-instruct",
+          "delayed_retry_attempted": false,
+          "delayed_retry_model_chain": [],
+          "delayed_retry_final_model": null,
+          "error_classification": null,
+          "error": null
+        },
+        {
+          "source_article_id": "4442407",
+          "canonical_url": "https://www.hkej.com/instantnews/current/article/4442407/%E6%B8%AF%E7%94%A2%E5%A4%AA%E7%A9%BA%E4%BA%BA%E4%B8%A8%E5%AD%AB%E6%9D%B1%3A%E9%BB%8E%E5%AE%B6%E7%9B%88%E6%98%AF%E9%A6%99%E6%B8%AF%E5%B9%B4%E8%BC%95%E4%BA%BA%E7%9A%84%E6%A6%9C%E6%A8%A3",
+          "title": "港產太空人丨孫東:黎家盈是香港年輕人的榜樣",
+          "section": "時事脈搏",
+          "published_at": "2026-06-28T19:22:00+08:00",
+          "attention_tier": "light",
+          "novelty_score": 5,
+          "relevance_score": 5,
+          "urgency_score": 5,
+          "named_entities": [],
+          "key_points": [],
+          "content_truncated": false,
+          "analysis_method": "bypassed",
+          "model_used": "direct"
+        },
+        {
+          "source_article_id": "4442402",
+          "canonical_url": "https://www.hkej.com/instantnews/current/article/4442402/%E4%B9%9D%E9%BE%8D%E5%9F%8E%E6%B3%95%E9%99%A2%E5%A4%96%E6%9C%89%E5%B0%8F%E5%B7%B4%E7%96%91%E5%89%B7%E4%B8%8A%E8%A1%8C%E4%BA%BA%E8%B7%AF+%E8%87%B3%E5%B0%9120%E4%BA%BA%E5%82%B7",
+          "title": "九龍城法院外有小巴疑剷上行人路 至少20人傷",
+          "section": "時事脈搏",
+          "published_at": "2026-06-28T19:04:00+08:00",
+          "attention_tier": "light",
+          "novelty_score": 5,
+          "relevance_score": 5,
+          "urgency_score": 5,
+          "named_entities": [],
+          "key_points": [],
+          "content_truncated": false,
+          "analysis_method": "bypassed",
+          "model_used": "direct"
+        },
+        {
+          "source_article_id": "4442401",
+          "canonical_url": "https://www.hkej.com/instantnews/current/article/4442401/%E6%A2%81%E9%8C%A6%E6%9D%BE%E5%87%BA%E4%BB%BB%E8%A5%BF%E6%B9%96%E5%A4%A7%E5%AD%B8%E6%A0%A1%E8%91%A3",
+          "title": "梁錦松出任西湖大學校董",
+          "section": "時事脈搏",
+          "published_at": "2026-06-28T18:50:00+08:00",
+          "attention_tier": "light",
+          "novelty_score": 5,
+          "relevance_score": 5,
+          "urgency_score": 5,
+          "named_entities": [],
+          "key_points": [],
+          "content_truncated": false,
+          "analysis_method": "bypassed",
+          "model_used": "direct"
+        },
+        {
+          "source_article_id": "4442368",
+          "canonical_url": "https://www.hkej.com/instantnews/current/article/4442368/%E6%B7%B1%E5%9C%B3%E5%B8%82%E8%BB%8C%E9%81%93%E4%BA%A4%E9%80%9A13%E8%99%9F%E7%B7%9A%E7%AC%AC%E4%BA%8C%E6%9C%9F%E5%8C%97%E5%BB%B6%E6%AE%B5%E9%80%9A%E8%BB%8A",
+          "title": "深圳市軌道交通13號線第二期北延段通車",
+          "section": "時事脈搏",
+          "published_at": "2026-06-28T18:21:00+08:00",
+          "attention_tier": "light",
+          "novelty_score": 5,
+          "relevance_score": 5,
+          "urgency_score": 5,
+          "named_entities": [],
+          "key_points": [],
+          "content_truncated": false,
+          "analysis_method": "bypassed",
+          "model_used": "direct"
+        },
+        {
+          "source_article_id": "4442367",
+          "canonical_url": "https://www.hkej.com/instantnews/current/article/4442367/%E6%AD%90%E6%B4%B2%E7%86%B1%E6%B5%AA%E6%8C%81%E7%BA%8C+%E5%91%A8%E6%97%A5%E6%96%99%E8%BF%912%E5%84%84%E4%BA%BA%E9%9D%A2%E8%87%A8%E9%80%BE35%E5%BA%A6",
+          "title": "歐洲熱浪持續 周日料近2億人面臨逾35度",
+          "section": "時事脈搏",
+          "published_at": "2026-06-28T18:02:00+08:00",
+          "attention_tier": "light",
+          "novelty_score": 5,
+          "relevance_score": 5,
+          "urgency_score": 5,
+          "named_entities": [],
+          "key_points": [],
+          "content_truncated": false,
+          "analysis_method": "bypassed",
+          "model_used": "direct"
+        },
         {
           "source_article_id": "4442365",
           "canonical_url": "https://www.hkej.com/instantnews/current/article/4442365/%E5%A7%94%E5%85%A7%E7%91%9E%E6%8B%89%E5%9C%B0%E9%9C%87%E4%B8%A8%E6%95%91%E4%BA%BA%E9%BB%83%E9%87%9172%E5%B0%8F%E6%99%82%E9%81%8E%E5%8E%BB+%E6%89%BE%E5%88%B0%E7%94%9F%E9%82%84%E8%80%85%E6%A9%9F%E6%9C%83%E6%B8%BA%E8%8C%AB",
@@ -116,7 +560,10 @@
           "key_points": [],
           "content_truncated": false,
           "analysis_method": "bypassed",
-          "model_used": "direct"
+          "model_used": "direct",
+          "theme": "general",
+          "attention_reason": "Lighter treatment because this story sits in the 時事脈搏 section without strong market-moving signals.",
+          "must_keep": false
         },
         {
           "source_article_id": "4442364",
@@ -132,7 +579,10 @@
           "key_points": [],
           "content_truncated": false,
           "analysis_method": "bypassed",
-          "model_used": "direct"
+          "model_used": "direct",
+          "theme": "general",
+          "attention_reason": "Lighter treatment because this story sits in the 時事脈搏 section without strong market-moving signals.",
+          "must_keep": false
         },
         {
           "source_article_id": "4442363",
@@ -193,7 +643,10 @@
           "key_points": [],
           "content_truncated": false,
           "analysis_method": "bypassed",
-          "model_used": "direct"
+          "model_used": "direct",
+          "theme": "general",
+          "attention_reason": "Lighter treatment because this story sits in the 時事脈搏 section without strong market-moving signals.",
+          "must_keep": false
         },
         {
           "source_article_id": "4442353",
@@ -209,7 +662,10 @@
           "key_points": [],
           "content_truncated": false,
           "analysis_method": "bypassed",
-          "model_used": "direct"
+          "model_used": "direct",
+          "theme": "general",
+          "attention_reason": "Lighter treatment because this story sits in the 時事脈搏 section without strong market-moving signals.",
+          "must_keep": false
         },
         {
           "source_article_id": "4442352",
@@ -225,7 +681,10 @@
           "key_points": [],
           "content_truncated": false,
           "analysis_method": "bypassed",
-          "model_used": "direct"
+          "model_used": "direct",
+          "theme": "general",
+          "attention_reason": "Lighter treatment because this story sits in the 時事脈搏 section without strong market-moving signals.",
+          "must_keep": false
         },
         {
           "source_article_id": "4442351",
@@ -241,7 +700,10 @@
           "key_points": [],
           "content_truncated": false,
           "analysis_method": "bypassed",
-          "model_used": "direct"
+          "model_used": "direct",
+          "theme": "general",
+          "attention_reason": "Lighter treatment because this story sits in the 時事脈搏 section without strong market-moving signals.",
+          "must_keep": false
         },
         {
           "source_article_id": "4442349",
@@ -257,7 +719,10 @@
           "key_points": [],
           "content_truncated": false,
           "analysis_method": "bypassed",
-          "model_used": "direct"
+          "model_used": "direct",
+          "theme": "general",
+          "attention_reason": "Lighter treatment because this story sits in the 時事脈搏 section without strong market-moving signals.",
+          "must_keep": false
         },
         {
           "source_article_id": "4442350",
@@ -318,7 +783,10 @@
           "key_points": [],
           "content_truncated": false,
           "analysis_method": "bypassed",
-          "model_used": "direct"
+          "model_used": "direct",
+          "theme": "general",
+          "attention_reason": "Lighter treatment because this story sits in the 時事脈搏 section without strong market-moving signals.",
+          "must_keep": false
         },
         {
           "source_article_id": "4442347",
@@ -379,7 +847,10 @@
           "key_points": [],
           "content_truncated": false,
           "analysis_method": "bypassed",
-          "model_used": "direct"
+          "model_used": "direct",
+          "theme": "general",
+          "attention_reason": "Lighter treatment because this story sits in the 時事脈搏 section without strong market-moving signals.",
+          "must_keep": false
         },
         {
           "source_article_id": "4442346",
@@ -395,7 +866,10 @@
           "key_points": [],
           "content_truncated": false,
           "analysis_method": "bypassed",
-          "model_used": "direct"
+          "model_used": "direct",
+          "theme": "general",
+          "attention_reason": "Lighter treatment because this story sits in the 時事脈搏 section without strong market-moving signals.",
+          "must_keep": false
         },
         {
           "source_article_id": "4442341",
@@ -411,7 +885,10 @@
           "key_points": [],
           "content_truncated": false,
           "analysis_method": "bypassed",
-          "model_used": "direct"
+          "model_used": "direct",
+          "theme": "general",
+          "attention_reason": "Lighter treatment because this story sits in the 時事脈搏 section without strong market-moving signals.",
+          "must_keep": false
         },
         {
           "source_article_id": "4442343",
@@ -427,7 +904,10 @@
           "key_points": [],
           "content_truncated": false,
           "analysis_method": "bypassed",
-          "model_used": "direct"
+          "model_used": "direct",
+          "theme": "general",
+          "attention_reason": "Lighter treatment because this story sits in the 時事脈搏 section without strong market-moving signals.",
+          "must_keep": false
         },
         {
           "source_article_id": "4442342",
@@ -443,7 +923,10 @@
           "key_points": [],
           "content_truncated": false,
           "analysis_method": "bypassed",
-          "model_used": "direct"
+          "model_used": "direct",
+          "theme": "general",
+          "attention_reason": "Lighter treatment because this story sits in the 時事脈搏 section without strong market-moving signals.",
+          "must_keep": false
         },
         {
           "source_article_id": "4442340",
@@ -508,7 +991,10 @@
           "key_points": [],
           "content_truncated": false,
           "analysis_method": "bypassed",
-          "model_used": "direct"
+          "model_used": "direct",
+          "theme": "general",
+          "attention_reason": "Lighter treatment because this story sits in the 時事脈搏 section without strong market-moving signals.",
+          "must_keep": false
         },
         {
           "source_article_id": "4442338",
@@ -524,38 +1010,318 @@
           "key_points": [],
           "content_truncated": false,
           "analysis_method": "bypassed",
-          "model_used": "direct"
+          "model_used": "direct",
+          "theme": "general",
+          "attention_reason": "Lighter treatment because this story sits in the 時事脈搏 section without strong market-moving signals.",
+          "must_keep": false
         }
       ],
       "subgroups": [
         {
-          "title": "國際衝突 & Other News",
-          "theme_rationale": "包含國際地緣政治相關事件與衝突",
-          "article_count": 16,
+          "title": "社會新聞 & Other News",
+          "theme_rationale": "與社會民生相關的新聞事件",
+          "article_count": 25,
           "key_developments": [
-            "巴基斯坦南部準軍事部隊設施遭襲擊，造成最少3名安全部隊人員死亡，4人受傷。",
-            "港燈董事總經理鄭祖瀛表示，若中東未能恢復出口天然氣，燃料費難以回落。",
-            "韓日重申致力實現朝鮮半島無核化，恢復聯合搜救演習。"
+            "警察招募日收1028份投考申請，歷來最多。",
+            "歐洲熱浪造成逾1300宗超額死亡，與高溫天氣有關。",
+            "伊朗外長表示管理和恢復霍爾木茲海峽交通由伊朗負責。"
           ],
           "named_entities": [
             {
-              "name": "巴基斯坦",
+              "name": "警察招募",
+              "type": "other"
+            },
+            {
+              "name": "歐洲",
+              "type": "other"
+            },
+            {
+              "name": "伊朗",
               "type": "country"
             },
             {
-              "name": "巴基斯坦塔利班",
-              "type": "organization"
-            },
-            {
-              "name": "韓日",
-              "type": "country"
-            },
-            {
-              "name": "港燈",
-              "type": "company"
+              "name": "霍爾木茲海峽",
+              "type": "other"
             }
           ],
           "articles": [
+            {
+              "source_article_id": "4442424",
+              "canonical_url": "https://www.hkej.com/instantnews/current/article/4442424/%E8%AD%A6%E5%AF%9F%E6%8B%9B%E5%8B%9F%E6%97%A5%E6%94%B61028%E4%BB%BD%E6%8A%95%E8%80%83%E7%94%B3%E8%AB%8B+%E6%AD%B7%E4%BE%86%E6%9C%80%E5%A4%9A",
+              "title": "警察招募日收1028份投考申請 歷來最多",
+              "section": "時事脈搏",
+              "published_at": "2026-06-28T21:27:00+08:00",
+              "attention_tier": "light",
+              "novelty_score": 5,
+              "relevance_score": 5,
+              "urgency_score": 5,
+              "named_entities": [],
+              "key_points": [],
+              "content_truncated": false,
+              "analysis_method": "bypassed",
+              "model_used": "direct"
+            },
+            {
+              "source_article_id": "4442419",
+              "canonical_url": "https://www.hkej.com/instantnews/current/article/4442419/%E6%B0%B8%E6%98%8E%E9%A6%99%E6%B8%AF%E5%9C%8B%E9%9A%9B%E9%BE%8D%E8%88%9F%E9%82%80%E8%AB%8B%E8%B3%BD%E9%96%89%E5%B9%95+%E6%B0%A3%E6%B0%9B%E7%86%B1%E7%83%88%E5%B1%95%E7%8F%BE%E7%9B%9B%E4%BA%8B%E9%A2%A8%E9%87%87",
+              "title": "永明香港國際龍舟邀請賽閉幕 氣氛熱烈展現盛事風采",
+              "section": "時事脈搏",
+              "published_at": "2026-06-28T20:28:00+08:00",
+              "attention_tier": "light",
+              "novelty_score": 5,
+              "relevance_score": 5,
+              "urgency_score": 5,
+              "named_entities": [],
+              "key_points": [],
+              "content_truncated": false,
+              "analysis_method": "bypassed",
+              "model_used": "direct"
+            },
+            {
+              "source_article_id": "4442418",
+              "canonical_url": "https://www.hkej.com/instantnews/current/article/4442418/%E4%B9%9D%E9%BE%8D%E5%9F%8E%E6%B3%95%E9%99%A2%E5%A4%96%E5%B0%8F%E5%B7%B4%E5%89%B7%E4%B8%8A%E8%A1%8C%E4%BA%BA%E8%B7%AF+%E7%94%B7%E9%80%94%E4%BA%BA%E9%80%81%E9%99%A2%E6%90%B6%E6%95%91%E5%BE%8C%E4%B8%8D%E6%B2%BB",
+              "title": "九龍城法院外小巴剷上行人路 男途人送院搶救後不治",
+              "section": "時事脈搏",
+              "published_at": "2026-06-28T20:04:00+08:00",
+              "attention_tier": "light",
+              "novelty_score": 5,
+              "relevance_score": 5,
+              "urgency_score": 5,
+              "named_entities": [],
+              "key_points": [],
+              "content_truncated": false,
+              "analysis_method": "bypassed",
+              "model_used": "direct"
+            },
+            {
+              "source_article_id": "4442426",
+              "canonical_url": "https://www.hkej.com/instantnews/current/article/4442426/%E6%AD%90%E6%B4%B2%E7%86%B1%E6%B5%AA%E4%B8%A8%E4%B8%96%E8%A1%9E%3A%E9%80%BE1300%E5%AE%97%E8%B6%85%E9%A1%8D%E6%AD%BB%E4%BA%A1+%E8%88%87%E9%AB%98%E6%BA%AB%E5%A4%A9%E6%B0%A3%E6%9C%89%E9%97%9C",
+              "title": "歐洲熱浪丨世衞:逾1300宗超額死亡 與高溫天氣有關",
+              "section": "時事脈搏",
+              "published_at": "2026-06-28T22:00:00+08:00",
+              "attention_tier": "light",
+              "novelty_score": 5,
+              "relevance_score": 5,
+              "urgency_score": 5,
+              "named_entities": [],
+              "key_points": [],
+              "content_truncated": false,
+              "analysis_method": "bypassed",
+              "model_used": "direct"
+            },
+            {
+              "source_article_id": "4442420",
+              "title": "中東局勢丨伊朗外長:管理和恢復霍爾木茲海峽交通由伊朗負責",
+              "canonical_url": "https://www.hkej.com/instantnews/current/article/4442420/%E4%B8%AD%E6%9D%B1%E5%B1%80%E5%8B%A2%E4%B8%A8%E4%BC%8A%E6%9C%97%E5%A4%96%E9%95%B7%3A%E7%AE%A1%E7%90%86%E5%92%8C%E6%81%A2%E5%BE%A9%E9%9C%8D%E7%88%BE%E6%9C%A8%E8%8C%B2%E6%B5%B7%E5%B3%BD%E4%BA%A4%E9%80%9A%E7%94%B1%E4%BC%8A%E6%9C%97%E8%B2%A0%E8%B2%AC",
+              "published_at": "2026-06-28T20:50:00+08:00",
+              "section": "時事脈搏",
+              "novelty_score": 6,
+              "relevance_score": 8,
+              "urgency_score": 9,
+              "named_entities": [
+                {
+                  "name": "伊朗",
+                  "type": "country"
+                },
+                {
+                  "name": "阿拉格齊",
+                  "type": "person"
+                },
+                {
+                  "name": "美國",
+                  "type": "country"
+                },
+                {
+                  "name": "以色列",
+                  "type": "country"
+                }
+              ],
+              "key_points": [
+                "伊朗外長阿拉格齊表示，管理和全面恢復霍爾木茲海峽的交通是伊朗的責任。",
+                "任何干涉霍爾木茲海峽管理的做法都違反了伊朗和美國的諒解備忘錄。"
+              ],
+              "content_truncated": false,
+              "original_content_length_chars": 378,
+              "analyzed_content_length_chars": 378,
+              "original_content_token_estimate": 95,
+              "analyzed_content_token_estimate": 95,
+              "truncation_reason": null,
+              "analysis_method": "full_text",
+              "attention_tier": "high",
+              "theme": "geopolitics",
+              "attention_reason": "High-signal geopolitics headline based on title/summary keywords.",
+              "must_keep": true,
+              "model_used": "meta-llama/llama-4-scout-17b-16e-instruct",
+              "delayed_retry_attempted": false,
+              "delayed_retry_model_chain": [],
+              "delayed_retry_final_model": null,
+              "error_classification": null,
+              "error": null
+            },
+            {
+              "source_article_id": "4442416",
+              "title": "伊朗外長:外部勢力干預霍爾木茲海峽會帶來局勢升級風險",
+              "canonical_url": "https://www.hkej.com/instantnews/current/article/4442416/%E4%BC%8A%E6%9C%97%E5%A4%96%E9%95%B7%3A%E5%A4%96%E9%83%A8%E5%8B%A2%E5%8A%9B%E5%B9%B2%E9%A0%90%E9%9C%8D%E7%88%BE%E6%9C%A8%E8%8C%B2%E6%B5%B7%E5%B3%BD%E6%9C%83%E5%B8%B6%E4%BE%86%E5%B1%80%E5%8B%A2%E5%8D%87%E7%B4%9A%E9%A2%A8%E9%9A%AA",
+              "published_at": "2026-06-28T19:43:00+08:00",
+              "section": "時事脈搏",
+              "novelty_score": 5,
+              "relevance_score": 8,
+              "urgency_score": 9,
+              "named_entities": [
+                {
+                  "name": "伊朗",
+                  "type": "country"
+                },
+                {
+                  "name": "阿拉格齊",
+                  "type": "person"
+                },
+                {
+                  "name": "伊拉克",
+                  "type": "country"
+                },
+                {
+                  "name": "美國",
+                  "type": "country"
+                }
+              ],
+              "key_points": [
+                "伊朗外長阿拉格齊表示，伊朗對霍爾木茲海峽恢復通行負有全部責任。",
+                "外部勢力干預霍爾木茲海峽會帶來局勢升級風險。"
+              ],
+              "content_truncated": false,
+              "original_content_length_chars": 409,
+              "analyzed_content_length_chars": 409,
+              "original_content_token_estimate": 103,
+              "analyzed_content_token_estimate": 103,
+              "truncation_reason": null,
+              "analysis_method": "full_text",
+              "attention_tier": "high",
+              "theme": "geopolitics",
+              "attention_reason": "High-signal geopolitics headline based on title/summary keywords.",
+              "must_keep": true,
+              "model_used": "meta-llama/llama-4-scout-17b-16e-instruct",
+              "delayed_retry_attempted": false,
+              "delayed_retry_model_chain": [],
+              "delayed_retry_final_model": null,
+              "error_classification": null,
+              "error": null
+            },
+            {
+              "source_article_id": "4442422",
+              "canonical_url": "https://www.hkej.com/instantnews/current/article/4442422/AI%E7%A6%81%E6%AF%92%E7%89%87%E4%B8%8B%E6%9E%B6%E4%B8%A8%E6%87%B2%E6%95%99%E7%BD%B2%E6%89%BF%E8%AA%8D%E6%9C%89%E4%B8%8D%E8%B6%B3%E4%B9%8B%E8%99%95+%E7%A8%B1%E4%B8%8D%E6%B6%89%E9%A1%8D%E5%A4%96%E5%85%AC%E5%B8%91",
+              "title": "AI禁毒片下架丨懲教署承認有不足之處 稱不涉額外公帑",
+              "section": "時事脈搏",
+              "published_at": "2026-06-28T21:05:00+08:00",
+              "attention_tier": "light",
+              "novelty_score": 5,
+              "relevance_score": 5,
+              "urgency_score": 5,
+              "named_entities": [],
+              "key_points": [],
+              "content_truncated": false,
+              "analysis_method": "bypassed",
+              "model_used": "direct"
+            },
+            {
+              "source_article_id": "4442402",
+              "canonical_url": "https://www.hkej.com/instantnews/current/article/4442402/%E4%B9%9D%E9%BE%8D%E5%9F%8E%E6%B3%95%E9%99%A2%E5%A4%96%E6%9C%89%E5%B0%8F%E5%B7%B4%E7%96%91%E5%89%B7%E4%B8%8A%E8%A1%8C%E4%BA%BA%E8%B7%AF+%E8%87%B3%E5%B0%9120%E4%BA%BA%E5%82%B7",
+              "title": "九龍城法院外有小巴疑剷上行人路 至少20人傷",
+              "section": "時事脈搏",
+              "published_at": "2026-06-28T19:04:00+08:00",
+              "attention_tier": "light",
+              "novelty_score": 5,
+              "relevance_score": 5,
+              "urgency_score": 5,
+              "named_entities": [],
+              "key_points": [],
+              "content_truncated": false,
+              "analysis_method": "bypassed",
+              "model_used": "direct"
+            },
+            {
+              "source_article_id": "4442401",
+              "canonical_url": "https://www.hkej.com/instantnews/current/article/4442401/%E6%A2%81%E9%8C%A6%E6%9D%BE%E5%87%BA%E4%BB%BB%E8%A5%BF%E6%B9%96%E5%A4%A7%E5%AD%B8%E6%A0%A1%E8%91%A3",
+              "title": "梁錦松出任西湖大學校董",
+              "section": "時事脈搏",
+              "published_at": "2026-06-28T18:50:00+08:00",
+              "attention_tier": "light",
+              "novelty_score": 5,
+              "relevance_score": 5,
+              "urgency_score": 5,
+              "named_entities": [],
+              "key_points": [],
+              "content_truncated": false,
+              "analysis_method": "bypassed",
+              "model_used": "direct"
+            },
+            {
+              "source_article_id": "4442407",
+              "canonical_url": "https://www.hkej.com/instantnews/current/article/4442407/%E6%B8%AF%E7%94%A2%E5%A4%AA%E7%A9%BA%E4%BA%BA%E4%B8%A8%E5%AD%AB%E6%9D%B1%3A%E9%BB%8E%E5%AE%B6%E7%9B%88%E6%98%AF%E9%A6%99%E6%B8%AF%E5%B9%B4%E8%BC%95%E4%BA%BA%E7%9A%84%E6%A6%9C%E6%A8%A3",
+              "title": "港產太空人丨孫東:黎家盈是香港年輕人的榜樣",
+              "section": "時事脈搏",
+              "published_at": "2026-06-28T19:22:00+08:00",
+              "attention_tier": "light",
+              "novelty_score": 5,
+              "relevance_score": 5,
+              "urgency_score": 5,
+              "named_entities": [],
+              "key_points": [],
+              "content_truncated": false,
+              "analysis_method": "bypassed",
+              "model_used": "direct"
+            },
+            {
+              "source_article_id": "4442368",
+              "canonical_url": "https://www.hkej.com/instantnews/current/article/4442368/%E6%B7%B1%E5%9C%B3%E5%B8%82%E8%BB%8C%E9%81%93%E4%BA%A4%E9%80%9A13%E8%99%9F%E7%B7%9A%E7%AC%AC%E4%BA%8C%E6%9C%9F%E5%8C%97%E5%BB%B6%E6%AE%B5%E9%80%9A%E8%BB%8A",
+              "title": "深圳市軌道交通13號線第二期北延段通車",
+              "section": "時事脈搏",
+              "published_at": "2026-06-28T18:21:00+08:00",
+              "attention_tier": "light",
+              "novelty_score": 5,
+              "relevance_score": 5,
+              "urgency_score": 5,
+              "named_entities": [],
+              "key_points": [],
+              "content_truncated": false,
+              "analysis_method": "bypassed",
+              "model_used": "direct"
+            },
+            {
+              "source_article_id": "4442367",
+              "canonical_url": "https://www.hkej.com/instantnews/current/article/4442367/%E6%AD%90%E6%B4%B2%E7%86%B1%E6%B5%AA%E6%8C%81%E7%BA%8C+%E5%91%A8%E6%97%A5%E6%96%99%E8%BF%912%E5%84%84%E4%BA%BA%E9%9D%A2%E8%87%A8%E9%80%BE35%E5%BA%A6",
+              "title": "歐洲熱浪持續 周日料近2億人面臨逾35度",
+              "section": "時事脈搏",
+              "published_at": "2026-06-28T18:02:00+08:00",
+              "attention_tier": "light",
+              "novelty_score": 5,
+              "relevance_score": 5,
+              "urgency_score": 5,
+              "named_entities": [],
+              "key_points": [],
+              "content_truncated": false,
+              "analysis_method": "bypassed",
+              "model_used": "direct"
+            },
+            {
+              "source_article_id": "4442365",
+              "canonical_url": "https://www.hkej.com/instantnews/current/article/4442365/%E5%A7%94%E5%85%A7%E7%91%9E%E6%8B%89%E5%9C%B0%E9%9C%87%E4%B8%A8%E6%95%91%E4%BA%BA%E9%BB%83%E9%87%9172%E5%B0%8F%E6%99%82%E9%81%8E%E5%8E%BB+%E6%89%BE%E5%88%B0%E7%94%9F%E9%82%84%E8%80%85%E6%A9%9F%E6%9C%83%E6%B8%BA%E8%8C%AB",
+              "title": "委內瑞拉地震丨救人黃金72小時過去 找到生還者機會渺茫",
+              "section": "時事脈搏",
+              "published_at": "2026-06-28T17:02:00+08:00",
+              "attention_tier": "light",
+              "novelty_score": 5,
+              "relevance_score": 5,
+              "urgency_score": 5,
+              "named_entities": [],
+              "key_points": [],
+              "content_truncated": false,
+              "analysis_method": "bypassed",
+              "model_used": "direct",
+              "theme": "general",
+              "attention_reason": "Lighter treatment because this story sits in the 時事脈搏 section without strong market-moving signals.",
+              "must_keep": false
+            },
             {
               "source_article_id": "4442364",
               "canonical_url": "https://www.hkej.com/instantnews/current/article/4442364/%E9%9F%93%E6%97%A5%E9%87%8D%E7%94%B3%E8%87%B4%E5%8A%9B%E5%AF%A6%E7%8F%BE%E6%9C%9D%E9%AE%AE%E5%8D%8A%E5%B3%B6%E7%84%A1%E6%A0%B8%E5%8C%96+%E6%81%A2%E5%BE%A9%E8%81%AF%E5%90%88%E6%90%9C%E6%95%91%E6%BC%94%E7%BF%92",
@@ -570,7 +1336,10 @@
               "key_points": [],
               "content_truncated": false,
               "analysis_method": "bypassed",
-              "model_used": "direct"
+              "model_used": "direct",
+              "theme": "general",
+              "attention_reason": "Lighter treatment because this story sits in the 時事脈搏 section without strong market-moving signals.",
+              "must_keep": false
             },
             {
               "source_article_id": "4442363",
@@ -618,22 +1387,6 @@
               "error": null
             },
             {
-              "source_article_id": "4442365",
-              "canonical_url": "https://www.hkej.com/instantnews/current/article/4442365/%E5%A7%94%E5%85%A7%E7%91%9E%E6%8B%89%E5%9C%B0%E9%9C%87%E4%B8%A8%E6%95%91%E4%BA%BA%E9%BB%83%E9%87%9172%E5%B0%8F%E6%99%82%E9%81%8E%E5%8E%BB+%E6%89%BE%E5%88%B0%E7%94%9F%E9%82%84%E8%80%85%E6%A9%9F%E6%9C%83%E6%B8%BA%E8%8C%AB",
-              "title": "委內瑞拉地震丨救人黃金72小時過去 找到生還者機會渺茫",
-              "section": "時事脈搏",
-              "published_at": "2026-06-28T17:02:00+08:00",
-              "attention_tier": "light",
-              "novelty_score": 5,
-              "relevance_score": 5,
-              "urgency_score": 5,
-              "named_entities": [],
-              "key_points": [],
-              "content_truncated": false,
-              "analysis_method": "bypassed",
-              "model_used": "direct"
-            },
-            {
               "source_article_id": "4442355",
               "canonical_url": "https://www.hkej.com/instantnews/current/article/4442355/%E7%85%A4%E6%B0%A3%E8%B3%87%E5%8A%A9%E5%AE%89%E8%80%81%E9%99%A2%E8%88%8D%E5%8D%87%E7%B4%9A%E8%A8%AD%E6%96%BD+%E5%8E%BB%E5%B9%B4%E8%B3%87%E5%8A%A9%E9%A1%8D%E9%81%945000%E8%90%AC",
               "title": "煤氣資助安老院舍升級設施 去年資助額達5000萬",
@@ -647,14 +1400,17 @@
               "key_points": [],
               "content_truncated": false,
               "analysis_method": "bypassed",
-              "model_used": "direct"
+              "model_used": "direct",
+              "theme": "general",
+              "attention_reason": "Lighter treatment because this story sits in the 時事脈搏 section without strong market-moving signals.",
+              "must_keep": false
             },
             {
-              "source_article_id": "4442352",
-              "canonical_url": "https://www.hkej.com/instantnews/current/article/4442352/%E6%B7%B1%E6%B0%B4%E5%9F%97%E7%94%B7%E5%AD%90%E7%96%91%E6%AC%A0%E5%82%B5%E9%81%87%E8%A5%B2+%E6%89%8B%E8%85%B3%E4%B8%AD%E5%88%80%E5%8F%97%E5%82%B7%E9%80%81%E9%99%A2",
-              "title": "深水埗男子疑欠債遇襲 手腳中刀受傷送院",
+              "source_article_id": "4442351",
+              "canonical_url": "https://www.hkej.com/instantnews/current/article/4442351/%E4%BA%94%E5%B9%B4%E8%A6%8F%E5%8A%83%E4%B8%A8%E8%AC%9D%E5%B0%8F%E8%8F%AF%3A%E6%96%BD%E6%94%BF%E5%A0%B1%E5%91%8A%E4%BB%BB%E5%8B%99%E5%B0%87%E6%9B%B4%E9%87%8D%E8%A6%81+%E6%88%90%E4%BA%94%E5%B9%B4%E8%A6%8F%E5%8A%83%E6%AF%8F%E5%B9%B4%E5%B0%8F%E6%AA%A2%E8%A8%8E",
+              "title": "五年規劃丨謝小華:施政報告任務將更重要 成五年規劃每年小檢討",
               "section": "時事脈搏",
-              "published_at": "2026-06-28T13:00:00+08:00",
+              "published_at": "2026-06-28T12:54:00+08:00",
               "attention_tier": "light",
               "novelty_score": 5,
               "relevance_score": 5,
@@ -663,7 +1419,10 @@
               "key_points": [],
               "content_truncated": false,
               "analysis_method": "bypassed",
-              "model_used": "direct"
+              "model_used": "direct",
+              "theme": "general",
+              "attention_reason": "Lighter treatment because this story sits in the 時事脈搏 section without strong market-moving signals.",
+              "must_keep": false
             },
             {
               "source_article_id": "4442353",
@@ -679,7 +1438,67 @@
               "key_points": [],
               "content_truncated": false,
               "analysis_method": "bypassed",
-              "model_used": "direct"
+              "model_used": "direct",
+              "theme": "general",
+              "attention_reason": "Lighter treatment because this story sits in the 時事脈搏 section without strong market-moving signals.",
+              "must_keep": false
+            },
+            {
+              "source_article_id": "4442352",
+              "canonical_url": "https://www.hkej.com/instantnews/current/article/4442352/%E6%B7%B1%E6%B0%B4%E5%9F%97%E7%94%B7%E5%AD%90%E7%96%91%E6%AC%A0%E5%82%B5%E9%81%87%E8%A5%B2+%E6%89%8B%E8%85%B3%E4%B8%AD%E5%88%80%E5%8F%97%E5%82%B7%E9%80%81%E9%99%A2",
+              "title": "深水埗男子疑欠債遇襲 手腳中刀受傷送院",
+              "section": "時事脈搏",
+              "published_at": "2026-06-28T13:00:00+08:00",
+              "attention_tier": "light",
+              "novelty_score": 5,
+              "relevance_score": 5,
+              "urgency_score": 5,
+              "named_entities": [],
+              "key_points": [],
+              "content_truncated": false,
+              "analysis_method": "bypassed",
+              "model_used": "direct",
+              "theme": "general",
+              "attention_reason": "Lighter treatment because this story sits in the 時事脈搏 section without strong market-moving signals.",
+              "must_keep": false
+            },
+            {
+              "source_article_id": "4442349",
+              "canonical_url": "https://www.hkej.com/instantnews/current/article/4442349/%E5%A1%9E%E7%88%BE%E7%B6%AD%E4%BA%9E%E7%B8%BD%E7%B5%B1%E6%AD%A6%E5%A5%91%E5%A5%87%E5%AE%A3%E5%B8%83%E5%B0%87%E5%9C%A8%E6%95%B8%E5%91%A8%E5%BE%8C%E8%BE%AD%E8%81%B7",
+              "title": "塞爾維亞總統武契奇宣布將在數周後辭職",
+              "section": "時事脈搏",
+              "published_at": "2026-06-28T11:59:00+08:00",
+              "attention_tier": "light",
+              "novelty_score": 5,
+              "relevance_score": 5,
+              "urgency_score": 5,
+              "named_entities": [],
+              "key_points": [],
+              "content_truncated": false,
+              "analysis_method": "bypassed",
+              "model_used": "direct",
+              "theme": "general",
+              "attention_reason": "Lighter treatment because this story sits in the 時事脈搏 section without strong market-moving signals.",
+              "must_keep": false
+            },
+            {
+              "source_article_id": "4442348",
+              "canonical_url": "https://www.hkej.com/instantnews/current/article/4442348/%E5%A4%A9%E6%B0%A3%E4%B8%A8%E5%A4%A9%E6%96%87%E5%8F%B0%E7%99%BC%E5%87%BA%E9%BB%83%E8%89%B2%E6%9A%B4%E9%9B%A8%E8%AD%A6%E5%91%8A%E8%A8%8A%E8%99%9F",
+              "title": "天氣丨天文台發出黃色暴雨警告訊號",
+              "section": "時事脈搏",
+              "published_at": "2026-06-28T11:19:00+08:00",
+              "attention_tier": "light",
+              "novelty_score": 5,
+              "relevance_score": 5,
+              "urgency_score": 5,
+              "named_entities": [],
+              "key_points": [],
+              "content_truncated": false,
+              "analysis_method": "bypassed",
+              "model_used": "direct",
+              "theme": "general",
+              "attention_reason": "Lighter treatment because this story sits in the 時事脈搏 section without strong market-moving signals.",
+              "must_keep": false
             },
             {
               "source_article_id": "4442350",
@@ -727,70 +1546,6 @@
               "error": null
             },
             {
-              "source_article_id": "4442351",
-              "canonical_url": "https://www.hkej.com/instantnews/current/article/4442351/%E4%BA%94%E5%B9%B4%E8%A6%8F%E5%8A%83%E4%B8%A8%E8%AC%9D%E5%B0%8F%E8%8F%AF%3A%E6%96%BD%E6%94%BF%E5%A0%B1%E5%91%8A%E4%BB%BB%E5%8B%99%E5%B0%87%E6%9B%B4%E9%87%8D%E8%A6%81+%E6%88%90%E4%BA%94%E5%B9%B4%E8%A6%8F%E5%8A%83%E6%AF%8F%E5%B9%B4%E5%B0%8F%E6%AA%A2%E8%A8%8E",
-              "title": "五年規劃丨謝小華:施政報告任務將更重要 成五年規劃每年小檢討",
-              "section": "時事脈搏",
-              "published_at": "2026-06-28T12:54:00+08:00",
-              "attention_tier": "light",
-              "novelty_score": 5,
-              "relevance_score": 5,
-              "urgency_score": 5,
-              "named_entities": [],
-              "key_points": [],
-              "content_truncated": false,
-              "analysis_method": "bypassed",
-              "model_used": "direct"
-            },
-            {
-              "source_article_id": "4442349",
-              "canonical_url": "https://www.hkej.com/instantnews/current/article/4442349/%E5%A1%9E%E7%88%BE%E7%B6%AD%E4%BA%9E%E7%B8%BD%E7%B5%B1%E6%AD%A6%E5%A5%91%E5%A5%87%E5%AE%A3%E5%B8%83%E5%B0%87%E5%9C%A8%E6%95%B8%E5%91%A8%E5%BE%8C%E8%BE%AD%E8%81%B7",
-              "title": "塞爾維亞總統武契奇宣布將在數周後辭職",
-              "section": "時事脈搏",
-              "published_at": "2026-06-28T11:59:00+08:00",
-              "attention_tier": "light",
-              "novelty_score": 5,
-              "relevance_score": 5,
-              "urgency_score": 5,
-              "named_entities": [],
-              "key_points": [],
-              "content_truncated": false,
-              "analysis_method": "bypassed",
-              "model_used": "direct"
-            },
-            {
-              "source_article_id": "4442348",
-              "canonical_url": "https://www.hkej.com/instantnews/current/article/4442348/%E5%A4%A9%E6%B0%A3%E4%B8%A8%E5%A4%A9%E6%96%87%E5%8F%B0%E7%99%BC%E5%87%BA%E9%BB%83%E8%89%B2%E6%9A%B4%E9%9B%A8%E8%AD%A6%E5%91%8A%E8%A8%8A%E8%99%9F",
-              "title": "天氣丨天文台發出黃色暴雨警告訊號",
-              "section": "時事脈搏",
-              "published_at": "2026-06-28T11:19:00+08:00",
-              "attention_tier": "light",
-              "novelty_score": 5,
-              "relevance_score": 5,
-              "urgency_score": 5,
-              "named_entities": [],
-              "key_points": [],
-              "content_truncated": false,
-              "analysis_method": "bypassed",
-              "model_used": "direct"
-            },
-            {
-              "source_article_id": "4442346",
-              "canonical_url": "https://www.hkej.com/instantnews/current/article/4442346/%E5%A4%A9%E6%B0%A3%E4%B8%A8%E5%A4%A9%E6%96%87%E5%8F%B0%3A%E6%9C%AA%E4%BE%86%E4%B8%80%E5%85%A9%E5%B0%8F%E6%99%82%E6%9C%AC%E6%B8%AF%E5%BB%A3%E6%B3%9B%E5%9C%B0%E5%8D%80%E6%88%96%E5%8F%97%E5%A4%A7%E9%9B%A8%E5%BD%B1%E9%9F%BF",
-              "title": "天氣丨天文台:未來一兩小時本港廣泛地區或受大雨影響",
-              "section": "時事脈搏",
-              "published_at": "2026-06-28T10:54:00+08:00",
-              "attention_tier": "light",
-              "novelty_score": 5,
-              "relevance_score": 5,
-              "urgency_score": 5,
-              "named_entities": [],
-              "key_points": [],
-              "content_truncated": false,
-              "analysis_method": "bypassed",
-              "model_used": "direct"
-            },
-            {
               "source_article_id": "4442347",
               "title": "電費丨港燈:若中東未能恢復出口天然氣 燃料費難回落",
               "canonical_url": "https://www.hkej.com/instantnews/current/article/4442347/%E9%9B%BB%E8%B2%BB%E4%B8%A8%E6%B8%AF%E7%87%88%3A%E8%8B%A5%E4%B8%AD%E6%9D%B1%E6%9C%AA%E8%83%BD%E6%81%A2%E5%BE%A9%E5%87%BA%E5%8F%A3%E5%A4%A9%E7%84%B6%E6%B0%A3+%E7%87%83%E6%96%99%E8%B2%BB%E9%9B%A3%E5%9B%9E%E8%90%BD",
@@ -836,22 +1591,6 @@
               "error": null
             },
             {
-              "source_article_id": "4442344",
-              "canonical_url": "https://www.hkej.com/instantnews/current/article/4442344/%E5%A7%94%E5%85%A7%E7%91%9E%E6%8B%89%E5%9C%B0%E9%9C%87%E4%B8%A8%E5%A2%9E%E8%87%B31430%E4%BA%BA%E6%AD%BB%E4%BA%A1+%E9%81%87%E9%9B%A3%E4%B8%AD%E5%9C%8B%E5%85%AC%E6%B0%91%E5%A2%9E%E8%87%B38%E4%BA%BA",
-              "title": "委內瑞拉地震丨增至1430人死亡 遇難中國公民增至8人",
-              "section": "時事脈搏",
-              "published_at": "2026-06-28T11:02:00+08:00",
-              "attention_tier": "light",
-              "novelty_score": 5,
-              "relevance_score": 5,
-              "urgency_score": 5,
-              "named_entities": [],
-              "key_points": [],
-              "content_truncated": false,
-              "analysis_method": "bypassed",
-              "model_used": "direct"
-            },
-            {
               "source_article_id": "4442341",
               "canonical_url": "https://www.hkej.com/instantnews/current/article/4442341/AI%E7%A6%81%E6%AF%92%E7%89%87%E8%A2%AB%E8%B3%AA%E7%96%91%E5%8F%8D%E6%95%88%E6%9E%9C+%E6%87%B2%E6%95%99%E7%BD%B2%E6%84%9F%E6%8A%B1%E6%AD%89%E5%B7%B2%E4%B8%8B%E6%9E%B6",
               "title": "AI禁毒片被質疑反效果 懲教署感抱歉已下架",
@@ -865,71 +1604,11 @@
               "key_points": [],
               "content_truncated": false,
               "analysis_method": "bypassed",
-              "model_used": "direct"
+              "model_used": "direct",
+              "theme": "general",
+              "attention_reason": "Lighter treatment because this story sits in the 時事脈搏 section without strong market-moving signals.",
+              "must_keep": false
             },
-            {
-              "source_article_id": "4442339",
-              "canonical_url": "https://www.hkej.com/instantnews/current/article/4442339/11%E6%AD%B2%E7%94%B7%E7%AB%A5%E5%B0%87%E8%BB%8D%E6%BE%B3%E9%81%8B%E5%8B%95%E5%A0%B4%E8%B7%91%E6%AD%A5%E6%9A%88%E5%80%92+%E9%80%81%E9%99%A2%E4%B8%8D%E6%B2%BB",
-              "title": "11歲男童將軍澳運動場跑步暈倒 送院不治",
-              "section": "時事脈搏",
-              "published_at": "2026-06-28T09:34:00+08:00",
-              "attention_tier": "light",
-              "novelty_score": 5,
-              "relevance_score": 5,
-              "urgency_score": 5,
-              "named_entities": [],
-              "key_points": [],
-              "content_truncated": false,
-              "analysis_method": "bypassed",
-              "model_used": "direct"
-            },
-            {
-              "source_article_id": "4442338",
-              "canonical_url": "https://www.hkej.com/instantnews/current/article/4442338/%E5%A4%A9%E6%B0%A3%E4%B8%A8%E5%A4%A9%E6%96%87%E5%8F%B0%E6%96%99%E6%9C%AA%E4%BE%86%E4%B8%80%E5%85%A9%E5%B0%8F%E6%99%82%E9%83%A8%E5%88%86%E5%9C%B0%E5%8D%80%E9%9B%A8%E5%8B%A2%E8%BC%83%E5%A4%A7",
-              "title": "天氣丨天文台料未來一兩小時部分地區雨勢較大",
-              "section": "時事脈搏",
-              "published_at": "2026-06-28T09:11:00+08:00",
-              "attention_tier": "light",
-              "novelty_score": 5,
-              "relevance_score": 5,
-              "urgency_score": 5,
-              "named_entities": [],
-              "key_points": [],
-              "content_truncated": false,
-              "analysis_method": "bypassed",
-              "model_used": "direct"
-            }
-          ],
-          "model_used": "meta-llama/llama-4-scout-17b-16e-instruct"
-        },
-        {
-          "title": "國際時事",
-          "theme_rationale": "與國際事件相關的新聞報道",
-          "article_count": 3,
-          "key_developments": [
-            "美軍連續第二日空襲伊朗，目標包括導彈和無人機倉庫及沿海雷達站。",
-            "特朗普警告伊朗或將不復存在，如果伊朗繼續違反停火協議。",
-            "日本岩手縣近海發生6.1級地震。"
-          ],
-          "named_entities": [
-            {
-              "name": "伊朗",
-              "type": "country"
-            },
-            {
-              "name": "美國",
-              "type": "country"
-            },
-            {
-              "name": "特朗普",
-              "type": "person"
-            },
-            {
-              "name": "美軍",
-              "type": "organization"
-            }
-          ],
-          "articles": [
             {
               "source_article_id": "4442340",
               "title": "中東局勢丨美軍再空襲伊朗 特朗普警告伊朗或將不復存在",
@@ -978,6 +1657,52 @@
               "delayed_retry_final_model": null,
               "error_classification": null,
               "error": null
+            }
+          ],
+          "model_used": "meta-llama/llama-4-scout-17b-16e-instruct"
+        },
+        {
+          "title": "自然災害",
+          "theme_rationale": "與自然災害相關的新聞報導",
+          "article_count": 3,
+          "key_developments": [
+            "委內瑞拉地震已造成1430人死亡，遇難中國公民增至8人",
+            "日本岩手縣近海發生6.1級地震",
+            "香港未來一兩小時或受大雨影響"
+          ],
+          "named_entities": [
+            {
+              "name": "委內瑞拉",
+              "type": "country"
+            },
+            {
+              "name": "日本",
+              "type": "country"
+            },
+            {
+              "name": "香港",
+              "type": "other"
+            }
+          ],
+          "articles": [
+            {
+              "source_article_id": "4442344",
+              "canonical_url": "https://www.hkej.com/instantnews/current/article/4442344/%E5%A7%94%E5%85%A7%E7%91%9E%E6%8B%89%E5%9C%B0%E9%9C%87%E4%B8%A8%E5%A2%9E%E8%87%B31430%E4%BA%BA%E6%AD%BB%E4%BA%A1+%E9%81%87%E9%9B%A3%E4%B8%AD%E5%9C%8B%E5%85%AC%E6%B0%91%E5%A2%9E%E8%87%B38%E4%BA%BA",
+              "title": "委內瑞拉地震丨增至1430人死亡 遇難中國公民增至8人",
+              "section": "時事脈搏",
+              "published_at": "2026-06-28T11:02:00+08:00",
+              "attention_tier": "light",
+              "novelty_score": 5,
+              "relevance_score": 5,
+              "urgency_score": 5,
+              "named_entities": [],
+              "key_points": [],
+              "content_truncated": false,
+              "analysis_method": "bypassed",
+              "model_used": "direct",
+              "theme": "general",
+              "attention_reason": "Lighter treatment because this story sits in the 時事脈搏 section without strong market-moving signals.",
+              "must_keep": false
             },
             {
               "source_article_id": "4442343",
@@ -993,7 +1718,94 @@
               "key_points": [],
               "content_truncated": false,
               "analysis_method": "bypassed",
-              "model_used": "direct"
+              "model_used": "direct",
+              "theme": "general",
+              "attention_reason": "Lighter treatment because this story sits in the 時事脈搏 section without strong market-moving signals.",
+              "must_keep": false
+            },
+            {
+              "source_article_id": "4442346",
+              "canonical_url": "https://www.hkej.com/instantnews/current/article/4442346/%E5%A4%A9%E6%B0%A3%E4%B8%A8%E5%A4%A9%E6%96%87%E5%8F%B0%3A%E6%9C%AA%E4%BE%86%E4%B8%80%E5%85%A9%E5%B0%8F%E6%99%82%E6%9C%AC%E6%B8%AF%E5%BB%A3%E6%B3%9B%E5%9C%B0%E5%8D%80%E6%88%96%E5%8F%97%E5%A4%A7%E9%9B%A8%E5%BD%B1%E9%9F%BF",
+              "title": "天氣丨天文台:未來一兩小時本港廣泛地區或受大雨影響",
+              "section": "時事脈搏",
+              "published_at": "2026-06-28T10:54:00+08:00",
+              "attention_tier": "light",
+              "novelty_score": 5,
+              "relevance_score": 5,
+              "urgency_score": 5,
+              "named_entities": [],
+              "key_points": [],
+              "content_truncated": false,
+              "analysis_method": "bypassed",
+              "model_used": "direct",
+              "theme": "general",
+              "attention_reason": "Lighter treatment because this story sits in the 時事脈搏 section without strong market-moving signals.",
+              "must_keep": false
+            }
+          ],
+          "model_used": "meta-llama/llama-4-scout-17b-16e-instruct"
+        },
+        {
+          "title": "本地新聞",
+          "theme_rationale": "報導本地發生的新聞事件",
+          "article_count": 3,
+          "key_developments": [
+            "11歲男童在將軍澳運動場跑步暈倒送院不治",
+            "天文台預料未來一兩小時部分地區雨勢較大",
+            "李家超表示將堅定改革步伐"
+          ],
+          "named_entities": [
+            {
+              "name": "李家超",
+              "type": "person"
+            },
+            {
+              "name": "將軍澳運動場",
+              "type": "other"
+            },
+            {
+              "name": "天文台",
+              "type": "institution"
+            }
+          ],
+          "articles": [
+            {
+              "source_article_id": "4442339",
+              "canonical_url": "https://www.hkej.com/instantnews/current/article/4442339/11%E6%AD%B2%E7%94%B7%E7%AB%A5%E5%B0%87%E8%BB%8D%E6%BE%B3%E9%81%8B%E5%8B%95%E5%A0%B4%E8%B7%91%E6%AD%A5%E6%9A%88%E5%80%92+%E9%80%81%E9%99%A2%E4%B8%8D%E6%B2%BB",
+              "title": "11歲男童將軍澳運動場跑步暈倒 送院不治",
+              "section": "時事脈搏",
+              "published_at": "2026-06-28T09:34:00+08:00",
+              "attention_tier": "light",
+              "novelty_score": 5,
+              "relevance_score": 5,
+              "urgency_score": 5,
+              "named_entities": [],
+              "key_points": [],
+              "content_truncated": false,
+              "analysis_method": "bypassed",
+              "model_used": "direct",
+              "theme": "general",
+              "attention_reason": "Lighter treatment because this story sits in the 時事脈搏 section without strong market-moving signals.",
+              "must_keep": false
+            },
+            {
+              "source_article_id": "4442338",
+              "canonical_url": "https://www.hkej.com/instantnews/current/article/4442338/%E5%A4%A9%E6%B0%A3%E4%B8%A8%E5%A4%A9%E6%96%87%E5%8F%B0%E6%96%99%E6%9C%AA%E4%BE%86%E4%B8%80%E5%85%A9%E5%B0%8F%E6%99%82%E9%83%A8%E5%88%86%E5%9C%B0%E5%8D%80%E9%9B%A8%E5%8B%A2%E8%BC%83%E5%A4%A7",
+              "title": "天氣丨天文台料未來一兩小時部分地區雨勢較大",
+              "section": "時事脈搏",
+              "published_at": "2026-06-28T09:11:00+08:00",
+              "attention_tier": "light",
+              "novelty_score": 5,
+              "relevance_score": 5,
+              "urgency_score": 5,
+              "named_entities": [],
+              "key_points": [],
+              "content_truncated": false,
+              "analysis_method": "bypassed",
+              "model_used": "direct",
+              "theme": "general",
+              "attention_reason": "Lighter treatment because this story sits in the 時事脈搏 section without strong market-moving signals.",
+              "must_keep": false
             },
             {
               "source_article_id": "4442342",
@@ -1009,7 +1821,10 @@
               "key_points": [],
               "content_truncated": false,
               "analysis_method": "bypassed",
-              "model_used": "direct"
+              "model_used": "direct",
+              "theme": "general",
+              "attention_reason": "Lighter treatment because this story sits in the 時事脈搏 section without strong market-moving signals.",
+              "must_keep": false
             }
           ],
           "model_used": "meta-llama/llama-4-scout-17b-16e-instruct"
@@ -1017,17 +1832,17 @@
       ],
       "analysis_profile": "light",
       "model_used": "meta-llama/llama-4-scout-17b-16e-instruct",
-      "sub_batch_count": 7,
+      "sub_batch_count": 13,
       "diagnostics": {
-        "sub_batch_count": 2,
+        "sub_batch_count": 13,
         "split_reasons": [
           "pre_send_budget"
         ],
         "models_attempted": [
           "meta-llama/llama-4-scout-17b-16e-instruct"
         ],
-        "estimated_input_tokens_max": 1312,
-        "serialized_request_bytes_max": 6919,
+        "estimated_input_tokens_max": 1290,
+        "serialized_request_bytes_max": 6219,
         "rate_limit_waits": 0,
         "partial_article_count": 0,
         "synthesis_wait_seconds_total": 0.0,
@@ -1283,15 +2098,13 @@
       ],
       "analysis_profile": "standard",
       "model_used": "meta-llama/llama-4-scout-17b-16e-instruct",
-      "sub_batch_count": 2,
+      "sub_batch_count": 1,
       "diagnostics": {
         "sub_batch_count": 1,
         "split_reasons": [],
-        "models_attempted": [
-          "meta-llama/llama-4-scout-17b-16e-instruct"
-        ],
-        "estimated_input_tokens_max": 1009,
-        "serialized_request_bytes_max": 6672,
+        "models_attempted": [],
+        "estimated_input_tokens_max": 0,
+        "serialized_request_bytes_max": 0,
         "rate_limit_waits": 0,
         "partial_article_count": 0,
         "synthesis_wait_seconds_total": 0.0,
@@ -1310,7 +2123,7 @@
       "article_count": 1,
       "status": "success",
       "key_developments": [
-        "智元機器人第1.5萬台機械人量產下線，型號為AgiBot G2，適用於工業及真實作業場景。",
+        "智元機器人量產第1.5萬台機械人，型號為AgiBot G2，適用於工業及真實作業場景。",
         "AgiBot G2具備26個自由度，支持高精度力控作業，全天候連續作業。",
         "機械人已進駐龍旗科技江西南昌量產工廠，執行3C產線質檢工段作業。"
       ],
@@ -1382,7 +2195,7 @@
           "theme_rationale": "Single subgroup because the category size did not require thematic splitting.",
           "article_count": 1,
           "key_developments": [
-            "智元機器人第1.5萬台機械人量產下線，型號為AgiBot G2，適用於工業及真實作業場景。",
+            "智元機器人量產第1.5萬台機械人，型號為AgiBot G2，適用於工業及真實作業場景。",
             "AgiBot G2具備26個自由度，支持高精度力控作業，全天候連續作業。",
             "機械人已進駐龍旗科技江西南昌量產工廠，執行3C產線質檢工段作業。"
           ],
@@ -1453,6 +2266,158 @@
       ],
       "analysis_profile": "standard",
       "model_used": "meta-llama/llama-4-scout-17b-16e-instruct",
+      "sub_batch_count": 1,
+      "diagnostics": {
+        "sub_batch_count": 1,
+        "split_reasons": [],
+        "models_attempted": [],
+        "estimated_input_tokens_max": 0,
+        "serialized_request_bytes_max": 0,
+        "rate_limit_waits": 0,
+        "partial_article_count": 0,
+        "synthesis_wait_seconds_total": 0.0,
+        "synthesis_retry_count": 0,
+        "synthesis_retry_skipped_count": 0,
+        "synthesis_budget_exhausted": false,
+        "degraded_merge_used": false,
+        "degraded_merge_reason": "",
+        "synthesis_merge_depth_max": 0,
+        "model_switches": []
+      },
+      "error": null
+    },
+    {
+      "category": "重要通告",
+      "article_count": 1,
+      "status": "success",
+      "key_developments": [
+        "安克創新每股發售價釐定為99.32元",
+        "集資約46.32億元，預計7月2日上市",
+        "發售量調整權未獲行使，已失效"
+      ],
+      "named_entities": [
+        {
+          "name": "安克創新",
+          "type": "company"
+        },
+        {
+          "name": "00668",
+          "type": "asset"
+        }
+      ],
+      "articles": [
+        {
+          "source_article_id": "4442395",
+          "title": "新股IPO丨安克創新99.32元定價",
+          "canonical_url": "https://www.hkej.com/instantnews/announcement/article/4442395/%E6%96%B0%E8%82%A1IPO%E4%B8%A8%E5%AE%89%E5%85%8B%E5%89%B5%E6%96%B099.32%E5%85%83%E5%AE%9A%E5%83%B9",
+          "published_at": "2026-06-28T18:36:00+08:00",
+          "section": "重要通告",
+          "novelty_score": 6,
+          "relevance_score": 8,
+          "urgency_score": 5,
+          "named_entities": [
+            {
+              "name": "安克創新",
+              "type": "company"
+            },
+            {
+              "name": "00668",
+              "type": "asset"
+            }
+          ],
+          "key_points": [
+            "安克創新每股發售價釐定為99.32元",
+            "集資約46.32億元，預計7月2日上市",
+            "發售量調整權未獲行使，已失效"
+          ],
+          "content_truncated": false,
+          "original_content_length_chars": 118,
+          "analyzed_content_length_chars": 118,
+          "original_content_token_estimate": 30,
+          "analyzed_content_token_estimate": 30,
+          "truncation_reason": null,
+          "analysis_method": "full_text",
+          "attention_tier": "medium",
+          "theme": "stocks",
+          "attention_reason": "The article discusses an IPO pricing, which is a market-moving event.",
+          "must_keep": true,
+          "model_used": "meta-llama/llama-4-scout-17b-16e-instruct",
+          "delayed_retry_attempted": false,
+          "delayed_retry_model_chain": [],
+          "delayed_retry_final_model": null,
+          "error_classification": null,
+          "error": null
+        }
+      ],
+      "subgroups": [
+        {
+          "title": "重要通告 overview",
+          "theme_rationale": "Single subgroup because the category size did not require thematic splitting.",
+          "article_count": 1,
+          "key_developments": [
+            "安克創新每股發售價釐定為99.32元",
+            "集資約46.32億元，預計7月2日上市",
+            "發售量調整權未獲行使，已失效"
+          ],
+          "named_entities": [
+            {
+              "name": "安克創新",
+              "type": "company"
+            },
+            {
+              "name": "00668",
+              "type": "asset"
+            }
+          ],
+          "articles": [
+            {
+              "source_article_id": "4442395",
+              "title": "新股IPO丨安克創新99.32元定價",
+              "canonical_url": "https://www.hkej.com/instantnews/announcement/article/4442395/%E6%96%B0%E8%82%A1IPO%E4%B8%A8%E5%AE%89%E5%85%8B%E5%89%B5%E6%96%B099.32%E5%85%83%E5%AE%9A%E5%83%B9",
+              "published_at": "2026-06-28T18:36:00+08:00",
+              "section": "重要通告",
+              "novelty_score": 6,
+              "relevance_score": 8,
+              "urgency_score": 5,
+              "named_entities": [
+                {
+                  "name": "安克創新",
+                  "type": "company"
+                },
+                {
+                  "name": "00668",
+                  "type": "asset"
+                }
+              ],
+              "key_points": [
+                "安克創新每股發售價釐定為99.32元",
+                "集資約46.32億元，預計7月2日上市",
+                "發售量調整權未獲行使，已失效"
+              ],
+              "content_truncated": false,
+              "original_content_length_chars": 118,
+              "analyzed_content_length_chars": 118,
+              "original_content_token_estimate": 30,
+              "analyzed_content_token_estimate": 30,
+              "truncation_reason": null,
+              "analysis_method": "full_text",
+              "attention_tier": "medium",
+              "theme": "stocks",
+              "attention_reason": "The article discusses an IPO pricing, which is a market-moving event.",
+              "must_keep": true,
+              "model_used": "meta-llama/llama-4-scout-17b-16e-instruct",
+              "delayed_retry_attempted": false,
+              "delayed_retry_model_chain": [],
+              "delayed_retry_final_model": null,
+              "error_classification": null,
+              "error": null
+            }
+          ],
+          "model_used": "meta-llama/llama-4-scout-17b-16e-instruct"
+        }
+      ],
+      "analysis_profile": "standard",
+      "model_used": "meta-llama/llama-4-scout-17b-16e-instruct",
       "sub_batch_count": 2,
       "diagnostics": {
         "sub_batch_count": 1,
@@ -1460,8 +2425,8 @@
         "models_attempted": [
           "meta-llama/llama-4-scout-17b-16e-instruct"
         ],
-        "estimated_input_tokens_max": 758,
-        "serialized_request_bytes_max": 4759,
+        "estimated_input_tokens_max": 622,
+        "serialized_request_bytes_max": 3106,
         "rate_limit_waits": 0,
         "partial_article_count": 0,
         "synthesis_wait_seconds_total": 0.0,
@@ -1477,20 +2442,20 @@
     },
     {
       "category": "地產新聞",
-      "article_count": 7,
+      "article_count": 8,
       "status": "success",
       "key_developments": [],
       "named_entities": [
         {
-          "name": "御龍山",
-          "type": "institution"
-        },
-        {
-          "name": "寓．弍捌",
-          "type": "institution"
+          "name": "OCEAN MARINI",
+          "type": "asset"
         },
         {
           "name": "LP6",
+          "type": "institution"
+        },
+        {
+          "name": "御龍山",
           "type": "institution"
         },
         {
@@ -1499,6 +2464,47 @@
         }
       ],
       "articles": [
+        {
+          "source_article_id": "4442390",
+          "title": "OCEAN MARINI三房短炒三個月獲利135萬",
+          "canonical_url": "https://www.hkej.com/instantnews/property/article/4442390/OCEAN+MARINI%E4%B8%89%E6%88%BF%E7%9F%AD%E7%82%92%E4%B8%89%E5%80%8B%E6%9C%88%E7%8D%B2%E5%88%A9135%E8%90%AC",
+          "published_at": "2026-06-28T18:30:00+08:00",
+          "section": "二手市場",
+          "novelty_score": 4,
+          "relevance_score": 7,
+          "urgency_score": 5,
+          "named_entities": [
+            {
+              "name": "OCEAN MARINI",
+              "type": "asset"
+            },
+            {
+              "name": "美聯物業",
+              "type": "organization"
+            }
+          ],
+          "key_points": [
+            "物業於今年3月以約838萬元購入，持貨約3個月轉手賬面獲利約135萬元",
+            "該物業實用面積約616方呎，3房間隔，原叫價998萬元，議價後以973萬元成交"
+          ],
+          "content_truncated": false,
+          "original_content_length_chars": 147,
+          "analyzed_content_length_chars": 147,
+          "original_content_token_estimate": 37,
+          "analyzed_content_token_estimate": 37,
+          "truncation_reason": null,
+          "analysis_method": "full_text",
+          "attention_tier": "medium",
+          "theme": "general",
+          "attention_reason": "Default medium attention because the story is relevant but not an obvious top-priority market mover.",
+          "must_keep": false,
+          "model_used": "meta-llama/llama-4-scout-17b-16e-instruct",
+          "delayed_retry_attempted": false,
+          "delayed_retry_model_chain": [],
+          "delayed_retry_final_model": null,
+          "error_classification": null,
+          "error": null
+        },
         {
           "source_article_id": "4442362",
           "title": "御龍山兩房17年升值一倍",
@@ -1797,29 +2803,111 @@
       ],
       "subgroups": [
         {
-          "title": "樓市投資回報",
-          "theme_rationale": "關注樓市投資的回報和升值情況",
-          "article_count": 3,
+          "title": "二手樓市成交",
+          "theme_rationale": "報道個別樓盤成交情況，包括短炒獲利和長期持有升值情況。",
+          "article_count": 4,
           "key_developments": [
-            "御龍山兩房單位17年升值一倍，成交價980萬元。",
-            "寓．弍捌三房單位租金2.52萬元，實用呎租45元，業主於2011年以725.3萬元買入單位，租金回報4.2厘。",
-            "LP6一房單位短炒七個月獲利72萬元，升值17%，成交價495萬元。"
+            "OCEAN MARINI三房單位短炒三個月獲利135萬元，買入價約838萬元，成交價973萬元。",
+            "LP6一房單位短炒七個月獲利72萬元，成交價495萬元。",
+            "御龍山兩房單位17年升值一倍，成交價980萬元，原業主於2009年以488萬元購入。"
           ],
           "named_entities": [
             {
-              "name": "御龍山",
-              "type": "institution"
-            },
-            {
-              "name": "寓．弍捌",
-              "type": "institution"
+              "name": "OCEAN MARINI",
+              "type": "asset"
             },
             {
               "name": "LP6",
               "type": "institution"
+            },
+            {
+              "name": "御龍山",
+              "type": "institution"
             }
           ],
           "articles": [
+            {
+              "source_article_id": "4442390",
+              "title": "OCEAN MARINI三房短炒三個月獲利135萬",
+              "canonical_url": "https://www.hkej.com/instantnews/property/article/4442390/OCEAN+MARINI%E4%B8%89%E6%88%BF%E7%9F%AD%E7%82%92%E4%B8%89%E5%80%8B%E6%9C%88%E7%8D%B2%E5%88%A9135%E8%90%AC",
+              "published_at": "2026-06-28T18:30:00+08:00",
+              "section": "二手市場",
+              "novelty_score": 4,
+              "relevance_score": 7,
+              "urgency_score": 5,
+              "named_entities": [
+                {
+                  "name": "OCEAN MARINI",
+                  "type": "asset"
+                },
+                {
+                  "name": "美聯物業",
+                  "type": "organization"
+                }
+              ],
+              "key_points": [
+                "物業於今年3月以約838萬元購入，持貨約3個月轉手賬面獲利約135萬元",
+                "該物業實用面積約616方呎，3房間隔，原叫價998萬元，議價後以973萬元成交"
+              ],
+              "content_truncated": false,
+              "original_content_length_chars": 147,
+              "analyzed_content_length_chars": 147,
+              "original_content_token_estimate": 37,
+              "analyzed_content_token_estimate": 37,
+              "truncation_reason": null,
+              "analysis_method": "full_text",
+              "attention_tier": "medium",
+              "theme": "general",
+              "attention_reason": "Default medium attention because the story is relevant but not an obvious top-priority market mover.",
+              "must_keep": false,
+              "model_used": "meta-llama/llama-4-scout-17b-16e-instruct",
+              "delayed_retry_attempted": false,
+              "delayed_retry_model_chain": [],
+              "delayed_retry_final_model": null,
+              "error_classification": null,
+              "error": null
+            },
+            {
+              "source_article_id": "4442360",
+              "title": "LP6一房短炒七個月獲利72萬",
+              "canonical_url": "https://www.hkej.com/instantnews/property/article/4442360/LP6%E4%B8%80%E6%88%BF%E7%9F%AD%E7%82%92%E4%B8%83%E5%80%8B%E6%9C%88%E7%8D%B2%E5%88%A972%E8%90%AC",
+              "published_at": "2026-06-28T16:45:00+08:00",
+              "section": "二手市場",
+              "novelty_score": 7,
+              "relevance_score": 9,
+              "urgency_score": 6,
+              "named_entities": [
+                {
+                  "name": "LP6",
+                  "type": "institution"
+                },
+                {
+                  "name": "日出康城",
+                  "type": "institution"
+                }
+              ],
+              "key_points": [
+                "LP6一房單位短炒七個月獲利72萬元，升值17%。",
+                "成交價495萬元，實用呎價約16124元。"
+              ],
+              "content_truncated": false,
+              "original_content_length_chars": 193,
+              "analyzed_content_length_chars": 193,
+              "original_content_token_estimate": 49,
+              "analyzed_content_token_estimate": 49,
+              "truncation_reason": null,
+              "analysis_method": "full_text",
+              "attention_tier": "medium",
+              "theme": "general",
+              "attention_reason": "Default medium attention because the story is relevant but not an obvious top-priority market mover.",
+              "must_keep": false,
+              "model_used": "meta-llama/llama-4-scout-17b-16e-instruct",
+              "delayed_retry_attempted": false,
+              "delayed_retry_model_chain": [],
+              "delayed_retry_final_model": null,
+              "error_classification": null,
+              "error": null
+            },
             {
               "source_article_id": "4442362",
               "title": "御龍山兩房17年升值一倍",
@@ -1901,59 +2989,18 @@
               "delayed_retry_final_model": null,
               "error_classification": null,
               "error": null
-            },
-            {
-              "source_article_id": "4442360",
-              "title": "LP6一房短炒七個月獲利72萬",
-              "canonical_url": "https://www.hkej.com/instantnews/property/article/4442360/LP6%E4%B8%80%E6%88%BF%E7%9F%AD%E7%82%92%E4%B8%83%E5%80%8B%E6%9C%88%E7%8D%B2%E5%88%A972%E8%90%AC",
-              "published_at": "2026-06-28T16:45:00+08:00",
-              "section": "二手市場",
-              "novelty_score": 7,
-              "relevance_score": 9,
-              "urgency_score": 6,
-              "named_entities": [
-                {
-                  "name": "LP6",
-                  "type": "institution"
-                },
-                {
-                  "name": "日出康城",
-                  "type": "institution"
-                }
-              ],
-              "key_points": [
-                "LP6一房單位短炒七個月獲利72萬元，升值17%。",
-                "成交價495萬元，實用呎價約16124元。"
-              ],
-              "content_truncated": false,
-              "original_content_length_chars": 193,
-              "analyzed_content_length_chars": 193,
-              "original_content_token_estimate": 49,
-              "analyzed_content_token_estimate": 49,
-              "truncation_reason": null,
-              "analysis_method": "full_text",
-              "attention_tier": "medium",
-              "theme": "general",
-              "attention_reason": "Default medium attention because the story is relevant but not an obvious top-priority market mover.",
-              "must_keep": false,
-              "model_used": "meta-llama/llama-4-scout-17b-16e-instruct",
-              "delayed_retry_attempted": false,
-              "delayed_retry_model_chain": [],
-              "delayed_retry_final_model": null,
-              "error_classification": null,
-              "error": null
             }
           ],
           "model_used": "meta-llama/llama-4-scout-17b-16e-instruct"
         },
         {
-          "title": "租金回报与投资",
-          "theme_rationale": "讨论房产的租金回报率和投资表现",
+          "title": "二手市場分析",
+          "theme_rationale": "報道關注二手物業的價格走勢和投資回報。",
           "article_count": 3,
           "key_developments": [
             "Beacon Peak三房單位租金6.5萬元，實用呎租約53元，業主於去年初以約2789萬元購入單位，租金回報約2.8厘。",
-            "港景峯業主於2009年7月以約776.8萬元購入港景峯3座中層B室，持貨17年後實現年化回報5.4厘。",
-            "柏傲山四房單位十年僅升值12%，成交價3240萬元，原業主於2016年以2900萬元購入單位，獲利340萬元。"
+            "柏傲山四房單位十年僅升值12%，成交價3240萬元，原業主於2016年以2900萬元購入單位，獲利340萬元。",
+            "港景峯三房單位以實用呎租46.7元成交，租賃期間吸引外區退休人士快速成交，業主於2009年7月以約776.8萬元購入，持貨17年後實現年化回報5.4厘。"
           ],
           "named_entities": [
             {
@@ -1961,16 +3008,12 @@
               "type": "institution"
             },
             {
-              "name": "港景峯",
-              "type": "asset"
-            },
-            {
               "name": "柏傲山",
               "type": "institution"
             },
             {
-              "name": "香港置業",
-              "type": "organization"
+              "name": "港景峯",
+              "type": "asset"
             }
           ],
           "articles": [
@@ -2002,6 +3045,47 @@
               "analyzed_content_length_chars": 142,
               "original_content_token_estimate": 36,
               "analyzed_content_token_estimate": 36,
+              "truncation_reason": null,
+              "analysis_method": "full_text",
+              "attention_tier": "medium",
+              "theme": "general",
+              "attention_reason": "Default medium attention because the story is relevant but not an obvious top-priority market mover.",
+              "must_keep": false,
+              "model_used": "meta-llama/llama-4-scout-17b-16e-instruct",
+              "delayed_retry_attempted": false,
+              "delayed_retry_model_chain": [],
+              "delayed_retry_final_model": null,
+              "error_classification": null,
+              "error": null
+            },
+            {
+              "source_article_id": "4442357",
+              "title": "柏傲山四房十年僅升值12%",
+              "canonical_url": "https://www.hkej.com/instantnews/property/article/4442357/%E6%9F%8F%E5%82%B2%E5%B1%B1%E5%9B%9B%E6%88%BF%E5%8D%81%E5%B9%B4%E5%83%85%E5%8D%87%E5%80%BC12%25",
+              "published_at": "2026-06-28T15:43:00+08:00",
+              "section": "二手市場",
+              "novelty_score": 3,
+              "relevance_score": 5,
+              "urgency_score": 1,
+              "named_entities": [
+                {
+                  "name": "柏傲山",
+                  "type": "institution"
+                },
+                {
+                  "name": "北角",
+                  "type": "other"
+                }
+              ],
+              "key_points": [
+                "柏傲山四房單位十年僅升值12%，成交價3240萬元。",
+                "原業主於2016年以2900萬元購入單位，獲利340萬元。"
+              ],
+              "content_truncated": false,
+              "original_content_length_chars": 249,
+              "analyzed_content_length_chars": 249,
+              "original_content_token_estimate": 63,
+              "analyzed_content_token_estimate": 63,
               "truncation_reason": null,
               "analysis_method": "full_text",
               "attention_tier": "medium",
@@ -2063,59 +3147,18 @@
               "delayed_retry_final_model": null,
               "error_classification": null,
               "error": null
-            },
-            {
-              "source_article_id": "4442357",
-              "title": "柏傲山四房十年僅升值12%",
-              "canonical_url": "https://www.hkej.com/instantnews/property/article/4442357/%E6%9F%8F%E5%82%B2%E5%B1%B1%E5%9B%9B%E6%88%BF%E5%8D%81%E5%B9%B4%E5%83%85%E5%8D%87%E5%80%BC12%25",
-              "published_at": "2026-06-28T15:43:00+08:00",
-              "section": "二手市場",
-              "novelty_score": 3,
-              "relevance_score": 5,
-              "urgency_score": 1,
-              "named_entities": [
-                {
-                  "name": "柏傲山",
-                  "type": "institution"
-                },
-                {
-                  "name": "北角",
-                  "type": "other"
-                }
-              ],
-              "key_points": [
-                "柏傲山四房單位十年僅升值12%，成交價3240萬元。",
-                "原業主於2016年以2900萬元購入單位，獲利340萬元。"
-              ],
-              "content_truncated": false,
-              "original_content_length_chars": 249,
-              "analyzed_content_length_chars": 249,
-              "original_content_token_estimate": 63,
-              "analyzed_content_token_estimate": 63,
-              "truncation_reason": null,
-              "analysis_method": "full_text",
-              "attention_tier": "medium",
-              "theme": "general",
-              "attention_reason": "Default medium attention because the story is relevant but not an obvious top-priority market mover.",
-              "must_keep": false,
-              "model_used": "meta-llama/llama-4-scout-17b-16e-instruct",
-              "delayed_retry_attempted": false,
-              "delayed_retry_model_chain": [],
-              "delayed_retry_final_model": null,
-              "error_classification": null,
-              "error": null
             }
           ],
           "model_used": "meta-llama/llama-4-scout-17b-16e-instruct"
         },
         {
-          "title": "市场交易与销售",
-          "theme_rationale": "报道房产市场最新的交易和销售情况",
+          "title": "新盤動向",
+          "theme_rationale": "報道關注新樓盤的銷售情況和成交價格。",
           "article_count": 1,
           "key_developments": [
             "長實(01113)港島半山波老道21號超級豪宅項目第2期應天，以招標形式售出15樓11號大宅，成交價逾1.55億元。",
             "整個項目(第1期及應天)不足一個月共售出七套，套現近15億元。",
-            "該項目銷售推動了市場交易，反映豪宅市場需求強勁。"
+            "長實的應天項目在近期銷售成績顯著。"
           ],
           "named_entities": [
             {
@@ -2175,19 +3218,16 @@
       ],
       "analysis_profile": "light",
       "model_used": "meta-llama/llama-4-scout-17b-16e-instruct",
-      "sub_batch_count": 6,
+      "sub_batch_count": 5,
       "diagnostics": {
-        "sub_batch_count": 3,
-        "split_reasons": [
-          "pre_send_budget"
-        ],
+        "sub_batch_count": 5,
+        "split_reasons": [],
         "models_attempted": [
-          "meta-llama/llama-4-scout-17b-16e-instruct",
-          "qwen/qwen3-32b"
+          "meta-llama/llama-4-scout-17b-16e-instruct"
         ],
-        "estimated_input_tokens_max": 1565,
-        "serialized_request_bytes_max": 9183,
-        "rate_limit_waits": 1,
+        "estimated_input_tokens_max": 625,
+        "serialized_request_bytes_max": 3130,
+        "rate_limit_waits": 0,
         "partial_article_count": 0,
         "synthesis_wait_seconds_total": 0.0,
         "synthesis_retry_count": 0,
