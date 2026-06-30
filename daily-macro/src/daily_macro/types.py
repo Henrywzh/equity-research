@@ -193,9 +193,12 @@ class AnalysisGraphState(TypedDict):
     macro_release_digest: dict[str, Any]
     top_alerts: list[str]
     legacy_executive_summary: list[str]
+    validation_issues: NotRequired[list[dict[str, Any]]]
+    theme_memory: NotRequired[dict[str, Any]]
     report: dict[str, Any]
     total_scraped_articles: int
     newly_analyzed_keys: set[str]
+    data_dir: NotRequired[Path]
 
 
 # ---------------------------------------------------------------------------
@@ -253,6 +256,16 @@ class RuntimeDiagnostics:
     synthesis_budget_exhausted_count: int = 0
     degraded_merge_count: int = 0
     key_rotation_count: int = 0
+    request_timeout_count: int = 0
+    model_decommissioned_count: int = 0
+    daily_budget_skip_count: int = 0
+    daily_budget_tokens_used: int = 0
+    avoided_rate_limit_wait_count: int = 0
+    avoided_rate_limit_wait_seconds_total: float = 0.0
+    degraded_mode_count: int = 0
+    resolver_rejections: list[dict[str, Any]] = field(default_factory=list)
+    model_task_counts: dict[str, dict[str, int]] = field(default_factory=dict)
+    model_substitutions: list[dict[str, Any]] = field(default_factory=list)
 
     def as_dict(self) -> dict[str, Any]:
         return {
@@ -274,6 +287,16 @@ class RuntimeDiagnostics:
             "delayed_retry_skipped_final_model_count": self.delayed_retry_skipped_final_model_count,
             "synthesis_budget_exhausted_count": self.synthesis_budget_exhausted_count,
             "degraded_merge_count": self.degraded_merge_count,
+            "request_timeout_count": self.request_timeout_count,
+            "model_decommissioned_count": self.model_decommissioned_count,
+            "daily_budget_skip_count": self.daily_budget_skip_count,
+            "daily_budget_tokens_used": self.daily_budget_tokens_used,
+            "avoided_rate_limit_wait_count": self.avoided_rate_limit_wait_count,
+            "avoided_rate_limit_wait_seconds_total": round(self.avoided_rate_limit_wait_seconds_total, 3),
+            "degraded_mode_count": self.degraded_mode_count,
+            "resolver_rejections": list(self.resolver_rejections),
+            "model_task_counts": {task: dict(counts) for task, counts in self.model_task_counts.items()},
+            "model_substitutions": list(self.model_substitutions),
         }
 
 
@@ -338,6 +361,7 @@ class BatchContext:
     estimated_input_tokens: int
     serialized_request_bytes: int
     content_shrunk: bool = False
+    llm_task: str = "article_analysis"
 
 
 # ---------------------------------------------------------------------------

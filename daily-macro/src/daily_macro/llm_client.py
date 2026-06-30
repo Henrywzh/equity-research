@@ -15,15 +15,20 @@ import logging
 import math
 import os
 import random
+import re
+import threading
 import time
 from dataclasses import dataclass, field
 from datetime import datetime
+from enum import StrEnum
 from pathlib import Path
 from typing import Any
 
 import requests
 
+from .budget import UNLIMITED, DailyBudgetLedger
 from .config import get_project_root
+from .model_catalog import ModelCapability, get_capability
 from .types import (
     BatchContext,
     CategoryBudgetState,
@@ -48,6 +53,200 @@ from .types import (
 )
 
 LOGGER = logging.getLogger(__name__)
+
+
+class LLMTask(StrEnum):
+    ROUTING = "routing"
+    ARTICLE_ANALYSIS = "article_analysis"
+    CATEGORY_SYNTHESIS = "category_synthesis"
+    TOP_ALERTS = "top_alerts"
+    JSON_REPAIR = "json_repair"
+    CRITIC = "critic"
+
+
+@dataclass(frozen=True)
+class ModelSelection:
+    model: ModelConfig
+    rejections: list[dict[str, str]] = field(default_factory=list)
+    avoided_wait_seconds: float = 0.0
+
+
+DEFAULT_MAX_LLM_WAIT_SECONDS = 45.0
+
+# Tasks whose output quality most benefits from the strongest models; these may
+# select premium models. All other (high-volume) tasks reserve premium capacity
+# so bulk work cannot starve synthesis/alerts of the scarce, low-throughput
+# high-quality models.
+HIGH_VALUE_TASKS = frozenset({"category_synthesis", "top_alerts", "critic"})
+# A model counts as "premium" (reserved) when it is strong at synthesis. Derived
+# from scores so newly released large models are reserved automatically.
+PREMIUM_SYNTHESIS_THRESHOLD = 0.85
+# Score penalty applied to a premium model on a bulk task: large enough that any
+# non-premium model with headroom outranks it, small enough that a premium model
+# is still chosen over sleeping on a rate-limited one.
+PREMIUM_BULK_PENALTY = 0.6
+# Fraction of a premium model's declared daily token budget held in reserve for
+# high-value tasks: while remaining daily budget is above this floor, bulk work
+# may use the premium model; below it, the bulk-reservation penalty kicks in so
+# the remainder is saved for synthesis/top-alerts/critic.
+RESERVE_FRACTION = 0.25
+
+
+def _resolve_max_wait_seconds(explicit: float | None = None) -> float:
+    """Resolve the rate-limit wait cap shared by the resolver and governor.
+
+    Precedence: explicit argument, then ``DAILY_MACRO_MAX_LLM_WAIT_SECONDS``,
+    then :data:`DEFAULT_MAX_LLM_WAIT_SECONDS`.
+    """
+    if explicit is not None:
+        return max(0.0, explicit)
+    raw_wait = os.environ.get("DAILY_MACRO_MAX_LLM_WAIT_SECONDS")
+    if raw_wait:
+        try:
+            return max(0.0, float(raw_wait))
+        except ValueError:
+            return DEFAULT_MAX_LLM_WAIT_SECONDS
+    return DEFAULT_MAX_LLM_WAIT_SECONDS
+
+
+class ModelResolver:
+    def __init__(
+        self,
+        *,
+        active_model_ids: set[str] | None = None,
+        model_policy: str | None = None,
+        max_wait_seconds: float | None = None,
+        capabilities: dict[str, ModelCapability] | None = None,
+    ) -> None:
+        self.active_model_ids = active_model_ids
+        self.model_policy = (model_policy or os.environ.get("DAILY_MACRO_MODEL_POLICY") or "production_only").strip().lower()
+        self.max_wait_seconds = _resolve_max_wait_seconds(max_wait_seconds)
+        self.capabilities = capabilities or {}
+
+    def task_preferences(self, task: str) -> list[str]:
+        env_name = f"DAILY_MACRO_MODEL_{task.upper()}_PREFERENCES"
+        raw = os.environ.get(env_name) or os.environ.get("DAILY_MACRO_MODEL_PREFERENCES", "")
+        return [item.strip() for item in raw.split(",") if item.strip()]
+
+    def capability_for(self, model: ModelConfig) -> ModelCapability:
+        return self.capabilities.get(model.model_id) or get_capability(model.model_id, provider=model.provider)
+
+    def resolve(
+        self,
+        task: LLMTask | str,
+        model_chain: list[ModelConfig],
+        *,
+        estimated_input_tokens: int,
+        requested_output_tokens: int,
+        rate_limit_waits: dict[str, float] | None = None,
+        preferred_model_id: str | None = None,
+        budget_remaining: dict[str, float] | None = None,
+    ) -> ModelSelection:
+        task_value = task.value if isinstance(task, LLMTask) else str(task)
+        task_preferences = self.task_preferences(task_value)
+        is_high_value = task_value in HIGH_VALUE_TASKS
+        rejections: list[dict[str, str]] = []
+        scored: list[tuple[float, int, ModelConfig, float]] = []
+        wait_eligible: list[tuple[float, int, ModelConfig]] = []
+        rate_limit_waits = rate_limit_waits or {}
+        needed_tokens = estimated_input_tokens + requested_output_tokens
+
+        for index, model in enumerate(model_chain):
+            capability = self.capability_for(model)
+            if self.model_policy == "production_only" and capability.lifecycle != "production":
+                rejections.append({"model_id": model.model_id, "reason": "preview_model_disallowed"})
+                continue
+            if self.active_model_ids is not None and model.model_id not in self.active_model_ids:
+                rejections.append({"model_id": model.model_id, "reason": "model_not_active"})
+                continue
+            if not capability.supports_json:
+                rejections.append({"model_id": model.model_id, "reason": "json_not_supported"})
+                continue
+            if estimated_input_tokens + requested_output_tokens > capability.context_window:
+                rejections.append({"model_id": model.model_id, "reason": "context_window_exceeded"})
+                continue
+            output_cap = min(capability.max_output_tokens, model.max_completion_tokens)
+            if requested_output_tokens > output_cap:
+                rejections.append({"model_id": model.model_id, "reason": "output_limit_exceeded"})
+                continue
+            # Hard daily-budget gate: skip a model whose remaining TPD can't cover
+            # this call rather than stalling on it. The floor model has a huge
+            # daily budget and is always in the pool, so gating never strands the
+            # run. budget_remaining is per the current key; UNLIMITED when the
+            # model's TPD is unknown (no gating).
+            if budget_remaining is not None:
+                remaining_budget = budget_remaining.get(model.model_id, UNLIMITED)
+                if remaining_budget < needed_tokens:
+                    rejections.append({"model_id": model.model_id, "reason": "daily_budget_exhausted"})
+                    continue
+            wait_seconds = rate_limit_waits.get(model.model_id, 0.0)
+            # Passed every hard constraint (policy, active, json, context,
+            # output). Remember it as a fallback that respects those constraints
+            # even if its wait exceeds the cap.
+            wait_eligible.append((wait_seconds, index, model))
+            if wait_seconds > self.max_wait_seconds:
+                rejections.append({"model_id": model.model_id, "reason": "rate_limit_wait_too_long"})
+                continue
+
+            task_score = capability.task_scores.get(task_value, capability.task_scores.get("article_analysis", 0.5))
+            preferred_bonus = 0.5 if model.model_id == preferred_model_id else 0.0
+            preference_bonus = 0.0
+            if model.model_id in task_preferences:
+                preference_bonus = max(0.0, 0.35 - task_preferences.index(model.model_id) * 0.03)
+            wait_penalty = min(wait_seconds / max(self.max_wait_seconds, 1.0), 1.0) * 0.4
+            order_penalty = index * 0.01
+            # Reserve premium models for high-value tasks: penalize them on bulk
+            # tasks so any non-premium model with headroom outranks them, keeping
+            # bulk work off the scarce high-quality models. The penalty is soft —
+            # a premium model is still chosen over sleeping on a rate-limited one,
+            # and an explicit env preference is exempt.
+            reservation_penalty = 0.0
+            is_premium = capability.task_scores.get("category_synthesis", 0.0) >= PREMIUM_SYNTHESIS_THRESHOLD
+            if is_premium and not is_high_value and model.model_id not in task_preferences:
+                # Budget-aware reservation: while the premium model still has
+                # ample daily budget, bulk work may use it; once remaining drops
+                # below the reserve floor (or with no budget signal at all), apply
+                # the penalty so the remainder is held for high-value tasks.
+                declared_tpd = capability.limits.get("tpd")
+                remaining_budget = budget_remaining.get(model.model_id) if budget_remaining else None
+                reserve_floor = RESERVE_FRACTION * declared_tpd if declared_tpd else None
+                if remaining_budget is None or reserve_floor is None or remaining_budget < reserve_floor:
+                    reservation_penalty = PREMIUM_BULK_PENALTY
+            scored.append(
+                (
+                    task_score + preferred_bonus + preference_bonus - wait_penalty - order_penalty - reservation_penalty,
+                    index,
+                    model,
+                    wait_seconds,
+                )
+            )
+
+        if scored:
+            scored.sort(key=lambda item: item[0], reverse=True)
+            _score, _index, model, wait_seconds = scored[0]
+            return ModelSelection(model=model, rejections=rejections, avoided_wait_seconds=max(rate_limit_waits.get(preferred_model_id or "", 0.0) - wait_seconds, 0.0))
+
+        # Nothing scored within the wait cap. Prefer a model that satisfies every
+        # hard constraint (policy/active/context/output) and just has a long
+        # wait — the governor now caps the actual sleep — over silently
+        # returning model_chain[0], which may be a preview model the policy
+        # forbids or one whose context window can't fit the request.
+        if wait_eligible:
+            wait_eligible.sort(key=lambda item: (item[0], item[1]))
+            wait_seconds, _index, model = wait_eligible[0]
+            return ModelSelection(model=model, rejections=rejections, avoided_wait_seconds=0.0)
+
+        # Truly no eligible model (e.g. request too large for every context
+        # window, or no active production model). Fall back to the chain head as
+        # a last resort so the caller can surface a meaningful error.
+        fallback = model_chain[0]
+        LOGGER.warning(
+            "Model resolver found no eligible model for task %s; falling back to %s. Rejections: %s",
+            task_value,
+            fallback.model_id,
+            rejections,
+        )
+        return ModelSelection(model=fallback, rejections=rejections, avoided_wait_seconds=0.0)
 
 
 # ---------------------------------------------------------------------------
@@ -173,8 +372,19 @@ def _classify_exception(exc: Exception) -> str:
 # ---------------------------------------------------------------------------
 
 
+# CJK ideographs, kana, and full-width punctuation tokenize at roughly one
+# token per character for the llama/Qwen tokenizers we target, unlike latin
+# text which averages ~4 chars/token. HKEJ content is predominantly Chinese, so
+# a flat len/4 heuristic undercounts by ~4x and lets oversized requests through.
+_CJK_RE = re.compile(r"[　-〿㐀-䶿一-鿿豈-﫿＀-￯]")
+
+
 def _estimate_tokens(text: str) -> int:
-    return math.ceil(len(text) / 4)
+    if not text:
+        return 0
+    cjk_chars = len(_CJK_RE.findall(text))
+    other_chars = len(text) - cjk_chars
+    return math.ceil(cjk_chars + other_chars / 4)
 
 
 def _estimate_messages_tokens(messages: list[dict[str, Any]]) -> int:
@@ -256,6 +466,26 @@ def _build_groq_session(api_key: str) -> requests.Session:
     return _build_provider_session(api_key)
 
 
+def load_active_groq_model_ids(api_key: str, *, timeout: int = 10) -> set[str] | None:
+    if str(os.environ.get("DAILY_MACRO_REFRESH_MODEL_CATALOG") or "").strip().lower() not in {"1", "true", "yes"}:
+        return None
+    session = _build_groq_session(api_key)
+    try:
+        response = session.get("https://api.groq.com/openai/v1/models", timeout=timeout)
+        response.raise_for_status()
+        payload = response.json()
+    except Exception as exc:
+        LOGGER.warning("Could not refresh Groq model catalog: %s", exc)
+        return None
+    finally:
+        session.close()
+    data = payload.get("data") if isinstance(payload, dict) else None
+    if not isinstance(data, list):
+        return None
+    model_ids = {str(item.get("id") or "").strip() for item in data if isinstance(item, dict)}
+    return {model_id for model_id in model_ids if model_id}
+
+
 def _build_provider_session(api_key: str) -> requests.Session:
     session = requests.Session()
     session.headers.update(
@@ -265,6 +495,80 @@ def _build_provider_session(api_key: str) -> requests.Session:
         }
     )
     return session
+
+
+class LLMRequestDeadlineError(requests.exceptions.Timeout):
+    """Raised when an LLM HTTP request exceeds its hard wall-clock deadline."""
+
+
+def _llm_request_timeouts() -> tuple[float, float, float]:
+    """Return (connect_timeout, read_timeout, total_deadline) in seconds.
+
+    ``requests``' ``timeout`` only bounds the gap between received bytes, so the
+    total deadline is enforced separately by :func:`_post_with_deadline`.
+    """
+
+    def _read(name: str, default: float) -> float:
+        raw = os.environ.get(name)
+        if not raw:
+            return default
+        try:
+            return max(1.0, float(raw))
+        except ValueError:
+            return default
+
+    connect_timeout = _read("DAILY_MACRO_LLM_CONNECT_TIMEOUT_SECONDS", 10.0)
+    read_timeout = _read("DAILY_MACRO_LLM_READ_TIMEOUT_SECONDS", 60.0)
+    total_deadline = _read("DAILY_MACRO_LLM_DEADLINE_SECONDS", 120.0)
+    # The total deadline must cover at least one connect + read cycle.
+    total_deadline = max(total_deadline, connect_timeout + read_timeout)
+    return connect_timeout, read_timeout, total_deadline
+
+
+def _post_with_deadline(
+    session: requests.Session,
+    url: str,
+    *,
+    json_body: dict[str, Any],
+    connect_timeout: float,
+    read_timeout: float,
+    total_deadline: float,
+) -> requests.Response:
+    """POST with a hard wall-clock deadline.
+
+    ``requests``' ``timeout`` only limits the gap between received bytes, so a
+    server that trickles data or stalls mid-stream can hang far longer than
+    intended. We run the request on a daemon worker thread and enforce an
+    absolute ceiling; on expiry we close the session to abandon the stuck socket
+    and raise :class:`LLMRequestDeadlineError` so the caller's retry/rotation
+    logic can recover instead of blocking forever.
+    """
+    box: dict[str, Any] = {}
+
+    def _run() -> None:
+        try:
+            box["response"] = session.post(
+                url, json=json_body, timeout=(connect_timeout, read_timeout)
+            )
+        except BaseException as exc:  # noqa: BLE001 - re-raised to the caller below
+            box["error"] = exc
+
+    worker = threading.Thread(target=_run, name="llm-post", daemon=True)
+    worker.start()
+    worker.join(total_deadline)
+    if worker.is_alive():
+        # Close the session to break the blocked recv on the worker thread; the
+        # caller evicts and rebuilds it before the next attempt.
+        try:
+            session.close()
+        except Exception:  # noqa: BLE001 - best-effort socket teardown
+            pass
+        raise LLMRequestDeadlineError(
+            f"LLM request exceeded hard deadline of {total_deadline:.0f}s"
+        )
+    if "error" in box:
+        raise box["error"]
+    return box["response"]
 
 
 def _load_model_api_key(model: ModelConfig) -> str:
@@ -293,14 +597,37 @@ def _load_model_api_key(model: ModelConfig) -> str:
 
 
 class RateLimitGovernor:
-    def __init__(self, *, time_fn=time.monotonic, sleep_fn=time.sleep):
+    def __init__(
+        self,
+        *,
+        time_fn=time.monotonic,
+        sleep_fn=time.sleep,
+        max_wait_seconds: float | None = None,
+        model_limits: dict[str, dict[str, int]] | None = None,
+    ):
         self._time_fn = time_fn
         self._sleep_fn = sleep_fn
+        self.max_wait_seconds = _resolve_max_wait_seconds(max_wait_seconds)
+        # Declared per-model limits (rpm/rpd/tpm/tpd) from the catalog, used to
+        # pre-seed per-minute headroom before any response header is observed.
+        self.model_limits = model_limits or {}
         # Keyed by (model_id, key_index) to track rate limits per API key independently.
         self._states: dict[tuple[str, int], ModelRateLimitState] = {}
 
     def _state(self, model_id: str, key_index: int) -> ModelRateLimitState:
-        return self._states.setdefault((model_id, key_index), ModelRateLimitState())
+        key = (model_id, key_index)
+        state = self._states.get(key)
+        if state is None:
+            state = ModelRateLimitState()
+            # Pre-seed per-minute token headroom from the declared TPM so the
+            # very first burst on a fresh key can't overshoot before a header is
+            # seen. Real headers overwrite this on the next response.
+            tpm = self.model_limits.get(model_id, {}).get("tpm")
+            if tpm:
+                state.remaining_tokens = int(tpm)
+                state.reset_tokens_at = self._time_fn() + 60.0
+            self._states[key] = state
+        return state
 
     def select_key(
         self,
@@ -351,10 +678,59 @@ class RateLimitGovernor:
         if best_key is not None:
             return best_key, 0.0
 
-        # All keys exhausted — sleep until the soonest one resets.
+        # All keys exhausted — sleep until the soonest one resets, but never
+        # longer than the configured cap. A far-future reset (e.g. a daily token
+        # limit) would otherwise block the whole run for hours; capping lets the
+        # caller's retry/model-fallback logic degrade gracefully instead.
         sleep_secs = max(0.0, earliest_reset - now) if earliest_reset != float("inf") else 0.0
+        sleep_secs = min(sleep_secs, self.max_wait_seconds)
         if sleep_secs > 0:
             self._sleep_fn(sleep_secs)
+        return current_key, sleep_secs
+
+    def peek_key(
+        self,
+        model_id: str,
+        current_key: int,
+        num_keys: int,
+        estimated_input_tokens: int = 0,
+    ) -> tuple[int, float]:
+        now = self._time_fn()
+        best_key: int | None = None
+        best_remaining_tokens = -1
+        earliest_reset = float("inf")
+
+        for ki in range(num_keys):
+            state = self._state(model_id, ki)
+            is_observed_key = (
+                ki == current_key
+                or state.remaining_requests is not None
+                or state.remaining_tokens is not None
+            )
+            req_ok = (
+                state.remaining_requests is None
+                or state.remaining_requests > RATE_LIMIT_REQUEST_FLOOR
+            )
+            tok_ok = (
+                state.remaining_tokens is None
+                or state.remaining_tokens > estimated_input_tokens + RATE_LIMIT_TOKEN_FLOOR
+            )
+            if req_ok and tok_ok and is_observed_key:
+                remaining = state.remaining_tokens if state.remaining_tokens is not None else 9_999_999
+                if best_key is None or remaining > best_remaining_tokens:
+                    best_key = ki
+                    best_remaining_tokens = remaining
+            else:
+                reset_at = max(
+                    state.reset_requests_at or 0.0,
+                    state.reset_tokens_at or 0.0,
+                )
+                if reset_at > now:
+                    earliest_reset = min(earliest_reset, reset_at)
+
+        if best_key is not None:
+            return best_key, 0.0
+        sleep_secs = max(0.0, earliest_reset - now) if earliest_reset != float("inf") else 0.0
         return current_key, sleep_secs
 
     def before_request(self, model_id: str, estimated_input_tokens: int = 0) -> float:
@@ -409,6 +785,7 @@ class AnalysisRuntime:
     groq_api_keys: list[str] = field(default_factory=list)
     session: requests.Session | None = None
     delayed_retry_final_model: ModelConfig | None = None
+    resolver: ModelResolver | None = None
     current_model_index: int = 0
     current_key_index: int = 0
     groq_sessions: dict[int, requests.Session] = field(default_factory=dict)
@@ -420,8 +797,11 @@ class AnalysisRuntime:
     provider_sessions: dict[str, requests.Session] = field(default_factory=dict)
     market_context_string: str = ""
     macro_release_digest: dict[str, Any] = field(default_factory=dict)
+    budget: DailyBudgetLedger = field(default_factory=DailyBudgetLedger)
 
     def __post_init__(self) -> None:
+        if self.resolver is None:
+            self.resolver = ModelResolver()
         if self.session is not None:
             if not self.groq_api_keys:
                 self.groq_api_keys = ["session-backed-groq-key"]
@@ -470,9 +850,33 @@ class AnalysisRuntime:
         return True
 
     def close_sessions(self) -> None:
+        # Persist daily token/request usage so budget survives across same-day
+        # runs; best-effort, never blocks teardown.
+        self.budget.flush()
         for session in self.groq_sessions.values():
             session.close()
         self.groq_sessions.clear()
+
+    def reset_session_for_model(self, model: ModelConfig) -> None:
+        """Drop the cached session for a model so a fresh one is built next use.
+
+        Used after a request error (e.g. a hard-deadline abort closed the
+        session) to avoid reusing a torn-down connection pool.
+        """
+        if model.provider == DEFAULT_PROVIDER:
+            for ki in list(self.groq_sessions.keys()):
+                try:
+                    self.groq_sessions[ki].close()
+                except Exception:  # noqa: BLE001 - best-effort teardown
+                    pass
+                del self.groq_sessions[ki]
+            return
+        session = self.provider_sessions.pop(model.provider, None)
+        if session is not None:
+            try:
+                session.close()
+            except Exception:  # noqa: BLE001 - best-effort teardown
+                pass
         for session in self.provider_sessions.values():
             session.close()
         self.provider_sessions.clear()
@@ -515,6 +919,27 @@ class AnalysisRuntime:
 
     def reset_model_for_category(self) -> None:
         self.current_model_index = 0
+
+    def evict_model(self, model_id: str) -> bool:
+        """Drop a decommissioned/unavailable model from the pool for this run.
+
+        Returns False (and keeps the model) if it is the only one left, so the
+        pool is never emptied. The resolver re-resolves over the reduced chain on
+        the next attempt.
+        """
+        if len(self.model_chain) <= 1:
+            return False
+        index = next((i for i, m in enumerate(self.model_chain) if m.model_id == model_id), None)
+        if index is None:
+            return False
+        self.model_chain.pop(index)
+        if self.current_model_index >= len(self.model_chain):
+            self.current_model_index = len(self.model_chain) - 1
+        if self.resolver is not None and self.resolver.active_model_ids is not None:
+            self.resolver.active_model_ids.discard(model_id)
+        self.diagnostics.fallback_switch_count += 1
+        LOGGER.info("Evicted model %s from the pool; %d remain.", model_id, len(self.model_chain))
+        return True
 
     def get_category_diagnostics(self, category_name: str) -> CategoryDiagnostics:
         return self.category_diagnostics.setdefault(category_name, CategoryDiagnostics())
@@ -588,7 +1013,10 @@ class AnalysisRuntime:
             self.diagnostics.response_413_split_count += 1
 
     def record_batch_attempt(self, context: BatchContext, model_id: str) -> None:
-        self.diagnostics.batch_count += 1
+        if context.llm_task != LLMTask.TOP_ALERTS.value:
+            self.diagnostics.batch_count += 1
+        task_counts = self.diagnostics.model_task_counts.setdefault(context.llm_task, {})
+        task_counts[model_id] = task_counts.get(model_id, 0) + 1
         diagnostics = self.get_category_diagnostics(context.category_name)
         if model_id not in diagnostics.models_attempted:
             diagnostics.models_attempted.append(model_id)
@@ -603,6 +1031,33 @@ class AnalysisRuntime:
 
     def record_json_repair_retry(self) -> None:
         self.diagnostics.json_repair_retry_count += 1
+
+    def record_resolver_selection(
+        self,
+        *,
+        task: str,
+        preferred_model: str,
+        selected_model: str,
+        rejections: list[dict[str, str]],
+        avoided_wait_seconds: float,
+    ) -> None:
+        for rejection in rejections:
+            if rejection.get("reason") == "daily_budget_exhausted":
+                self.diagnostics.daily_budget_skip_count += 1
+            item = {"task": task, **rejection}
+            if item not in self.diagnostics.resolver_rejections:
+                self.diagnostics.resolver_rejections.append(item)
+        if selected_model != preferred_model:
+            substitution = {
+                "task": task,
+                "from_model": preferred_model,
+                "to_model": selected_model,
+            }
+            if avoided_wait_seconds > 0:
+                substitution["avoided_wait_seconds"] = round(avoided_wait_seconds, 3)
+                self.diagnostics.avoided_rate_limit_wait_count += 1
+                self.diagnostics.avoided_rate_limit_wait_seconds_total += avoided_wait_seconds
+            self.diagnostics.model_substitutions.append(substitution)
 
     def record_failed_batch(self) -> None:
         self.diagnostics.failed_batch_count += 1
@@ -647,7 +1102,46 @@ def _chat_completion(
 ) -> tuple[str, str]:
     response: requests.Response | None = None
     for attempt in range(DEFAULT_CHAT_RETRIES):
-        model = model_override or runtime.current_model
+        preferred_model = model_override or runtime.current_model
+        task = context.llm_task
+        candidate_chain = [preferred_model] if model_override is not None else runtime.model_chain
+        rate_limit_waits = {
+            candidate.model_id: runtime.governor.peek_key(
+                candidate.model_id,
+                runtime.current_key_index,
+                len(runtime.groq_api_keys),
+                estimated_input_tokens,
+            )[1]
+            for candidate in candidate_chain
+        }
+        resolver = runtime.resolver or ModelResolver()
+        # Remaining daily token budget per candidate on the current key, so the
+        # resolver can skip a TPD-exhausted model and reserve premium capacity.
+        budget_remaining = {
+            candidate.model_id: runtime.budget.remaining_tokens(
+                candidate.model_id,
+                runtime.current_key_index,
+                resolver.capability_for(candidate).limits.get("tpd"),
+            )
+            for candidate in candidate_chain
+        }
+        selection = resolver.resolve(
+            task,
+            candidate_chain,
+            estimated_input_tokens=estimated_input_tokens,
+            requested_output_tokens=preferred_model.max_completion_tokens,
+            rate_limit_waits=rate_limit_waits,
+            preferred_model_id=preferred_model.model_id,
+            budget_remaining=budget_remaining,
+        )
+        model = selection.model
+        runtime.record_resolver_selection(
+            task=task,
+            preferred_model=preferred_model.model_id,
+            selected_model=model.model_id,
+            rejections=selection.rejections,
+            avoided_wait_seconds=selection.avoided_wait_seconds,
+        )
         if context.batch_kind.startswith("synthesis"):
             runtime.ensure_synthesis_budget(context.category_name)
         api_url = model.api_url or GROQ_CHAT_COMPLETIONS_URL
@@ -661,7 +1155,11 @@ def _chat_completion(
             estimated_input_tokens=estimated_input_tokens,
             serialized_request_bytes=_estimate_request_payload_bytes(model.model_id, messages, model.max_completion_tokens),
             content_shrunk=context.content_shrunk,
+            llm_task=task,
         )
+        selected_wait = rate_limit_waits.get(model.model_id, 0.0)
+        if task == LLMTask.TOP_ALERTS.value and selected_wait > 0:
+            raise RuntimeError(f"Top-alert generation degraded instead of waiting {selected_wait:.1f}s for rate limit reset.")
         runtime.record_batch_attempt(attempt_context, model.model_id)
         LOGGER.debug(
             "Sending %s for %s batch=%s model=%s articles=%s estimated_tokens=%s serialized_bytes=%s shrunk=%s attempt=%s.",
@@ -704,17 +1202,56 @@ def _chat_completion(
                 model.model_id,
                 runtime.current_key_index,
             )
-        response = session.post(
-            api_url,
-            json={
-                "model": model.model_id,
-                "messages": messages,
-                "temperature": 0.1,
-                "max_completion_tokens": model.max_completion_tokens,
-                "response_format": {"type": "json_object"},
-            },
-            timeout=60,
-        )
+        connect_timeout, read_timeout, total_deadline = _llm_request_timeouts()
+        try:
+            response = _post_with_deadline(
+                session,
+                api_url,
+                json_body={
+                    "model": model.model_id,
+                    "messages": messages,
+                    "temperature": 0.1,
+                    "max_completion_tokens": model.max_completion_tokens,
+                    "response_format": {"type": "json_object"},
+                },
+                connect_timeout=connect_timeout,
+                read_timeout=read_timeout,
+                total_deadline=total_deadline,
+            )
+        except requests.exceptions.RequestException as exc:
+            # Network failure or hard-deadline abort: never sit on a stuck
+            # socket. Treat like a transient server error and let key rotation /
+            # model fallback recover instead of failing the whole category.
+            runtime.diagnostics.request_timeout_count += 1
+            LOGGER.warning(
+                "LLM request error for category %s batch=%s on %s (key=%d): %s",
+                attempt_context.category_name,
+                attempt_context.batch_label,
+                model.model_id,
+                runtime.current_key_index,
+                exc,
+            )
+            runtime.reset_session_for_model(model)
+            runtime.record_retry(attempt_context.category_name, batch_kind=attempt_context.batch_kind)
+            if attempt == DEFAULT_CHAT_RETRIES - 1:
+                raise
+            if model.provider == DEFAULT_PROVIDER and runtime.rotate_key(
+                f"request error on key {runtime.current_key_index} / model {model.model_id}"
+            ):
+                session = runtime.get_session_for_model(model)
+                continue
+            if model_override is None and runtime.switch_to_next_model(
+                f"Request error on {model.model_id}: {exc}"
+            ):
+                runtime.current_key_index = 0
+                session = runtime.get_session_for_model(runtime.current_model)
+                runtime.record_model_switch(context.category_name, runtime.model_switches[-1])
+                continue
+            delay_seconds = min(5.0 * (attempt + 1), 20.0)
+            runtime.record_wait(attempt_context.category_name, delay_seconds, batch_kind=attempt_context.batch_kind)
+            time.sleep(delay_seconds)
+            session = runtime.get_session_for_model(model)
+            continue
         runtime.governor.record_response(model.model_id, response, key_index=runtime.current_key_index)
         LOGGER.debug(
             "Received HTTP %s for %s category=%s batch=%s model=%s.",
@@ -786,8 +1323,37 @@ def _chat_completion(
             )
             continue
 
+        if response.status_code in {400, 404}:
+            # A 404 (model gone) or a 400 on an already-minimal request (≤1 item,
+            # so it cannot be split smaller) means the model is rejecting our
+            # request shape, not that the request is too big. Evict it for this
+            # run and re-resolve onto a working model instead of failing. A 400
+            # on a multi-item batch is treated as oversized and falls through to
+            # the split/retry path below.
+            minimal_request = attempt_context.article_count <= 1
+            if (response.status_code == 404 or minimal_request) and model_override is None:
+                LOGGER.warning(
+                    "Model %s rejected request (HTTP %s) for category %s batch=%s; evicting and re-resolving.",
+                    model.model_id,
+                    response.status_code,
+                    attempt_context.category_name,
+                    attempt_context.batch_label,
+                )
+                if runtime.evict_model(model.model_id):
+                    runtime.diagnostics.model_decommissioned_count += 1
+                    runtime.current_key_index = 0
+                    session = runtime.get_session_for_model(runtime.current_model)
+                    continue
+
         response.raise_for_status()
         payload = response.json()
+        # Record actual daily token/request usage so budget survives across runs.
+        usage = payload.get("usage") if isinstance(payload, dict) else None
+        used_tokens = (usage or {}).get("total_tokens")
+        if not isinstance(used_tokens, int) or used_tokens <= 0:
+            used_tokens = estimated_input_tokens + model.max_completion_tokens
+        runtime.budget.record(model.model_id, runtime.current_key_index, used_tokens)
+        runtime.diagnostics.daily_budget_tokens_used += used_tokens
         content = payload["choices"][0]["message"]["content"]
         if not isinstance(content, str):
             raise ValueError("Groq response content was not a string.")
@@ -843,6 +1409,7 @@ def _invoke_json_with_retry(
                 (model_override or runtime.current_model).max_completion_tokens,
             ),
             content_shrunk=context.content_shrunk,
+            llm_task=LLMTask.JSON_REPAIR.value,
         )
         repaired_text, repaired_model = _chat_completion(
             runtime,

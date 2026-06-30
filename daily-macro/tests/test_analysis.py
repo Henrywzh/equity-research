@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+import os
 import tempfile
 import unittest
 from pathlib import Path
@@ -18,8 +19,13 @@ from daily_macro.analysis import (
     run_analysis,
     select_content_for_analysis,
 )
+from daily_macro.budget import DailyBudgetLedger
+from daily_macro.llm_client import ModelResolver, LLMTask, load_active_groq_model_ids
+from daily_macro.model_catalog import get_capability
+from daily_macro.model_registry import ModelPool
 from daily_macro.models import ArticleDetails
 from daily_macro.storage import Storage
+from daily_macro.types import FALLBACK_MODEL_IDS, PRIMARY_MODEL_ID
 
 
 class _FakeResponse:
@@ -60,6 +66,19 @@ class AnalysisTests(unittest.TestCase):
         self.data_dir = self.root / "data"
         self.db_path = self.data_dir / "news.sqlite"
         self.storage = Storage(self.db_path)
+        # Pin a deterministic, network-free model pool mirroring the legacy chain
+        # so these tests exercise batching/rate-limit/synthesis logic without
+        # hitting the live /models endpoint. Dynamic pool/routing behavior is
+        # covered separately in test_model_registry.py.
+        legacy_ids = [PRIMARY_MODEL_ID, *FALLBACK_MODEL_IDS]
+        legacy_pool = ModelPool(
+            models=[ModelConfig(model_id) for model_id in legacy_ids],
+            capabilities={model_id: get_capability(model_id) for model_id in legacy_ids},
+            active_ids=set(legacy_ids),
+        )
+        pool_patch = patch("daily_macro.analysis.build_model_pool", return_value=legacy_pool)
+        pool_patch.start()
+        self.addCleanup(pool_patch.stop)
 
     def tearDown(self) -> None:
         self.storage.close()
@@ -347,6 +366,287 @@ class AnalysisTests(unittest.TestCase):
         governor.before_request("qwen/qwen3-32b", estimated_input_tokens=100)
 
         self.assertEqual(slept, [2.0])
+
+    def test_select_key_caps_far_future_reset(self) -> None:
+        # A far-future reset (e.g. a daily token limit) must not block for hours:
+        # select_key sleeps at most max_wait_seconds and hands control back so the
+        # caller can rotate / fall back / degrade.
+        slept: list[float] = []
+        governor = RateLimitGovernor(
+            time_fn=lambda: 10.0,
+            sleep_fn=lambda seconds: slept.append(seconds),
+            max_wait_seconds=20.0,
+        )
+        governor.record_response(
+            "qwen/qwen3-32b",
+            _FakeResponse(
+                status_code=429,
+                headers={
+                    "x-ratelimit-remaining-tokens": "0",
+                    "x-ratelimit-reset-tokens": "100000",  # ~27h away
+                },
+            ),
+        )
+
+        best_key, slept_seconds = governor.select_key(
+            "qwen/qwen3-32b", current_key=0, num_keys=1, estimated_input_tokens=100
+        )
+
+        self.assertEqual(best_key, 0)
+        self.assertEqual(slept_seconds, 20.0)
+        self.assertEqual(slept, [20.0])
+
+    def test_model_resolver_excludes_preview_and_unavailable_models_by_default(self) -> None:
+        resolver = ModelResolver(
+            active_model_ids={"llama-3.1-8b-instant", "openai/gpt-oss-20b"},
+            model_policy="production_only",
+        )
+
+        selected = resolver.resolve(
+            LLMTask.TOP_ALERTS,
+            [
+                ModelConfig("meta-llama/llama-4-scout-17b-16e-instruct"),
+                ModelConfig("llama-3.3-70b-versatile"),
+                ModelConfig("llama-3.1-8b-instant"),
+            ],
+            estimated_input_tokens=500,
+            requested_output_tokens=500,
+        )
+
+        self.assertEqual(selected.model.model_id, "llama-3.1-8b-instant")
+        rejected = {item["model_id"]: item["reason"] for item in selected.rejections}
+        self.assertEqual(rejected["meta-llama/llama-4-scout-17b-16e-instruct"], "preview_model_disallowed")
+        self.assertEqual(rejected["llama-3.3-70b-versatile"], "model_not_active")
+
+    def test_resolver_fallback_avoids_preview_when_all_rate_limited(self) -> None:
+        # When every production model is rate-limited past the cap and nothing
+        # scores, the resolver must fall back to an eligible production model,
+        # NOT model_chain[0] which is the preview Scout model the policy forbids.
+        resolver = ModelResolver(
+            active_model_ids={
+                "meta-llama/llama-4-scout-17b-16e-instruct",
+                "llama-3.1-8b-instant",
+            },
+            model_policy="production_only",
+            max_wait_seconds=20.0,
+        )
+        chain = [
+            ModelConfig("meta-llama/llama-4-scout-17b-16e-instruct"),  # preview, chain head
+            ModelConfig("llama-3.1-8b-instant"),  # production
+        ]
+
+        selected = resolver.resolve(
+            LLMTask.ARTICLE_ANALYSIS,
+            chain,
+            estimated_input_tokens=100,
+            requested_output_tokens=100,
+            rate_limit_waits={"llama-3.1-8b-instant": 9999.0},  # over the cap
+        )
+
+        self.assertEqual(selected.model.model_id, "llama-3.1-8b-instant")
+        reasons = {item["model_id"]: item["reason"] for item in selected.rejections}
+        self.assertEqual(
+            reasons["meta-llama/llama-4-scout-17b-16e-instruct"], "preview_model_disallowed"
+        )
+
+    def test_model_resolver_prefers_different_models_for_routing_and_top_alerts(self) -> None:
+        resolver = ModelResolver(
+            active_model_ids={"llama-3.1-8b-instant", "llama-3.3-70b-versatile", "openai/gpt-oss-20b"},
+            model_policy="production_only",
+        )
+        chain = [
+            ModelConfig("llama-3.1-8b-instant"),
+            ModelConfig("llama-3.3-70b-versatile"),
+            ModelConfig("openai/gpt-oss-20b"),
+        ]
+
+        routing = resolver.resolve(LLMTask.ROUTING, chain, estimated_input_tokens=300, requested_output_tokens=300)
+        alerts = resolver.resolve(LLMTask.TOP_ALERTS, chain, estimated_input_tokens=300, requested_output_tokens=800)
+
+        self.assertEqual(routing.model.model_id, "llama-3.1-8b-instant")
+        self.assertEqual(alerts.model.model_id, "openai/gpt-oss-20b")
+
+    def test_model_resolver_honors_task_preference_environment_override(self) -> None:
+        resolver = ModelResolver(
+            active_model_ids={"llama-3.1-8b-instant", "llama-3.3-70b-versatile"},
+            model_policy="production_only",
+        )
+
+        with patch.dict(os.environ, {"DAILY_MACRO_MODEL_ROUTING_PREFERENCES": "llama-3.3-70b-versatile"}, clear=False):
+            selected = resolver.resolve(
+                LLMTask.ROUTING,
+                [ModelConfig("llama-3.1-8b-instant"), ModelConfig("llama-3.3-70b-versatile")],
+                estimated_input_tokens=100,
+                requested_output_tokens=100,
+            )
+
+        self.assertEqual(selected.model.model_id, "llama-3.3-70b-versatile")
+
+    def test_active_groq_model_refresh_is_disabled_by_default(self) -> None:
+        with patch.dict(os.environ, {}, clear=True), patch(
+            "daily_macro.llm_client._build_groq_session",
+            side_effect=AssertionError("model refresh should be opt-in"),
+        ):
+            active_ids = load_active_groq_model_ids("test-key")
+
+        self.assertIsNone(active_ids)
+
+    def test_chat_completion_switches_model_instead_of_sleeping_for_long_reset(self) -> None:
+        slept: list[float] = []
+        governor = RateLimitGovernor(time_fn=lambda: 10.0, sleep_fn=lambda seconds: slept.append(seconds))
+        governor.record_response(
+            "llama-3.1-8b-instant",
+            _FakeResponse(
+                200,
+                headers={
+                    "x-ratelimit-remaining-requests": "0",
+                    "x-ratelimit-reset-requests": "120",
+                },
+            ),
+        )
+        session = _FakeGroqSession(
+            [
+                _FakeResponse(
+                    200,
+                    payload={"choices": [{"message": {"content": json.dumps({"ok": True})}}]},
+                )
+            ]
+        )
+        runtime = AnalysisRuntime(
+            session=session,
+            governor=governor,
+            model_chain=[
+                ModelConfig("llama-3.1-8b-instant"),
+                ModelConfig("llama-3.3-70b-versatile"),
+            ],
+            resolver=ModelResolver(
+                active_model_ids={"llama-3.1-8b-instant", "llama-3.3-70b-versatile"},
+                model_policy="production_only",
+                max_wait_seconds=30.0,
+            ),
+        )
+
+        payload, model_used = analysis_module._invoke_json_with_retry(
+            runtime,
+            [{"role": "user", "content": "{}"}],
+            10,
+            analysis_module.BatchContext("test", "article_batch", "1", 1, 10, 100),
+        )
+
+        self.assertEqual(payload, {"ok": True})
+        self.assertEqual(model_used, "llama-3.3-70b-versatile")
+        self.assertEqual(slept, [])
+        self.assertEqual(runtime.diagnostics.avoided_rate_limit_wait_count, 1)
+        self.assertEqual(session.models_used, ["llama-3.3-70b-versatile"])
+
+    def test_chat_completion_records_actual_usage_into_budget(self) -> None:
+        governor = RateLimitGovernor(sleep_fn=lambda _seconds: None)
+        session = _FakeGroqSession(
+            [
+                _FakeResponse(
+                    200,
+                    payload={
+                        "usage": {"total_tokens": 4321},
+                        "choices": [{"message": {"content": json.dumps({"ok": True})}}],
+                    },
+                )
+            ]
+        )
+        ledger = DailyBudgetLedger()
+        runtime = AnalysisRuntime(
+            session=session,
+            governor=governor,
+            model_chain=[ModelConfig("llama-3.1-8b-instant")],
+            resolver=ModelResolver(
+                active_model_ids={"llama-3.1-8b-instant"},
+                model_policy="production_only",
+            ),
+            budget=ledger,
+        )
+
+        payload, _model_used = analysis_module._invoke_json_with_retry(
+            runtime,
+            [{"role": "user", "content": "{}"}],
+            10,
+            analysis_module.BatchContext("test", "article_batch", "1", 1, 10, 100),
+        )
+
+        self.assertEqual(payload, {"ok": True})
+        self.assertEqual(ledger.used_tokens("llama-3.1-8b-instant", 0), 4321)
+        self.assertEqual(runtime.diagnostics.daily_budget_tokens_used, 4321)
+
+    def test_governor_preseeds_remaining_tokens_from_declared_tpm(self) -> None:
+        governor = RateLimitGovernor(model_limits={"m": {"tpm": 5000}})
+        # First contact with the model pre-seeds per-minute headroom from TPM.
+        self.assertEqual(governor._state("m", 0).remaining_tokens, 5000)
+        # A model with no declared TPM is left unconstrained (None) until a header.
+        self.assertIsNone(governor._state("other", 0).remaining_tokens)
+
+    def test_generate_top_alerts_uses_structured_schema_and_shared_invocation(self) -> None:
+        session = _FakeGroqSession(
+            [
+                _FakeResponse(
+                    200,
+                    payload={
+                        "choices": [
+                            {
+                                "message": {
+                                    "content": json.dumps(
+                                        {
+                                            "top_alerts": [
+                                                {
+                                                    "summary": "Fed repricing is the key macro risk.",
+                                                    "why_it_matters": "Higher yields pressure growth equities.",
+                                                    "affected_assets": ["US10Y", "HSI"],
+                                                    "time_horizon": "1w",
+                                                    "confidence": 0.82,
+                                                    "source_article_ids": ["9001"],
+                                                }
+                                            ]
+                                        }
+                                    )
+                                }
+                            }
+                        ]
+                    },
+                )
+            ]
+        )
+        runtime = AnalysisRuntime(
+            session=session,
+            governor=RateLimitGovernor(sleep_fn=lambda seconds: None),
+            model_chain=[ModelConfig("llama-3.1-8b-instant"), ModelConfig("openai/gpt-oss-20b")],
+            resolver=ModelResolver(
+                active_model_ids={"llama-3.1-8b-instant", "openai/gpt-oss-20b"},
+                model_policy="production_only",
+            ),
+        )
+
+        alerts = analysis_module._generate_top_alerts(
+            runtime=runtime,
+            market_context="US10Y +8bp",
+            developments=[
+                {
+                    "category": "國際財經",
+                    "subgroup": "Rates",
+                    "text": "Fed repricing is the key macro risk.",
+                    "ref_ids": ["9001"],
+                }
+            ],
+            article_metadata={
+                "9001": {
+                    "title": "Fed headline",
+                    "date": "2026-04-03",
+                    "url": "https://example.com/9001",
+                }
+            },
+        )
+
+        self.assertEqual(len(alerts), 1)
+        self.assertEqual(alerts[0]["source_article_ids"], ["9001"])
+        self.assertEqual(alerts[0]["affected_assets"], ["US10Y", "HSI"])
+        self.assertEqual(alerts[0]["source_articles"][0]["url"], "https://example.com/9001")
+        self.assertEqual(session.models_used, ["openai/gpt-oss-20b"])
 
     def test_run_analysis_returns_empty_report_for_missing_day(self) -> None:
         with patch(
@@ -992,7 +1292,7 @@ class AnalysisTests(unittest.TestCase):
             return_value=False,
         ), patch(
             "daily_macro.analysis.RateLimitGovernor",
-            side_effect=lambda: RateLimitGovernor(sleep_fn=lambda _seconds: None),
+            side_effect=lambda **kwargs: RateLimitGovernor(sleep_fn=lambda _seconds: None),
         ), patch(
             "daily_macro.analysis.time.sleep",
             return_value=None,
@@ -1086,7 +1386,7 @@ class AnalysisTests(unittest.TestCase):
             "daily_macro.analysis._build_groq_session", return_value=session
         ), patch(
             "daily_macro.analysis.RateLimitGovernor",
-            side_effect=lambda: RateLimitGovernor(sleep_fn=lambda _seconds: None),
+            side_effect=lambda **kwargs: RateLimitGovernor(sleep_fn=lambda _seconds: None),
         ), patch(
             "daily_macro.analysis.time.sleep",
             return_value=None,
@@ -1195,7 +1495,7 @@ class AnalysisTests(unittest.TestCase):
             return_value=False,
         ), patch(
             "daily_macro.analysis.RateLimitGovernor",
-            side_effect=lambda: RateLimitGovernor(sleep_fn=lambda _seconds: None),
+            side_effect=lambda **kwargs: RateLimitGovernor(sleep_fn=lambda _seconds: None),
         ), patch(
             "daily_macro.analysis.time.sleep",
             return_value=None,
@@ -1474,7 +1774,7 @@ class AnalysisTests(unittest.TestCase):
             "daily_macro.analysis._build_groq_session", return_value=session
         ), patch(
             "daily_macro.analysis.RateLimitGovernor",
-            side_effect=lambda: RateLimitGovernor(time_fn=lambda: 10.0, sleep_fn=lambda _seconds: None),
+            side_effect=lambda **kwargs: RateLimitGovernor(time_fn=lambda: 10.0, sleep_fn=lambda _seconds: None),
         ):
             report = run_analysis(date_string="2026-04-03", data_dir=self.data_dir, db_path=self.db_path)
 
@@ -1685,6 +1985,7 @@ class AnalysisTests(unittest.TestCase):
                 ModelConfig("qwen/qwen3-32b"),
                 ModelConfig("llama-3.1-8b-instant"),
             ],
+            resolver=ModelResolver(model_policy="allow_preview"),
         )
         global_article = analysis_module._prepare_single_article(
             {
@@ -1865,6 +2166,7 @@ class AnalysisTests(unittest.TestCase):
                 ModelConfig("qwen/qwen3-32b"),
                 ModelConfig("llama-3.1-8b-instant"),
             ],
+            resolver=ModelResolver(model_policy="allow_preview"),
         )
         article = analysis_module._prepare_single_article(
             {

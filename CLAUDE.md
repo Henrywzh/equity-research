@@ -2,13 +2,13 @@
 
 ## Git Compatibility
 
-Do not enable `extensions.worktreeConfig` in this repository's `.git/config`.
+`extensions.worktreeConfig` may be enabled in this repository's `.git/config`.
 
 Reason:
-- Antigravity failed to resolve workspace metadata when that Git extension was present.
-- The failure broke workspace/chat state lookup and caused replies to stop.
+- Antigravity previously failed to resolve workspace metadata when that Git extension was present.
+- Antigravity has since been verified to work with `extensions.worktreeConfig = true` in this repository.
 
-If Antigravity stops responding again, first verify that `.git/config` does not contain `extensions.worktreeConfig = true`.
+If Antigravity stops responding again, do not assume `extensions.worktreeConfig` is the cause; inspect workspace/chat state lookup and recent Git/config changes first.
 
 ## Local Configuration
 
