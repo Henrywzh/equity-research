@@ -1,0 +1,4036 @@
+{
+  "report_schema_version": 6,
+  "report_date": "2026-05-30",
+  "generated_at": "2026-05-30T22:00:16.999413+00:00",
+  "source_site": "hkej",
+  "status": "success",
+  "executive_summary": [],
+  "legacy_executive_summary": [
+    "歐洲股市收盤漲0.14%，航太股表現良好。",
+    "道指一度升416點，高見51085點。",
+    "藍色起源火箭測試時爆炸，美國航太概念股急跌，AST SpaceMobile收市瀉14.8%。"
+  ],
+  "model": {
+    "provider": "groq",
+    "primary_model": "meta-llama/llama-4-scout-17b-16e-instruct",
+    "fallback_models": [
+      "qwen/qwen3-32b",
+      "llama-3.1-8b-instant"
+    ]
+  },
+  "model_switches": [],
+  "input": {
+    "article_count": 46,
+    "category_count": 6
+  },
+  "diagnostics": {
+    "rate_limit_wait_count": 1,
+    "rate_limit_wait_seconds_total": 1641.6,
+    "fallback_switch_count": 0,
+    "key_rotation_count": 0,
+    "pre_send_split_count": 12,
+    "response_413_split_count": 0,
+    "json_repair_retry_count": 0,
+    "batch_count": 32,
+    "failed_batch_count": 0,
+    "delayed_retry_candidate_count": 0,
+    "delayed_retry_attempted_count": 0,
+    "delayed_retry_recovered_count": 0,
+    "delayed_retry_failed_count": 0,
+    "high_medium_unresolved_count": 0,
+    "light_unresolved_count": 0,
+    "delayed_retry_skipped_final_model_count": 0,
+    "synthesis_budget_exhausted_count": 0,
+    "degraded_merge_count": 0
+  },
+  "incremental": {
+    "reused_successful_articles": 39,
+    "new_articles_analyzed": 7,
+    "retried_previous_day_articles": 0,
+    "previous_day_retry_successes": 0
+  },
+  "daily_stats": {
+    "total_scraped": 46,
+    "analyzed": 46,
+    "success_rate": 100.0
+  },
+  "macro_release_digest": {
+    "generated_at": "2026-05-30T21:32:34.905881+00:00",
+    "window_start": "2026-05-30",
+    "window_end": "2026-06-05",
+    "fetch_status": "failed",
+    "items": [],
+    "source": "mixed",
+    "error_messages": [
+      "fred:HTTPSConnectionPool(host='api.stlouisfed.org', port=443): Read timed out. (read timeout=10)"
+    ]
+  },
+  "unresolved_articles": [],
+  "totals": {
+    "article_count": 46,
+    "successful_article_analyses": 46,
+    "failed_article_analyses": 0,
+    "full_text_article_count": 46,
+    "truncated_article_count": 0,
+    "successful_categories": 6,
+    "partial_categories": 0,
+    "failed_categories": 0
+  },
+  "market_context": [],
+  "categories": [
+    {
+      "category": "國際財經",
+      "article_count": 10,
+      "status": "success",
+      "key_developments": [],
+      "named_entities": [
+        {
+          "name": "美股",
+          "type": "index"
+        },
+        {
+          "name": "藍色起源",
+          "type": "company"
+        },
+        {
+          "name": "美國國會",
+          "type": "organization"
+        },
+        {
+          "name": "瑞銀",
+          "type": "company"
+        },
+        {
+          "name": "歐洲股市",
+          "type": "index"
+        }
+      ],
+      "articles": [
+        {
+          "source_article_id": "4416493",
+          "title": "瑞銀據報短期再裁EMEA地區數百職位",
+          "canonical_url": "https://www.hkej.com/instantnews/international/article/4416493/%E7%91%9E%E9%8A%80%E6%93%9A%E5%A0%B1%E7%9F%AD%E6%9C%9F%E5%86%8D%E8%A3%81EMEA%E5%9C%B0%E5%8D%80%E6%95%B8%E7%99%BE%E8%81%B7%E4%BD%8D",
+          "published_at": "2026-05-30T17:22:00+08:00",
+          "section": "國際財經",
+          "novelty_score": 6,
+          "relevance_score": 8,
+          "urgency_score": 5,
+          "named_entities": [
+            {
+              "name": "瑞銀",
+              "type": "company"
+            },
+            {
+              "name": "瑞信",
+              "type": "company"
+            },
+            {
+              "name": "歐洲",
+              "type": "other"
+            },
+            {
+              "name": "中東",
+              "type": "other"
+            },
+            {
+              "name": "非洲",
+              "type": "other"
+            }
+          ],
+          "key_points": [
+            "瑞銀計劃在EMEA地區裁減數百個職位，主要影響後勤支援部門和部分前線員工。",
+            "裁員因瑞銀收購瑞信後員工數目大增至近12萬人，近期完成客戶數據遷移項目使部分崗位成冗餘。",
+            "瑞銀預計下半年將進一步削減崗位，裁員計劃將歷時數年，通過自然減員、提前退休、內部轉崗等方式實現。"
+          ],
+          "content_truncated": false,
+          "original_content_length_chars": 270,
+          "analyzed_content_length_chars": 270,
+          "original_content_token_estimate": 68,
+          "analyzed_content_token_estimate": 68,
+          "truncation_reason": null,
+          "analysis_method": "full_text",
+          "attention_tier": "medium",
+          "theme": "macro",
+          "attention_reason": "Involves job cuts in a major financial institution's EMEA region.",
+          "must_keep": true,
+          "model_used": "meta-llama/llama-4-scout-17b-16e-instruct",
+          "delayed_retry_attempted": false,
+          "delayed_retry_model_chain": [],
+          "delayed_retry_final_model": null,
+          "error_classification": null,
+          "error": null
+        },
+        {
+          "source_article_id": "4416473",
+          "title": "國際早班車丨藍色起源火箭測試時爆炸 美航太概念股急瀉",
+          "canonical_url": "https://www.hkej.com/instantnews/international/article/4416473/%E5%9C%8B%E9%9A%9B%E6%97%A9%E7%8F%AD%E8%BB%8A%E4%B8%A8%E8%97%8D%E8%89%B2%E8%B5%B7%E6%BA%90%E7%81%AB%E7%AE%AD%E6%B8%AC%E8%A9%A6%E6%99%82%E7%88%86%E7%82%B8+%E7%BE%8E%E8%88%AA%E5%A4%AA%E6%A6%82%E5%BF%B5%E8%82%A1%E6%80%A5%E7%80%89",
+          "published_at": "2026-05-30T07:50:00+08:00",
+          "section": "國際財經",
+          "novelty_score": 6,
+          "relevance_score": 8,
+          "urgency_score": 9,
+          "named_entities": [
+            {
+              "name": "藍色起源",
+              "type": "company"
+            },
+            {
+              "name": "貝索斯",
+              "type": "person"
+            },
+            {
+              "name": "SpaceX",
+              "type": "company"
+            },
+            {
+              "name": "丹麥退休基金",
+              "type": "institution"
+            },
+            {
+              "name": "美國國會",
+              "type": "organization"
+            }
+          ],
+          "key_points": [
+            "藍色起源火箭測試時爆炸，美國航太概念股急跌，AST SpaceMobile收市瀉14.8%。",
+            "美國國會推動法案限制中國車企，平治或被波及，可能被排除在美國汽車市場之外。",
+            "百度旗下崑崙芯傳最早6月來港上市，集資介乎10億至20億美元。"
+          ],
+          "content_truncated": false,
+          "original_content_length_chars": 3143,
+          "analyzed_content_length_chars": 3143,
+          "original_content_token_estimate": 786,
+          "analyzed_content_token_estimate": 786,
+          "truncation_reason": null,
+          "analysis_method": "full_text",
+          "attention_tier": "high",
+          "theme": "geopolitics",
+          "attention_reason": "涉及航太概念股爆炸事件",
+          "must_keep": true,
+          "model_used": "meta-llama/llama-4-scout-17b-16e-instruct",
+          "delayed_retry_attempted": false,
+          "delayed_retry_model_chain": [],
+          "delayed_retry_final_model": null,
+          "error_classification": null,
+          "error": null
+        },
+        {
+          "source_article_id": "4416469",
+          "title": "特朗普關稅丨美將對法官要求退稅裁決提上訴",
+          "canonical_url": "https://www.hkej.com/instantnews/international/article/4416469/%E7%89%B9%E6%9C%97%E6%99%AE%E9%97%9C%E7%A8%85%E4%B8%A8%E7%BE%8E%E5%B0%87%E5%B0%8D%E6%B3%95%E5%AE%98%E8%A6%81%E6%B1%82%E9%80%80%E7%A8%85%E8%A3%81%E6%B1%BA%E6%8F%90%E4%B8%8A%E8%A8%B4",
+          "published_at": "2026-05-30T06:54:00+08:00",
+          "section": "國際財經",
+          "novelty_score": 6,
+          "relevance_score": 8,
+          "urgency_score": 7,
+          "named_entities": [
+            {
+              "name": "特朗普",
+              "type": "person"
+            },
+            {
+              "name": "美國",
+              "type": "country"
+            },
+            {
+              "name": "美國司法部",
+              "type": "institution"
+            }
+          ],
+          "key_points": [
+            "美國總統特朗普政府將對貿易法院法官的職權提出質疑，涉案關稅金額數百億美元。",
+            "法官此前裁決要求海關重新計算特朗普政府徵收的進口稅，該徵收被最高法院宣布為違法。",
+            "此舉可能為關稅索賠程序帶來法律混亂。"
+          ],
+          "content_truncated": false,
+          "original_content_length_chars": 202,
+          "analyzed_content_length_chars": 202,
+          "original_content_token_estimate": 51,
+          "analyzed_content_token_estimate": 51,
+          "truncation_reason": null,
+          "analysis_method": "full_text",
+          "attention_tier": "medium",
+          "theme": "geopolitics",
+          "attention_reason": "Article mentions trade-related disputes and potential tariffs.",
+          "must_keep": true,
+          "model_used": "meta-llama/llama-4-scout-17b-16e-instruct",
+          "delayed_retry_attempted": false,
+          "delayed_retry_model_chain": [],
+          "delayed_retry_final_model": null,
+          "error_classification": null,
+          "error": null
+        },
+        {
+          "source_article_id": "4416430",
+          "title": "藍色起源火箭測試時爆炸 美航太概念股急瀉",
+          "canonical_url": "https://www.hkej.com/instantnews/international/article/4416430/%E8%97%8D%E8%89%B2%E8%B5%B7%E6%BA%90%E7%81%AB%E7%AE%AD%E6%B8%AC%E8%A9%A6%E6%99%82%E7%88%86%E7%82%B8+%E7%BE%8E%E8%88%AA%E5%A4%AA%E6%A6%82%E5%BF%B5%E8%82%A1%E6%80%A5%E7%80%89",
+          "published_at": "2026-05-30T05:05:00+08:00",
+          "section": "國際財經",
+          "novelty_score": 8,
+          "relevance_score": 9,
+          "urgency_score": 9,
+          "named_entities": [
+            {
+              "name": "Jeff Bezos",
+              "type": "person"
+            },
+            {
+              "name": "Blue Origin",
+              "type": "company"
+            },
+            {
+              "name": "NASA",
+              "type": "institution"
+            },
+            {
+              "name": "Karman Holdings",
+              "type": "company"
+            },
+            {
+              "name": "Rocket Lab",
+              "type": "company"
+            }
+          ],
+          "key_points": [
+            "藍色起源新格倫火箭測試時爆炸，影響NASA探月計劃。",
+            "美國航太概念股急跌，Karman Holdings跌12.7%，Rocket Lab跌3.1%。",
+            "維珍銀河控股逆勢飆升36.4%，報6.18美元。"
+          ],
+          "content_truncated": false,
+          "original_content_length_chars": 679,
+          "analyzed_content_length_chars": 679,
+          "original_content_token_estimate": 170,
+          "analyzed_content_token_estimate": 170,
+          "truncation_reason": null,
+          "analysis_method": "full_text",
+          "attention_tier": "high",
+          "theme": "geopolitics",
+          "attention_reason": "涉及航太概念股爆炸事件",
+          "must_keep": true,
+          "model_used": "meta-llama/llama-4-scout-17b-16e-instruct",
+          "delayed_retry_attempted": false,
+          "delayed_retry_model_chain": [],
+          "delayed_retry_final_model": null,
+          "error_classification": null,
+          "error": null
+        },
+        {
+          "source_article_id": "4416467",
+          "title": "美股走勢丨三大指數創新高 道指收市升363點",
+          "canonical_url": "https://www.hkej.com/instantnews/international/article/4416467/%E7%BE%8E%E8%82%A1%E8%B5%B0%E5%8B%A2%E4%B8%A8%E4%B8%89%E5%A4%A7%E6%8C%87%E6%95%B8%E5%89%B5%E6%96%B0%E9%AB%98+%E9%81%93%E6%8C%87%E6%94%B6%E5%B8%82%E5%8D%87363%E9%BB%9E",
+          "published_at": "2026-05-30T04:35:00+08:00",
+          "section": "國際財經",
+          "novelty_score": 6,
+          "relevance_score": 8,
+          "urgency_score": 7,
+          "named_entities": [
+            {
+              "name": "美股",
+              "type": "index"
+            },
+            {
+              "name": "道指",
+              "type": "index"
+            },
+            {
+              "name": "標指",
+              "type": "index"
+            },
+            {
+              "name": "納指",
+              "type": "index"
+            },
+            {
+              "name": "微軟",
+              "type": "company"
+            }
+          ],
+          "key_points": [
+            "美股三大指數創新高，道指收市升363點。",
+            "微軟收市股價上揚5.5%，IBM炒高12.7%。",
+            "戴爾大幅上調收入預測，股價爆升32.8%。"
+          ],
+          "content_truncated": false,
+          "original_content_length_chars": 1494,
+          "analyzed_content_length_chars": 1494,
+          "original_content_token_estimate": 374,
+          "analyzed_content_token_estimate": 374,
+          "truncation_reason": null,
+          "analysis_method": "full_text",
+          "attention_tier": "high",
+          "theme": "stocks",
+          "attention_reason": "涉及美股三大指數創新高",
+          "must_keep": true,
+          "model_used": "meta-llama/llama-4-scout-17b-16e-instruct",
+          "delayed_retry_attempted": false,
+          "delayed_retry_model_chain": [],
+          "delayed_retry_final_model": null,
+          "error_classification": null,
+          "error": null
+        },
+        {
+          "source_article_id": "4416428",
+          "title": "美眾院推動法案限制中國車企 平治或被波及",
+          "canonical_url": "https://www.hkej.com/instantnews/international/article/4416428/%E7%BE%8E%E7%9C%BE%E9%99%A2%E6%8E%A8%E5%8B%95%E6%B3%95%E6%A1%88%E9%99%90%E5%88%B6%E4%B8%AD%E5%9C%8B%E8%BB%8A%E4%BC%81+%E5%B9%B3%E6%B2%BB%E6%88%96%E8%A2%AB%E6%B3%A2%E5%8F%8A",
+          "published_at": "2026-05-30T03:14:00+08:00",
+          "section": "國際財經",
+          "novelty_score": 6,
+          "relevance_score": 8,
+          "urgency_score": 7,
+          "named_entities": [
+            {
+              "name": "Mercedes-Benz",
+              "type": "company"
+            },
+            {
+              "name": "北汽集團",
+              "type": "company"
+            },
+            {
+              "name": "吉利汽車",
+              "type": "company"
+            },
+            {
+              "name": "李書福",
+              "type": "person"
+            },
+            {
+              "name": "Brett Guthrie",
+              "type": "person"
+            }
+          ],
+          "key_points": [
+            "美國眾議院提出法案限制中國企業參與美國汽車市場，可能影響平治在美業務。",
+            "平治最大股東北汽集團持有9.98%股份，第二大股東李書福持有9.69%股份。",
+            "法案或影響其他中國控股汽車製造商，包括沃爾沃、法拉第未來等。"
+          ],
+          "content_truncated": false,
+          "original_content_length_chars": 1042,
+          "analyzed_content_length_chars": 1042,
+          "original_content_token_estimate": 261,
+          "analyzed_content_token_estimate": 261,
+          "truncation_reason": null,
+          "analysis_method": "full_text",
+          "attention_tier": "medium",
+          "theme": "geopolitics",
+          "attention_reason": "涉及美國法案限制中國車企",
+          "must_keep": true,
+          "model_used": "meta-llama/llama-4-scout-17b-16e-instruct",
+          "delayed_retry_attempted": false,
+          "delayed_retry_model_chain": [],
+          "delayed_retry_final_model": null,
+          "error_classification": null,
+          "error": null
+        },
+        {
+          "source_article_id": "4416426",
+          "title": "歐股收市升0.14% 航太股造好",
+          "canonical_url": "https://www.hkej.com/instantnews/international/article/4416426/%E6%AD%90%E8%82%A1%E6%94%B6%E5%B8%82%E5%8D%870.14%25+%E8%88%AA%E5%A4%AA%E8%82%A1%E9%80%A0%E5%A5%BD",
+          "published_at": "2026-05-30T02:05:00+08:00",
+          "section": "國際財經",
+          "novelty_score": 4,
+          "relevance_score": 6,
+          "urgency_score": 5,
+          "named_entities": [
+            {
+              "name": "歐洲股市",
+              "type": "index"
+            },
+            {
+              "name": "泛歐指數Stoxx 600",
+              "type": "index"
+            },
+            {
+              "name": "美國總統特朗普",
+              "type": "person"
+            },
+            {
+              "name": "聯儲局理事鮑曼",
+              "type": "person"
+            }
+          ],
+          "key_points": [
+            "歐洲股市收盤漲0.14%，航太股表現良好。",
+            "美伊停火預期升溫，提振市場投資氣氛。",
+            "聯儲局理事鮑曼表示中東戰爭可能導致通脹持續攀升。"
+          ],
+          "content_truncated": false,
+          "original_content_length_chars": 505,
+          "analyzed_content_length_chars": 505,
+          "original_content_token_estimate": 127,
+          "analyzed_content_token_estimate": 127,
+          "truncation_reason": null,
+          "analysis_method": "full_text",
+          "attention_tier": "medium",
+          "theme": "stocks",
+          "attention_reason": "歐股收市微升",
+          "must_keep": true,
+          "model_used": "meta-llama/llama-4-scout-17b-16e-instruct",
+          "delayed_retry_attempted": false,
+          "delayed_retry_model_chain": [],
+          "delayed_retry_final_model": null,
+          "error_classification": null,
+          "error": null
+        },
+        {
+          "source_article_id": "4416422",
+          "title": "美國4月商品貿易逆差收窄至824億美元",
+          "canonical_url": "https://www.hkej.com/instantnews/international/article/4416422/%E7%BE%8E%E5%9C%8B4%E6%9C%88%E5%95%86%E5%93%81%E8%B2%BF%E6%98%93%E9%80%86%E5%B7%AE%E6%94%B6%E7%AA%84%E8%87%B3824%E5%84%84%E7%BE%8E%E5%85%83",
+          "published_at": "2026-05-30T01:24:00+08:00",
+          "section": "國際財經",
+          "novelty_score": 5,
+          "relevance_score": 7,
+          "urgency_score": 6,
+          "named_entities": [
+            {
+              "name": "美國",
+              "type": "country"
+            },
+            {
+              "name": "商品貿易逆差",
+              "type": "other"
+            }
+          ],
+          "key_points": [
+            "美國4月商品貿易逆差收窄至824億美元，少於預期。",
+            "商品出口增加85億美元，至2197億美元；商品進口增長56億美元，報3021億美元。",
+            "貿易逆差收窄或為第2季經濟增長帶來貢獻。"
+          ],
+          "content_truncated": false,
+          "original_content_length_chars": 227,
+          "analyzed_content_length_chars": 227,
+          "original_content_token_estimate": 57,
+          "analyzed_content_token_estimate": 57,
+          "truncation_reason": null,
+          "analysis_method": "full_text",
+          "attention_tier": "medium",
+          "theme": "macro",
+          "attention_reason": "Article reports on trade deficit data, a macroeconomic indicator.",
+          "must_keep": true,
+          "model_used": "meta-llama/llama-4-scout-17b-16e-instruct",
+          "delayed_retry_attempted": false,
+          "delayed_retry_model_chain": [],
+          "delayed_retry_final_model": null,
+          "error_classification": null,
+          "error": null
+        },
+        {
+          "source_article_id": "4416419",
+          "title": "SpaceX IPO丨丹麥退休基金拉黑SpaceX 批公司治理結構具災難性",
+          "canonical_url": "https://www.hkej.com/instantnews/international/article/4416419/SpaceX+IPO%E4%B8%A8%E4%B8%B9%E9%BA%A5%E9%80%80%E4%BC%91%E5%9F%BA%E9%87%91%E6%8B%89%E9%BB%91SpaceX+%E6%89%B9%E5%85%AC%E5%8F%B8%E6%B2%BB%E7%90%86%E7%B5%90%E6%A7%8B%E5%85%B7%E7%81%BD%E9%9B%A3%E6%80%A7",
+          "published_at": "2026-05-30T00:48:00+08:00",
+          "section": "國際財經",
+          "novelty_score": 7,
+          "relevance_score": 8,
+          "urgency_score": 7,
+          "named_entities": [
+            {
+              "name": "SpaceX",
+              "type": "company"
+            },
+            {
+              "name": "丹麥退休基金AkademikerPension",
+              "type": "institution"
+            },
+            {
+              "name": "馬斯克",
+              "type": "person"
+            }
+          ],
+          "key_points": [],
+          "content_truncated": false,
+          "original_content_length_chars": 405,
+          "analyzed_content_length_chars": 405,
+          "original_content_token_estimate": 102,
+          "analyzed_content_token_estimate": 102,
+          "truncation_reason": null,
+          "analysis_method": "full_text",
+          "attention_tier": "medium",
+          "theme": "stocks",
+          "attention_reason": "Article mentions SpaceX IPO and company governance issues.",
+          "must_keep": true,
+          "model_used": "meta-llama/llama-4-scout-17b-16e-instruct",
+          "delayed_retry_attempted": false,
+          "delayed_retry_model_chain": [],
+          "delayed_retry_final_model": null,
+          "error_classification": null,
+          "error": null
+        },
+        {
+          "source_article_id": "4416417",
+          "title": "美股走勢丨道指曾升逾400點 現貨金價彈超過2%",
+          "canonical_url": "https://www.hkej.com/instantnews/international/article/4416417/%E7%BE%8E%E8%82%A1%E8%B5%B0%E5%8B%A2%E4%B8%A8%E9%81%93%E6%8C%87%E6%9B%BE%E5%8D%87%E9%80%BE400%E9%BB%9E+%E7%8F%BE%E8%B2%A8%E9%87%91%E5%83%B9%E5%BD%88%E8%B6%85%E9%81%8E2%25",
+          "published_at": "2026-05-30T00:22:00+08:00",
+          "section": "國際財經",
+          "novelty_score": 6,
+          "relevance_score": 9,
+          "urgency_score": 8,
+          "named_entities": [
+            {
+              "name": "美伊",
+              "type": "country"
+            },
+            {
+              "name": "道指",
+              "type": "index"
+            },
+            {
+              "name": "戴爾",
+              "type": "company"
+            },
+            {
+              "name": "IBM",
+              "type": "company"
+            },
+            {
+              "name": "微軟",
+              "type": "company"
+            }
+          ],
+          "key_points": [
+            "道指一度升416點，高見51085點。",
+            "戴爾科技股價一度上揚35.4%，創新高至429.15美元。",
+            "現貨金價最多曾彈2.21%，每盎斯高見4594.98美元。",
+            "聯儲局理事鮑曼指出，中東戰爭可能導致通脹持續攀升。"
+          ],
+          "content_truncated": false,
+          "original_content_length_chars": 471,
+          "analyzed_content_length_chars": 471,
+          "original_content_token_estimate": 118,
+          "analyzed_content_token_estimate": 118,
+          "truncation_reason": null,
+          "analysis_method": "full_text",
+          "attention_tier": "high",
+          "theme": "macro",
+          "attention_reason": "Article mentions significant stock market movements and gold price surge.",
+          "must_keep": true,
+          "model_used": "meta-llama/llama-4-scout-17b-16e-instruct",
+          "delayed_retry_attempted": false,
+          "delayed_retry_model_chain": [],
+          "delayed_retry_final_model": null,
+          "error_classification": null,
+          "error": null
+        }
+      ],
+      "subgroups": [
+        {
+          "title": "全球經濟與地緣政治 & Other News",
+          "theme_rationale": "涵蓋國際貿易、政治和地緣政治事件對經濟的影響",
+          "article_count": 7,
+          "key_developments": [
+            "美股三大指數創新高，道指收市升363點。",
+            "藍色起源火箭測試時爆炸，美國航太概念股急跌，AST SpaceMobile收市瀉14.8%。",
+            "美國國會推動法案限制中國車企，平治或被波及，可能被排除在美國汽車市場之外。",
+            "瑞銀計劃在EMEA地區裁減數百個職位，主要影響後勤支援部門和部分前線員工。"
+          ],
+          "named_entities": [
+            {
+              "name": "美股",
+              "type": "index"
+            },
+            {
+              "name": "藍色起源",
+              "type": "company"
+            },
+            {
+              "name": "美國國會",
+              "type": "organization"
+            },
+            {
+              "name": "瑞銀",
+              "type": "company"
+            }
+          ],
+          "articles": [
+            {
+              "source_article_id": "4416473",
+              "title": "國際早班車丨藍色起源火箭測試時爆炸 美航太概念股急瀉",
+              "canonical_url": "https://www.hkej.com/instantnews/international/article/4416473/%E5%9C%8B%E9%9A%9B%E6%97%A9%E7%8F%AD%E8%BB%8A%E4%B8%A8%E8%97%8D%E8%89%B2%E8%B5%B7%E6%BA%90%E7%81%AB%E7%AE%AD%E6%B8%AC%E8%A9%A6%E6%99%82%E7%88%86%E7%82%B8+%E7%BE%8E%E8%88%AA%E5%A4%AA%E6%A6%82%E5%BF%B5%E8%82%A1%E6%80%A5%E7%80%89",
+              "published_at": "2026-05-30T07:50:00+08:00",
+              "section": "國際財經",
+              "novelty_score": 6,
+              "relevance_score": 8,
+              "urgency_score": 9,
+              "named_entities": [
+                {
+                  "name": "藍色起源",
+                  "type": "company"
+                },
+                {
+                  "name": "貝索斯",
+                  "type": "person"
+                },
+                {
+                  "name": "SpaceX",
+                  "type": "company"
+                },
+                {
+                  "name": "丹麥退休基金",
+                  "type": "institution"
+                },
+                {
+                  "name": "美國國會",
+                  "type": "organization"
+                }
+              ],
+              "key_points": [
+                "藍色起源火箭測試時爆炸，美國航太概念股急跌，AST SpaceMobile收市瀉14.8%。",
+                "美國國會推動法案限制中國車企，平治或被波及，可能被排除在美國汽車市場之外。",
+                "百度旗下崑崙芯傳最早6月來港上市，集資介乎10億至20億美元。"
+              ],
+              "content_truncated": false,
+              "original_content_length_chars": 3143,
+              "analyzed_content_length_chars": 3143,
+              "original_content_token_estimate": 786,
+              "analyzed_content_token_estimate": 786,
+              "truncation_reason": null,
+              "analysis_method": "full_text",
+              "attention_tier": "high",
+              "theme": "geopolitics",
+              "attention_reason": "涉及航太概念股爆炸事件",
+              "must_keep": true,
+              "model_used": "meta-llama/llama-4-scout-17b-16e-instruct",
+              "delayed_retry_attempted": false,
+              "delayed_retry_model_chain": [],
+              "delayed_retry_final_model": null,
+              "error_classification": null,
+              "error": null
+            },
+            {
+              "source_article_id": "4416469",
+              "title": "特朗普關稅丨美將對法官要求退稅裁決提上訴",
+              "canonical_url": "https://www.hkej.com/instantnews/international/article/4416469/%E7%89%B9%E6%9C%97%E6%99%AE%E9%97%9C%E7%A8%85%E4%B8%A8%E7%BE%8E%E5%B0%87%E5%B0%8D%E6%B3%95%E5%AE%98%E8%A6%81%E6%B1%82%E9%80%80%E7%A8%85%E8%A3%81%E6%B1%BA%E6%8F%90%E4%B8%8A%E8%A8%B4",
+              "published_at": "2026-05-30T06:54:00+08:00",
+              "section": "國際財經",
+              "novelty_score": 6,
+              "relevance_score": 8,
+              "urgency_score": 7,
+              "named_entities": [
+                {
+                  "name": "特朗普",
+                  "type": "person"
+                },
+                {
+                  "name": "美國",
+                  "type": "country"
+                },
+                {
+                  "name": "美國司法部",
+                  "type": "institution"
+                }
+              ],
+              "key_points": [
+                "美國總統特朗普政府將對貿易法院法官的職權提出質疑，涉案關稅金額數百億美元。",
+                "法官此前裁決要求海關重新計算特朗普政府徵收的進口稅，該徵收被最高法院宣布為違法。",
+                "此舉可能為關稅索賠程序帶來法律混亂。"
+              ],
+              "content_truncated": false,
+              "original_content_length_chars": 202,
+              "analyzed_content_length_chars": 202,
+              "original_content_token_estimate": 51,
+              "analyzed_content_token_estimate": 51,
+              "truncation_reason": null,
+              "analysis_method": "full_text",
+              "attention_tier": "medium",
+              "theme": "geopolitics",
+              "attention_reason": "Article mentions trade-related disputes and potential tariffs.",
+              "must_keep": true,
+              "model_used": "meta-llama/llama-4-scout-17b-16e-instruct",
+              "delayed_retry_attempted": false,
+              "delayed_retry_model_chain": [],
+              "delayed_retry_final_model": null,
+              "error_classification": null,
+              "error": null
+            },
+            {
+              "source_article_id": "4416430",
+              "title": "藍色起源火箭測試時爆炸 美航太概念股急瀉",
+              "canonical_url": "https://www.hkej.com/instantnews/international/article/4416430/%E8%97%8D%E8%89%B2%E8%B5%B7%E6%BA%90%E7%81%AB%E7%AE%AD%E6%B8%AC%E8%A9%A6%E6%99%82%E7%88%86%E7%82%B8+%E7%BE%8E%E8%88%AA%E5%A4%AA%E6%A6%82%E5%BF%B5%E8%82%A1%E6%80%A5%E7%80%89",
+              "published_at": "2026-05-30T05:05:00+08:00",
+              "section": "國際財經",
+              "novelty_score": 8,
+              "relevance_score": 9,
+              "urgency_score": 9,
+              "named_entities": [
+                {
+                  "name": "Jeff Bezos",
+                  "type": "person"
+                },
+                {
+                  "name": "Blue Origin",
+                  "type": "company"
+                },
+                {
+                  "name": "NASA",
+                  "type": "institution"
+                },
+                {
+                  "name": "Karman Holdings",
+                  "type": "company"
+                },
+                {
+                  "name": "Rocket Lab",
+                  "type": "company"
+                }
+              ],
+              "key_points": [
+                "藍色起源新格倫火箭測試時爆炸，影響NASA探月計劃。",
+                "美國航太概念股急跌，Karman Holdings跌12.7%，Rocket Lab跌3.1%。",
+                "維珍銀河控股逆勢飆升36.4%，報6.18美元。"
+              ],
+              "content_truncated": false,
+              "original_content_length_chars": 679,
+              "analyzed_content_length_chars": 679,
+              "original_content_token_estimate": 170,
+              "analyzed_content_token_estimate": 170,
+              "truncation_reason": null,
+              "analysis_method": "full_text",
+              "attention_tier": "high",
+              "theme": "geopolitics",
+              "attention_reason": "涉及航太概念股爆炸事件",
+              "must_keep": true,
+              "model_used": "meta-llama/llama-4-scout-17b-16e-instruct",
+              "delayed_retry_attempted": false,
+              "delayed_retry_model_chain": [],
+              "delayed_retry_final_model": null,
+              "error_classification": null,
+              "error": null
+            },
+            {
+              "source_article_id": "4416493",
+              "title": "瑞銀據報短期再裁EMEA地區數百職位",
+              "canonical_url": "https://www.hkej.com/instantnews/international/article/4416493/%E7%91%9E%E9%8A%80%E6%93%9A%E5%A0%B1%E7%9F%AD%E6%9C%9F%E5%86%8D%E8%A3%81EMEA%E5%9C%B0%E5%8D%80%E6%95%B8%E7%99%BE%E8%81%B7%E4%BD%8D",
+              "published_at": "2026-05-30T17:22:00+08:00",
+              "section": "國際財經",
+              "novelty_score": 6,
+              "relevance_score": 8,
+              "urgency_score": 5,
+              "named_entities": [
+                {
+                  "name": "瑞銀",
+                  "type": "company"
+                },
+                {
+                  "name": "瑞信",
+                  "type": "company"
+                },
+                {
+                  "name": "歐洲",
+                  "type": "other"
+                },
+                {
+                  "name": "中東",
+                  "type": "other"
+                },
+                {
+                  "name": "非洲",
+                  "type": "other"
+                }
+              ],
+              "key_points": [
+                "瑞銀計劃在EMEA地區裁減數百個職位，主要影響後勤支援部門和部分前線員工。",
+                "裁員因瑞銀收購瑞信後員工數目大增至近12萬人，近期完成客戶數據遷移項目使部分崗位成冗餘。",
+                "瑞銀預計下半年將進一步削減崗位，裁員計劃將歷時數年，通過自然減員、提前退休、內部轉崗等方式實現。"
+              ],
+              "content_truncated": false,
+              "original_content_length_chars": 270,
+              "analyzed_content_length_chars": 270,
+              "original_content_token_estimate": 68,
+              "analyzed_content_token_estimate": 68,
+              "truncation_reason": null,
+              "analysis_method": "full_text",
+              "attention_tier": "medium",
+              "theme": "macro",
+              "attention_reason": "Involves job cuts in a major financial institution's EMEA region.",
+              "must_keep": true,
+              "model_used": "meta-llama/llama-4-scout-17b-16e-instruct",
+              "delayed_retry_attempted": false,
+              "delayed_retry_model_chain": [],
+              "delayed_retry_final_model": null,
+              "error_classification": null,
+              "error": null
+            },
+            {
+              "source_article_id": "4416467",
+              "title": "美股走勢丨三大指數創新高 道指收市升363點",
+              "canonical_url": "https://www.hkej.com/instantnews/international/article/4416467/%E7%BE%8E%E8%82%A1%E8%B5%B0%E5%8B%A2%E4%B8%A8%E4%B8%89%E5%A4%A7%E6%8C%87%E6%95%B8%E5%89%B5%E6%96%B0%E9%AB%98+%E9%81%93%E6%8C%87%E6%94%B6%E5%B8%82%E5%8D%87363%E9%BB%9E",
+              "published_at": "2026-05-30T04:35:00+08:00",
+              "section": "國際財經",
+              "novelty_score": 6,
+              "relevance_score": 8,
+              "urgency_score": 7,
+              "named_entities": [
+                {
+                  "name": "美股",
+                  "type": "index"
+                },
+                {
+                  "name": "道指",
+                  "type": "index"
+                },
+                {
+                  "name": "標指",
+                  "type": "index"
+                },
+                {
+                  "name": "納指",
+                  "type": "index"
+                },
+                {
+                  "name": "微軟",
+                  "type": "company"
+                }
+              ],
+              "key_points": [
+                "美股三大指數創新高，道指收市升363點。",
+                "微軟收市股價上揚5.5%，IBM炒高12.7%。",
+                "戴爾大幅上調收入預測，股價爆升32.8%。"
+              ],
+              "content_truncated": false,
+              "original_content_length_chars": 1494,
+              "analyzed_content_length_chars": 1494,
+              "original_content_token_estimate": 374,
+              "analyzed_content_token_estimate": 374,
+              "truncation_reason": null,
+              "analysis_method": "full_text",
+              "attention_tier": "high",
+              "theme": "stocks",
+              "attention_reason": "涉及美股三大指數創新高",
+              "must_keep": true,
+              "model_used": "meta-llama/llama-4-scout-17b-16e-instruct",
+              "delayed_retry_attempted": false,
+              "delayed_retry_model_chain": [],
+              "delayed_retry_final_model": null,
+              "error_classification": null,
+              "error": null
+            },
+            {
+              "source_article_id": "4416428",
+              "title": "美眾院推動法案限制中國車企 平治或被波及",
+              "canonical_url": "https://www.hkej.com/instantnews/international/article/4416428/%E7%BE%8E%E7%9C%BE%E9%99%A2%E6%8E%A8%E5%8B%95%E6%B3%95%E6%A1%88%E9%99%90%E5%88%B6%E4%B8%AD%E5%9C%8B%E8%BB%8A%E4%BC%81+%E5%B9%B3%E6%B2%BB%E6%88%96%E8%A2%AB%E6%B3%A2%E5%8F%8A",
+              "published_at": "2026-05-30T03:14:00+08:00",
+              "section": "國際財經",
+              "novelty_score": 6,
+              "relevance_score": 8,
+              "urgency_score": 7,
+              "named_entities": [
+                {
+                  "name": "Mercedes-Benz",
+                  "type": "company"
+                },
+                {
+                  "name": "北汽集團",
+                  "type": "company"
+                },
+                {
+                  "name": "吉利汽車",
+                  "type": "company"
+                },
+                {
+                  "name": "李書福",
+                  "type": "person"
+                },
+                {
+                  "name": "Brett Guthrie",
+                  "type": "person"
+                }
+              ],
+              "key_points": [
+                "美國眾議院提出法案限制中國企業參與美國汽車市場，可能影響平治在美業務。",
+                "平治最大股東北汽集團持有9.98%股份，第二大股東李書福持有9.69%股份。",
+                "法案或影響其他中國控股汽車製造商，包括沃爾沃、法拉第未來等。"
+              ],
+              "content_truncated": false,
+              "original_content_length_chars": 1042,
+              "analyzed_content_length_chars": 1042,
+              "original_content_token_estimate": 261,
+              "analyzed_content_token_estimate": 261,
+              "truncation_reason": null,
+              "analysis_method": "full_text",
+              "attention_tier": "medium",
+              "theme": "geopolitics",
+              "attention_reason": "涉及美國法案限制中國車企",
+              "must_keep": true,
+              "model_used": "meta-llama/llama-4-scout-17b-16e-instruct",
+              "delayed_retry_attempted": false,
+              "delayed_retry_model_chain": [],
+              "delayed_retry_final_model": null,
+              "error_classification": null,
+              "error": null
+            },
+            {
+              "source_article_id": "4416422",
+              "title": "美國4月商品貿易逆差收窄至824億美元",
+              "canonical_url": "https://www.hkej.com/instantnews/international/article/4416422/%E7%BE%8E%E5%9C%8B4%E6%9C%88%E5%95%86%E5%93%81%E8%B2%BF%E6%98%93%E9%80%86%E5%B7%AE%E6%94%B6%E7%AA%84%E8%87%B3824%E5%84%84%E7%BE%8E%E5%85%83",
+              "published_at": "2026-05-30T01:24:00+08:00",
+              "section": "國際財經",
+              "novelty_score": 5,
+              "relevance_score": 7,
+              "urgency_score": 6,
+              "named_entities": [
+                {
+                  "name": "美國",
+                  "type": "country"
+                },
+                {
+                  "name": "商品貿易逆差",
+                  "type": "other"
+                }
+              ],
+              "key_points": [
+                "美國4月商品貿易逆差收窄至824億美元，少於預期。",
+                "商品出口增加85億美元，至2197億美元；商品進口增長56億美元，報3021億美元。",
+                "貿易逆差收窄或為第2季經濟增長帶來貢獻。"
+              ],
+              "content_truncated": false,
+              "original_content_length_chars": 227,
+              "analyzed_content_length_chars": 227,
+              "original_content_token_estimate": 57,
+              "analyzed_content_token_estimate": 57,
+              "truncation_reason": null,
+              "analysis_method": "full_text",
+              "attention_tier": "medium",
+              "theme": "macro",
+              "attention_reason": "Article reports on trade deficit data, a macroeconomic indicator.",
+              "must_keep": true,
+              "model_used": "meta-llama/llama-4-scout-17b-16e-instruct",
+              "delayed_retry_attempted": false,
+              "delayed_retry_model_chain": [],
+              "delayed_retry_final_model": null,
+              "error_classification": null,
+              "error": null
+            }
+          ],
+          "model_used": "meta-llama/llama-4-scout-17b-16e-instruct"
+        },
+        {
+          "title": "股市動態",
+          "theme_rationale": "報導股市走勢、上市公司動態與市場預期",
+          "article_count": 3,
+          "key_developments": [
+            "歐洲股市收盤漲0.14%，其中泛歐指數Stoxx 600指數表現良好。",
+            "美國股市方面，道指一度升416點，高見51085點。",
+            "航太股表現良好，SpaceX相關新聞引發關注。",
+            "現貨金價最多曾彈2.21%，每盎斯高見4594.98美元。"
+          ],
+          "named_entities": [
+            {
+              "name": "歐洲股市",
+              "type": "index"
+            },
+            {
+              "name": "泛歐指數Stoxx 600",
+              "type": "index"
+            },
+            {
+              "name": "道指",
+              "type": "index"
+            },
+            {
+              "name": "SpaceX",
+              "type": "company"
+            },
+            {
+              "name": "鮑曼",
+              "type": "person"
+            }
+          ],
+          "articles": [
+            {
+              "source_article_id": "4416426",
+              "title": "歐股收市升0.14% 航太股造好",
+              "canonical_url": "https://www.hkej.com/instantnews/international/article/4416426/%E6%AD%90%E8%82%A1%E6%94%B6%E5%B8%82%E5%8D%870.14%25+%E8%88%AA%E5%A4%AA%E8%82%A1%E9%80%A0%E5%A5%BD",
+              "published_at": "2026-05-30T02:05:00+08:00",
+              "section": "國際財經",
+              "novelty_score": 4,
+              "relevance_score": 6,
+              "urgency_score": 5,
+              "named_entities": [
+                {
+                  "name": "歐洲股市",
+                  "type": "index"
+                },
+                {
+                  "name": "泛歐指數Stoxx 600",
+                  "type": "index"
+                },
+                {
+                  "name": "美國總統特朗普",
+                  "type": "person"
+                },
+                {
+                  "name": "聯儲局理事鮑曼",
+                  "type": "person"
+                }
+              ],
+              "key_points": [
+                "歐洲股市收盤漲0.14%，航太股表現良好。",
+                "美伊停火預期升溫，提振市場投資氣氛。",
+                "聯儲局理事鮑曼表示中東戰爭可能導致通脹持續攀升。"
+              ],
+              "content_truncated": false,
+              "original_content_length_chars": 505,
+              "analyzed_content_length_chars": 505,
+              "original_content_token_estimate": 127,
+              "analyzed_content_token_estimate": 127,
+              "truncation_reason": null,
+              "analysis_method": "full_text",
+              "attention_tier": "medium",
+              "theme": "stocks",
+              "attention_reason": "歐股收市微升",
+              "must_keep": true,
+              "model_used": "meta-llama/llama-4-scout-17b-16e-instruct",
+              "delayed_retry_attempted": false,
+              "delayed_retry_model_chain": [],
+              "delayed_retry_final_model": null,
+              "error_classification": null,
+              "error": null
+            },
+            {
+              "source_article_id": "4416419",
+              "title": "SpaceX IPO丨丹麥退休基金拉黑SpaceX 批公司治理結構具災難性",
+              "canonical_url": "https://www.hkej.com/instantnews/international/article/4416419/SpaceX+IPO%E4%B8%A8%E4%B8%B9%E9%BA%A5%E9%80%80%E4%BC%91%E5%9F%BA%E9%87%91%E6%8B%89%E9%BB%91SpaceX+%E6%89%B9%E5%85%AC%E5%8F%B8%E6%B2%BB%E7%90%86%E7%B5%90%E6%A7%8B%E5%85%B7%E7%81%BD%E9%9B%A3%E6%80%A7",
+              "published_at": "2026-05-30T00:48:00+08:00",
+              "section": "國際財經",
+              "novelty_score": 7,
+              "relevance_score": 8,
+              "urgency_score": 7,
+              "named_entities": [
+                {
+                  "name": "SpaceX",
+                  "type": "company"
+                },
+                {
+                  "name": "丹麥退休基金AkademikerPension",
+                  "type": "institution"
+                },
+                {
+                  "name": "馬斯克",
+                  "type": "person"
+                }
+              ],
+              "key_points": [],
+              "content_truncated": false,
+              "original_content_length_chars": 405,
+              "analyzed_content_length_chars": 405,
+              "original_content_token_estimate": 102,
+              "analyzed_content_token_estimate": 102,
+              "truncation_reason": null,
+              "analysis_method": "full_text",
+              "attention_tier": "medium",
+              "theme": "stocks",
+              "attention_reason": "Article mentions SpaceX IPO and company governance issues.",
+              "must_keep": true,
+              "model_used": "meta-llama/llama-4-scout-17b-16e-instruct",
+              "delayed_retry_attempted": false,
+              "delayed_retry_model_chain": [],
+              "delayed_retry_final_model": null,
+              "error_classification": null,
+              "error": null
+            },
+            {
+              "source_article_id": "4416417",
+              "title": "美股走勢丨道指曾升逾400點 現貨金價彈超過2%",
+              "canonical_url": "https://www.hkej.com/instantnews/international/article/4416417/%E7%BE%8E%E8%82%A1%E8%B5%B0%E5%8B%A2%E4%B8%A8%E9%81%93%E6%8C%87%E6%9B%BE%E5%8D%87%E9%80%BE400%E9%BB%9E+%E7%8F%BE%E8%B2%A8%E9%87%91%E5%83%B9%E5%BD%88%E8%B6%85%E9%81%8E2%25",
+              "published_at": "2026-05-30T00:22:00+08:00",
+              "section": "國際財經",
+              "novelty_score": 6,
+              "relevance_score": 9,
+              "urgency_score": 8,
+              "named_entities": [
+                {
+                  "name": "美伊",
+                  "type": "country"
+                },
+                {
+                  "name": "道指",
+                  "type": "index"
+                },
+                {
+                  "name": "戴爾",
+                  "type": "company"
+                },
+                {
+                  "name": "IBM",
+                  "type": "company"
+                },
+                {
+                  "name": "微軟",
+                  "type": "company"
+                }
+              ],
+              "key_points": [
+                "道指一度升416點，高見51085點。",
+                "戴爾科技股價一度上揚35.4%，創新高至429.15美元。",
+                "現貨金價最多曾彈2.21%，每盎斯高見4594.98美元。",
+                "聯儲局理事鮑曼指出，中東戰爭可能導致通脹持續攀升。"
+              ],
+              "content_truncated": false,
+              "original_content_length_chars": 471,
+              "analyzed_content_length_chars": 471,
+              "original_content_token_estimate": 118,
+              "analyzed_content_token_estimate": 118,
+              "truncation_reason": null,
+              "analysis_method": "full_text",
+              "attention_tier": "high",
+              "theme": "macro",
+              "attention_reason": "Article mentions significant stock market movements and gold price surge.",
+              "must_keep": true,
+              "model_used": "meta-llama/llama-4-scout-17b-16e-instruct",
+              "delayed_retry_attempted": false,
+              "delayed_retry_model_chain": [],
+              "delayed_retry_final_model": null,
+              "error_classification": null,
+              "error": null
+            }
+          ],
+          "model_used": "meta-llama/llama-4-scout-17b-16e-instruct"
+        }
+      ],
+      "analysis_profile": "standard",
+      "model_used": "meta-llama/llama-4-scout-17b-16e-instruct",
+      "sub_batch_count": 6,
+      "diagnostics": {
+        "sub_batch_count": 6,
+        "split_reasons": [],
+        "models_attempted": [
+          "meta-llama/llama-4-scout-17b-16e-instruct"
+        ],
+        "estimated_input_tokens_max": 654,
+        "serialized_request_bytes_max": 3448,
+        "rate_limit_waits": 0,
+        "partial_article_count": 0,
+        "synthesis_wait_seconds_total": 0.0,
+        "synthesis_retry_count": 0,
+        "synthesis_retry_skipped_count": 0,
+        "synthesis_budget_exhausted": false,
+        "degraded_merge_used": false,
+        "degraded_merge_reason": "",
+        "synthesis_merge_depth_max": 0,
+        "model_switches": []
+      },
+      "error": null
+    },
+    {
+      "category": "時事脈搏",
+      "article_count": 28,
+      "status": "success",
+      "key_developments": [],
+      "named_entities": [
+        {
+          "name": "Hong Kong Government",
+          "type": "other"
+        },
+        {
+          "name": "伊朗",
+          "type": "country"
+        },
+        {
+          "name": "美國",
+          "type": "country"
+        },
+        {
+          "name": "美國財政部",
+          "type": "institution"
+        }
+      ],
+      "articles": [
+        {
+          "source_article_id": "4416497",
+          "canonical_url": "https://www.hkej.com/instantnews/current/article/4416497/%E4%BC%8A%E6%B3%A2%E6%8B%89%E4%B8%A8%E8%AD%9A%E5%BE%B7%E5%A1%9E%E6%8A%B5%E5%89%9B%E6%9E%9C%E6%B0%91%E4%B8%BB%E5%85%B1%E5%92%8C%E5%9C%8B%E4%BA%86%E8%A7%A3%E7%96%AB%E6%83%85%E7%99%BC%E5%B1%95",
+          "title": "伊波拉丨譚德塞抵剛果民主共和國了解疫情發展",
+          "section": "時事脈搏",
+          "published_at": "2026-05-30T19:30:00+08:00",
+          "attention_tier": "light",
+          "novelty_score": 5,
+          "relevance_score": 5,
+          "urgency_score": 5,
+          "named_entities": [],
+          "key_points": [],
+          "content_truncated": false,
+          "analysis_method": "bypassed",
+          "model_used": "direct"
+        },
+        {
+          "source_article_id": "4416499",
+          "canonical_url": "https://www.hkej.com/instantnews/current/article/4416499/%E6%94%BF%E5%BA%9C%E6%AD%A1%E8%BF%8E%E5%A4%A7%E7%81%A3%E5%8D%80%E6%B8%AF%E6%BE%B3%E9%81%8A%E8%89%87%E8%87%AA%E7%94%B1%E8%A1%8C%E6%94%BF%E7%AD%96+%E7%A9%8D%E6%A5%B5%E5%8D%94%E8%AA%BF%E5%8C%97%E8%89%87%E5%8D%97%E4%B8%8B",
+          "title": "政府歡迎大灣區港澳遊艇自由行政策 積極協調北艇南下",
+          "section": "時事脈搏",
+          "published_at": "2026-05-30T19:25:00+08:00",
+          "attention_tier": "light",
+          "novelty_score": 5,
+          "relevance_score": 5,
+          "urgency_score": 5,
+          "named_entities": [],
+          "key_points": [],
+          "content_truncated": false,
+          "analysis_method": "bypassed",
+          "model_used": "direct"
+        },
+        {
+          "source_article_id": "4416498",
+          "title": "中東局勢丨伊朗據報準備為已故最高領袖哈梅內伊舉行盛大葬禮",
+          "canonical_url": "https://www.hkej.com/instantnews/current/article/4416498/%E4%B8%AD%E6%9D%B1%E5%B1%80%E5%8B%A2%E4%B8%A8%E4%BC%8A%E6%9C%97%E6%93%9A%E5%A0%B1%E6%BA%96%E5%82%99%E7%82%BA%E5%B7%B2%E6%95%85%E6%9C%80%E9%AB%98%E9%A0%98%E8%A2%96%E5%93%88%E6%A2%85%E5%85%A7%E4%BC%8A%E8%88%89%E8%A1%8C%E7%9B%9B%E5%A4%A7%E8%91%AC%E7%A6%AE",
+          "published_at": "2026-05-30T19:00:00+08:00",
+          "section": "時事脈搏",
+          "novelty_score": 6,
+          "relevance_score": 8,
+          "urgency_score": 7,
+          "named_entities": [
+            {
+              "name": "Ali Khamenei",
+              "type": "person"
+            },
+            {
+              "name": "伊朗",
+              "type": "country"
+            }
+          ],
+          "key_points": [
+            "伊朗當局正在為已故前最高領袖哈梅內伊籌備一場盛大葬禮。",
+            "葬禮此前因伊朗和美以戰爭推遲。"
+          ],
+          "content_truncated": false,
+          "original_content_length_chars": 209,
+          "analyzed_content_length_chars": 209,
+          "original_content_token_estimate": 53,
+          "analyzed_content_token_estimate": 53,
+          "truncation_reason": null,
+          "analysis_method": "full_text",
+          "attention_tier": "high",
+          "theme": "geopolitics",
+          "attention_reason": "High-signal geopolitics headline based on title/summary keywords.",
+          "must_keep": true,
+          "model_used": "meta-llama/llama-4-scout-17b-16e-instruct",
+          "delayed_retry_attempted": false,
+          "delayed_retry_model_chain": [],
+          "delayed_retry_final_model": null,
+          "error_classification": null,
+          "error": null
+        },
+        {
+          "source_article_id": "4416496",
+          "canonical_url": "https://www.hkej.com/instantnews/current/article/4416496/%E6%B8%AF%E5%B3%B6%E5%8D%8A%E5%B1%B1%E8%96%88%E8%90%83%E8%8B%91%E7%81%AB%E8%AD%A61%E7%94%B72%E5%A5%B3%E6%98%8F%E8%BF%B7+%E7%96%91%E5%90%B8%E6%AF%92%E6%88%96%E5%90%B8%E7%85%99%E9%87%80%E7%A6%8D",
+          "title": "港島半山薈萃苑火警1男2女昏迷 疑吸毒或吸煙釀禍",
+          "section": "時事脈搏",
+          "published_at": "2026-05-30T18:30:00+08:00",
+          "attention_tier": "light",
+          "novelty_score": 5,
+          "relevance_score": 5,
+          "urgency_score": 5,
+          "named_entities": [],
+          "key_points": [],
+          "content_truncated": false,
+          "analysis_method": "bypassed",
+          "model_used": "direct"
+        },
+        {
+          "source_article_id": "4416494",
+          "title": "中東局勢丨伊朗襲擊科威特空軍基地 據報數名美國人員受傷",
+          "canonical_url": "https://www.hkej.com/instantnews/current/article/4416494/%E4%B8%AD%E6%9D%B1%E5%B1%80%E5%8B%A2%E4%B8%A8%E4%BC%8A%E6%9C%97%E8%A5%B2%E6%93%8A%E7%A7%91%E5%A8%81%E7%89%B9%E7%A9%BA%E8%BB%8D%E5%9F%BA%E5%9C%B0+%E6%93%9A%E5%A0%B1%E6%95%B8%E5%90%8D%E7%BE%8E%E5%9C%8B%E4%BA%BA%E5%93%A1%E5%8F%97%E5%82%B7",
+          "published_at": "2026-05-30T17:45:00+08:00",
+          "section": "時事脈搏",
+          "novelty_score": 8,
+          "relevance_score": 9,
+          "urgency_score": 8,
+          "named_entities": [
+            {
+              "name": "伊朗",
+              "type": "country"
+            },
+            {
+              "name": "科威特",
+              "type": "country"
+            },
+            {
+              "name": "美國",
+              "type": "country"
+            }
+          ],
+          "key_points": [
+            "伊朗據報向科威特空軍基地發射一枚彈道飛彈，造成數名美國人員輕傷。",
+            "至少一架MQ-9「死神」攻擊無人機被摧毀，造價約3000萬美元。"
+          ],
+          "content_truncated": false,
+          "original_content_length_chars": 213,
+          "analyzed_content_length_chars": 213,
+          "original_content_token_estimate": 54,
+          "analyzed_content_token_estimate": 54,
+          "truncation_reason": null,
+          "analysis_method": "full_text",
+          "attention_tier": "high",
+          "theme": "geopolitics",
+          "attention_reason": "High-signal geopolitics headline based on title/summary keywords.",
+          "must_keep": true,
+          "model_used": "meta-llama/llama-4-scout-17b-16e-instruct",
+          "delayed_retry_attempted": false,
+          "delayed_retry_model_chain": [],
+          "delayed_retry_final_model": null,
+          "error_classification": null,
+          "error": null
+        },
+        {
+          "source_article_id": "4416492",
+          "canonical_url": "https://www.hkej.com/instantnews/current/article/4416492/%E9%99%B3%E7%BE%8E%E5%AF%B6%3A%E5%B7%B2%E6%8C%87%E7%A4%BA%E8%B7%AF%E6%94%BF%E7%BD%B2%E7%82%BA%E6%A5%B5%E7%AB%AF%E5%A4%A9%E6%B0%A3%E5%81%9A%E5%A5%BD%E9%A0%90%E5%82%99",
+          "title": "陳美寶:已指示路政署為極端天氣做好預備",
+          "section": "時事脈搏",
+          "published_at": "2026-05-30T17:02:00+08:00",
+          "attention_tier": "light",
+          "novelty_score": 5,
+          "relevance_score": 5,
+          "urgency_score": 5,
+          "named_entities": [],
+          "key_points": [],
+          "content_truncated": false,
+          "analysis_method": "bypassed",
+          "model_used": "direct",
+          "theme": "general",
+          "attention_reason": "Lighter treatment because this story sits in the 時事脈搏 section without strong market-moving signals.",
+          "must_keep": false
+        },
+        {
+          "source_article_id": "4416490",
+          "title": "中東局勢丨海格塞思:目前情況來看將與伊朗達成好協議",
+          "canonical_url": "https://www.hkej.com/instantnews/current/article/4416490/%E4%B8%AD%E6%9D%B1%E5%B1%80%E5%8B%A2%E4%B8%A8%E6%B5%B7%E6%A0%BC%E5%A1%9E%E6%80%9D%3A%E7%9B%AE%E5%89%8D%E6%83%85%E6%B3%81%E4%BE%86%E7%9C%8B%E5%B0%87%E8%88%87%E4%BC%8A%E6%9C%97%E9%81%94%E6%88%90%E5%A5%BD%E5%8D%94%E8%AD%B0",
+          "published_at": "2026-05-30T16:50:00+08:00",
+          "section": "時事脈搏",
+          "novelty_score": 6,
+          "relevance_score": 8,
+          "urgency_score": 7,
+          "named_entities": [
+            {
+              "name": "Pete Hegseth",
+              "type": "person"
+            },
+            {
+              "name": "特朗普",
+              "type": "person"
+            },
+            {
+              "name": "伊朗",
+              "type": "country"
+            }
+          ],
+          "key_points": [
+            "美國財政部對伊朗實施新制裁後，海格塞思表示與伊朗達成協議是好協議。",
+            "特朗普強調會非常有耐心，確保美國達成好的及偉大的協議。"
+          ],
+          "content_truncated": false,
+          "original_content_length_chars": 215,
+          "analyzed_content_length_chars": 215,
+          "original_content_token_estimate": 54,
+          "analyzed_content_token_estimate": 54,
+          "truncation_reason": null,
+          "analysis_method": "full_text",
+          "attention_tier": "high",
+          "theme": "geopolitics",
+          "attention_reason": "High-signal geopolitics headline based on title/summary keywords.",
+          "must_keep": true,
+          "model_used": "meta-llama/llama-4-scout-17b-16e-instruct",
+          "delayed_retry_attempted": false,
+          "delayed_retry_model_chain": [],
+          "delayed_retry_final_model": null,
+          "error_classification": null,
+          "error": null
+        },
+        {
+          "source_article_id": "4416489",
+          "canonical_url": "https://www.hkej.com/instantnews/current/article/4416489/%E6%B8%AF%E8%BB%8A%E5%8C%97%E4%B8%8A%E6%94%BF%E7%AD%96%E6%9C%89%E6%95%88%E6%9C%9F%E7%8D%B2%E5%BB%B6%E9%95%B75%E5%B9%B4",
+          "title": "港車北上政策有效期獲延長5年",
+          "section": "時事脈搏",
+          "published_at": "2026-05-30T16:17:00+08:00",
+          "attention_tier": "light",
+          "novelty_score": 5,
+          "relevance_score": 5,
+          "urgency_score": 5,
+          "named_entities": [],
+          "key_points": [],
+          "content_truncated": false,
+          "analysis_method": "bypassed",
+          "model_used": "direct",
+          "theme": "general",
+          "attention_reason": "Lighter treatment because this story sits in the 時事脈搏 section without strong market-moving signals.",
+          "must_keep": false
+        },
+        {
+          "source_article_id": "4416487",
+          "canonical_url": "https://www.hkej.com/instantnews/current/article/4416487/%E7%8E%8B%E6%AF%85%3A%E4%B8%AD%E5%8A%A0%E9%97%9C%E4%BF%82%E6%A0%A1%E6%AD%A3%E8%88%AA%E5%90%91%E9%87%8D%E6%AD%B8%E6%AD%A3%E8%BB%8C%E7%AC%A6%E5%85%A9%E5%9C%8B%E5%88%A9%E7%9B%8A",
+          "title": "王毅:中加關係校正航向重歸正軌符兩國利益",
+          "section": "時事脈搏",
+          "published_at": "2026-05-30T15:53:00+08:00",
+          "attention_tier": "light",
+          "novelty_score": 5,
+          "relevance_score": 5,
+          "urgency_score": 5,
+          "named_entities": [],
+          "key_points": [],
+          "content_truncated": false,
+          "analysis_method": "bypassed",
+          "model_used": "direct",
+          "theme": "general",
+          "attention_reason": "Lighter treatment because this story sits in the 時事脈搏 section without strong market-moving signals.",
+          "must_keep": false
+        },
+        {
+          "source_article_id": "4416486",
+          "canonical_url": "https://www.hkej.com/instantnews/current/article/4416486/%E5%85%AC%E5%83%95%E5%8A%A0%E8%96%AA%E4%B8%A8%E6%A5%8A%E4%BD%95%E8%93%93%E8%8C%B5%3A%E8%A9%95%E6%A0%B8%E8%8B%A5%E5%A4%AA%E5%AF%AC%E9%AC%86%E6%89%8D%E6%98%AF%E7%9C%9F%E6%AD%A3%E6%89%93%E6%93%8A%E5%A5%BD%E5%93%A1%E5%B7%A5%E5%A3%AB%E6%B0%A3",
+          "title": "公僕加薪丨楊何蓓茵:評核若太寬鬆才是真正打擊好員工士氣",
+          "section": "時事脈搏",
+          "published_at": "2026-05-30T15:44:00+08:00",
+          "attention_tier": "light",
+          "novelty_score": 5,
+          "relevance_score": 5,
+          "urgency_score": 5,
+          "named_entities": [],
+          "key_points": [],
+          "content_truncated": false,
+          "analysis_method": "bypassed",
+          "model_used": "direct",
+          "theme": "general",
+          "attention_reason": "Lighter treatment because this story sits in the 時事脈搏 section without strong market-moving signals.",
+          "must_keep": false
+        },
+        {
+          "source_article_id": "4416484",
+          "canonical_url": "https://www.hkej.com/instantnews/current/article/4416484/%E7%BE%8E%E6%B3%95%E5%AE%98%E4%B8%8B%E4%BB%A4%E7%89%B9%E6%9C%97%E6%99%AE%E5%90%8D%E5%AD%97%E5%BE%9E%E7%94%98%E8%BF%BA%E8%BF%AA%E4%B8%AD%E5%BF%83%E7%A7%BB%E9%99%A4",
+          "title": "美法官下令特朗普名字從甘迺迪中心移除",
+          "section": "時事脈搏",
+          "published_at": "2026-05-30T14:57:00+08:00",
+          "attention_tier": "light",
+          "novelty_score": 5,
+          "relevance_score": 5,
+          "urgency_score": 5,
+          "named_entities": [],
+          "key_points": [],
+          "content_truncated": false,
+          "analysis_method": "bypassed",
+          "model_used": "direct",
+          "theme": "general",
+          "attention_reason": "Lighter treatment because this story sits in the 時事脈搏 section without strong market-moving signals.",
+          "must_keep": false
+        },
+        {
+          "source_article_id": "4416482",
+          "canonical_url": "https://www.hkej.com/instantnews/current/article/4416482/%E4%BC%8A%E6%B3%A2%E6%8B%89%E4%B8%A8%E7%9B%A7%E5%AF%B5%E8%8C%82%3A%E6%9C%AC%E6%B8%AF%E9%A2%A8%E9%9A%AA%E4%BB%8D%E4%BD%8E+%E6%94%BF%E5%BA%9C%E5%B7%B2%E5%81%9A%E5%A5%BD%E9%98%B2%E7%96%AB%E6%8E%AA%E6%96%BD",
+          "title": "伊波拉丨盧寵茂:本港風險仍低 政府已做好防疫措施",
+          "section": "時事脈搏",
+          "published_at": "2026-05-30T12:55:00+08:00",
+          "attention_tier": "light",
+          "novelty_score": 5,
+          "relevance_score": 5,
+          "urgency_score": 5,
+          "named_entities": [],
+          "key_points": [],
+          "content_truncated": false,
+          "analysis_method": "bypassed",
+          "model_used": "direct",
+          "theme": "general",
+          "attention_reason": "Lighter treatment because this story sits in the 時事脈搏 section without strong market-moving signals.",
+          "must_keep": false
+        },
+        {
+          "source_article_id": "4416481",
+          "canonical_url": "https://www.hkej.com/instantnews/current/article/4416481/%E4%B8%AD%E7%BE%8E%E9%97%9C%E4%BF%82%E4%B8%A8%E7%BE%8E%E9%98%B2%E9%95%B7%3A%E7%BE%8E%E4%B8%AD%E7%9B%B8%E4%BA%92%E5%B0%8A%E9%87%8D%E8%88%87%E6%BA%9D%E9%80%9A%E5%B0%8D%E7%B6%AD%E7%B9%AB%E4%B8%96%E7%95%8C%E5%92%8C%E5%B9%B3%E5%85%B7%E9%87%8D%E8%A6%81%E6%84%8F%E7%BE%A9",
+          "title": "中美關係丨美防長:美中相互尊重與溝通對維繫世界和平具重要意義",
+          "section": "時事脈搏",
+          "published_at": "2026-05-30T12:17:00+08:00",
+          "attention_tier": "light",
+          "novelty_score": 5,
+          "relevance_score": 5,
+          "urgency_score": 5,
+          "named_entities": [],
+          "key_points": [],
+          "content_truncated": false,
+          "analysis_method": "bypassed",
+          "model_used": "direct",
+          "theme": "general",
+          "attention_reason": "Lighter treatment because this story sits in the 時事脈搏 section without strong market-moving signals.",
+          "must_keep": false
+        },
+        {
+          "source_article_id": "4416480",
+          "canonical_url": "https://www.hkej.com/instantnews/current/article/4416480/%E5%AE%8F%E7%A6%8F%E8%8B%91%E4%B8%A8%E6%A5%AD%E4%B8%BB%E7%9D%87%E6%A8%93%E5%9C%98+%E4%BD%95%E6%B0%B8%E8%B3%A2%3A%E6%9C%89%E6%A5%AD%E4%B8%BB%E5%8D%B3%E5%A0%B4%E4%BA%A4%E8%A1%A8%E7%94%B3%E8%AB%8B%E6%8F%80%E6%A8%93",
+          "title": "宏福苑丨業主睇樓團 何永賢:有業主即場交表申請揀樓",
+          "section": "時事脈搏",
+          "published_at": "2026-05-30T12:02:00+08:00",
+          "attention_tier": "light",
+          "novelty_score": 5,
+          "relevance_score": 5,
+          "urgency_score": 5,
+          "named_entities": [],
+          "key_points": [],
+          "content_truncated": false,
+          "analysis_method": "bypassed",
+          "model_used": "direct",
+          "theme": "general",
+          "attention_reason": "Lighter treatment because this story sits in the 時事脈搏 section without strong market-moving signals.",
+          "must_keep": false
+        },
+        {
+          "source_article_id": "4416479",
+          "canonical_url": "https://www.hkej.com/instantnews/current/article/4416479/%E6%8E%A7%E7%85%99%E4%B8%A8%E7%9B%A7%E5%AF%B5%E8%8C%82%3A%E7%9D%80%E5%8A%9B%E6%89%93%E6%93%8A%E7%A7%81%E7%85%99%E5%92%8C%E9%9B%BB%E5%AD%90%E7%85%99+%E5%B0%87%E7%AE%A1%E6%8E%A7%E5%8A%A0%E5%91%B3%E7%89%A9%E8%B3%AA",
+          "title": "控煙丨盧寵茂:着力打擊私煙和電子煙 將管控加味物質",
+          "section": "時事脈搏",
+          "published_at": "2026-05-30T11:40:00+08:00",
+          "attention_tier": "light",
+          "novelty_score": 5,
+          "relevance_score": 5,
+          "urgency_score": 5,
+          "named_entities": [],
+          "key_points": [],
+          "content_truncated": false,
+          "analysis_method": "bypassed",
+          "model_used": "direct",
+          "theme": "general",
+          "attention_reason": "Lighter treatment because this story sits in the 時事脈搏 section without strong market-moving signals.",
+          "must_keep": false
+        },
+        {
+          "source_article_id": "4416477",
+          "title": "中東局勢丨美國財政部對伊朗實施新制裁",
+          "canonical_url": "https://www.hkej.com/instantnews/current/article/4416477/%E4%B8%AD%E6%9D%B1%E5%B1%80%E5%8B%A2%E4%B8%A8%E7%BE%8E%E5%9C%8B%E8%B2%A1%E6%94%BF%E9%83%A8%E5%B0%8D%E4%BC%8A%E6%9C%97%E5%AF%A6%E6%96%BD%E6%96%B0%E5%88%B6%E8%A3%81",
+          "published_at": "2026-05-30T10:57:00+08:00",
+          "section": "時事脈搏",
+          "novelty_score": 5,
+          "relevance_score": 9,
+          "urgency_score": 8,
+          "named_entities": [
+            {
+              "name": "美國財政部",
+              "type": "institution"
+            },
+            {
+              "name": "伊朗",
+              "type": "country"
+            }
+          ],
+          "key_points": [
+            "美國財政部對伊朗實施新制裁，包括8名個人和5個實體。",
+            "此輪制裁對象涉及伊朗採購網絡，涉嫌假冒身份和欺詐美國企業。"
+          ],
+          "content_truncated": false,
+          "original_content_length_chars": 210,
+          "analyzed_content_length_chars": 210,
+          "original_content_token_estimate": 53,
+          "analyzed_content_token_estimate": 53,
+          "truncation_reason": null,
+          "analysis_method": "full_text",
+          "attention_tier": "high",
+          "theme": "geopolitics",
+          "attention_reason": "High-signal geopolitics headline based on title/summary keywords.",
+          "must_keep": true,
+          "model_used": "meta-llama/llama-4-scout-17b-16e-instruct",
+          "delayed_retry_attempted": false,
+          "delayed_retry_model_chain": [],
+          "delayed_retry_final_model": null,
+          "error_classification": null,
+          "error": null
+        },
+        {
+          "source_article_id": "4416476",
+          "canonical_url": "https://www.hkej.com/instantnews/current/article/4416476/%E6%96%B0%E7%9A%87%E5%B4%97%E5%8F%A3%E5%B2%B8%E4%B8%A8%E9%84%A7%E7%82%B3%E5%BC%B7%3A%E5%A4%A7%E6%A8%93%E5%B0%87%E8%A8%AD%E7%89%B9%E5%88%A5%E5%A4%A7%E5%A0%82%E4%BA%88%E9%9A%A8%E8%BB%8A%E4%B9%98%E5%AE%A2%E9%81%8E%E9%97%9C",
+          "title": "新皇崗口岸丨鄧炳強:大樓將設特別大堂予隨車乘客過關",
+          "section": "時事脈搏",
+          "published_at": "2026-05-30T10:33:00+08:00",
+          "attention_tier": "light",
+          "novelty_score": 5,
+          "relevance_score": 5,
+          "urgency_score": 5,
+          "named_entities": [],
+          "key_points": [],
+          "content_truncated": false,
+          "analysis_method": "bypassed",
+          "model_used": "direct",
+          "theme": "general",
+          "attention_reason": "Lighter treatment because this story sits in the 時事脈搏 section without strong market-moving signals.",
+          "must_keep": false
+        },
+        {
+          "source_article_id": "4416475",
+          "canonical_url": "https://www.hkej.com/instantnews/current/article/4416475/%E7%A5%9E%E8%88%9F21%E4%B8%A8%E4%B9%98%E7%B5%84%E8%BF%94%E5%9B%9E%E5%9C%B0%E7%90%83%E5%AF%A6%E9%A9%97%E6%A8%A3%E6%9C%AC%E6%B6%8923%E5%AF%A6%E9%A9%97%E9%A0%85%E7%9B%AE+%E9%87%8D%E9%80%BE41%E5%85%AC%E6%96%A4",
+          "title": "神舟21丨乘組返回地球實驗樣本涉23實驗項目 重逾41公斤",
+          "section": "時事脈搏",
+          "published_at": "2026-05-30T09:44:00+08:00",
+          "attention_tier": "light",
+          "novelty_score": 5,
+          "relevance_score": 5,
+          "urgency_score": 5,
+          "named_entities": [],
+          "key_points": [],
+          "content_truncated": false,
+          "analysis_method": "bypassed",
+          "model_used": "direct",
+          "theme": "general",
+          "attention_reason": "Lighter treatment because this story sits in the 時事脈搏 section without strong market-moving signals.",
+          "must_keep": false
+        },
+        {
+          "source_article_id": "4416474",
+          "canonical_url": "https://www.hkej.com/instantnews/current/article/4416474/%E5%A4%A9%E6%B0%A3%E4%B8%A8%E4%BB%8A%E6%9C%80%E9%AB%98%E6%B0%A3%E6%BA%AB%E7%B4%8431%E5%BA%A6+%E7%A8%8D%E5%BE%8C%E9%A9%9F%E9%9B%A8%E5%A2%9E%E5%A4%9A%E5%8F%8A%E6%9C%89%E9%9B%B7%E6%9A%B4",
+          "title": "天氣丨今最高氣溫約31度 稍後驟雨增多及有雷暴",
+          "section": "時事脈搏",
+          "published_at": "2026-05-30T09:19:00+08:00",
+          "attention_tier": "light",
+          "novelty_score": 5,
+          "relevance_score": 5,
+          "urgency_score": 5,
+          "named_entities": [],
+          "key_points": [],
+          "content_truncated": false,
+          "analysis_method": "bypassed",
+          "model_used": "direct",
+          "theme": "general",
+          "attention_reason": "Lighter treatment because this story sits in the 時事脈搏 section without strong market-moving signals.",
+          "must_keep": false
+        },
+        {
+          "source_article_id": "4416471",
+          "title": "中美核競賽丨中國強化核導彈發射設施 提升二次核打擊能力",
+          "canonical_url": "https://www.hkej.com/instantnews/current/article/4416471/%E4%B8%AD%E7%BE%8E%E6%A0%B8%E7%AB%B6%E8%B3%BD%E4%B8%A8%E4%B8%AD%E5%9C%8B%E5%BC%B7%E5%8C%96%E6%A0%B8%E5%B0%8E%E5%BD%88%E7%99%BC%E5%B0%84%E8%A8%AD%E6%96%BD+%E6%8F%90%E5%8D%87%E4%BA%8C%E6%AC%A1%E6%A0%B8%E6%89%93%E6%93%8A%E8%83%BD%E5%8A%9B",
+          "published_at": "2026-05-30T07:19:00+08:00",
+          "section": "時事脈搏",
+          "novelty_score": 8,
+          "relevance_score": 10,
+          "urgency_score": 9,
+          "named_entities": [
+            {
+              "name": "中國",
+              "type": "country"
+            },
+            {
+              "name": "美國",
+              "type": "country"
+            }
+          ],
+          "key_points": [
+            "中國強化核導彈發射設施，提升二次核打擊能力。",
+            "中國新建的軍事綜合體包括發射台、掩體和通訊基站，覆蓋面積廣大。"
+          ],
+          "content_truncated": false,
+          "original_content_length_chars": 579,
+          "analyzed_content_length_chars": 579,
+          "original_content_token_estimate": 145,
+          "analyzed_content_token_estimate": 145,
+          "truncation_reason": null,
+          "analysis_method": "full_text",
+          "attention_tier": "high",
+          "theme": "geopolitics",
+          "attention_reason": "High-signal geopolitics headline based on title/summary keywords.",
+          "must_keep": true,
+          "model_used": "meta-llama/llama-4-scout-17b-16e-instruct",
+          "delayed_retry_attempted": false,
+          "delayed_retry_model_chain": [],
+          "delayed_retry_final_model": null,
+          "error_classification": null,
+          "error": null
+        },
+        {
+          "source_article_id": "4416470",
+          "title": "日本首次向北約援助烏克蘭機構派駐自衞官",
+          "canonical_url": "https://www.hkej.com/instantnews/current/article/4416470/%E6%97%A5%E6%9C%AC%E9%A6%96%E6%AC%A1%E5%90%91%E5%8C%97%E7%B4%84%E6%8F%B4%E5%8A%A9%E7%83%8F%E5%85%8B%E8%98%AD%E6%A9%9F%E6%A7%8B%E6%B4%BE%E9%A7%90%E8%87%AA%E8%A1%9E%E5%AE%98",
+          "published_at": "2026-05-30T06:57:00+08:00",
+          "section": "時事脈搏",
+          "novelty_score": 7,
+          "relevance_score": 8,
+          "urgency_score": 6,
+          "named_entities": [
+            {
+              "name": "日本",
+              "type": "country"
+            },
+            {
+              "name": "北約",
+              "type": "organization"
+            },
+            {
+              "name": "烏克蘭",
+              "type": "country"
+            }
+          ],
+          "key_points": [],
+          "content_truncated": false,
+          "original_content_length_chars": 122,
+          "analyzed_content_length_chars": 122,
+          "original_content_token_estimate": 31,
+          "analyzed_content_token_estimate": 31,
+          "truncation_reason": null,
+          "analysis_method": "full_text",
+          "attention_tier": "high",
+          "theme": "geopolitics",
+          "attention_reason": "High-signal geopolitics headline based on title/summary keywords.",
+          "must_keep": true,
+          "model_used": "meta-llama/llama-4-scout-17b-16e-instruct",
+          "delayed_retry_attempted": false,
+          "delayed_retry_model_chain": [],
+          "delayed_retry_final_model": null,
+          "error_classification": null,
+          "error": null
+        },
+        {
+          "source_article_id": "4416468",
+          "canonical_url": "https://www.hkej.com/instantnews/current/article/4416468/%E7%B8%BD%E5%95%86%E6%9C%83165%E5%91%A8%E5%B9%B4+%E6%9D%8E%E5%AE%B6%E8%B6%85%3A%E9%9E%8F%E5%9B%BA%E9%A6%99%E6%B8%AF%E8%B6%85%E7%B4%9A%E8%81%AF%E7%B9%AB%E4%BA%BA%E8%A7%92%E8%89%B2",
+          "title": "總商會165周年 李家超:鞏固香港超級聯繫人角色",
+          "section": "時事脈搏",
+          "published_at": "2026-05-30T05:29:00+08:00",
+          "attention_tier": "light",
+          "novelty_score": 5,
+          "relevance_score": 5,
+          "urgency_score": 5,
+          "named_entities": [],
+          "key_points": [],
+          "content_truncated": false,
+          "analysis_method": "bypassed",
+          "model_used": "direct",
+          "theme": "general",
+          "attention_reason": "Lighter treatment because this story sits in the 時事脈搏 section without strong market-moving signals.",
+          "must_keep": false
+        },
+        {
+          "source_article_id": "4416433",
+          "title": "伊朗衝突丨軍方在格什姆島附近擊落美以小型無人機",
+          "canonical_url": "https://www.hkej.com/instantnews/current/article/4416433/%E4%BC%8A%E6%9C%97%E8%A1%9D%E7%AA%81%E4%B8%A8%E8%BB%8D%E6%96%B9%E5%9C%A8%E6%A0%BC%E4%BB%80%E5%A7%86%E5%B3%B6%E9%99%84%E8%BF%91%E6%93%8A%E8%90%BD%E7%BE%8E%E4%BB%A5%E5%B0%8F%E5%9E%8B%E7%84%A1%E4%BA%BA%E6%A9%9F",
+          "published_at": "2026-05-30T04:03:00+08:00",
+          "section": "時事脈搏",
+          "novelty_score": 6,
+          "relevance_score": 8,
+          "urgency_score": 9,
+          "named_entities": [
+            {
+              "name": "伊朗",
+              "type": "country"
+            },
+            {
+              "name": "美國",
+              "type": "country"
+            },
+            {
+              "name": "以色列",
+              "type": "country"
+            },
+            {
+              "name": "格什姆島",
+              "type": "other"
+            }
+          ],
+          "key_points": [
+            "伊朗軍方在格什姆島附近擊落敵對小型無人機，據稱該無人機來自美國和以色列。",
+            "美國中央司令部警告將在霍爾木茲海峽附近開展軍事行動，並打擊參與或支持布設水雷的船隻。"
+          ],
+          "content_truncated": false,
+          "original_content_length_chars": 336,
+          "analyzed_content_length_chars": 336,
+          "original_content_token_estimate": 84,
+          "analyzed_content_token_estimate": 84,
+          "truncation_reason": null,
+          "analysis_method": "full_text",
+          "attention_tier": "high",
+          "theme": "geopolitics",
+          "attention_reason": "High-signal geopolitics headline based on title/summary keywords.",
+          "must_keep": true,
+          "model_used": "meta-llama/llama-4-scout-17b-16e-instruct",
+          "delayed_retry_attempted": false,
+          "delayed_retry_model_chain": [],
+          "delayed_retry_final_model": null,
+          "error_classification": null,
+          "error": null
+        },
+        {
+          "source_article_id": "4416432",
+          "title": "伊朗協議丨特朗普據報推遲作最終決定",
+          "canonical_url": "https://www.hkej.com/instantnews/current/article/4416432/%E4%BC%8A%E6%9C%97%E5%8D%94%E8%AD%B0%E4%B8%A8%E7%89%B9%E6%9C%97%E6%99%AE%E6%93%9A%E5%A0%B1%E6%8E%A8%E9%81%B2%E4%BD%9C%E6%9C%80%E7%B5%82%E6%B1%BA%E5%AE%9A",
+          "published_at": "2026-05-30T03:56:00+08:00",
+          "section": "時事脈搏",
+          "novelty_score": 5,
+          "relevance_score": 7,
+          "urgency_score": 8,
+          "named_entities": [
+            {
+              "name": "伊朗",
+              "type": "country"
+            },
+            {
+              "name": "特朗普",
+              "type": "person"
+            },
+            {
+              "name": "美國",
+              "type": "country"
+            }
+          ],
+          "key_points": [
+            "美國總統特朗普推遲對伊朗核協議的最終決定，繼續討論解凍伊朗資金等問題。",
+            "特朗普要求伊朗永遠不能擁有核武，霍爾木茲海峽必須立即開放。"
+          ],
+          "content_truncated": false,
+          "original_content_length_chars": 204,
+          "analyzed_content_length_chars": 204,
+          "original_content_token_estimate": 51,
+          "analyzed_content_token_estimate": 51,
+          "truncation_reason": null,
+          "analysis_method": "full_text",
+          "attention_tier": "high",
+          "theme": "geopolitics",
+          "attention_reason": "High-signal geopolitics headline based on title/summary keywords.",
+          "must_keep": true,
+          "model_used": "meta-llama/llama-4-scout-17b-16e-instruct",
+          "delayed_retry_attempted": false,
+          "delayed_retry_model_chain": [],
+          "delayed_retry_final_model": null,
+          "error_classification": null,
+          "error": null
+        },
+        {
+          "source_article_id": "4416431",
+          "title": "美伊談判丨伊朗外交部:尚未與美國達成最終協議",
+          "canonical_url": "https://www.hkej.com/instantnews/current/article/4416431/%E7%BE%8E%E4%BC%8A%E8%AB%87%E5%88%A4%E4%B8%A8%E4%BC%8A%E6%9C%97%E5%A4%96%E4%BA%A4%E9%83%A8%3A%E5%B0%9A%E6%9C%AA%E8%88%87%E7%BE%8E%E5%9C%8B%E9%81%94%E6%88%90%E6%9C%80%E7%B5%82%E5%8D%94%E8%AD%B0",
+          "published_at": "2026-05-30T03:50:00+08:00",
+          "section": "時事脈搏",
+          "novelty_score": 5,
+          "relevance_score": 7,
+          "urgency_score": 8,
+          "named_entities": [
+            {
+              "name": "伊朗",
+              "type": "country"
+            },
+            {
+              "name": "美國",
+              "type": "country"
+            },
+            {
+              "name": "巴加埃",
+              "type": "person"
+            }
+          ],
+          "key_points": [
+            "伊朗外交部發言人巴加埃稱，伊朗與美國尚未達成最終協議。",
+            "伊朗重點是結束戰爭，不就核計劃進行談判。"
+          ],
+          "content_truncated": false,
+          "original_content_length_chars": 246,
+          "analyzed_content_length_chars": 246,
+          "original_content_token_estimate": 62,
+          "analyzed_content_token_estimate": 62,
+          "truncation_reason": null,
+          "analysis_method": "full_text",
+          "attention_tier": "high",
+          "theme": "geopolitics",
+          "attention_reason": "High-signal geopolitics headline based on title/summary keywords.",
+          "must_keep": true,
+          "model_used": "meta-llama/llama-4-scout-17b-16e-instruct",
+          "delayed_retry_attempted": false,
+          "delayed_retry_model_chain": [],
+          "delayed_retry_final_model": null,
+          "error_classification": null,
+          "error": null
+        },
+        {
+          "source_article_id": "4416423",
+          "title": "俄烏戰爭丨普京:有理由認為衝突臨近尾聲",
+          "canonical_url": "https://www.hkej.com/instantnews/current/article/4416423/%E4%BF%84%E7%83%8F%E6%88%B0%E7%88%AD%E4%B8%A8%E6%99%AE%E4%BA%AC%3A%E6%9C%89%E7%90%86%E7%94%B1%E8%AA%8D%E7%82%BA%E8%A1%9D%E7%AA%81%E8%87%A8%E8%BF%91%E5%B0%BE%E8%81%B2",
+          "published_at": "2026-05-30T01:34:00+08:00",
+          "section": "時事脈搏",
+          "novelty_score": 4,
+          "relevance_score": 6,
+          "urgency_score": 7,
+          "named_entities": [
+            {
+              "name": "俄羅斯",
+              "type": "country"
+            },
+            {
+              "name": "烏克蘭",
+              "type": "country"
+            },
+            {
+              "name": "普京",
+              "type": "person"
+            }
+          ],
+          "key_points": [],
+          "content_truncated": false,
+          "original_content_length_chars": 216,
+          "analyzed_content_length_chars": 216,
+          "original_content_token_estimate": 54,
+          "analyzed_content_token_estimate": 54,
+          "truncation_reason": null,
+          "analysis_method": "full_text",
+          "attention_tier": "high",
+          "theme": "geopolitics",
+          "attention_reason": "High-signal geopolitics headline based on title/summary keywords.",
+          "must_keep": true,
+          "model_used": "meta-llama/llama-4-scout-17b-16e-instruct",
+          "delayed_retry_attempted": false,
+          "delayed_retry_model_chain": [],
+          "delayed_retry_final_model": null,
+          "error_classification": null,
+          "error": null
+        },
+        {
+          "source_article_id": "4416420",
+          "title": "美伊談判丨特朗普稱將達成協議 伊朗駁言論真假參半",
+          "canonical_url": "https://www.hkej.com/instantnews/current/article/4416420/%E7%BE%8E%E4%BC%8A%E8%AB%87%E5%88%A4%E4%B8%A8%E7%89%B9%E6%9C%97%E6%99%AE%E7%A8%B1%E5%B0%87%E9%81%94%E6%88%90%E5%8D%94%E8%AD%B0+%E4%BC%8A%E6%9C%97%E9%A7%81%E8%A8%80%E8%AB%96%E7%9C%9F%E5%81%87%E5%8F%83%E5%8D%8A",
+          "published_at": "2026-05-30T01:12:00+08:00",
+          "section": "時事脈搏",
+          "novelty_score": 6,
+          "relevance_score": 8,
+          "urgency_score": 9,
+          "named_entities": [
+            {
+              "name": "特朗普",
+              "type": "person"
+            },
+            {
+              "name": "伊朗",
+              "type": "country"
+            }
+          ],
+          "key_points": [
+            "特朗普稱可能與伊朗達成協議，但伊朗方面駁斥其言論真假參半。",
+            "伊朗表示協議文本處於國內審批最後階段，但尚未作出最終決定。"
+          ],
+          "content_truncated": false,
+          "original_content_length_chars": 369,
+          "analyzed_content_length_chars": 369,
+          "original_content_token_estimate": 93,
+          "analyzed_content_token_estimate": 93,
+          "truncation_reason": null,
+          "analysis_method": "full_text",
+          "attention_tier": "high",
+          "theme": "geopolitics",
+          "attention_reason": "High-signal geopolitics headline based on title/summary keywords.",
+          "must_keep": true,
+          "model_used": "meta-llama/llama-4-scout-17b-16e-instruct",
+          "delayed_retry_attempted": false,
+          "delayed_retry_model_chain": [],
+          "delayed_retry_final_model": null,
+          "error_classification": null,
+          "error": null
+        },
+        {
+          "source_article_id": "4416418",
+          "title": "美伊談判丨特朗普:對伊朗海上封鎖即將被解除",
+          "canonical_url": "https://www.hkej.com/instantnews/current/article/4416418/%E7%BE%8E%E4%BC%8A%E8%AB%87%E5%88%A4%E4%B8%A8%E7%89%B9%E6%9C%97%E6%99%AE%3A%E5%B0%8D%E4%BC%8A%E6%9C%97%E6%B5%B7%E4%B8%8A%E5%B0%81%E9%8E%96%E5%8D%B3%E5%B0%87%E8%A2%AB%E8%A7%A3%E9%99%A4",
+          "published_at": "2026-05-30T00:33:00+08:00",
+          "section": "時事脈搏",
+          "novelty_score": 5,
+          "relevance_score": 7,
+          "urgency_score": 8,
+          "named_entities": [
+            {
+              "name": "特朗普",
+              "type": "person"
+            },
+            {
+              "name": "伊朗",
+              "type": "country"
+            }
+          ],
+          "key_points": [
+            "特朗普稱與伊朗達成協議後，美方對伊朗的海上封鎖即將被解除。",
+            "伊朗必須遵守美國設定的條件，包括允許所有船隻安全通過波斯灣地區。"
+          ],
+          "content_truncated": false,
+          "original_content_length_chars": 231,
+          "analyzed_content_length_chars": 231,
+          "original_content_token_estimate": 58,
+          "analyzed_content_token_estimate": 58,
+          "truncation_reason": null,
+          "analysis_method": "full_text",
+          "attention_tier": "high",
+          "theme": "geopolitics",
+          "attention_reason": "High-signal geopolitics headline based on title/summary keywords.",
+          "must_keep": true,
+          "model_used": "meta-llama/llama-4-scout-17b-16e-instruct",
+          "delayed_retry_attempted": false,
+          "delayed_retry_model_chain": [],
+          "delayed_retry_final_model": null,
+          "error_classification": null,
+          "error": null
+        }
+      ],
+      "subgroups": [
+        {
+          "title": "本地新聞 & Other News",
+          "theme_rationale": "關注香港本地議題與政策",
+          "article_count": 22,
+          "key_developments": [
+            "The Hong Kong government has extended the 'Hong Kong Vehicle Northbound Policy' for another 5 years.",
+            "伊朗據報向科威特空軍基地發射一枚彈道飛彈，造成數名美國人員輕傷。",
+            "美國財政部對伊朗實施新制裁，包括8名個人和5個實體，涉及伊朗採購網絡，涉嫌假冒身份和欺詐美國企業。"
+          ],
+          "named_entities": [
+            {
+              "name": "Hong Kong Government",
+              "type": "other"
+            },
+            {
+              "name": "伊朗",
+              "type": "country"
+            },
+            {
+              "name": "美國",
+              "type": "country"
+            },
+            {
+              "name": "美國財政部",
+              "type": "institution"
+            }
+          ],
+          "articles": [
+            {
+              "source_article_id": "4416489",
+              "canonical_url": "https://www.hkej.com/instantnews/current/article/4416489/%E6%B8%AF%E8%BB%8A%E5%8C%97%E4%B8%8A%E6%94%BF%E7%AD%96%E6%9C%89%E6%95%88%E6%9C%9F%E7%8D%B2%E5%BB%B6%E9%95%B75%E5%B9%B4",
+              "title": "港車北上政策有效期獲延長5年",
+              "section": "時事脈搏",
+              "published_at": "2026-05-30T16:17:00+08:00",
+              "attention_tier": "light",
+              "novelty_score": 5,
+              "relevance_score": 5,
+              "urgency_score": 5,
+              "named_entities": [],
+              "key_points": [],
+              "content_truncated": false,
+              "analysis_method": "bypassed",
+              "model_used": "direct",
+              "theme": "general",
+              "attention_reason": "Lighter treatment because this story sits in the 時事脈搏 section without strong market-moving signals.",
+              "must_keep": false
+            },
+            {
+              "source_article_id": "4416486",
+              "canonical_url": "https://www.hkej.com/instantnews/current/article/4416486/%E5%85%AC%E5%83%95%E5%8A%A0%E8%96%AA%E4%B8%A8%E6%A5%8A%E4%BD%95%E8%93%93%E8%8C%B5%3A%E8%A9%95%E6%A0%B8%E8%8B%A5%E5%A4%AA%E5%AF%AC%E9%AC%86%E6%89%8D%E6%98%AF%E7%9C%9F%E6%AD%A3%E6%89%93%E6%93%8A%E5%A5%BD%E5%93%A1%E5%B7%A5%E5%A3%AB%E6%B0%A3",
+              "title": "公僕加薪丨楊何蓓茵:評核若太寬鬆才是真正打擊好員工士氣",
+              "section": "時事脈搏",
+              "published_at": "2026-05-30T15:44:00+08:00",
+              "attention_tier": "light",
+              "novelty_score": 5,
+              "relevance_score": 5,
+              "urgency_score": 5,
+              "named_entities": [],
+              "key_points": [],
+              "content_truncated": false,
+              "analysis_method": "bypassed",
+              "model_used": "direct",
+              "theme": "general",
+              "attention_reason": "Lighter treatment because this story sits in the 時事脈搏 section without strong market-moving signals.",
+              "must_keep": false
+            },
+            {
+              "source_article_id": "4416480",
+              "canonical_url": "https://www.hkej.com/instantnews/current/article/4416480/%E5%AE%8F%E7%A6%8F%E8%8B%91%E4%B8%A8%E6%A5%AD%E4%B8%BB%E7%9D%87%E6%A8%93%E5%9C%98+%E4%BD%95%E6%B0%B8%E8%B3%A2%3A%E6%9C%89%E6%A5%AD%E4%B8%BB%E5%8D%B3%E5%A0%B4%E4%BA%A4%E8%A1%A8%E7%94%B3%E8%AB%8B%E6%8F%80%E6%A8%93",
+              "title": "宏福苑丨業主睇樓團 何永賢:有業主即場交表申請揀樓",
+              "section": "時事脈搏",
+              "published_at": "2026-05-30T12:02:00+08:00",
+              "attention_tier": "light",
+              "novelty_score": 5,
+              "relevance_score": 5,
+              "urgency_score": 5,
+              "named_entities": [],
+              "key_points": [],
+              "content_truncated": false,
+              "analysis_method": "bypassed",
+              "model_used": "direct",
+              "theme": "general",
+              "attention_reason": "Lighter treatment because this story sits in the 時事脈搏 section without strong market-moving signals.",
+              "must_keep": false
+            },
+            {
+              "source_article_id": "4416482",
+              "canonical_url": "https://www.hkej.com/instantnews/current/article/4416482/%E4%BC%8A%E6%B3%A2%E6%8B%89%E4%B8%A8%E7%9B%A7%E5%AF%B5%E8%8C%82%3A%E6%9C%AC%E6%B8%AF%E9%A2%A8%E9%9A%AA%E4%BB%8D%E4%BD%8E+%E6%94%BF%E5%BA%9C%E5%B7%B2%E5%81%9A%E5%A5%BD%E9%98%B2%E7%96%AB%E6%8E%AA%E6%96%BD",
+              "title": "伊波拉丨盧寵茂:本港風險仍低 政府已做好防疫措施",
+              "section": "時事脈搏",
+              "published_at": "2026-05-30T12:55:00+08:00",
+              "attention_tier": "light",
+              "novelty_score": 5,
+              "relevance_score": 5,
+              "urgency_score": 5,
+              "named_entities": [],
+              "key_points": [],
+              "content_truncated": false,
+              "analysis_method": "bypassed",
+              "model_used": "direct",
+              "theme": "general",
+              "attention_reason": "Lighter treatment because this story sits in the 時事脈搏 section without strong market-moving signals.",
+              "must_keep": false
+            },
+            {
+              "source_article_id": "4416497",
+              "canonical_url": "https://www.hkej.com/instantnews/current/article/4416497/%E4%BC%8A%E6%B3%A2%E6%8B%89%E4%B8%A8%E8%AD%9A%E5%BE%B7%E5%A1%9E%E6%8A%B5%E5%89%9B%E6%9E%9C%E6%B0%91%E4%B8%BB%E5%85%B1%E5%92%8C%E5%9C%8B%E4%BA%86%E8%A7%A3%E7%96%AB%E6%83%85%E7%99%BC%E5%B1%95",
+              "title": "伊波拉丨譚德塞抵剛果民主共和國了解疫情發展",
+              "section": "時事脈搏",
+              "published_at": "2026-05-30T19:30:00+08:00",
+              "attention_tier": "light",
+              "novelty_score": 5,
+              "relevance_score": 5,
+              "urgency_score": 5,
+              "named_entities": [],
+              "key_points": [],
+              "content_truncated": false,
+              "analysis_method": "bypassed",
+              "model_used": "direct"
+            },
+            {
+              "source_article_id": "4416499",
+              "canonical_url": "https://www.hkej.com/instantnews/current/article/4416499/%E6%94%BF%E5%BA%9C%E6%AD%A1%E8%BF%8E%E5%A4%A7%E7%81%A3%E5%8D%80%E6%B8%AF%E6%BE%B3%E9%81%8A%E8%89%87%E8%87%AA%E7%94%B1%E8%A1%8C%E6%94%BF%E7%AD%96+%E7%A9%8D%E6%A5%B5%E5%8D%94%E8%AA%BF%E5%8C%97%E8%89%87%E5%8D%97%E4%B8%8B",
+              "title": "政府歡迎大灣區港澳遊艇自由行政策 積極協調北艇南下",
+              "section": "時事脈搏",
+              "published_at": "2026-05-30T19:25:00+08:00",
+              "attention_tier": "light",
+              "novelty_score": 5,
+              "relevance_score": 5,
+              "urgency_score": 5,
+              "named_entities": [],
+              "key_points": [],
+              "content_truncated": false,
+              "analysis_method": "bypassed",
+              "model_used": "direct"
+            },
+            {
+              "source_article_id": "4416498",
+              "title": "中東局勢丨伊朗據報準備為已故最高領袖哈梅內伊舉行盛大葬禮",
+              "canonical_url": "https://www.hkej.com/instantnews/current/article/4416498/%E4%B8%AD%E6%9D%B1%E5%B1%80%E5%8B%A2%E4%B8%A8%E4%BC%8A%E6%9C%97%E6%93%9A%E5%A0%B1%E6%BA%96%E5%82%99%E7%82%BA%E5%B7%B2%E6%95%85%E6%9C%80%E9%AB%98%E9%A0%98%E8%A2%96%E5%93%88%E6%A2%85%E5%85%A7%E4%BC%8A%E8%88%89%E8%A1%8C%E7%9B%9B%E5%A4%A7%E8%91%AC%E7%A6%AE",
+              "published_at": "2026-05-30T19:00:00+08:00",
+              "section": "時事脈搏",
+              "novelty_score": 6,
+              "relevance_score": 8,
+              "urgency_score": 7,
+              "named_entities": [
+                {
+                  "name": "Ali Khamenei",
+                  "type": "person"
+                },
+                {
+                  "name": "伊朗",
+                  "type": "country"
+                }
+              ],
+              "key_points": [
+                "伊朗當局正在為已故前最高領袖哈梅內伊籌備一場盛大葬禮。",
+                "葬禮此前因伊朗和美以戰爭推遲。"
+              ],
+              "content_truncated": false,
+              "original_content_length_chars": 209,
+              "analyzed_content_length_chars": 209,
+              "original_content_token_estimate": 53,
+              "analyzed_content_token_estimate": 53,
+              "truncation_reason": null,
+              "analysis_method": "full_text",
+              "attention_tier": "high",
+              "theme": "geopolitics",
+              "attention_reason": "High-signal geopolitics headline based on title/summary keywords.",
+              "must_keep": true,
+              "model_used": "meta-llama/llama-4-scout-17b-16e-instruct",
+              "delayed_retry_attempted": false,
+              "delayed_retry_model_chain": [],
+              "delayed_retry_final_model": null,
+              "error_classification": null,
+              "error": null
+            },
+            {
+              "source_article_id": "4416494",
+              "title": "中東局勢丨伊朗襲擊科威特空軍基地 據報數名美國人員受傷",
+              "canonical_url": "https://www.hkej.com/instantnews/current/article/4416494/%E4%B8%AD%E6%9D%B1%E5%B1%80%E5%8B%A2%E4%B8%A8%E4%BC%8A%E6%9C%97%E8%A5%B2%E6%93%8A%E7%A7%91%E5%A8%81%E7%89%B9%E7%A9%BA%E8%BB%8D%E5%9F%BA%E5%9C%B0+%E6%93%9A%E5%A0%B1%E6%95%B8%E5%90%8D%E7%BE%8E%E5%9C%8B%E4%BA%BA%E5%93%A1%E5%8F%97%E5%82%B7",
+              "published_at": "2026-05-30T17:45:00+08:00",
+              "section": "時事脈搏",
+              "novelty_score": 8,
+              "relevance_score": 9,
+              "urgency_score": 8,
+              "named_entities": [
+                {
+                  "name": "伊朗",
+                  "type": "country"
+                },
+                {
+                  "name": "科威特",
+                  "type": "country"
+                },
+                {
+                  "name": "美國",
+                  "type": "country"
+                }
+              ],
+              "key_points": [
+                "伊朗據報向科威特空軍基地發射一枚彈道飛彈，造成數名美國人員輕傷。",
+                "至少一架MQ-9「死神」攻擊無人機被摧毀，造價約3000萬美元。"
+              ],
+              "content_truncated": false,
+              "original_content_length_chars": 213,
+              "analyzed_content_length_chars": 213,
+              "original_content_token_estimate": 54,
+              "analyzed_content_token_estimate": 54,
+              "truncation_reason": null,
+              "analysis_method": "full_text",
+              "attention_tier": "high",
+              "theme": "geopolitics",
+              "attention_reason": "High-signal geopolitics headline based on title/summary keywords.",
+              "must_keep": true,
+              "model_used": "meta-llama/llama-4-scout-17b-16e-instruct",
+              "delayed_retry_attempted": false,
+              "delayed_retry_model_chain": [],
+              "delayed_retry_final_model": null,
+              "error_classification": null,
+              "error": null
+            },
+            {
+              "source_article_id": "4416490",
+              "title": "中東局勢丨海格塞思:目前情況來看將與伊朗達成好協議",
+              "canonical_url": "https://www.hkej.com/instantnews/current/article/4416490/%E4%B8%AD%E6%9D%B1%E5%B1%80%E5%8B%A2%E4%B8%A8%E6%B5%B7%E6%A0%BC%E5%A1%9E%E6%80%9D%3A%E7%9B%AE%E5%89%8D%E6%83%85%E6%B3%81%E4%BE%86%E7%9C%8B%E5%B0%87%E8%88%87%E4%BC%8A%E6%9C%97%E9%81%94%E6%88%90%E5%A5%BD%E5%8D%94%E8%AD%B0",
+              "published_at": "2026-05-30T16:50:00+08:00",
+              "section": "時事脈搏",
+              "novelty_score": 6,
+              "relevance_score": 8,
+              "urgency_score": 7,
+              "named_entities": [
+                {
+                  "name": "Pete Hegseth",
+                  "type": "person"
+                },
+                {
+                  "name": "特朗普",
+                  "type": "person"
+                },
+                {
+                  "name": "伊朗",
+                  "type": "country"
+                }
+              ],
+              "key_points": [
+                "美國財政部對伊朗實施新制裁後，海格塞思表示與伊朗達成協議是好協議。",
+                "特朗普強調會非常有耐心，確保美國達成好的及偉大的協議。"
+              ],
+              "content_truncated": false,
+              "original_content_length_chars": 215,
+              "analyzed_content_length_chars": 215,
+              "original_content_token_estimate": 54,
+              "analyzed_content_token_estimate": 54,
+              "truncation_reason": null,
+              "analysis_method": "full_text",
+              "attention_tier": "high",
+              "theme": "geopolitics",
+              "attention_reason": "High-signal geopolitics headline based on title/summary keywords.",
+              "must_keep": true,
+              "model_used": "meta-llama/llama-4-scout-17b-16e-instruct",
+              "delayed_retry_attempted": false,
+              "delayed_retry_model_chain": [],
+              "delayed_retry_final_model": null,
+              "error_classification": null,
+              "error": null
+            },
+            {
+              "source_article_id": "4416496",
+              "canonical_url": "https://www.hkej.com/instantnews/current/article/4416496/%E6%B8%AF%E5%B3%B6%E5%8D%8A%E5%B1%B1%E8%96%88%E8%90%83%E8%8B%91%E7%81%AB%E8%AD%A61%E7%94%B72%E5%A5%B3%E6%98%8F%E8%BF%B7+%E7%96%91%E5%90%B8%E6%AF%92%E6%88%96%E5%90%B8%E7%85%99%E9%87%80%E7%A6%8D",
+              "title": "港島半山薈萃苑火警1男2女昏迷 疑吸毒或吸煙釀禍",
+              "section": "時事脈搏",
+              "published_at": "2026-05-30T18:30:00+08:00",
+              "attention_tier": "light",
+              "novelty_score": 5,
+              "relevance_score": 5,
+              "urgency_score": 5,
+              "named_entities": [],
+              "key_points": [],
+              "content_truncated": false,
+              "analysis_method": "bypassed",
+              "model_used": "direct"
+            },
+            {
+              "source_article_id": "4416492",
+              "canonical_url": "https://www.hkej.com/instantnews/current/article/4416492/%E9%99%B3%E7%BE%8E%E5%AF%B6%3A%E5%B7%B2%E6%8C%87%E7%A4%BA%E8%B7%AF%E6%94%BF%E7%BD%B2%E7%82%BA%E6%A5%B5%E7%AB%AF%E5%A4%A9%E6%B0%A3%E5%81%9A%E5%A5%BD%E9%A0%90%E5%82%99",
+              "title": "陳美寶:已指示路政署為極端天氣做好預備",
+              "section": "時事脈搏",
+              "published_at": "2026-05-30T17:02:00+08:00",
+              "attention_tier": "light",
+              "novelty_score": 5,
+              "relevance_score": 5,
+              "urgency_score": 5,
+              "named_entities": [],
+              "key_points": [],
+              "content_truncated": false,
+              "analysis_method": "bypassed",
+              "model_used": "direct",
+              "theme": "general",
+              "attention_reason": "Lighter treatment because this story sits in the 時事脈搏 section without strong market-moving signals.",
+              "must_keep": false
+            },
+            {
+              "source_article_id": "4416477",
+              "title": "中東局勢丨美國財政部對伊朗實施新制裁",
+              "canonical_url": "https://www.hkej.com/instantnews/current/article/4416477/%E4%B8%AD%E6%9D%B1%E5%B1%80%E5%8B%A2%E4%B8%A8%E7%BE%8E%E5%9C%8B%E8%B2%A1%E6%94%BF%E9%83%A8%E5%B0%8D%E4%BC%8A%E6%9C%97%E5%AF%A6%E6%96%BD%E6%96%B0%E5%88%B6%E8%A3%81",
+              "published_at": "2026-05-30T10:57:00+08:00",
+              "section": "時事脈搏",
+              "novelty_score": 5,
+              "relevance_score": 9,
+              "urgency_score": 8,
+              "named_entities": [
+                {
+                  "name": "美國財政部",
+                  "type": "institution"
+                },
+                {
+                  "name": "伊朗",
+                  "type": "country"
+                }
+              ],
+              "key_points": [
+                "美國財政部對伊朗實施新制裁，包括8名個人和5個實體。",
+                "此輪制裁對象涉及伊朗採購網絡，涉嫌假冒身份和欺詐美國企業。"
+              ],
+              "content_truncated": false,
+              "original_content_length_chars": 210,
+              "analyzed_content_length_chars": 210,
+              "original_content_token_estimate": 53,
+              "analyzed_content_token_estimate": 53,
+              "truncation_reason": null,
+              "analysis_method": "full_text",
+              "attention_tier": "high",
+              "theme": "geopolitics",
+              "attention_reason": "High-signal geopolitics headline based on title/summary keywords.",
+              "must_keep": true,
+              "model_used": "meta-llama/llama-4-scout-17b-16e-instruct",
+              "delayed_retry_attempted": false,
+              "delayed_retry_model_chain": [],
+              "delayed_retry_final_model": null,
+              "error_classification": null,
+              "error": null
+            },
+            {
+              "source_article_id": "4416479",
+              "canonical_url": "https://www.hkej.com/instantnews/current/article/4416479/%E6%8E%A7%E7%85%99%E4%B8%A8%E7%9B%A7%E5%AF%B5%E8%8C%82%3A%E7%9D%80%E5%8A%9B%E6%89%93%E6%93%8A%E7%A7%81%E7%85%99%E5%92%8C%E9%9B%BB%E5%AD%90%E7%85%99+%E5%B0%87%E7%AE%A1%E6%8E%A7%E5%8A%A0%E5%91%B3%E7%89%A9%E8%B3%AA",
+              "title": "控煙丨盧寵茂:着力打擊私煙和電子煙 將管控加味物質",
+              "section": "時事脈搏",
+              "published_at": "2026-05-30T11:40:00+08:00",
+              "attention_tier": "light",
+              "novelty_score": 5,
+              "relevance_score": 5,
+              "urgency_score": 5,
+              "named_entities": [],
+              "key_points": [],
+              "content_truncated": false,
+              "analysis_method": "bypassed",
+              "model_used": "direct",
+              "theme": "general",
+              "attention_reason": "Lighter treatment because this story sits in the 時事脈搏 section without strong market-moving signals.",
+              "must_keep": false
+            },
+            {
+              "source_article_id": "4416476",
+              "canonical_url": "https://www.hkej.com/instantnews/current/article/4416476/%E6%96%B0%E7%9A%87%E5%B4%97%E5%8F%A3%E5%B2%B8%E4%B8%A8%E9%84%A7%E7%82%B3%E5%BC%B7%3A%E5%A4%A7%E6%A8%93%E5%B0%87%E8%A8%AD%E7%89%B9%E5%88%A5%E5%A4%A7%E5%A0%82%E4%BA%88%E9%9A%A8%E8%BB%8A%E4%B9%98%E5%AE%A2%E9%81%8E%E9%97%9C",
+              "title": "新皇崗口岸丨鄧炳強:大樓將設特別大堂予隨車乘客過關",
+              "section": "時事脈搏",
+              "published_at": "2026-05-30T10:33:00+08:00",
+              "attention_tier": "light",
+              "novelty_score": 5,
+              "relevance_score": 5,
+              "urgency_score": 5,
+              "named_entities": [],
+              "key_points": [],
+              "content_truncated": false,
+              "analysis_method": "bypassed",
+              "model_used": "direct",
+              "theme": "general",
+              "attention_reason": "Lighter treatment because this story sits in the 時事脈搏 section without strong market-moving signals.",
+              "must_keep": false
+            },
+            {
+              "source_article_id": "4416475",
+              "canonical_url": "https://www.hkej.com/instantnews/current/article/4416475/%E7%A5%9E%E8%88%9F21%E4%B8%A8%E4%B9%98%E7%B5%84%E8%BF%94%E5%9B%9E%E5%9C%B0%E7%90%83%E5%AF%A6%E9%A9%97%E6%A8%A3%E6%9C%AC%E6%B6%8923%E5%AF%A6%E9%A9%97%E9%A0%85%E7%9B%AE+%E9%87%8D%E9%80%BE41%E5%85%AC%E6%96%A4",
+              "title": "神舟21丨乘組返回地球實驗樣本涉23實驗項目 重逾41公斤",
+              "section": "時事脈搏",
+              "published_at": "2026-05-30T09:44:00+08:00",
+              "attention_tier": "light",
+              "novelty_score": 5,
+              "relevance_score": 5,
+              "urgency_score": 5,
+              "named_entities": [],
+              "key_points": [],
+              "content_truncated": false,
+              "analysis_method": "bypassed",
+              "model_used": "direct",
+              "theme": "general",
+              "attention_reason": "Lighter treatment because this story sits in the 時事脈搏 section without strong market-moving signals.",
+              "must_keep": false
+            },
+            {
+              "source_article_id": "4416474",
+              "canonical_url": "https://www.hkej.com/instantnews/current/article/4416474/%E5%A4%A9%E6%B0%A3%E4%B8%A8%E4%BB%8A%E6%9C%80%E9%AB%98%E6%B0%A3%E6%BA%AB%E7%B4%8431%E5%BA%A6+%E7%A8%8D%E5%BE%8C%E9%A9%9F%E9%9B%A8%E5%A2%9E%E5%A4%9A%E5%8F%8A%E6%9C%89%E9%9B%B7%E6%9A%B4",
+              "title": "天氣丨今最高氣溫約31度 稍後驟雨增多及有雷暴",
+              "section": "時事脈搏",
+              "published_at": "2026-05-30T09:19:00+08:00",
+              "attention_tier": "light",
+              "novelty_score": 5,
+              "relevance_score": 5,
+              "urgency_score": 5,
+              "named_entities": [],
+              "key_points": [],
+              "content_truncated": false,
+              "analysis_method": "bypassed",
+              "model_used": "direct",
+              "theme": "general",
+              "attention_reason": "Lighter treatment because this story sits in the 時事脈搏 section without strong market-moving signals.",
+              "must_keep": false
+            },
+            {
+              "source_article_id": "4416471",
+              "title": "中美核競賽丨中國強化核導彈發射設施 提升二次核打擊能力",
+              "canonical_url": "https://www.hkej.com/instantnews/current/article/4416471/%E4%B8%AD%E7%BE%8E%E6%A0%B8%E7%AB%B6%E8%B3%BD%E4%B8%A8%E4%B8%AD%E5%9C%8B%E5%BC%B7%E5%8C%96%E6%A0%B8%E5%B0%8E%E5%BD%88%E7%99%BC%E5%B0%84%E8%A8%AD%E6%96%BD+%E6%8F%90%E5%8D%87%E4%BA%8C%E6%AC%A1%E6%A0%B8%E6%89%93%E6%93%8A%E8%83%BD%E5%8A%9B",
+              "published_at": "2026-05-30T07:19:00+08:00",
+              "section": "時事脈搏",
+              "novelty_score": 8,
+              "relevance_score": 10,
+              "urgency_score": 9,
+              "named_entities": [
+                {
+                  "name": "中國",
+                  "type": "country"
+                },
+                {
+                  "name": "美國",
+                  "type": "country"
+                }
+              ],
+              "key_points": [
+                "中國強化核導彈發射設施，提升二次核打擊能力。",
+                "中國新建的軍事綜合體包括發射台、掩體和通訊基站，覆蓋面積廣大。"
+              ],
+              "content_truncated": false,
+              "original_content_length_chars": 579,
+              "analyzed_content_length_chars": 579,
+              "original_content_token_estimate": 145,
+              "analyzed_content_token_estimate": 145,
+              "truncation_reason": null,
+              "analysis_method": "full_text",
+              "attention_tier": "high",
+              "theme": "geopolitics",
+              "attention_reason": "High-signal geopolitics headline based on title/summary keywords.",
+              "must_keep": true,
+              "model_used": "meta-llama/llama-4-scout-17b-16e-instruct",
+              "delayed_retry_attempted": false,
+              "delayed_retry_model_chain": [],
+              "delayed_retry_final_model": null,
+              "error_classification": null,
+              "error": null
+            },
+            {
+              "source_article_id": "4416470",
+              "title": "日本首次向北約援助烏克蘭機構派駐自衞官",
+              "canonical_url": "https://www.hkej.com/instantnews/current/article/4416470/%E6%97%A5%E6%9C%AC%E9%A6%96%E6%AC%A1%E5%90%91%E5%8C%97%E7%B4%84%E6%8F%B4%E5%8A%A9%E7%83%8F%E5%85%8B%E8%98%AD%E6%A9%9F%E6%A7%8B%E6%B4%BE%E9%A7%90%E8%87%AA%E8%A1%9E%E5%AE%98",
+              "published_at": "2026-05-30T06:57:00+08:00",
+              "section": "時事脈搏",
+              "novelty_score": 7,
+              "relevance_score": 8,
+              "urgency_score": 6,
+              "named_entities": [
+                {
+                  "name": "日本",
+                  "type": "country"
+                },
+                {
+                  "name": "北約",
+                  "type": "organization"
+                },
+                {
+                  "name": "烏克蘭",
+                  "type": "country"
+                }
+              ],
+              "key_points": [],
+              "content_truncated": false,
+              "original_content_length_chars": 122,
+              "analyzed_content_length_chars": 122,
+              "original_content_token_estimate": 31,
+              "analyzed_content_token_estimate": 31,
+              "truncation_reason": null,
+              "analysis_method": "full_text",
+              "attention_tier": "high",
+              "theme": "geopolitics",
+              "attention_reason": "High-signal geopolitics headline based on title/summary keywords.",
+              "must_keep": true,
+              "model_used": "meta-llama/llama-4-scout-17b-16e-instruct",
+              "delayed_retry_attempted": false,
+              "delayed_retry_model_chain": [],
+              "delayed_retry_final_model": null,
+              "error_classification": null,
+              "error": null
+            },
+            {
+              "source_article_id": "4416433",
+              "title": "伊朗衝突丨軍方在格什姆島附近擊落美以小型無人機",
+              "canonical_url": "https://www.hkej.com/instantnews/current/article/4416433/%E4%BC%8A%E6%9C%97%E8%A1%9D%E7%AA%81%E4%B8%A8%E8%BB%8D%E6%96%B9%E5%9C%A8%E6%A0%BC%E4%BB%80%E5%A7%86%E5%B3%B6%E9%99%84%E8%BF%91%E6%93%8A%E8%90%BD%E7%BE%8E%E4%BB%A5%E5%B0%8F%E5%9E%8B%E7%84%A1%E4%BA%BA%E6%A9%9F",
+              "published_at": "2026-05-30T04:03:00+08:00",
+              "section": "時事脈搏",
+              "novelty_score": 6,
+              "relevance_score": 8,
+              "urgency_score": 9,
+              "named_entities": [
+                {
+                  "name": "伊朗",
+                  "type": "country"
+                },
+                {
+                  "name": "美國",
+                  "type": "country"
+                },
+                {
+                  "name": "以色列",
+                  "type": "country"
+                },
+                {
+                  "name": "格什姆島",
+                  "type": "other"
+                }
+              ],
+              "key_points": [
+                "伊朗軍方在格什姆島附近擊落敵對小型無人機，據稱該無人機來自美國和以色列。",
+                "美國中央司令部警告將在霍爾木茲海峽附近開展軍事行動，並打擊參與或支持布設水雷的船隻。"
+              ],
+              "content_truncated": false,
+              "original_content_length_chars": 336,
+              "analyzed_content_length_chars": 336,
+              "original_content_token_estimate": 84,
+              "analyzed_content_token_estimate": 84,
+              "truncation_reason": null,
+              "analysis_method": "full_text",
+              "attention_tier": "high",
+              "theme": "geopolitics",
+              "attention_reason": "High-signal geopolitics headline based on title/summary keywords.",
+              "must_keep": true,
+              "model_used": "meta-llama/llama-4-scout-17b-16e-instruct",
+              "delayed_retry_attempted": false,
+              "delayed_retry_model_chain": [],
+              "delayed_retry_final_model": null,
+              "error_classification": null,
+              "error": null
+            },
+            {
+              "source_article_id": "4416432",
+              "title": "伊朗協議丨特朗普據報推遲作最終決定",
+              "canonical_url": "https://www.hkej.com/instantnews/current/article/4416432/%E4%BC%8A%E6%9C%97%E5%8D%94%E8%AD%B0%E4%B8%A8%E7%89%B9%E6%9C%97%E6%99%AE%E6%93%9A%E5%A0%B1%E6%8E%A8%E9%81%B2%E4%BD%9C%E6%9C%80%E7%B5%82%E6%B1%BA%E5%AE%9A",
+              "published_at": "2026-05-30T03:56:00+08:00",
+              "section": "時事脈搏",
+              "novelty_score": 5,
+              "relevance_score": 7,
+              "urgency_score": 8,
+              "named_entities": [
+                {
+                  "name": "伊朗",
+                  "type": "country"
+                },
+                {
+                  "name": "特朗普",
+                  "type": "person"
+                },
+                {
+                  "name": "美國",
+                  "type": "country"
+                }
+              ],
+              "key_points": [
+                "美國總統特朗普推遲對伊朗核協議的最終決定，繼續討論解凍伊朗資金等問題。",
+                "特朗普要求伊朗永遠不能擁有核武，霍爾木茲海峽必須立即開放。"
+              ],
+              "content_truncated": false,
+              "original_content_length_chars": 204,
+              "analyzed_content_length_chars": 204,
+              "original_content_token_estimate": 51,
+              "analyzed_content_token_estimate": 51,
+              "truncation_reason": null,
+              "analysis_method": "full_text",
+              "attention_tier": "high",
+              "theme": "geopolitics",
+              "attention_reason": "High-signal geopolitics headline based on title/summary keywords.",
+              "must_keep": true,
+              "model_used": "meta-llama/llama-4-scout-17b-16e-instruct",
+              "delayed_retry_attempted": false,
+              "delayed_retry_model_chain": [],
+              "delayed_retry_final_model": null,
+              "error_classification": null,
+              "error": null
+            },
+            {
+              "source_article_id": "4416468",
+              "canonical_url": "https://www.hkej.com/instantnews/current/article/4416468/%E7%B8%BD%E5%95%86%E6%9C%83165%E5%91%A8%E5%B9%B4+%E6%9D%8E%E5%AE%B6%E8%B6%85%3A%E9%9E%8F%E5%9B%BA%E9%A6%99%E6%B8%AF%E8%B6%85%E7%B4%9A%E8%81%AF%E7%B9%AB%E4%BA%BA%E8%A7%92%E8%89%B2",
+              "title": "總商會165周年 李家超:鞏固香港超級聯繫人角色",
+              "section": "時事脈搏",
+              "published_at": "2026-05-30T05:29:00+08:00",
+              "attention_tier": "light",
+              "novelty_score": 5,
+              "relevance_score": 5,
+              "urgency_score": 5,
+              "named_entities": [],
+              "key_points": [],
+              "content_truncated": false,
+              "analysis_method": "bypassed",
+              "model_used": "direct",
+              "theme": "general",
+              "attention_reason": "Lighter treatment because this story sits in the 時事脈搏 section without strong market-moving signals.",
+              "must_keep": false
+            },
+            {
+              "source_article_id": "4416423",
+              "title": "俄烏戰爭丨普京:有理由認為衝突臨近尾聲",
+              "canonical_url": "https://www.hkej.com/instantnews/current/article/4416423/%E4%BF%84%E7%83%8F%E6%88%B0%E7%88%AD%E4%B8%A8%E6%99%AE%E4%BA%AC%3A%E6%9C%89%E7%90%86%E7%94%B1%E8%AA%8D%E7%82%BA%E8%A1%9D%E7%AA%81%E8%87%A8%E8%BF%91%E5%B0%BE%E8%81%B2",
+              "published_at": "2026-05-30T01:34:00+08:00",
+              "section": "時事脈搏",
+              "novelty_score": 4,
+              "relevance_score": 6,
+              "urgency_score": 7,
+              "named_entities": [
+                {
+                  "name": "俄羅斯",
+                  "type": "country"
+                },
+                {
+                  "name": "烏克蘭",
+                  "type": "country"
+                },
+                {
+                  "name": "普京",
+                  "type": "person"
+                }
+              ],
+              "key_points": [],
+              "content_truncated": false,
+              "original_content_length_chars": 216,
+              "analyzed_content_length_chars": 216,
+              "original_content_token_estimate": 54,
+              "analyzed_content_token_estimate": 54,
+              "truncation_reason": null,
+              "analysis_method": "full_text",
+              "attention_tier": "high",
+              "theme": "geopolitics",
+              "attention_reason": "High-signal geopolitics headline based on title/summary keywords.",
+              "must_keep": true,
+              "model_used": "meta-llama/llama-4-scout-17b-16e-instruct",
+              "delayed_retry_attempted": false,
+              "delayed_retry_model_chain": [],
+              "delayed_retry_final_model": null,
+              "error_classification": null,
+              "error": null
+            }
+          ],
+          "model_used": "meta-llama/llama-4-scout-17b-16e-instruct"
+        },
+        {
+          "title": "國際關係",
+          "theme_rationale": "涉及國家間互動與政策",
+          "article_count": 3,
+          "key_developments": [
+            "王毅表示中加關係正在校正航向，重歸正軌符合兩國利益",
+            "美防長表示，美中相互尊重與溝通對維繫世界和平具重要意義",
+            "美法官下令特朗普名字從甘迺迪中心移除"
+          ],
+          "named_entities": [
+            {
+              "name": "王毅",
+              "type": "person"
+            },
+            {
+              "name": "美國",
+              "type": "country"
+            },
+            {
+              "name": "加拿大",
+              "type": "country"
+            },
+            {
+              "name": "特朗普",
+              "type": "person"
+            }
+          ],
+          "articles": [
+            {
+              "source_article_id": "4416487",
+              "canonical_url": "https://www.hkej.com/instantnews/current/article/4416487/%E7%8E%8B%E6%AF%85%3A%E4%B8%AD%E5%8A%A0%E9%97%9C%E4%BF%82%E6%A0%A1%E6%AD%A3%E8%88%AA%E5%90%91%E9%87%8D%E6%AD%B8%E6%AD%A3%E8%BB%8C%E7%AC%A6%E5%85%A9%E5%9C%8B%E5%88%A9%E7%9B%8A",
+              "title": "王毅:中加關係校正航向重歸正軌符兩國利益",
+              "section": "時事脈搏",
+              "published_at": "2026-05-30T15:53:00+08:00",
+              "attention_tier": "light",
+              "novelty_score": 5,
+              "relevance_score": 5,
+              "urgency_score": 5,
+              "named_entities": [],
+              "key_points": [],
+              "content_truncated": false,
+              "analysis_method": "bypassed",
+              "model_used": "direct",
+              "theme": "general",
+              "attention_reason": "Lighter treatment because this story sits in the 時事脈搏 section without strong market-moving signals.",
+              "must_keep": false
+            },
+            {
+              "source_article_id": "4416481",
+              "canonical_url": "https://www.hkej.com/instantnews/current/article/4416481/%E4%B8%AD%E7%BE%8E%E9%97%9C%E4%BF%82%E4%B8%A8%E7%BE%8E%E9%98%B2%E9%95%B7%3A%E7%BE%8E%E4%B8%AD%E7%9B%B8%E4%BA%92%E5%B0%8A%E9%87%8D%E8%88%87%E6%BA%9D%E9%80%9A%E5%B0%8D%E7%B6%AD%E7%B9%AB%E4%B8%96%E7%95%8C%E5%92%8C%E5%B9%B3%E5%85%B7%E9%87%8D%E8%A6%81%E6%84%8F%E7%BE%A9",
+              "title": "中美關係丨美防長:美中相互尊重與溝通對維繫世界和平具重要意義",
+              "section": "時事脈搏",
+              "published_at": "2026-05-30T12:17:00+08:00",
+              "attention_tier": "light",
+              "novelty_score": 5,
+              "relevance_score": 5,
+              "urgency_score": 5,
+              "named_entities": [],
+              "key_points": [],
+              "content_truncated": false,
+              "analysis_method": "bypassed",
+              "model_used": "direct",
+              "theme": "general",
+              "attention_reason": "Lighter treatment because this story sits in the 時事脈搏 section without strong market-moving signals.",
+              "must_keep": false
+            },
+            {
+              "source_article_id": "4416484",
+              "canonical_url": "https://www.hkej.com/instantnews/current/article/4416484/%E7%BE%8E%E6%B3%95%E5%AE%98%E4%B8%8B%E4%BB%A4%E7%89%B9%E6%9C%97%E6%99%AE%E5%90%8D%E5%AD%97%E5%BE%9E%E7%94%98%E8%BF%BA%E8%BF%AA%E4%B8%AD%E5%BF%83%E7%A7%BB%E9%99%A4",
+              "title": "美法官下令特朗普名字從甘迺迪中心移除",
+              "section": "時事脈搏",
+              "published_at": "2026-05-30T14:57:00+08:00",
+              "attention_tier": "light",
+              "novelty_score": 5,
+              "relevance_score": 5,
+              "urgency_score": 5,
+              "named_entities": [],
+              "key_points": [],
+              "content_truncated": false,
+              "analysis_method": "bypassed",
+              "model_used": "direct",
+              "theme": "general",
+              "attention_reason": "Lighter treatment because this story sits in the 時事脈搏 section without strong market-moving signals.",
+              "must_keep": false
+            }
+          ],
+          "model_used": "meta-llama/llama-4-scout-17b-16e-instruct"
+        },
+        {
+          "title": "中東地緣政治",
+          "theme_rationale": "涉及中東國家間的政治和外交事件",
+          "article_count": 3,
+          "key_developments": [
+            "伊朗外交部發言人巴加埃稱，伊朗與美國尚未達成最終協議。",
+            "特朗普稱可能與伊朗達成協議，但伊朗方面駁斥其言論真假參半。",
+            "特朗普稱與伊朗達成協議後，美方對伊朗的海上封鎖即將被解除。"
+          ],
+          "named_entities": [
+            {
+              "name": "伊朗",
+              "type": "country"
+            },
+            {
+              "name": "美國",
+              "type": "country"
+            },
+            {
+              "name": "特朗普",
+              "type": "person"
+            },
+            {
+              "name": "巴加埃",
+              "type": "person"
+            }
+          ],
+          "articles": [
+            {
+              "source_article_id": "4416431",
+              "title": "美伊談判丨伊朗外交部:尚未與美國達成最終協議",
+              "canonical_url": "https://www.hkej.com/instantnews/current/article/4416431/%E7%BE%8E%E4%BC%8A%E8%AB%87%E5%88%A4%E4%B8%A8%E4%BC%8A%E6%9C%97%E5%A4%96%E4%BA%A4%E9%83%A8%3A%E5%B0%9A%E6%9C%AA%E8%88%87%E7%BE%8E%E5%9C%8B%E9%81%94%E6%88%90%E6%9C%80%E7%B5%82%E5%8D%94%E8%AD%B0",
+              "published_at": "2026-05-30T03:50:00+08:00",
+              "section": "時事脈搏",
+              "novelty_score": 5,
+              "relevance_score": 7,
+              "urgency_score": 8,
+              "named_entities": [
+                {
+                  "name": "伊朗",
+                  "type": "country"
+                },
+                {
+                  "name": "美國",
+                  "type": "country"
+                },
+                {
+                  "name": "巴加埃",
+                  "type": "person"
+                }
+              ],
+              "key_points": [
+                "伊朗外交部發言人巴加埃稱，伊朗與美國尚未達成最終協議。",
+                "伊朗重點是結束戰爭，不就核計劃進行談判。"
+              ],
+              "content_truncated": false,
+              "original_content_length_chars": 246,
+              "analyzed_content_length_chars": 246,
+              "original_content_token_estimate": 62,
+              "analyzed_content_token_estimate": 62,
+              "truncation_reason": null,
+              "analysis_method": "full_text",
+              "attention_tier": "high",
+              "theme": "geopolitics",
+              "attention_reason": "High-signal geopolitics headline based on title/summary keywords.",
+              "must_keep": true,
+              "model_used": "meta-llama/llama-4-scout-17b-16e-instruct",
+              "delayed_retry_attempted": false,
+              "delayed_retry_model_chain": [],
+              "delayed_retry_final_model": null,
+              "error_classification": null,
+              "error": null
+            },
+            {
+              "source_article_id": "4416420",
+              "title": "美伊談判丨特朗普稱將達成協議 伊朗駁言論真假參半",
+              "canonical_url": "https://www.hkej.com/instantnews/current/article/4416420/%E7%BE%8E%E4%BC%8A%E8%AB%87%E5%88%A4%E4%B8%A8%E7%89%B9%E6%9C%97%E6%99%AE%E7%A8%B1%E5%B0%87%E9%81%94%E6%88%90%E5%8D%94%E8%AD%B0+%E4%BC%8A%E6%9C%97%E9%A7%81%E8%A8%80%E8%AB%96%E7%9C%9F%E5%81%87%E5%8F%83%E5%8D%8A",
+              "published_at": "2026-05-30T01:12:00+08:00",
+              "section": "時事脈搏",
+              "novelty_score": 6,
+              "relevance_score": 8,
+              "urgency_score": 9,
+              "named_entities": [
+                {
+                  "name": "特朗普",
+                  "type": "person"
+                },
+                {
+                  "name": "伊朗",
+                  "type": "country"
+                }
+              ],
+              "key_points": [
+                "特朗普稱可能與伊朗達成協議，但伊朗方面駁斥其言論真假參半。",
+                "伊朗表示協議文本處於國內審批最後階段，但尚未作出最終決定。"
+              ],
+              "content_truncated": false,
+              "original_content_length_chars": 369,
+              "analyzed_content_length_chars": 369,
+              "original_content_token_estimate": 93,
+              "analyzed_content_token_estimate": 93,
+              "truncation_reason": null,
+              "analysis_method": "full_text",
+              "attention_tier": "high",
+              "theme": "geopolitics",
+              "attention_reason": "High-signal geopolitics headline based on title/summary keywords.",
+              "must_keep": true,
+              "model_used": "meta-llama/llama-4-scout-17b-16e-instruct",
+              "delayed_retry_attempted": false,
+              "delayed_retry_model_chain": [],
+              "delayed_retry_final_model": null,
+              "error_classification": null,
+              "error": null
+            },
+            {
+              "source_article_id": "4416418",
+              "title": "美伊談判丨特朗普:對伊朗海上封鎖即將被解除",
+              "canonical_url": "https://www.hkej.com/instantnews/current/article/4416418/%E7%BE%8E%E4%BC%8A%E8%AB%87%E5%88%A4%E4%B8%A8%E7%89%B9%E6%9C%97%E6%99%AE%3A%E5%B0%8D%E4%BC%8A%E6%9C%97%E6%B5%B7%E4%B8%8A%E5%B0%81%E9%8E%96%E5%8D%B3%E5%B0%87%E8%A2%AB%E8%A7%A3%E9%99%A4",
+              "published_at": "2026-05-30T00:33:00+08:00",
+              "section": "時事脈搏",
+              "novelty_score": 5,
+              "relevance_score": 7,
+              "urgency_score": 8,
+              "named_entities": [
+                {
+                  "name": "特朗普",
+                  "type": "person"
+                },
+                {
+                  "name": "伊朗",
+                  "type": "country"
+                }
+              ],
+              "key_points": [
+                "特朗普稱與伊朗達成協議後，美方對伊朗的海上封鎖即將被解除。",
+                "伊朗必須遵守美國設定的條件，包括允許所有船隻安全通過波斯灣地區。"
+              ],
+              "content_truncated": false,
+              "original_content_length_chars": 231,
+              "analyzed_content_length_chars": 231,
+              "original_content_token_estimate": 58,
+              "analyzed_content_token_estimate": 58,
+              "truncation_reason": null,
+              "analysis_method": "full_text",
+              "attention_tier": "high",
+              "theme": "geopolitics",
+              "attention_reason": "High-signal geopolitics headline based on title/summary keywords.",
+              "must_keep": true,
+              "model_used": "meta-llama/llama-4-scout-17b-16e-instruct",
+              "delayed_retry_attempted": false,
+              "delayed_retry_model_chain": [],
+              "delayed_retry_final_model": null,
+              "error_classification": null,
+              "error": null
+            }
+          ],
+          "model_used": "meta-llama/llama-4-scout-17b-16e-instruct"
+        }
+      ],
+      "analysis_profile": "light",
+      "model_used": "meta-llama/llama-4-scout-17b-16e-instruct",
+      "sub_batch_count": 10,
+      "diagnostics": {
+        "sub_batch_count": 10,
+        "split_reasons": [],
+        "models_attempted": [
+          "meta-llama/llama-4-scout-17b-16e-instruct"
+        ],
+        "estimated_input_tokens_max": 1144,
+        "serialized_request_bytes_max": 5208,
+        "rate_limit_waits": 0,
+        "partial_article_count": 0,
+        "synthesis_wait_seconds_total": 0.0,
+        "synthesis_retry_count": 0,
+        "synthesis_retry_skipped_count": 0,
+        "synthesis_budget_exhausted": false,
+        "degraded_merge_used": false,
+        "degraded_merge_reason": "",
+        "synthesis_merge_depth_max": 0,
+        "model_switches": []
+      },
+      "error": null
+    },
+    {
+      "category": "香港財經",
+      "article_count": 1,
+      "status": "success",
+      "key_developments": [
+        "恒指夜期收報25098點，升109點。",
+        "較昨日恒指收市25182點，低水84點。",
+        "成交15312張。",
+        "恒指夜期漲幅與市場波動相關，市場關注成交量變化。"
+      ],
+      "named_entities": [
+        {
+          "name": "恒指",
+          "type": "index"
+        },
+        {
+          "name": "國指",
+          "type": "index"
+        }
+      ],
+      "articles": [
+        {
+          "source_article_id": "4416429",
+          "title": "恒指夜期丨收報25098 低水84點",
+          "canonical_url": "https://www.hkej.com/instantnews/hongkong/article/4416429/%E6%81%92%E6%8C%87%E5%A4%9C%E6%9C%9F%E4%B8%A8%E6%94%B6%E5%A0%B125098+%E4%BD%8E%E6%B0%B484%E9%BB%9E",
+          "published_at": "2026-05-30T03:22:00+08:00",
+          "section": "香港財經",
+          "novelty_score": 4,
+          "relevance_score": 7,
+          "urgency_score": 5,
+          "named_entities": [
+            {
+              "name": "恒指",
+              "type": "index"
+            },
+            {
+              "name": "國指",
+              "type": "index"
+            }
+          ],
+          "key_points": [
+            "恒指夜期收報25098點，升109點。",
+            "較昨日恒指收市25182點，低水84點。",
+            "成交15312張。"
+          ],
+          "content_truncated": false,
+          "original_content_length_chars": 102,
+          "analyzed_content_length_chars": 102,
+          "original_content_token_estimate": 26,
+          "analyzed_content_token_estimate": 26,
+          "truncation_reason": null,
+          "analysis_method": "full_text",
+          "attention_tier": "medium",
+          "theme": "stocks",
+          "attention_reason": "The article reports on the Hang Seng Index futures market with specific numbers, but lacks a clear market-moving signal.",
+          "must_keep": true,
+          "model_used": "meta-llama/llama-4-scout-17b-16e-instruct",
+          "delayed_retry_attempted": false,
+          "delayed_retry_model_chain": [],
+          "delayed_retry_final_model": null,
+          "error_classification": null,
+          "error": null
+        }
+      ],
+      "subgroups": [
+        {
+          "title": "香港財經 overview",
+          "theme_rationale": "Single subgroup because the category size did not require thematic splitting.",
+          "article_count": 1,
+          "key_developments": [
+            "恒指夜期收報25098點，升109點。",
+            "較昨日恒指收市25182點，低水84點。",
+            "成交15312張。",
+            "恒指夜期漲幅與市場波動相關，市場關注成交量變化。"
+          ],
+          "named_entities": [
+            {
+              "name": "恒指",
+              "type": "index"
+            },
+            {
+              "name": "國指",
+              "type": "index"
+            }
+          ],
+          "articles": [
+            {
+              "source_article_id": "4416429",
+              "title": "恒指夜期丨收報25098 低水84點",
+              "canonical_url": "https://www.hkej.com/instantnews/hongkong/article/4416429/%E6%81%92%E6%8C%87%E5%A4%9C%E6%9C%9F%E4%B8%A8%E6%94%B6%E5%A0%B125098+%E4%BD%8E%E6%B0%B484%E9%BB%9E",
+              "published_at": "2026-05-30T03:22:00+08:00",
+              "section": "香港財經",
+              "novelty_score": 4,
+              "relevance_score": 7,
+              "urgency_score": 5,
+              "named_entities": [
+                {
+                  "name": "恒指",
+                  "type": "index"
+                },
+                {
+                  "name": "國指",
+                  "type": "index"
+                }
+              ],
+              "key_points": [
+                "恒指夜期收報25098點，升109點。",
+                "較昨日恒指收市25182點，低水84點。",
+                "成交15312張。"
+              ],
+              "content_truncated": false,
+              "original_content_length_chars": 102,
+              "analyzed_content_length_chars": 102,
+              "original_content_token_estimate": 26,
+              "analyzed_content_token_estimate": 26,
+              "truncation_reason": null,
+              "analysis_method": "full_text",
+              "attention_tier": "medium",
+              "theme": "stocks",
+              "attention_reason": "The article reports on the Hang Seng Index futures market with specific numbers, but lacks a clear market-moving signal.",
+              "must_keep": true,
+              "model_used": "meta-llama/llama-4-scout-17b-16e-instruct",
+              "delayed_retry_attempted": false,
+              "delayed_retry_model_chain": [],
+              "delayed_retry_final_model": null,
+              "error_classification": null,
+              "error": null
+            }
+          ],
+          "model_used": "meta-llama/llama-4-scout-17b-16e-instruct"
+        }
+      ],
+      "analysis_profile": "standard",
+      "model_used": "meta-llama/llama-4-scout-17b-16e-instruct",
+      "sub_batch_count": 1,
+      "diagnostics": {
+        "sub_batch_count": 1,
+        "split_reasons": [],
+        "models_attempted": [],
+        "estimated_input_tokens_max": 0,
+        "serialized_request_bytes_max": 0,
+        "rate_limit_waits": 0,
+        "partial_article_count": 0,
+        "synthesis_wait_seconds_total": 0.0,
+        "synthesis_retry_count": 0,
+        "synthesis_retry_skipped_count": 0,
+        "synthesis_budget_exhausted": false,
+        "degraded_merge_used": false,
+        "degraded_merge_reason": "",
+        "synthesis_merge_depth_max": 0,
+        "model_switches": []
+      },
+      "error": null
+    },
+    {
+      "category": "中國財經",
+      "article_count": 4,
+      "status": "success",
+      "key_developments": [
+        "中國商務部警告歐方若採取歧視性限制，中方將堅決反制。",
+        "德勤中國成立「專精特新賦能中心」，響應國家創新驅動發展戰略。",
+        "百勝餐飲集團與LongRange Capital進行獨家談判，出售必勝客連鎖業務。",
+        "稀宇科技於5月29日與中信證券簽署輔導協議，正式啟動A股IPO進程。"
+      ],
+      "named_entities": [
+        {
+          "name": "中國商務部",
+          "type": "institution"
+        },
+        {
+          "name": "歐盟委員會",
+          "type": "institution"
+        },
+        {
+          "name": "中方",
+          "type": "country"
+        },
+        {
+          "name": "歐方",
+          "type": "country"
+        },
+        {
+          "name": "德勤中國",
+          "type": "company"
+        }
+      ],
+      "articles": [
+        {
+          "source_article_id": "4416491",
+          "title": "中國商務部:歐方若採取歧視性限制中方將堅決反制",
+          "canonical_url": "https://www.hkej.com/instantnews/china/article/4416491/%E4%B8%AD%E5%9C%8B%E5%95%86%E5%8B%99%E9%83%A8%3A%E6%AD%90%E6%96%B9%E8%8B%A5%E6%8E%A1%E5%8F%96%E6%AD%A7%E8%A6%96%E6%80%A7%E9%99%90%E5%88%B6%E4%B8%AD%E6%96%B9%E5%B0%87%E5%A0%85%E6%B1%BA%E5%8F%8D%E5%88%B6",
+          "published_at": "2026-05-30T16:59:00+08:00",
+          "section": "中國財經",
+          "novelty_score": 6,
+          "relevance_score": 8,
+          "urgency_score": 7,
+          "named_entities": [
+            {
+              "name": "中國商務部",
+              "type": "institution"
+            },
+            {
+              "name": "歐盟委員會",
+              "type": "institution"
+            },
+            {
+              "name": "中方",
+              "type": "country"
+            },
+            {
+              "name": "歐方",
+              "type": "country"
+            }
+          ],
+          "key_points": [
+            "中國商務部警告歐方若採取歧視性限制，中方將堅決反制。",
+            "中歐是平等和互惠互利的重要經貿夥伴。",
+            "商務部希望歐方遵守世貿組織規則，堅持自由貿易和公平競爭。"
+          ],
+          "content_truncated": false,
+          "original_content_length_chars": 236,
+          "analyzed_content_length_chars": 236,
+          "original_content_token_estimate": 59,
+          "analyzed_content_token_estimate": 59,
+          "truncation_reason": null,
+          "analysis_method": "full_text",
+          "attention_tier": "high",
+          "theme": "geopolitics",
+          "attention_reason": "Article mentions potential trade restrictions and China's response.",
+          "must_keep": true,
+          "model_used": "meta-llama/llama-4-scout-17b-16e-instruct",
+          "delayed_retry_attempted": false,
+          "delayed_retry_model_chain": [],
+          "delayed_retry_final_model": null,
+          "error_classification": null,
+          "error": null
+        },
+        {
+          "source_article_id": "4416488",
+          "title": "德勤中國成立專精特新賦能中心",
+          "canonical_url": "https://www.hkej.com/instantnews/china/article/4416488/%E5%BE%B7%E5%8B%A4%E4%B8%AD%E5%9C%8B%E6%88%90%E7%AB%8B%E5%B0%88%E7%B2%BE%E7%89%B9%E6%96%B0%E8%B3%A6%E8%83%BD%E4%B8%AD%E5%BF%83",
+          "published_at": "2026-05-30T16:04:00+08:00",
+          "section": "中國財經",
+          "novelty_score": 6,
+          "relevance_score": 7,
+          "urgency_score": 4,
+          "named_entities": [
+            {
+              "name": "德勤中國",
+              "type": "company"
+            },
+            {
+              "name": "雁棲湖創新大會",
+              "type": "institution"
+            }
+          ],
+          "key_points": [
+            "德勤中國成立「專精特新賦能中心」，響應國家創新驅動發展戰略。",
+            "賦能中心將提供多維度、可落地的解決方案，助力企業在戰略規劃、資本對接、技術創新等方面發展。",
+            "中心模式聚焦企業核心需求，打造覆蓋企業全生命周期、平台化、可持續的綜合賦能體系。"
+          ],
+          "content_truncated": false,
+          "original_content_length_chars": 271,
+          "analyzed_content_length_chars": 271,
+          "original_content_token_estimate": 68,
+          "analyzed_content_token_estimate": 68,
+          "truncation_reason": null,
+          "analysis_method": "full_text",
+          "attention_tier": "medium",
+          "theme": "general",
+          "attention_reason": "Article appears to be a corporate announcement without significant market-moving potential.",
+          "must_keep": true,
+          "model_used": "meta-llama/llama-4-scout-17b-16e-instruct",
+          "delayed_retry_attempted": false,
+          "delayed_retry_model_chain": [],
+          "delayed_retry_final_model": null,
+          "error_classification": null,
+          "error": null
+        },
+        {
+          "source_article_id": "4416483",
+          "title": "出售必勝客 百勝據悉與LongRange獨家談判",
+          "canonical_url": "https://www.hkej.com/instantnews/china/article/4416483/%E5%87%BA%E5%94%AE%E5%BF%85%E5%8B%9D%E5%AE%A2+%E7%99%BE%E5%8B%9D%E6%93%9A%E6%82%89%E8%88%87LongRange%E7%8D%A8%E5%AE%B6%E8%AB%87%E5%88%A4",
+          "published_at": "2026-05-30T13:25:00+08:00",
+          "section": "中國財經",
+          "novelty_score": 8,
+          "relevance_score": 9,
+          "urgency_score": 7,
+          "named_entities": [
+            {
+              "name": "百勝餐飲集團",
+              "type": "company"
+            },
+            {
+              "name": "LongRange Capital",
+              "type": "company"
+            },
+            {
+              "name": "必勝客",
+              "type": "company"
+            }
+          ],
+          "key_points": [
+            "百勝餐飲集團與LongRange Capital進行獨家談判，出售必勝客連鎖業務。",
+            "LongRange近日擊敗其他競標者，雙方可能在幾周內達成協議。",
+            "百勝去年展開戰略評估，審視必勝客業務。"
+          ],
+          "content_truncated": false,
+          "original_content_length_chars": 271,
+          "analyzed_content_length_chars": 271,
+          "original_content_token_estimate": 68,
+          "analyzed_content_token_estimate": 68,
+          "truncation_reason": null,
+          "analysis_method": "full_text",
+          "attention_tier": "medium",
+          "theme": "stocks",
+          "attention_reason": "Article mentions a potential sale of a business unit.",
+          "must_keep": true,
+          "model_used": "meta-llama/llama-4-scout-17b-16e-instruct",
+          "delayed_retry_attempted": false,
+          "delayed_retry_model_chain": [],
+          "delayed_retry_final_model": null,
+          "error_classification": null,
+          "error": null
+        },
+        {
+          "source_article_id": "4416478",
+          "title": "稀宇科技啟動A股IPO輔導備案",
+          "canonical_url": "https://www.hkej.com/instantnews/china/article/4416478/%E7%A8%80%E5%AE%87%E7%A7%91%E6%8A%80%E5%95%9F%E5%8B%95A%E8%82%A1IPO%E8%BC%94%E5%B0%8E%E5%82%99%E6%A1%88",
+          "published_at": "2026-05-30T11:13:00+08:00",
+          "section": "中國財經",
+          "novelty_score": 6,
+          "relevance_score": 8,
+          "urgency_score": 7,
+          "named_entities": [
+            {
+              "name": "稀宇科技(MiniMax)",
+              "type": "company"
+            },
+            {
+              "name": "中信證券",
+              "type": "company"
+            },
+            {
+              "name": "A股",
+              "type": "index"
+            }
+          ],
+          "key_points": [
+            "稀宇科技於5月29日與中信證券簽署輔導協議，正式啟動A股IPO進程。",
+            "該公司IPO輔導備案標誌著其上市準備進入實質階段。",
+            "MiniMax此次A股IPO動向備受市場關注。"
+          ],
+          "content_truncated": false,
+          "original_content_length_chars": 58,
+          "analyzed_content_length_chars": 58,
+          "original_content_token_estimate": 15,
+          "analyzed_content_token_estimate": 15,
+          "truncation_reason": null,
+          "analysis_method": "full_text",
+          "attention_tier": "high",
+          "theme": "stocks",
+          "attention_reason": "Article mentions a company starting IPO preparations.",
+          "must_keep": true,
+          "model_used": "meta-llama/llama-4-scout-17b-16e-instruct",
+          "delayed_retry_attempted": false,
+          "delayed_retry_model_chain": [],
+          "delayed_retry_final_model": null,
+          "error_classification": null,
+          "error": null
+        }
+      ],
+      "subgroups": [
+        {
+          "title": "中國財經 overview",
+          "theme_rationale": "Single subgroup because the category size did not require thematic splitting.",
+          "article_count": 4,
+          "key_developments": [
+            "中國商務部警告歐方若採取歧視性限制，中方將堅決反制。",
+            "德勤中國成立「專精特新賦能中心」，響應國家創新驅動發展戰略。",
+            "百勝餐飲集團與LongRange Capital進行獨家談判，出售必勝客連鎖業務。",
+            "稀宇科技於5月29日與中信證券簽署輔導協議，正式啟動A股IPO進程。"
+          ],
+          "named_entities": [
+            {
+              "name": "中國商務部",
+              "type": "institution"
+            },
+            {
+              "name": "歐盟委員會",
+              "type": "institution"
+            },
+            {
+              "name": "中方",
+              "type": "country"
+            },
+            {
+              "name": "歐方",
+              "type": "country"
+            },
+            {
+              "name": "德勤中國",
+              "type": "company"
+            }
+          ],
+          "articles": [
+            {
+              "source_article_id": "4416491",
+              "title": "中國商務部:歐方若採取歧視性限制中方將堅決反制",
+              "canonical_url": "https://www.hkej.com/instantnews/china/article/4416491/%E4%B8%AD%E5%9C%8B%E5%95%86%E5%8B%99%E9%83%A8%3A%E6%AD%90%E6%96%B9%E8%8B%A5%E6%8E%A1%E5%8F%96%E6%AD%A7%E8%A6%96%E6%80%A7%E9%99%90%E5%88%B6%E4%B8%AD%E6%96%B9%E5%B0%87%E5%A0%85%E6%B1%BA%E5%8F%8D%E5%88%B6",
+              "published_at": "2026-05-30T16:59:00+08:00",
+              "section": "中國財經",
+              "novelty_score": 6,
+              "relevance_score": 8,
+              "urgency_score": 7,
+              "named_entities": [
+                {
+                  "name": "中國商務部",
+                  "type": "institution"
+                },
+                {
+                  "name": "歐盟委員會",
+                  "type": "institution"
+                },
+                {
+                  "name": "中方",
+                  "type": "country"
+                },
+                {
+                  "name": "歐方",
+                  "type": "country"
+                }
+              ],
+              "key_points": [
+                "中國商務部警告歐方若採取歧視性限制，中方將堅決反制。",
+                "中歐是平等和互惠互利的重要經貿夥伴。",
+                "商務部希望歐方遵守世貿組織規則，堅持自由貿易和公平競爭。"
+              ],
+              "content_truncated": false,
+              "original_content_length_chars": 236,
+              "analyzed_content_length_chars": 236,
+              "original_content_token_estimate": 59,
+              "analyzed_content_token_estimate": 59,
+              "truncation_reason": null,
+              "analysis_method": "full_text",
+              "attention_tier": "high",
+              "theme": "geopolitics",
+              "attention_reason": "Article mentions potential trade restrictions and China's response.",
+              "must_keep": true,
+              "model_used": "meta-llama/llama-4-scout-17b-16e-instruct",
+              "delayed_retry_attempted": false,
+              "delayed_retry_model_chain": [],
+              "delayed_retry_final_model": null,
+              "error_classification": null,
+              "error": null
+            },
+            {
+              "source_article_id": "4416488",
+              "title": "德勤中國成立專精特新賦能中心",
+              "canonical_url": "https://www.hkej.com/instantnews/china/article/4416488/%E5%BE%B7%E5%8B%A4%E4%B8%AD%E5%9C%8B%E6%88%90%E7%AB%8B%E5%B0%88%E7%B2%BE%E7%89%B9%E6%96%B0%E8%B3%A6%E8%83%BD%E4%B8%AD%E5%BF%83",
+              "published_at": "2026-05-30T16:04:00+08:00",
+              "section": "中國財經",
+              "novelty_score": 6,
+              "relevance_score": 7,
+              "urgency_score": 4,
+              "named_entities": [
+                {
+                  "name": "德勤中國",
+                  "type": "company"
+                },
+                {
+                  "name": "雁棲湖創新大會",
+                  "type": "institution"
+                }
+              ],
+              "key_points": [
+                "德勤中國成立「專精特新賦能中心」，響應國家創新驅動發展戰略。",
+                "賦能中心將提供多維度、可落地的解決方案，助力企業在戰略規劃、資本對接、技術創新等方面發展。",
+                "中心模式聚焦企業核心需求，打造覆蓋企業全生命周期、平台化、可持續的綜合賦能體系。"
+              ],
+              "content_truncated": false,
+              "original_content_length_chars": 271,
+              "analyzed_content_length_chars": 271,
+              "original_content_token_estimate": 68,
+              "analyzed_content_token_estimate": 68,
+              "truncation_reason": null,
+              "analysis_method": "full_text",
+              "attention_tier": "medium",
+              "theme": "general",
+              "attention_reason": "Article appears to be a corporate announcement without significant market-moving potential.",
+              "must_keep": true,
+              "model_used": "meta-llama/llama-4-scout-17b-16e-instruct",
+              "delayed_retry_attempted": false,
+              "delayed_retry_model_chain": [],
+              "delayed_retry_final_model": null,
+              "error_classification": null,
+              "error": null
+            },
+            {
+              "source_article_id": "4416483",
+              "title": "出售必勝客 百勝據悉與LongRange獨家談判",
+              "canonical_url": "https://www.hkej.com/instantnews/china/article/4416483/%E5%87%BA%E5%94%AE%E5%BF%85%E5%8B%9D%E5%AE%A2+%E7%99%BE%E5%8B%9D%E6%93%9A%E6%82%89%E8%88%87LongRange%E7%8D%A8%E5%AE%B6%E8%AB%87%E5%88%A4",
+              "published_at": "2026-05-30T13:25:00+08:00",
+              "section": "中國財經",
+              "novelty_score": 8,
+              "relevance_score": 9,
+              "urgency_score": 7,
+              "named_entities": [
+                {
+                  "name": "百勝餐飲集團",
+                  "type": "company"
+                },
+                {
+                  "name": "LongRange Capital",
+                  "type": "company"
+                },
+                {
+                  "name": "必勝客",
+                  "type": "company"
+                }
+              ],
+              "key_points": [
+                "百勝餐飲集團與LongRange Capital進行獨家談判，出售必勝客連鎖業務。",
+                "LongRange近日擊敗其他競標者，雙方可能在幾周內達成協議。",
+                "百勝去年展開戰略評估，審視必勝客業務。"
+              ],
+              "content_truncated": false,
+              "original_content_length_chars": 271,
+              "analyzed_content_length_chars": 271,
+              "original_content_token_estimate": 68,
+              "analyzed_content_token_estimate": 68,
+              "truncation_reason": null,
+              "analysis_method": "full_text",
+              "attention_tier": "medium",
+              "theme": "stocks",
+              "attention_reason": "Article mentions a potential sale of a business unit.",
+              "must_keep": true,
+              "model_used": "meta-llama/llama-4-scout-17b-16e-instruct",
+              "delayed_retry_attempted": false,
+              "delayed_retry_model_chain": [],
+              "delayed_retry_final_model": null,
+              "error_classification": null,
+              "error": null
+            },
+            {
+              "source_article_id": "4416478",
+              "title": "稀宇科技啟動A股IPO輔導備案",
+              "canonical_url": "https://www.hkej.com/instantnews/china/article/4416478/%E7%A8%80%E5%AE%87%E7%A7%91%E6%8A%80%E5%95%9F%E5%8B%95A%E8%82%A1IPO%E8%BC%94%E5%B0%8E%E5%82%99%E6%A1%88",
+              "published_at": "2026-05-30T11:13:00+08:00",
+              "section": "中國財經",
+              "novelty_score": 6,
+              "relevance_score": 8,
+              "urgency_score": 7,
+              "named_entities": [
+                {
+                  "name": "稀宇科技(MiniMax)",
+                  "type": "company"
+                },
+                {
+                  "name": "中信證券",
+                  "type": "company"
+                },
+                {
+                  "name": "A股",
+                  "type": "index"
+                }
+              ],
+              "key_points": [
+                "稀宇科技於5月29日與中信證券簽署輔導協議，正式啟動A股IPO進程。",
+                "該公司IPO輔導備案標誌著其上市準備進入實質階段。",
+                "MiniMax此次A股IPO動向備受市場關注。"
+              ],
+              "content_truncated": false,
+              "original_content_length_chars": 58,
+              "analyzed_content_length_chars": 58,
+              "original_content_token_estimate": 15,
+              "analyzed_content_token_estimate": 15,
+              "truncation_reason": null,
+              "analysis_method": "full_text",
+              "attention_tier": "high",
+              "theme": "stocks",
+              "attention_reason": "Article mentions a company starting IPO preparations.",
+              "must_keep": true,
+              "model_used": "meta-llama/llama-4-scout-17b-16e-instruct",
+              "delayed_retry_attempted": false,
+              "delayed_retry_model_chain": [],
+              "delayed_retry_final_model": null,
+              "error_classification": null,
+              "error": null
+            }
+          ],
+          "model_used": "meta-llama/llama-4-scout-17b-16e-instruct"
+        }
+      ],
+      "analysis_profile": "standard",
+      "model_used": "meta-llama/llama-4-scout-17b-16e-instruct",
+      "sub_batch_count": 1,
+      "diagnostics": {
+        "sub_batch_count": 1,
+        "split_reasons": [],
+        "models_attempted": [],
+        "estimated_input_tokens_max": 0,
+        "serialized_request_bytes_max": 0,
+        "rate_limit_waits": 0,
+        "partial_article_count": 0,
+        "synthesis_wait_seconds_total": 0.0,
+        "synthesis_retry_count": 0,
+        "synthesis_retry_skipped_count": 0,
+        "synthesis_budget_exhausted": false,
+        "degraded_merge_used": false,
+        "degraded_merge_reason": "",
+        "synthesis_merge_depth_max": 0,
+        "model_switches": []
+      },
+      "error": null
+    },
+    {
+      "category": "即巿股評",
+      "article_count": 1,
+      "status": "success",
+      "key_developments": [
+        "聯想集團股價在公布季績後飆升近三成，收市漲約22%，5個交易日進賬82.5%，整月計股價翻倍有餘。",
+        "戴爾股價再刷新高，因盈利勝預期及AI伺服器需求佳。",
+        "恒指市盈率不足13倍，相對其他主要市場指數如上證指數、南韓KOSPI指數等偏低。"
+      ],
+      "named_entities": [
+        {
+          "name": "聯想集團",
+          "type": "company"
+        },
+        {
+          "name": "戴爾",
+          "type": "company"
+        }
+      ],
+      "articles": [
+        {
+          "source_article_id": "4416472",
+          "title": "EJFQ信析丨五窮有驚無險 暫無六絕之慮",
+          "canonical_url": "https://www.hkej.com/instantnews/market/article/4416472/EJFQ%E4%BF%A1%E6%9E%90%E4%B8%A8%E4%BA%94%E7%AA%AE%E6%9C%89%E9%A9%9A%E7%84%A1%E9%9A%AA+%E6%9A%AB%E7%84%A1%E5%85%AD%E7%B5%95%E4%B9%8B%E6%85%AE",
+          "published_at": "2026-05-30T07:35:00+08:00",
+          "section": "即巿股評",
+          "novelty_score": 6,
+          "relevance_score": 8,
+          "urgency_score": 5,
+          "named_entities": [
+            {
+              "name": "聯想集團",
+              "type": "company"
+            },
+            {
+              "name": "戴爾",
+              "type": "company"
+            },
+            {
+              "name": "Snowflake",
+              "type": "company"
+            },
+            {
+              "name": "思科系統",
+              "type": "company"
+            },
+            {
+              "name": "英特爾",
+              "type": "company"
+            }
+          ],
+          "key_points": [
+            "聯想集團股價在公布季績後飆升近三成，收市漲約22%，5個交易日進賬82.5%，整月計股價翻倍有餘。",
+            "戴爾股價再刷新高，因盈利勝預期及AI伺服器需求佳。",
+            "恒指市盈率不足13倍，相對其他主要市場指數如上證指數、南韓KOSPI指數等偏低。"
+          ],
+          "content_truncated": false,
+          "original_content_length_chars": 1048,
+          "analyzed_content_length_chars": 1048,
+          "original_content_token_estimate": 262,
+          "analyzed_content_token_estimate": 262,
+          "truncation_reason": null,
+          "analysis_method": "full_text",
+          "attention_tier": "medium",
+          "theme": "general",
+          "attention_reason": "Default medium attention because the story is relevant but not an obvious top-priority market mover.",
+          "must_keep": false,
+          "model_used": "meta-llama/llama-4-scout-17b-16e-instruct",
+          "delayed_retry_attempted": false,
+          "delayed_retry_model_chain": [],
+          "delayed_retry_final_model": null,
+          "error_classification": null,
+          "error": null
+        }
+      ],
+      "subgroups": [
+        {
+          "title": "即巿股評 overview",
+          "theme_rationale": "Single subgroup because the category size did not require thematic splitting.",
+          "article_count": 1,
+          "key_developments": [
+            "聯想集團股價在公布季績後飆升近三成，收市漲約22%，5個交易日進賬82.5%，整月計股價翻倍有餘。",
+            "戴爾股價再刷新高，因盈利勝預期及AI伺服器需求佳。",
+            "恒指市盈率不足13倍，相對其他主要市場指數如上證指數、南韓KOSPI指數等偏低。"
+          ],
+          "named_entities": [
+            {
+              "name": "聯想集團",
+              "type": "company"
+            },
+            {
+              "name": "戴爾",
+              "type": "company"
+            }
+          ],
+          "articles": [
+            {
+              "source_article_id": "4416472",
+              "title": "EJFQ信析丨五窮有驚無險 暫無六絕之慮",
+              "canonical_url": "https://www.hkej.com/instantnews/market/article/4416472/EJFQ%E4%BF%A1%E6%9E%90%E4%B8%A8%E4%BA%94%E7%AA%AE%E6%9C%89%E9%A9%9A%E7%84%A1%E9%9A%AA+%E6%9A%AB%E7%84%A1%E5%85%AD%E7%B5%95%E4%B9%8B%E6%85%AE",
+              "published_at": "2026-05-30T07:35:00+08:00",
+              "section": "即巿股評",
+              "novelty_score": 6,
+              "relevance_score": 8,
+              "urgency_score": 5,
+              "named_entities": [
+                {
+                  "name": "聯想集團",
+                  "type": "company"
+                },
+                {
+                  "name": "戴爾",
+                  "type": "company"
+                },
+                {
+                  "name": "Snowflake",
+                  "type": "company"
+                },
+                {
+                  "name": "思科系統",
+                  "type": "company"
+                },
+                {
+                  "name": "英特爾",
+                  "type": "company"
+                }
+              ],
+              "key_points": [
+                "聯想集團股價在公布季績後飆升近三成，收市漲約22%，5個交易日進賬82.5%，整月計股價翻倍有餘。",
+                "戴爾股價再刷新高，因盈利勝預期及AI伺服器需求佳。",
+                "恒指市盈率不足13倍，相對其他主要市場指數如上證指數、南韓KOSPI指數等偏低。"
+              ],
+              "content_truncated": false,
+              "original_content_length_chars": 1048,
+              "analyzed_content_length_chars": 1048,
+              "original_content_token_estimate": 262,
+              "analyzed_content_token_estimate": 262,
+              "truncation_reason": null,
+              "analysis_method": "full_text",
+              "attention_tier": "medium",
+              "theme": "general",
+              "attention_reason": "Default medium attention because the story is relevant but not an obvious top-priority market mover.",
+              "must_keep": false,
+              "model_used": "meta-llama/llama-4-scout-17b-16e-instruct",
+              "delayed_retry_attempted": false,
+              "delayed_retry_model_chain": [],
+              "delayed_retry_final_model": null,
+              "error_classification": null,
+              "error": null
+            }
+          ],
+          "model_used": "meta-llama/llama-4-scout-17b-16e-instruct"
+        }
+      ],
+      "analysis_profile": "standard",
+      "model_used": "meta-llama/llama-4-scout-17b-16e-instruct",
+      "sub_batch_count": 1,
+      "diagnostics": {
+        "sub_batch_count": 1,
+        "split_reasons": [],
+        "models_attempted": [],
+        "estimated_input_tokens_max": 0,
+        "serialized_request_bytes_max": 0,
+        "rate_limit_waits": 0,
+        "partial_article_count": 0,
+        "synthesis_wait_seconds_total": 0.0,
+        "synthesis_retry_count": 0,
+        "synthesis_retry_skipped_count": 0,
+        "synthesis_budget_exhausted": false,
+        "degraded_merge_used": false,
+        "degraded_merge_reason": "",
+        "synthesis_merge_depth_max": 0,
+        "model_switches": []
+      },
+      "error": null
+    },
+    {
+      "category": "地產新聞",
+      "article_count": 2,
+      "status": "success",
+      "key_developments": [
+        "名日．九肚山一單位以1977.5萬元成交，呎價約16302元。",
+        "長實發展的名日．九肚山項目自開售以來累售237伙，套現逾37億元。",
+        "新地發展的形瑨第四輪銷售52伙單位即日沽清，項目累售419伙。"
+      ],
+      "named_entities": [
+        {
+          "name": "長實",
+          "type": "company"
+        },
+        {
+          "name": "名日．九肚山",
+          "type": "asset"
+        },
+        {
+          "name": "新地",
+          "type": "company"
+        },
+        {
+          "name": "譚錫湛",
+          "type": "person"
+        }
+      ],
+      "articles": [
+        {
+          "source_article_id": "4416495",
+          "title": "新盤丨名日．九肚山4房海景戶逾1977萬沽出",
+          "canonical_url": "https://www.hkej.com/instantnews/property/article/4416495/%E6%96%B0%E7%9B%A4%E4%B8%A8%E5%90%8D%E6%97%A5%EF%BC%8E%E4%B9%9D%E8%82%9A%E5%B1%B14%E6%88%BF%E6%B5%B7%E6%99%AF%E6%88%B6%E9%80%BE1977%E8%90%AC%E6%B2%BD%E5%87%BA",
+          "published_at": "2026-05-30T17:57:00+08:00",
+          "section": "新盤情報",
+          "novelty_score": 4,
+          "relevance_score": 7,
+          "urgency_score": 5,
+          "named_entities": [
+            {
+              "name": "長實",
+              "type": "company"
+            },
+            {
+              "name": "名日．九肚山",
+              "type": "asset"
+            },
+            {
+              "name": "沙田九肚",
+              "type": "other"
+            }
+          ],
+          "key_points": [
+            "成交單位為第1座8樓A室，成交價1977.5萬元，成交呎價約16302元。",
+            "項目自開售以來累售237伙，套現逾37億元。"
+          ],
+          "content_truncated": false,
+          "original_content_length_chars": 238,
+          "analyzed_content_length_chars": 238,
+          "original_content_token_estimate": 60,
+          "analyzed_content_token_estimate": 60,
+          "truncation_reason": null,
+          "analysis_method": "full_text",
+          "attention_tier": "medium",
+          "theme": "general",
+          "attention_reason": "Default medium attention because the story is relevant but not an obvious top-priority market mover.",
+          "must_keep": false,
+          "model_used": "meta-llama/llama-4-scout-17b-16e-instruct",
+          "delayed_retry_attempted": false,
+          "delayed_retry_model_chain": [],
+          "delayed_retry_final_model": null,
+          "error_classification": null,
+          "error": null
+        },
+        {
+          "source_article_id": "4416485",
+          "title": "新盤丨形瑨第四輪賣52伙即日沽清",
+          "canonical_url": "https://www.hkej.com/instantnews/property/article/4416485/%E6%96%B0%E7%9B%A4%E4%B8%A8%E5%BD%A2%E7%91%A8%E7%AC%AC%E5%9B%9B%E8%BC%AA%E8%B3%A352%E4%BC%99%E5%8D%B3%E6%97%A5%E6%B2%BD%E6%B8%85",
+          "published_at": "2026-05-30T14:32:00+08:00",
+          "section": "新盤情報",
+          "novelty_score": 6,
+          "relevance_score": 8,
+          "urgency_score": 5,
+          "named_entities": [
+            {
+              "name": "新地",
+              "type": "company"
+            },
+            {
+              "name": "譚錫湛",
+              "type": "person"
+            }
+          ],
+          "key_points": [
+            "新地發展的荃灣橫窩仔街重建項目形瑨第四輪銷售52伙單位即日沽清",
+            "項目累售419伙，所有價單單位全部售罄，尚餘43伙三房及特色單位招標中"
+          ],
+          "content_truncated": false,
+          "original_content_length_chars": 179,
+          "analyzed_content_length_chars": 179,
+          "original_content_token_estimate": 45,
+          "analyzed_content_token_estimate": 45,
+          "truncation_reason": null,
+          "analysis_method": "full_text",
+          "attention_tier": "medium",
+          "theme": "general",
+          "attention_reason": "Default medium attention because the story is relevant but not an obvious top-priority market mover.",
+          "must_keep": false,
+          "model_used": "meta-llama/llama-4-scout-17b-16e-instruct",
+          "delayed_retry_attempted": false,
+          "delayed_retry_model_chain": [],
+          "delayed_retry_final_model": null,
+          "error_classification": null,
+          "error": null
+        }
+      ],
+      "subgroups": [
+        {
+          "title": "地產新聞 overview",
+          "theme_rationale": "Single subgroup because the category size did not require thematic splitting.",
+          "article_count": 2,
+          "key_developments": [
+            "名日．九肚山一單位以1977.5萬元成交，呎價約16302元。",
+            "長實發展的名日．九肚山項目自開售以來累售237伙，套現逾37億元。",
+            "新地發展的形瑨第四輪銷售52伙單位即日沽清，項目累售419伙。"
+          ],
+          "named_entities": [
+            {
+              "name": "長實",
+              "type": "company"
+            },
+            {
+              "name": "名日．九肚山",
+              "type": "asset"
+            },
+            {
+              "name": "新地",
+              "type": "company"
+            },
+            {
+              "name": "譚錫湛",
+              "type": "person"
+            }
+          ],
+          "articles": [
+            {
+              "source_article_id": "4416495",
+              "title": "新盤丨名日．九肚山4房海景戶逾1977萬沽出",
+              "canonical_url": "https://www.hkej.com/instantnews/property/article/4416495/%E6%96%B0%E7%9B%A4%E4%B8%A8%E5%90%8D%E6%97%A5%EF%BC%8E%E4%B9%9D%E8%82%9A%E5%B1%B14%E6%88%BF%E6%B5%B7%E6%99%AF%E6%88%B6%E9%80%BE1977%E8%90%AC%E6%B2%BD%E5%87%BA",
+              "published_at": "2026-05-30T17:57:00+08:00",
+              "section": "新盤情報",
+              "novelty_score": 4,
+              "relevance_score": 7,
+              "urgency_score": 5,
+              "named_entities": [
+                {
+                  "name": "長實",
+                  "type": "company"
+                },
+                {
+                  "name": "名日．九肚山",
+                  "type": "asset"
+                },
+                {
+                  "name": "沙田九肚",
+                  "type": "other"
+                }
+              ],
+              "key_points": [
+                "成交單位為第1座8樓A室，成交價1977.5萬元，成交呎價約16302元。",
+                "項目自開售以來累售237伙，套現逾37億元。"
+              ],
+              "content_truncated": false,
+              "original_content_length_chars": 238,
+              "analyzed_content_length_chars": 238,
+              "original_content_token_estimate": 60,
+              "analyzed_content_token_estimate": 60,
+              "truncation_reason": null,
+              "analysis_method": "full_text",
+              "attention_tier": "medium",
+              "theme": "general",
+              "attention_reason": "Default medium attention because the story is relevant but not an obvious top-priority market mover.",
+              "must_keep": false,
+              "model_used": "meta-llama/llama-4-scout-17b-16e-instruct",
+              "delayed_retry_attempted": false,
+              "delayed_retry_model_chain": [],
+              "delayed_retry_final_model": null,
+              "error_classification": null,
+              "error": null
+            },
+            {
+              "source_article_id": "4416485",
+              "title": "新盤丨形瑨第四輪賣52伙即日沽清",
+              "canonical_url": "https://www.hkej.com/instantnews/property/article/4416485/%E6%96%B0%E7%9B%A4%E4%B8%A8%E5%BD%A2%E7%91%A8%E7%AC%AC%E5%9B%9B%E8%BC%AA%E8%B3%A352%E4%BC%99%E5%8D%B3%E6%97%A5%E6%B2%BD%E6%B8%85",
+              "published_at": "2026-05-30T14:32:00+08:00",
+              "section": "新盤情報",
+              "novelty_score": 6,
+              "relevance_score": 8,
+              "urgency_score": 5,
+              "named_entities": [
+                {
+                  "name": "新地",
+                  "type": "company"
+                },
+                {
+                  "name": "譚錫湛",
+                  "type": "person"
+                }
+              ],
+              "key_points": [
+                "新地發展的荃灣橫窩仔街重建項目形瑨第四輪銷售52伙單位即日沽清",
+                "項目累售419伙，所有價單單位全部售罄，尚餘43伙三房及特色單位招標中"
+              ],
+              "content_truncated": false,
+              "original_content_length_chars": 179,
+              "analyzed_content_length_chars": 179,
+              "original_content_token_estimate": 45,
+              "analyzed_content_token_estimate": 45,
+              "truncation_reason": null,
+              "analysis_method": "full_text",
+              "attention_tier": "medium",
+              "theme": "general",
+              "attention_reason": "Default medium attention because the story is relevant but not an obvious top-priority market mover.",
+              "must_keep": false,
+              "model_used": "meta-llama/llama-4-scout-17b-16e-instruct",
+              "delayed_retry_attempted": false,
+              "delayed_retry_model_chain": [],
+              "delayed_retry_final_model": null,
+              "error_classification": null,
+              "error": null
+            }
+          ],
+          "model_used": "meta-llama/llama-4-scout-17b-16e-instruct"
+        }
+      ],
+      "analysis_profile": "light",
+      "model_used": "meta-llama/llama-4-scout-17b-16e-instruct",
+      "sub_batch_count": 3,
+      "diagnostics": {
+        "sub_batch_count": 3,
+        "split_reasons": [],
+        "models_attempted": [
+          "meta-llama/llama-4-scout-17b-16e-instruct"
+        ],
+        "estimated_input_tokens_max": 660,
+        "serialized_request_bytes_max": 3424,
+        "rate_limit_waits": 0,
+        "partial_article_count": 0,
+        "synthesis_wait_seconds_total": 0.0,
+        "synthesis_retry_count": 0,
+        "synthesis_retry_skipped_count": 0,
+        "synthesis_budget_exhausted": false,
+        "degraded_merge_used": false,
+        "degraded_merge_reason": "",
+        "synthesis_merge_depth_max": 0,
+        "model_switches": []
+      },
+      "error": null
+    }
+  ],
+  "errors": []
+}
