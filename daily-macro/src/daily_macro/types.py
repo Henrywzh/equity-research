@@ -258,6 +258,8 @@ class RuntimeDiagnostics:
     key_rotation_count: int = 0
     request_timeout_count: int = 0
     model_decommissioned_count: int = 0
+    daily_budget_skip_count: int = 0
+    daily_budget_tokens_used: int = 0
     avoided_rate_limit_wait_count: int = 0
     avoided_rate_limit_wait_seconds_total: float = 0.0
     degraded_mode_count: int = 0
@@ -287,6 +289,8 @@ class RuntimeDiagnostics:
             "degraded_merge_count": self.degraded_merge_count,
             "request_timeout_count": self.request_timeout_count,
             "model_decommissioned_count": self.model_decommissioned_count,
+            "daily_budget_skip_count": self.daily_budget_skip_count,
+            "daily_budget_tokens_used": self.daily_budget_tokens_used,
             "avoided_rate_limit_wait_count": self.avoided_rate_limit_wait_count,
             "avoided_rate_limit_wait_seconds_total": round(self.avoided_rate_limit_wait_seconds_total, 3),
             "degraded_mode_count": self.degraded_mode_count,

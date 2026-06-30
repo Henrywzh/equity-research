@@ -108,6 +108,7 @@ from .prompts import (  # noqa: E402
 )
 
 from .model_registry import build_model_pool  # noqa: E402
+from .budget import DailyBudgetLedger  # noqa: E402
 
 # ---------------------------------------------------------------------------
 # Patch AnalysisRuntime methods to look up helpers through this module's
@@ -252,11 +253,14 @@ def _graph_initialize(state: AnalysisGraphState) -> AnalysisGraphState:
         LOGGER.info("Loaded %d Groq API key(s).", len(groq_keys))
         pool = build_model_pool(groq_keys, data_dir=state.get("data_dir"))
         fallback_chain = [ModelConfig(PRIMARY_MODEL_ID), *(ModelConfig(model_id) for model_id in FALLBACK_MODEL_IDS)]
+        budget = DailyBudgetLedger.load(state.get("data_dir"))
+        model_limits = {model_id: cap.limits for model_id, cap in pool.capabilities.items() if cap.limits}
         runtime = AnalysisRuntime(
             groq_api_keys=groq_keys,
-            governor=RateLimitGovernor(),
+            governor=RateLimitGovernor(model_limits=model_limits),
             model_chain=pool.models or fallback_chain,
             resolver=ModelResolver(active_model_ids=pool.active_ids, capabilities=pool.capabilities),
+            budget=budget,
             delayed_retry_final_model=ModelConfig(
                 DELAYED_RETRY_FINAL_MODEL_ID,
                 provider="openai",

@@ -9,7 +9,7 @@ import pytest
 
 from daily_macro import model_registry as mr
 from daily_macro.llm_client import AnalysisRuntime, LLMTask, ModelResolver, RateLimitGovernor
-from daily_macro.model_catalog import heuristic_scores, infer_kind
+from daily_macro.model_catalog import get_capability, heuristic_scores, infer_kind
 from daily_macro.model_registry import FLOOR_MODEL_ID, build_model_pool
 from daily_macro.types import ModelConfig
 
@@ -162,6 +162,59 @@ def test_bulk_task_falls_back_to_premium_when_nothing_else():
         requested_output_tokens=300,
     ).model.model_id
     assert chosen in {"openai/gpt-oss-120b", "openai/gpt-oss-20b"}
+
+
+# --------------------------------------------------------------------------- #
+# Daily-budget gate + reservation
+# --------------------------------------------------------------------------- #
+
+def test_resolver_skips_budget_exhausted_model(monkeypatch, tmp_data_dir):
+    _patch_live(monkeypatch, None)  # full catalog pool
+    pool = build_model_pool(["k"], data_dir=tmp_data_dir)
+    resolver = ModelResolver(
+        active_model_ids=pool.active_ids,
+        capabilities=pool.capabilities,
+        model_policy="production_only",
+    )
+    # gpt-oss-120b is the synthesis winner, but its remaining daily budget can't
+    # cover this call -> it must be skipped, not selected.
+    selection = resolver.resolve(
+        LLMTask.CATEGORY_SYNTHESIS,
+        pool.models,
+        estimated_input_tokens=500,
+        requested_output_tokens=500,
+        preferred_model_id=FLOOR_MODEL_ID,
+        budget_remaining={"openai/gpt-oss-120b": 100},  # < 1000 needed
+    )
+    assert selection.model.model_id != "openai/gpt-oss-120b"
+    assert any(r["reason"] == "daily_budget_exhausted" for r in selection.rejections)
+
+
+def test_resolver_reservation_relaxes_with_ample_budget():
+    caps = {
+        "openai/gpt-oss-120b": get_capability("openai/gpt-oss-120b"),
+        "llama-3.1-8b-instant": get_capability("llama-3.1-8b-instant"),
+    }
+    resolver = ModelResolver(
+        active_model_ids=set(caps),
+        capabilities=caps,
+        model_policy="production_only",
+    )
+    chain = [ModelConfig("llama-3.1-8b-instant"), ModelConfig("openai/gpt-oss-120b")]
+
+    def pick(premium_remaining):
+        return resolver.resolve(
+            LLMTask.ARTICLE_ANALYSIS,
+            chain,
+            estimated_input_tokens=300,
+            requested_output_tokens=300,
+            budget_remaining={"openai/gpt-oss-120b": premium_remaining, "llama-3.1-8b-instant": 500000},
+        ).model.model_id
+
+    # Ample premium daily budget (above the reserve floor): bulk may use premium.
+    assert pick(200000) == "openai/gpt-oss-120b"
+    # Premium budget below the reserve floor: reservation defers bulk to the floor.
+    assert pick(1000) == "llama-3.1-8b-instant"
 
 
 # --------------------------------------------------------------------------- #

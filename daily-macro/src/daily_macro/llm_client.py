@@ -26,6 +26,7 @@ from typing import Any
 
 import requests
 
+from .budget import UNLIMITED, DailyBudgetLedger
 from .config import get_project_root
 from .model_catalog import ModelCapability, get_capability
 from .types import (
@@ -84,6 +85,11 @@ PREMIUM_SYNTHESIS_THRESHOLD = 0.85
 # non-premium model with headroom outranks it, small enough that a premium model
 # is still chosen over sleeping on a rate-limited one.
 PREMIUM_BULK_PENALTY = 0.6
+# Fraction of a premium model's declared daily token budget held in reserve for
+# high-value tasks: while remaining daily budget is above this floor, bulk work
+# may use the premium model; below it, the bulk-reservation penalty kicks in so
+# the remainder is saved for synthesis/top-alerts/critic.
+RESERVE_FRACTION = 0.25
 
 
 def _resolve_max_wait_seconds(explicit: float | None = None) -> float:
@@ -134,6 +140,7 @@ class ModelResolver:
         requested_output_tokens: int,
         rate_limit_waits: dict[str, float] | None = None,
         preferred_model_id: str | None = None,
+        budget_remaining: dict[str, float] | None = None,
     ) -> ModelSelection:
         task_value = task.value if isinstance(task, LLMTask) else str(task)
         task_preferences = self.task_preferences(task_value)
@@ -142,6 +149,7 @@ class ModelResolver:
         scored: list[tuple[float, int, ModelConfig, float]] = []
         wait_eligible: list[tuple[float, int, ModelConfig]] = []
         rate_limit_waits = rate_limit_waits or {}
+        needed_tokens = estimated_input_tokens + requested_output_tokens
 
         for index, model in enumerate(model_chain):
             capability = self.capability_for(model)
@@ -161,6 +169,16 @@ class ModelResolver:
             if requested_output_tokens > output_cap:
                 rejections.append({"model_id": model.model_id, "reason": "output_limit_exceeded"})
                 continue
+            # Hard daily-budget gate: skip a model whose remaining TPD can't cover
+            # this call rather than stalling on it. The floor model has a huge
+            # daily budget and is always in the pool, so gating never strands the
+            # run. budget_remaining is per the current key; UNLIMITED when the
+            # model's TPD is unknown (no gating).
+            if budget_remaining is not None:
+                remaining_budget = budget_remaining.get(model.model_id, UNLIMITED)
+                if remaining_budget < needed_tokens:
+                    rejections.append({"model_id": model.model_id, "reason": "daily_budget_exhausted"})
+                    continue
             wait_seconds = rate_limit_waits.get(model.model_id, 0.0)
             # Passed every hard constraint (policy, active, json, context,
             # output). Remember it as a fallback that respects those constraints
@@ -185,7 +203,15 @@ class ModelResolver:
             reservation_penalty = 0.0
             is_premium = capability.task_scores.get("category_synthesis", 0.0) >= PREMIUM_SYNTHESIS_THRESHOLD
             if is_premium and not is_high_value and model.model_id not in task_preferences:
-                reservation_penalty = PREMIUM_BULK_PENALTY
+                # Budget-aware reservation: while the premium model still has
+                # ample daily budget, bulk work may use it; once remaining drops
+                # below the reserve floor (or with no budget signal at all), apply
+                # the penalty so the remainder is held for high-value tasks.
+                declared_tpd = capability.limits.get("tpd")
+                remaining_budget = budget_remaining.get(model.model_id) if budget_remaining else None
+                reserve_floor = RESERVE_FRACTION * declared_tpd if declared_tpd else None
+                if remaining_budget is None or reserve_floor is None or remaining_budget < reserve_floor:
+                    reservation_penalty = PREMIUM_BULK_PENALTY
             scored.append(
                 (
                     task_score + preferred_bonus + preference_bonus - wait_penalty - order_penalty - reservation_penalty,
@@ -571,15 +597,37 @@ def _load_model_api_key(model: ModelConfig) -> str:
 
 
 class RateLimitGovernor:
-    def __init__(self, *, time_fn=time.monotonic, sleep_fn=time.sleep, max_wait_seconds: float | None = None):
+    def __init__(
+        self,
+        *,
+        time_fn=time.monotonic,
+        sleep_fn=time.sleep,
+        max_wait_seconds: float | None = None,
+        model_limits: dict[str, dict[str, int]] | None = None,
+    ):
         self._time_fn = time_fn
         self._sleep_fn = sleep_fn
         self.max_wait_seconds = _resolve_max_wait_seconds(max_wait_seconds)
+        # Declared per-model limits (rpm/rpd/tpm/tpd) from the catalog, used to
+        # pre-seed per-minute headroom before any response header is observed.
+        self.model_limits = model_limits or {}
         # Keyed by (model_id, key_index) to track rate limits per API key independently.
         self._states: dict[tuple[str, int], ModelRateLimitState] = {}
 
     def _state(self, model_id: str, key_index: int) -> ModelRateLimitState:
-        return self._states.setdefault((model_id, key_index), ModelRateLimitState())
+        key = (model_id, key_index)
+        state = self._states.get(key)
+        if state is None:
+            state = ModelRateLimitState()
+            # Pre-seed per-minute token headroom from the declared TPM so the
+            # very first burst on a fresh key can't overshoot before a header is
+            # seen. Real headers overwrite this on the next response.
+            tpm = self.model_limits.get(model_id, {}).get("tpm")
+            if tpm:
+                state.remaining_tokens = int(tpm)
+                state.reset_tokens_at = self._time_fn() + 60.0
+            self._states[key] = state
+        return state
 
     def select_key(
         self,
@@ -749,6 +797,7 @@ class AnalysisRuntime:
     provider_sessions: dict[str, requests.Session] = field(default_factory=dict)
     market_context_string: str = ""
     macro_release_digest: dict[str, Any] = field(default_factory=dict)
+    budget: DailyBudgetLedger = field(default_factory=DailyBudgetLedger)
 
     def __post_init__(self) -> None:
         if self.resolver is None:
@@ -801,6 +850,9 @@ class AnalysisRuntime:
         return True
 
     def close_sessions(self) -> None:
+        # Persist daily token/request usage so budget survives across same-day
+        # runs; best-effort, never blocks teardown.
+        self.budget.flush()
         for session in self.groq_sessions.values():
             session.close()
         self.groq_sessions.clear()
@@ -990,6 +1042,8 @@ class AnalysisRuntime:
         avoided_wait_seconds: float,
     ) -> None:
         for rejection in rejections:
+            if rejection.get("reason") == "daily_budget_exhausted":
+                self.diagnostics.daily_budget_skip_count += 1
             item = {"task": task, **rejection}
             if item not in self.diagnostics.resolver_rejections:
                 self.diagnostics.resolver_rejections.append(item)
@@ -1060,13 +1114,25 @@ def _chat_completion(
             )[1]
             for candidate in candidate_chain
         }
-        selection = (runtime.resolver or ModelResolver()).resolve(
+        resolver = runtime.resolver or ModelResolver()
+        # Remaining daily token budget per candidate on the current key, so the
+        # resolver can skip a TPD-exhausted model and reserve premium capacity.
+        budget_remaining = {
+            candidate.model_id: runtime.budget.remaining_tokens(
+                candidate.model_id,
+                runtime.current_key_index,
+                resolver.capability_for(candidate).limits.get("tpd"),
+            )
+            for candidate in candidate_chain
+        }
+        selection = resolver.resolve(
             task,
             candidate_chain,
             estimated_input_tokens=estimated_input_tokens,
             requested_output_tokens=preferred_model.max_completion_tokens,
             rate_limit_waits=rate_limit_waits,
             preferred_model_id=preferred_model.model_id,
+            budget_remaining=budget_remaining,
         )
         model = selection.model
         runtime.record_resolver_selection(
@@ -1281,6 +1347,13 @@ def _chat_completion(
 
         response.raise_for_status()
         payload = response.json()
+        # Record actual daily token/request usage so budget survives across runs.
+        usage = payload.get("usage") if isinstance(payload, dict) else None
+        used_tokens = (usage or {}).get("total_tokens")
+        if not isinstance(used_tokens, int) or used_tokens <= 0:
+            used_tokens = estimated_input_tokens + model.max_completion_tokens
+        runtime.budget.record(model.model_id, runtime.current_key_index, used_tokens)
+        runtime.diagnostics.daily_budget_tokens_used += used_tokens
         content = payload["choices"][0]["message"]["content"]
         if not isinstance(content, str):
             raise ValueError("Groq response content was not a string.")

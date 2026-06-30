@@ -19,6 +19,7 @@ from daily_macro.analysis import (
     run_analysis,
     select_content_for_analysis,
 )
+from daily_macro.budget import DailyBudgetLedger
 from daily_macro.llm_client import ModelResolver, LLMTask, load_active_groq_model_ids
 from daily_macro.model_catalog import get_capability
 from daily_macro.model_registry import ModelPool
@@ -537,6 +538,49 @@ class AnalysisTests(unittest.TestCase):
         self.assertEqual(slept, [])
         self.assertEqual(runtime.diagnostics.avoided_rate_limit_wait_count, 1)
         self.assertEqual(session.models_used, ["llama-3.3-70b-versatile"])
+
+    def test_chat_completion_records_actual_usage_into_budget(self) -> None:
+        governor = RateLimitGovernor(sleep_fn=lambda _seconds: None)
+        session = _FakeGroqSession(
+            [
+                _FakeResponse(
+                    200,
+                    payload={
+                        "usage": {"total_tokens": 4321},
+                        "choices": [{"message": {"content": json.dumps({"ok": True})}}],
+                    },
+                )
+            ]
+        )
+        ledger = DailyBudgetLedger()
+        runtime = AnalysisRuntime(
+            session=session,
+            governor=governor,
+            model_chain=[ModelConfig("llama-3.1-8b-instant")],
+            resolver=ModelResolver(
+                active_model_ids={"llama-3.1-8b-instant"},
+                model_policy="production_only",
+            ),
+            budget=ledger,
+        )
+
+        payload, _model_used = analysis_module._invoke_json_with_retry(
+            runtime,
+            [{"role": "user", "content": "{}"}],
+            10,
+            analysis_module.BatchContext("test", "article_batch", "1", 1, 10, 100),
+        )
+
+        self.assertEqual(payload, {"ok": True})
+        self.assertEqual(ledger.used_tokens("llama-3.1-8b-instant", 0), 4321)
+        self.assertEqual(runtime.diagnostics.daily_budget_tokens_used, 4321)
+
+    def test_governor_preseeds_remaining_tokens_from_declared_tpm(self) -> None:
+        governor = RateLimitGovernor(model_limits={"m": {"tpm": 5000}})
+        # First contact with the model pre-seeds per-minute headroom from TPM.
+        self.assertEqual(governor._state("m", 0).remaining_tokens, 5000)
+        # A model with no declared TPM is left unconstrained (None) until a header.
+        self.assertIsNone(governor._state("other", 0).remaining_tokens)
 
     def test_generate_top_alerts_uses_structured_schema_and_shared_invocation(self) -> None:
         session = _FakeGroqSession(
@@ -1248,7 +1292,7 @@ class AnalysisTests(unittest.TestCase):
             return_value=False,
         ), patch(
             "daily_macro.analysis.RateLimitGovernor",
-            side_effect=lambda: RateLimitGovernor(sleep_fn=lambda _seconds: None),
+            side_effect=lambda **kwargs: RateLimitGovernor(sleep_fn=lambda _seconds: None),
         ), patch(
             "daily_macro.analysis.time.sleep",
             return_value=None,
@@ -1342,7 +1386,7 @@ class AnalysisTests(unittest.TestCase):
             "daily_macro.analysis._build_groq_session", return_value=session
         ), patch(
             "daily_macro.analysis.RateLimitGovernor",
-            side_effect=lambda: RateLimitGovernor(sleep_fn=lambda _seconds: None),
+            side_effect=lambda **kwargs: RateLimitGovernor(sleep_fn=lambda _seconds: None),
         ), patch(
             "daily_macro.analysis.time.sleep",
             return_value=None,
@@ -1451,7 +1495,7 @@ class AnalysisTests(unittest.TestCase):
             return_value=False,
         ), patch(
             "daily_macro.analysis.RateLimitGovernor",
-            side_effect=lambda: RateLimitGovernor(sleep_fn=lambda _seconds: None),
+            side_effect=lambda **kwargs: RateLimitGovernor(sleep_fn=lambda _seconds: None),
         ), patch(
             "daily_macro.analysis.time.sleep",
             return_value=None,
@@ -1730,7 +1774,7 @@ class AnalysisTests(unittest.TestCase):
             "daily_macro.analysis._build_groq_session", return_value=session
         ), patch(
             "daily_macro.analysis.RateLimitGovernor",
-            side_effect=lambda: RateLimitGovernor(time_fn=lambda: 10.0, sleep_fn=lambda _seconds: None),
+            side_effect=lambda **kwargs: RateLimitGovernor(time_fn=lambda: 10.0, sleep_fn=lambda _seconds: None),
         ):
             report = run_analysis(date_string="2026-04-03", data_dir=self.data_dir, db_path=self.db_path)
 
