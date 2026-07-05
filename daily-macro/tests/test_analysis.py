@@ -2384,5 +2384,79 @@ class AnalysisTests(unittest.TestCase):
         self.assertLessEqual(len(category["articles"][0]["key_points"]), 2)
 
 
+class NormalizeDevelopmentsTests(unittest.TestCase):
+    def test_plain_string_becomes_text_with_no_sources(self):
+        out = analysis_module._normalize_developments(["SoftBank $100B loan"], valid_ids=None, limit=5)
+        self.assertEqual(out, [{"text": "SoftBank $100B loan", "source_article_ids": []}])
+
+    def test_entity_dict_extracts_text_not_repr(self):
+        # Defect 1 regression: a structured entity dict must never leak as str(dict).
+        out = analysis_module._normalize_developments(
+            [{"development": "Micron HBM plant", "figure": "¥1.5tn", "named_company": "Micron"}],
+            valid_ids=None,
+            limit=5,
+        )
+        self.assertEqual(out[0]["text"], "Micron HBM plant")
+        self.assertNotIn("{", out[0]["text"])
+        self.assertNotIn("named_company", out[0]["text"])
+
+    def test_invalid_source_ids_dropped(self):
+        out = analysis_module._normalize_developments(
+            [{"text": "Next buys Harvey Nichols", "source_article_ids": ["A", "HALLUCINATED"]}],
+            valid_ids={"A"},
+            limit=5,
+        )
+        self.assertEqual(out[0]["source_article_ids"], ["A"])
+
+    def test_empty_text_dropped_and_limit_and_dedupe(self):
+        out = analysis_module._normalize_developments(
+            [{"text": ""}, "one", "one", "two", "three"], valid_ids=None, limit=2
+        )
+        self.assertEqual([d["text"] for d in out], ["one", "two"])
+
+    def test_non_list_returns_empty(self):
+        self.assertEqual(analysis_module._normalize_developments("nope", valid_ids=None, limit=3), [])
+
+
+class AlertProvenanceTests(unittest.TestCase):
+    def _run_collector(self, subgroup_extra):
+        captured = {}
+
+        def _capture(*, runtime, market_context, developments, article_metadata, is_incremental):
+            captured["developments"] = developments
+            return []
+
+        articles = [
+            {"source_article_id": "hbm", "canonical_url": "http://x/hbm", "title": "Micron HBM", "published_at": "2026-07-05T00:00:00"},
+            {"source_article_id": "next", "canonical_url": "http://x/next", "title": "Next buys Harvey Nichols", "published_at": "2026-07-05T00:00:00"},
+        ]
+        subgroup = {"title": "Corporate", "articles": articles, "key_developments": ["Micron builds HBM plant", "Next buys Harvey Nichols"]}
+        subgroup.update(subgroup_extra)
+        state = {
+            "runtime": object(),
+            "category_reports": [{"category": "Intl", "subgroups": [subgroup]}],
+            "market_context_string": "",
+            "target_date": "2026-07-05",
+        }
+        with patch.object(analysis_module, "_generate_top_alerts", _capture):
+            analysis_module._graph_summarize_top_alerts(state)
+        return {d["text"]: d["ref_ids"] for d in captured["developments"]}
+
+    def test_per_development_provenance_narrows_ref_ids(self):
+        detailed = [
+            {"text": "Micron builds HBM plant", "source_article_ids": ["hbm"]},
+            {"text": "Next buys Harvey Nichols", "source_article_ids": ["next"]},
+        ]
+        by_text = self._run_collector({"key_developments_detailed": detailed})
+        # Each development is tagged only with its own article, not the whole subgroup.
+        self.assertEqual(by_text["Next buys Harvey Nichols"], ["next"])
+        self.assertEqual(by_text["Micron builds HBM plant"], ["hbm"])
+
+    def test_falls_back_to_subgroup_ref_ids_without_detailed(self):
+        by_text = self._run_collector({})  # no key_developments_detailed
+        # Legacy shape: developments inherit the full subgroup article pool.
+        self.assertEqual(sorted(by_text["Next buys Harvey Nichols"]), ["hbm", "next"])
+
+
 if __name__ == "__main__":
     unittest.main()
