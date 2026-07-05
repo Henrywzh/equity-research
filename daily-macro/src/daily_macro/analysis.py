@@ -418,9 +418,28 @@ def _graph_summarize_top_alerts(state: AnalysisGraphState) -> AnalysisGraphState
                     }
                     ref_ids.append(aid)
             
-            for dev in subgroup.get("key_developments") or []:
-                dev_text = str(dev)
-                # If we are in an incremental run, we should only focus on developments 
+            # Prefer per-development provenance (each development's own source
+            # article ids) so an alert is tagged with the article it actually
+            # came from — not every article in the subgroup. Fall back to the
+            # subgroup-wide ref_ids for older reports or when the model gave no
+            # (valid) ids, so behavior never regresses to empty.
+            detailed = subgroup.get("key_developments_detailed")
+            if detailed:
+                dev_items = [
+                    (
+                        str(dev.get("text") or "").strip(),
+                        [sid for sid in (dev.get("source_article_ids") or []) if sid in ref_ids],
+                    )
+                    for dev in detailed
+                    if isinstance(dev, dict)
+                ]
+            else:
+                dev_items = [(str(dev).strip(), []) for dev in (subgroup.get("key_developments") or [])]
+
+            for dev_text, own_ref_ids in dev_items:
+                if not dev_text:
+                    continue
+                # If we are in an incremental run, we should only focus on developments
                 # that were derived from the newly analyzed articles.
                 if state.get("legacy_executive_summary") and state.get("newly_analyzed_keys"):
                     subgroup_keys = {
@@ -435,7 +454,7 @@ def _graph_summarize_top_alerts(state: AnalysisGraphState) -> AnalysisGraphState
                         "category": cat_name,
                         "subgroup": subgroup_title,
                         "text": dev_text,
-                        "ref_ids": ref_ids,
+                        "ref_ids": own_ref_ids or ref_ids,
                     }
                 )
     
@@ -1024,7 +1043,10 @@ def _merge_category_report(
                     category_name,
                     successful_articles,
                 )
-                key_developments = _normalize_string_list(synthesis_payload.get("key_developments"), limit=profile.category_bullet_limit)
+                key_developments = [
+                    dev["text"]
+                    for dev in _normalize_developments(synthesis_payload.get("key_developments"), valid_ids=None, limit=profile.category_bullet_limit)
+                ]
                 named_entities = _normalize_entities(synthesis_payload.get("named_entities"))[: profile.entity_limit]
                 subgroups = subgroup_reports
                 model_used = synthesis_model
@@ -1368,7 +1390,10 @@ def _analyze_category(
                 successful_articles,
             )
             sub_batch_count += synthesis_batch_count
-            key_developments = _normalize_string_list(synthesis_payload.get("key_developments"), limit=profile.category_bullet_limit)
+            key_developments = [
+                dev["text"]
+                for dev in _normalize_developments(synthesis_payload.get("key_developments"), valid_ids=None, limit=profile.category_bullet_limit)
+            ]
             named_entities = _normalize_entities(synthesis_payload.get("named_entities"))[: profile.entity_limit]
         except Exception as exc:
             category_status = "partial"
@@ -1998,11 +2023,17 @@ def _build_category_outputs(
             scope_kind="category",
             scope_title=category_name,
         )
+        detailed_developments = _normalize_developments(
+            summary_payload.get("key_developments"),
+            valid_ids=_subgroup_article_ids(successful_articles),
+            limit=profile.subgroup_bullet_limit,
+        )
         subgroup = {
             "title": f"{category_name} overview",
             "theme_rationale": "Single subgroup because the category size did not require thematic splitting.",
             "article_count": len(successful_articles),
-            "key_developments": _normalize_string_list(summary_payload.get("key_developments"), limit=profile.subgroup_bullet_limit),
+            "key_developments": [dev["text"] for dev in detailed_developments],
+            "key_developments_detailed": detailed_developments,
             "named_entities": _normalize_entities(summary_payload.get("named_entities"))[: profile.entity_limit],
             "articles": successful_articles,
             "model_used": summary_model,
@@ -2026,12 +2057,18 @@ def _build_category_outputs(
             scope_kind="subgroup",
             scope_title=str(subgroup["title"]),
         )
+        detailed_developments = _normalize_developments(
+            subgroup_payload.get("key_developments"),
+            valid_ids=_subgroup_article_ids(subgroup["articles"]),
+            limit=profile.subgroup_bullet_limit,
+        )
         subgroup_reports.append(
             {
                 "title": subgroup["title"],
                 "theme_rationale": subgroup["theme_rationale"],
                 "article_count": len(subgroup["articles"]),
-                "key_developments": _normalize_string_list(subgroup_payload.get("key_developments"), limit=profile.subgroup_bullet_limit),
+                "key_developments": [dev["text"] for dev in detailed_developments],
+                "key_developments_detailed": detailed_developments,
                 "named_entities": _normalize_entities(subgroup_payload.get("named_entities"))[: profile.entity_limit],
                 "articles": subgroup["articles"],
                 "model_used": subgroup_model,
@@ -2043,7 +2080,7 @@ def _build_category_outputs(
                 "label": subgroup["title"],
                 "article_count": len(subgroup["articles"]),
                 "theme_rationale": subgroup["theme_rationale"],
-                "key_developments": _normalize_string_list(subgroup_payload.get("key_developments"), limit=profile.subgroup_bullet_limit),
+                "key_developments": _normalize_developments(subgroup_payload.get("key_developments"), valid_ids=None, limit=profile.subgroup_bullet_limit),
                 "named_entities": _normalize_entities(subgroup_payload.get("named_entities"))[: profile.entity_limit],
             }
         )
@@ -2502,26 +2539,29 @@ def _article_to_grouping_item(article: dict[str, Any]) -> dict[str, Any]:
 def _summary_to_synthesis_item(payload: dict[str, Any], article_count: int, label: str) -> dict[str, Any]:
     return {
         "kind": "summary",
+        # Keep developments as {text, source_article_ids} objects so per-development
+        # provenance survives batching/merging instead of being flattened to
+        # strings (which would drop source ids and could stringify to reprs).
         "label": label,
         "article_count": article_count,
-        "key_developments": _normalize_string_list(payload.get("key_developments"), limit=5),
+        "key_developments": _normalize_developments(payload.get("key_developments"), valid_ids=None, limit=5),
         "named_entities": _normalize_entities(payload.get("named_entities"))[:6],
     }
 
 
 def _merge_summary_items_locally(summary_items: list[dict[str, Any]], bullet_limit: int) -> dict[str, Any]:
-    key_developments: list[str] = []
+    key_developments: list[dict[str, Any]] = []
     seen_developments: set[str] = set()
     seen_entities: set[str] = set()
     named_entities: list[dict[str, str]] = []
 
     for item in summary_items:
-        for development in _normalize_string_list(item.get("key_developments"), limit=bullet_limit):
-            normalized = development.strip()
-            if not normalized or normalized in seen_developments:
+        for development in _normalize_developments(item.get("key_developments"), valid_ids=None, limit=bullet_limit):
+            text = development["text"]
+            if text in seen_developments:
                 continue
-            seen_developments.add(normalized)
-            key_developments.append(normalized)
+            seen_developments.add(text)
+            key_developments.append(development)
             if len(key_developments) >= bullet_limit:
                 break
         for entity in _normalize_entities(item.get("named_entities")):
@@ -3055,6 +3095,67 @@ def _normalize_string_list(value: Any, *, limit: int) -> list[str]:
         if len(cleaned) >= limit:
             break
     return cleaned
+
+
+_DEVELOPMENT_TEXT_KEYS = ("text", "development", "summary", "point")
+_DEVELOPMENT_ID_KEYS = ("source_article_ids", "ref_ids", "source_article_id")
+
+
+def _subgroup_article_ids(articles: list[dict[str, Any]]) -> set[str]:
+    """Source-article ids the synthesis model was shown, for provenance validation."""
+    return {str(a.get("source_article_id")) for a in articles if a.get("source_article_id")}
+
+
+def _normalize_developments(
+    value: Any,
+    *,
+    valid_ids: set[str] | None = None,
+    limit: int,
+) -> list[dict[str, Any]]:
+    """Normalize model ``key_developments`` output to ``[{text, source_article_ids}]``.
+
+    Defends against model drift: a development may arrive as a plain sentence
+    string or as a structured object (``{"development": ..., "figure": ...}``).
+    A dict is coerced to its text field — never stringified into a Python repr,
+    which is how malformed dict-dumps used to leak into alerts. Source ids are
+    intersected with ``valid_ids`` (when provided) to drop hallucinated ids.
+    """
+    if not isinstance(value, list):
+        return []
+
+    developments: list[dict[str, Any]] = []
+    seen: set[str] = set()
+    for item in value:
+        if isinstance(item, dict):
+            text = ""
+            for key in _DEVELOPMENT_TEXT_KEYS:
+                candidate = str(item.get(key) or "").strip()
+                if candidate:
+                    text = candidate
+                    break
+            raw_ids: Any = None
+            for key in _DEVELOPMENT_ID_KEYS:
+                if item.get(key) is not None:
+                    raw_ids = item.get(key)
+                    break
+            if isinstance(raw_ids, str):
+                raw_ids = [raw_ids]
+            source_ids = [str(x).strip() for x in raw_ids if str(x).strip()] if isinstance(raw_ids, list) else []
+        else:
+            text = str(item).strip()
+            source_ids = []
+
+        if not text or text in seen:
+            continue
+        if valid_ids is not None:
+            source_ids = [sid for sid in source_ids if sid in valid_ids]
+        # Dedupe source ids while preserving order.
+        source_ids = list(dict.fromkeys(source_ids))
+        seen.add(text)
+        developments.append({"text": text, "source_article_ids": source_ids})
+        if len(developments) >= limit:
+            break
+    return developments
 
 
 def _coerce_score(value: Any) -> int:

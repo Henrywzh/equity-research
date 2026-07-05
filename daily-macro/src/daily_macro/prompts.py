@@ -182,12 +182,19 @@ def _build_synthesis_messages(
                 {
                     "task": f"Synthesize one {scope_kind} from already-analyzed article results.",
                     "required_schema": {
-                        "key_developments": [f"2 to {bullet_limit} developments — each must contain a specific detail such as a figure, causal link, named company, or concrete outcome; avoid abstract statements"],
+                        "key_developments": [
+                            {
+                                "text": f"2 to {bullet_limit} developments — one sentence each, containing a specific detail such as a figure, causal link, named company, or concrete outcome; avoid abstract statements",
+                                "source_article_ids": ["the source_article_id(s) of the input article(s) this development came from"],
+                            }
+                        ],
                         "named_entities": [
                             {"name": "entity name", "type": "person|company|country|institution|index|organization|asset|other"}
                         ],
                     },
                     "rules": [
+                        "Each key_developments item is an object with `text` (a single sentence string) and `source_article_ids`.",
+                        "Populate `source_article_ids` only with source_article_id values that appear in the provided inputs; do not invent ids.",
                         "If market_context data is provided, incorporate specific price movements into developments where relevant.",
                     ],
                     "category": category_name,
