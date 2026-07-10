@@ -136,9 +136,9 @@ def test_resolver_routes_synthesis_to_premium_and_routing_to_floor(monkeypatch, 
             preferred_model_id=FLOOR_MODEL_ID,  # mirrors current_model = chain[0]
         ).model.model_id
 
-    # High-value, low-volume tasks go to the premium model.
-    assert pick(LLMTask.CATEGORY_SYNTHESIS) == "openai/gpt-oss-120b"
-    assert pick(LLMTask.TOP_ALERTS) == "openai/gpt-oss-120b"
+    # High-value, low-volume tasks go to the premium model (highest task_score).
+    assert pick(LLMTask.CATEGORY_SYNTHESIS) == "qwen/qwen3.6-27b"
+    assert pick(LLMTask.TOP_ALERTS) == "qwen/qwen3.6-27b"
     # High-volume cheap tasks stay on the floor model (conserves premium budget).
     assert pick(LLMTask.ROUTING) == FLOOR_MODEL_ID
     assert pick(LLMTask.ARTICLE_ANALYSIS) == FLOOR_MODEL_ID

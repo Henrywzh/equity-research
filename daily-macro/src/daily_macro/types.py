@@ -31,8 +31,8 @@ if TYPE_CHECKING:
 GROQ_CHAT_COMPLETIONS_URL = "https://api.groq.com/openai/v1/chat/completions"
 OPENAI_CHAT_COMPLETIONS_URL = "https://api.openai.com/v1/chat/completions"
 DEFAULT_PROVIDER = "groq"
-PRIMARY_MODEL_ID = "meta-llama/llama-4-scout-17b-16e-instruct"
-FALLBACK_MODEL_IDS = ["qwen/qwen3-32b", "llama-3.1-8b-instant"]
+PRIMARY_MODEL_ID = "qwen/qwen3.6-27b"
+FALLBACK_MODEL_IDS = ["llama-3.3-70b-versatile", "llama-3.1-8b-instant"]
 DELAYED_RETRY_FINAL_MODEL_ID = "openai/gpt-oss-20b"
 
 # ---------------------------------------------------------------------------

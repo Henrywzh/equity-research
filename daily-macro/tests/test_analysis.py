@@ -1306,8 +1306,8 @@ class AnalysisTests(unittest.TestCase):
         self.assertTrue(
             set(session.models_used).issubset(
                 {
-                    "meta-llama/llama-4-scout-17b-16e-instruct",
-                    "qwen/qwen3-32b",
+                    "qwen/qwen3.6-27b",
+                    "llama-3.3-70b-versatile",
                     "llama-3.1-8b-instant",
                 }
             )
