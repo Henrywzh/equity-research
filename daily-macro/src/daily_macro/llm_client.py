@@ -673,6 +673,7 @@ class RateLimitGovernor:
         # When quota_scope is present, key credentials share one state bucket.
         # Without it, the legacy per-(model, key) behavior is retained.
         self._states: dict[tuple[str, int], ModelRateLimitState] = {}
+        self._lock = threading.RLock()
 
     @staticmethod
     def _bucket_id(model_id: str, quota_scope: str | None) -> str:
@@ -773,11 +774,37 @@ class RateLimitGovernor:
         local catalog values prevents a burst of calls from overshooting a
         provider's published RPM/TPM before the first header arrives.
         """
-        state = self._state(model_id, key_index, quota_scope)
-        if state.remaining_requests is not None:
-            state.remaining_requests = max(0, state.remaining_requests - 1)
-        if state.remaining_tokens is not None:
-            state.remaining_tokens = max(0, state.remaining_tokens - max(0, int(estimated_tokens)))
+        with self._lock:
+            state = self._state(model_id, key_index, quota_scope)
+            if state.remaining_requests is not None:
+                state.remaining_requests = max(0, state.remaining_requests - 1)
+            if state.remaining_tokens is not None:
+                state.remaining_tokens = max(0, state.remaining_tokens - max(0, int(estimated_tokens)))
+
+    def select_and_reserve(
+        self,
+        model_id: str,
+        current_key: int,
+        num_keys: int,
+        estimated_input_tokens: int = 0,
+        quota_scope: str | None = None,
+    ) -> tuple[int, float]:
+        """Select and reserve one key atomically for concurrent workers."""
+        with self._lock:
+            selected_key, waited = self.select_key(
+                model_id,
+                current_key,
+                num_keys,
+                estimated_input_tokens,
+                quota_scope=quota_scope,
+            )
+            self.reserve_request(
+                model_id,
+                estimated_input_tokens,
+                key_index=selected_key,
+                quota_scope=quota_scope,
+            )
+            return selected_key, waited
 
     def peek_key(
         self,
@@ -921,6 +948,91 @@ class AnalysisRuntime:
                 self.groq_api_keys = ["session-backed-groq-key"]
             self.groq_sessions.setdefault(0, self.session)
 
+    def fork_for_worker(self) -> "AnalysisRuntime":
+        """Create isolated mutable execution state for one parallel batch."""
+        worker_resolver = None
+        if self.resolver is not None:
+            worker_resolver = ModelResolver(
+                active_model_ids=(
+                    set(self.resolver.active_model_ids)
+                    if self.resolver.active_model_ids is not None
+                    else None
+                ),
+                model_policy=self.resolver.model_policy,
+                max_wait_seconds=self.resolver.max_wait_seconds,
+                capabilities=self.resolver.capabilities,
+            )
+        worker = AnalysisRuntime(
+            governor=self.governor,
+            model_chain=list(self.model_chain),
+            groq_api_keys=list(self.groq_api_keys),
+            delayed_retry_final_model=self.delayed_retry_final_model,
+            resolver=worker_resolver,
+            budget=self.budget,
+        )
+        worker.market_context_string = self.market_context_string
+        worker.macro_release_digest = dict(self.macro_release_digest)
+        return worker
+
+    def merge_worker_diagnostics(self, worker: "AnalysisRuntime") -> None:
+        """Merge one worker's counters into the parent runtime."""
+        parent = self.diagnostics
+        child = worker.diagnostics
+        additive = (
+            "rate_limit_wait_count", "rate_limit_wait_seconds_total", "fallback_switch_count",
+            "pre_send_split_count", "response_413_split_count", "json_repair_retry_count",
+            "batch_count", "failed_batch_count", "delayed_retry_candidate_count",
+            "delayed_retry_attempted_count", "delayed_retry_recovered_count",
+            "delayed_retry_failed_count", "delayed_retry_skipped_final_model_count",
+            "synthesis_budget_exhausted_count", "degraded_merge_count", "key_rotation_count",
+            "request_timeout_count", "model_decommissioned_count", "daily_budget_skip_count",
+            "daily_budget_tokens_used", "llm_request_count", "input_tokens_used",
+            "output_tokens_used", "total_tokens_used", "avoided_rate_limit_wait_count",
+            "avoided_rate_limit_wait_seconds_total", "degraded_mode_count", "parallel_batch_count",
+        )
+        for name in additive:
+            setattr(parent, name, getattr(parent, name) + getattr(child, name))
+        parent.high_medium_unresolved_count = max(parent.high_medium_unresolved_count, child.high_medium_unresolved_count)
+        parent.light_unresolved_count = max(parent.light_unresolved_count, child.light_unresolved_count)
+        parent.resolver_rejections.extend(child.resolver_rejections)
+        parent.model_substitutions.extend(child.model_substitutions)
+        for field_name in ("model_task_counts", "endpoint_task_counts", "endpoint_usage"):
+            target = getattr(parent, field_name)
+            for outer_key, counts in getattr(child, field_name).items():
+                target_counts = target.setdefault(outer_key, {})
+                for key, value in counts.items():
+                    target_counts[key] = target_counts.get(key, 0) + value
+        for category_name, child_category in worker.category_diagnostics.items():
+            target_category = self.category_diagnostics.setdefault(category_name, CategoryDiagnostics())
+            for name in (
+                "rate_limit_waits", "partial_article_count", "sub_batch_count",
+                "synthesis_wait_seconds_total", "synthesis_retry_count",
+                "synthesis_retry_skipped_count",
+            ):
+                setattr(target_category, name, getattr(target_category, name) + getattr(child_category, name))
+            target_category.estimated_input_tokens_max = max(
+                target_category.estimated_input_tokens_max,
+                child_category.estimated_input_tokens_max,
+            )
+            target_category.serialized_request_bytes_max = max(
+                target_category.serialized_request_bytes_max,
+                child_category.serialized_request_bytes_max,
+            )
+            target_category.synthesis_merge_depth_max = max(
+                target_category.synthesis_merge_depth_max,
+                child_category.synthesis_merge_depth_max,
+            )
+            target_category.synthesis_budget_exhausted |= child_category.synthesis_budget_exhausted
+            target_category.degraded_merge_used |= child_category.degraded_merge_used
+            if child_category.degraded_merge_reason:
+                target_category.degraded_merge_reason = child_category.degraded_merge_reason
+            for name in ("split_reasons", "models_attempted"):
+                target_list = getattr(target_category, name)
+                for value in getattr(child_category, name):
+                    if value not in target_list:
+                        target_list.append(value)
+            target_category.model_switches.extend(child_category.model_switches)
+
     @property
     def primary_model(self) -> ModelConfig:
         return self.model_chain[0]
@@ -973,6 +1085,15 @@ class AnalysisRuntime:
         # Persist daily token/request usage so budget survives across same-day
         # runs; best-effort, never blocks teardown.
         self.budget.flush()
+        for session in self.groq_sessions.values():
+            session.close()
+        self.groq_sessions.clear()
+        for session in self.provider_sessions.values():
+            session.close()
+        self.provider_sessions.clear()
+
+    def close_worker_sessions(self) -> None:
+        """Close worker-local HTTP sessions without flushing shared state."""
         for session in self.groq_sessions.values():
             session.close()
         self.groq_sessions.clear()
@@ -1326,7 +1447,7 @@ def _chat_completion(
         )
         # Select the API key with the most remaining capacity; rotate silently if a
         # better key exists, sleep only when all keys are exhausted for this model.
-        best_key, wait_seconds = runtime.governor.select_key(
+        best_key, wait_seconds = runtime.governor.select_and_reserve(
             model.model_id,
             runtime.key_index_for_model(model),
             runtime.key_count_for_model(model),
@@ -1354,12 +1475,6 @@ def _chat_completion(
                 model.model_id,
                 runtime.current_key_index,
             )
-        runtime.governor.reserve_request(
-            model.model_id,
-            estimated_input_tokens,
-            key_index=runtime.key_index_for_model(model),
-            quota_scope=model.quota_scope,
-        )
         connect_timeout, read_timeout, total_deadline = _llm_request_timeouts()
         try:
             response = _post_with_deadline(

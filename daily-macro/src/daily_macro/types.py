@@ -317,6 +317,8 @@ class RuntimeDiagnostics:
     endpoint_task_counts: dict[str, dict[str, int]] = field(default_factory=dict)
     endpoint_usage: dict[str, dict[str, int]] = field(default_factory=dict)
     model_substitutions: list[dict[str, Any]] = field(default_factory=list)
+    parallel_batch_count: int = 0
+    parallel_worker_count: int = 1
 
     def as_dict(self) -> dict[str, Any]:
         return {
@@ -354,6 +356,8 @@ class RuntimeDiagnostics:
             "endpoint_task_counts": {task: dict(counts) for task, counts in self.endpoint_task_counts.items()},
             "endpoint_usage": {endpoint: dict(counts) for endpoint, counts in self.endpoint_usage.items()},
             "model_substitutions": list(self.model_substitutions),
+            "parallel_batch_count": self.parallel_batch_count,
+            "parallel_worker_count": self.parallel_worker_count,
         }
 
 

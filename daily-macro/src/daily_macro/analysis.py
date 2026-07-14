@@ -6,6 +6,7 @@ import math
 import os
 import random
 import time
+from concurrent.futures import ThreadPoolExecutor, as_completed
 from collections import defaultdict
 from datetime import datetime, timedelta
 from pathlib import Path
@@ -1348,14 +1349,15 @@ def _analyze_category(
     article_errors: list[dict[str, Any]] = []
     sub_batch_count = 0
     
-    # Analyze non-light articles in batches
-    for index, batch in enumerate(planned_batches, start=1):
-        if not batch:
-            continue
-        batch_results, batch_errors, batch_count = _process_batch_recursive(runtime, category_name, batch, str(index))
-        article_results.extend(batch_results)
-        article_errors.extend(batch_errors)
-        sub_batch_count += batch_count
+    # Analyze independent article batches with bounded fan-out when enabled.
+    batch_results, batch_errors, batch_count = _run_article_batches(
+        runtime,
+        category_name,
+        planned_batches,
+    )
+    article_results.extend(batch_results)
+    article_errors.extend(batch_errors)
+    sub_batch_count += batch_count
         
     # Handle bypassed light articles
     for article in prepared_articles:
@@ -1467,6 +1469,87 @@ def _analyze_category(
         },
         category_errors,
     )
+
+
+def _llm_parallelism() -> int:
+    """Return the opt-in worker count for independent LLM batches."""
+    raw = os.environ.get("DAILY_MACRO_LLM_PARALLELISM", "1")
+    try:
+        return max(1, min(16, int(raw)))
+    except ValueError:
+        return 1
+
+
+def _run_article_batches(
+    runtime: AnalysisRuntime,
+    category_name: str,
+    planned_batches: list[list[dict[str, Any]]],
+) -> tuple[list[dict[str, Any]], list[dict[str, Any]], int]:
+    """Run independent article batches with deterministic fan-in.
+
+    Each worker receives isolated model cursors, sessions, budgets, and
+    diagnostics. The governor and daily ledger remain shared, so provider
+    reservations are coordinated across workers.
+    """
+    work = [(index, batch) for index, batch in enumerate(planned_batches, start=1) if batch]
+    if not work:
+        return [], [], 0
+
+    parallelism = min(_llm_parallelism(), len(work))
+    if parallelism <= 1:
+        results: list[dict[str, Any]] = []
+        errors: list[dict[str, Any]] = []
+        count = 0
+        for index, batch in work:
+            batch_results, batch_errors, batch_count = _process_batch_recursive(
+                runtime, category_name, batch, str(index)
+            )
+            results.extend(batch_results)
+            errors.extend(batch_errors)
+            count += batch_count
+        return results, errors, count
+
+    runtime.diagnostics.parallel_worker_count = max(
+        runtime.diagnostics.parallel_worker_count,
+        parallelism,
+    )
+    runtime.diagnostics.parallel_batch_count += len(work)
+    LOGGER.info(
+        "Running %d independent article batch(es) for %s with %d worker(s).",
+        len(work),
+        category_name,
+        parallelism,
+    )
+
+    def run_one(index: int, batch: list[dict[str, Any]]) -> tuple[int, AnalysisRuntime, tuple[list[dict[str, Any]], list[dict[str, Any]], int], BaseException | None]:
+        worker = runtime.fork_for_worker()
+        try:
+            result = _process_batch_recursive(worker, category_name, batch, str(index))
+            return index, worker, result, None
+        except BaseException as exc:  # preserve the sequential path's failure behavior
+            return index, worker, ([], [], 0), exc
+        finally:
+            worker.close_worker_sessions()
+
+    completed: dict[int, tuple[list[dict[str, Any]], list[dict[str, Any]], int]] = {}
+    with ThreadPoolExecutor(max_workers=parallelism, thread_name_prefix="daily-macro-llm") as executor:
+        futures = [executor.submit(run_one, index, batch) for index, batch in work]
+        for future in as_completed(futures):
+            index, worker, result, error = future.result()
+            runtime.merge_worker_diagnostics(worker)
+            if error is not None:
+                raise error
+            completed[index] = result
+
+    results = []
+    errors = []
+    count = 0
+    for index, _batch in work:
+        batch_results, batch_errors, batch_count = completed[index]
+        results.extend(batch_results)
+        errors.extend(batch_errors)
+        count += batch_count
+    return results, errors, count
 
 
 def _run_delayed_retry_pass(
