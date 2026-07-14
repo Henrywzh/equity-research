@@ -1,8 +1,9 @@
 """Dynamic model pool construction.
 
-Builds the candidate model pool from the live Groq ``/models`` list intersected
-with the local catalog, filtered to chat/JSON-capable models, with a disk cache
-(TTL + last-known-good) and a guaranteed floor model so the pool is never empty.
+Builds the candidate model pool from live provider catalogs intersected with
+explicit provider allowlists, filtered to chat/JSON-capable models, with a disk
+cache (TTL + last-known-good). Deprecated or unapproved live models never enter
+the runnable pool.
 
 This makes model add/removal a non-event: a removed model simply isn't in the
 live list (so it drops out), and a newly released model is profiled via the
@@ -22,14 +23,20 @@ from typing import Any
 import requests
 
 from .config import get_project_root
-from .model_catalog import MODEL_CATALOG, ModelCapability, get_capability
-from .types import DEFAULT_PROVIDER, ModelConfig
+from .model_catalog import ModelCapability, get_capability
+from .provider_registry import provider_model_ids
+from .types import (
+    DEFAULT_PROVIDER,
+    GROQ_CHAT_COMPLETIONS_URL,
+    ModelConfig,
+    ProviderAccount,
+)
 
 LOGGER = logging.getLogger(__name__)
 
-# A stable, high-throughput production model kept as the guaranteed fallback so
-# the pool (and the resolver's last resort) is never empty.
-FLOOR_MODEL_ID = "llama-3.1-8b-instant"
+# Groq's approved primary model. GPT OSS 120B and 20B are ordered fallbacks,
+# supplied by provider_model_ids().
+FLOOR_MODEL_ID = "qwen/qwen3.6-27b"
 
 _GROQ_MODELS_URL = "https://api.groq.com/openai/v1/models"
 _CACHE_FILENAME = "model_catalog_cache.json"
@@ -43,6 +50,7 @@ class ModelPool:
     models: list[ModelConfig]
     capabilities: dict[str, ModelCapability]
     active_ids: set[str]
+    accounts: list[ProviderAccount] = dataclasses.field(default_factory=list, repr=False)
 
 
 def _refresh_enabled() -> bool:
@@ -115,9 +123,9 @@ def _read_cache(path: Path) -> list[dict[str, Any]] | None:
     return None
 
 
-def _merged_capability(model_id: str, live_meta: dict[str, Any]) -> ModelCapability:
+def _merged_capability(model_id: str, live_meta: dict[str, Any], *, provider: str = DEFAULT_PROVIDER) -> ModelCapability:
     """Capability for a model, with live context/output metadata layered on top."""
-    cap = get_capability(model_id)
+    cap = get_capability(model_id, provider=provider)
     overrides: dict[str, Any] = {}
     live_ctx = live_meta.get("context_window")
     if isinstance(live_ctx, int) and live_ctx > 0:
@@ -130,50 +138,162 @@ def _merged_capability(model_id: str, live_meta: dict[str, Any]) -> ModelCapabil
     return dataclasses.replace(cap, **overrides) if overrides else cap
 
 
-def build_model_pool(api_keys: list[str], *, data_dir: str | Path | None = None) -> ModelPool:
-    """Build the candidate pool: live ∩ catalog, chat-only, floor-guaranteed."""
-    cache_path = _cache_path(data_dir)
-    live = load_groq_models(api_keys[0]) if api_keys else None
-    if live:
-        _write_cache(cache_path, live)
-    else:
-        live = _read_cache(cache_path)
+def load_provider_models(account: ProviderAccount, *, timeout: int = 10) -> list[dict[str, Any]] | None:
+    """Best-effort model discovery for an OpenAI-compatible provider."""
+    if not _refresh_enabled() or not account.api_key:
+        return None
+    url = account.base_url.rsplit("/chat/completions", 1)[0] + "/models"
+    session = requests.Session()
+    session.headers.update({"Authorization": f"Bearer {account.api_key}"})
+    try:
+        response = session.get(url, timeout=timeout)
+        response.raise_for_status()
+        payload = response.json()
+    except Exception as exc:  # noqa: BLE001 - static catalog remains usable
+        LOGGER.info("Could not refresh %s model list for %s: %s", account.provider, account.account_id, exc)
+        return None
+    finally:
+        session.close()
+    data = payload.get("data") if isinstance(payload, dict) else None
+    if not isinstance(data, list):
+        return None
+    models: list[dict[str, Any]] = []
+    for item in data:
+        if not isinstance(item, dict):
+            continue
+        model_id = str(item.get("id") or "").strip()
+        if not model_id or item.get("active") is False:
+            continue
+        models.append(
+            {
+                "id": model_id,
+                "context_window": item.get("context_window") or item.get("context_length"),
+                "max_completion_tokens": item.get("max_completion_tokens") or item.get("max_output_tokens"),
+            }
+        )
+    return models or None
 
-    live_meta = {entry["id"]: entry for entry in (live or [])}
-    candidate_ids = list(live_meta.keys()) if live else list(MODEL_CATALOG.keys())
 
+def _provider_cache_path(data_dir: str | Path | None, provider: str, account_id: str) -> Path:
+    base = Path(data_dir) if data_dir else (get_project_root() / "daily-macro" / "data")
+    safe_name = f"model_catalog_{provider}_{account_id}.json".replace("/", "_")
+    return base / safe_name
+
+
+def _accounts_for_pool(api_keys: list[str] | None, provider_accounts: list[ProviderAccount] | None) -> list[ProviderAccount]:
+    if provider_accounts is not None:
+        return list(provider_accounts)
+    keys = list(api_keys or [])
+    return [
+        ProviderAccount(
+            account_id=f"groq_{index}",
+            provider=DEFAULT_PROVIDER,
+            api_key_env="GROQ_API_KEY",
+            base_url=GROQ_CHAT_COMPLETIONS_URL,
+            quota_scope="groq:organization",
+            api_key=key,
+        )
+        for index, key in enumerate(keys or [None], start=1)
+    ]
+
+
+def build_model_pool(
+    api_keys: list[str] | None = None,
+    *,
+    data_dir: str | Path | None = None,
+    provider_accounts: list[ProviderAccount] | None = None,
+) -> ModelPool:
+    """Build a multi-provider pool with live discovery and static fallbacks."""
+    accounts = _accounts_for_pool(api_keys, provider_accounts)
     capabilities: dict[str, ModelCapability] = {}
-    for model_id in candidate_ids:
-        cap = _merged_capability(model_id, live_meta.get(model_id, {}))
-        if cap.kind != "chat" or not cap.supports_json:
-            continue  # exclude audio / guard / tts / embedding / agentic models
-        capabilities[model_id] = cap
+    models: list[ModelConfig] = []
+    active_ids: set[str] = set()
 
-    # Guarantee the floor model is always present and callable.
-    if FLOOR_MODEL_ID not in capabilities:
-        capabilities[FLOOR_MODEL_ID] = _merged_capability(FLOOR_MODEL_ID, live_meta.get(FLOOR_MODEL_ID, {}))
+    # Groq credentials share one model list; key rotation remains a credential
+    # concern in AnalysisRuntime and does not duplicate every model six times.
+    seen_account_models: set[tuple[str, str]] = set()
+    for account in accounts:
+        if account.provider == DEFAULT_PROVIDER and any(m.provider == DEFAULT_PROVIDER for m in models):
+            continue
+        cache_path = _cache_path(data_dir) if account.provider == DEFAULT_PROVIDER else _provider_cache_path(data_dir, account.provider, account.account_id)
+        live = load_groq_models(account.api_key or "") if account.provider == DEFAULT_PROVIDER else load_provider_models(account)
+        if live:
+            _write_cache(cache_path, live)
+        else:
+            live = _read_cache(cache_path) if account.provider == DEFAULT_PROVIDER else None
 
-    def _mean_score(model_id: str) -> float:
-        scores = capabilities[model_id].task_scores
+        live_meta = {entry["id"]: entry for entry in (live or [])}
+        if live and account.provider == DEFAULT_PROVIDER:
+            # Groq's live catalog is broad and changes during the current
+            # retirement cycle. Never turn every discovered chat model into a
+            # runnable candidate; only use the explicit transition allowlist.
+            allowed_ids = provider_model_ids(account.provider)
+            candidate_ids = [model_id for model_id in allowed_ids if model_id in live_meta]
+        elif live:
+            # Third-party model catalogs can contain hundreds of unrelated or
+            # short-lived models. Keep non-Groq providers on the explicit
+            # configured/default allowlist; operators can opt in to another
+            # model with DAILY_MACRO_*_MODELS.
+            allowed_ids = provider_model_ids(account.provider)
+            candidate_ids = [model_id for model_id in allowed_ids if model_id in live_meta]
+        elif account.provider == DEFAULT_PROVIDER:
+            # A failed refresh must not widen the pool back to the historical
+            # catalog. Use the same explicit Groq allowlist as the live path.
+            candidate_ids = provider_model_ids(account.provider)
+        else:
+            candidate_ids = provider_model_ids(account.provider)
+
+        for model_id in candidate_ids:
+            if (account.account_id, model_id) in seen_account_models:
+                continue
+            seen_account_models.add((account.account_id, model_id))
+            cap = _merged_capability(model_id, live_meta.get(model_id, {}), provider=account.provider)
+            if cap.kind != "chat" or not cap.supports_json:
+                continue
+            capability_key = model_id if account.provider == DEFAULT_PROVIDER else f"{account.provider}:{model_id}"
+            capabilities[capability_key] = cap
+            model = ModelConfig(
+                model_id=model_id,
+                provider=account.provider,
+                max_completion_tokens=cap.max_completion_tokens,
+                api_url=account.base_url,
+                api_key_env=account.api_key_env,
+                account_id=account.account_id,
+                quota_scope=account.quota_scope,
+                api_key=account.api_key,
+            )
+            models.append(model)
+            capabilities[model.endpoint_id] = cap
+            active_ids.update({model_id, model.endpoint_id})
+
+    # Do not synthesize a missing Groq model here. If live discovery says a
+    # model is gone, re-adding it defeats deprecation handling; if discovery
+    # is unavailable, the explicit Groq allowlist above is already used.
+
+    def _score(model: ModelConfig) -> float:
+        key = model.model_id if model.provider == DEFAULT_PROVIDER else f"{model.provider}:{model.model_id}"
+        scores = capabilities.get(key, get_capability(model.model_id, model.provider)).task_scores
         return sum(scores.values()) / len(scores) if scores else 0.5
 
-    # Floor model first (anchors the resolver's preferred-bonus + last-resort
-    # fallback on a safe, high-limit model); the rest by descending quality.
-    rest = sorted((m for m in capabilities if m != FLOOR_MODEL_ID), key=_mean_score, reverse=True)
-    ordered_ids = [FLOOR_MODEL_ID, *rest]
-
-    models = [
-        ModelConfig(
-            model_id=model_id,
-            provider=DEFAULT_PROVIDER,
-            max_completion_tokens=capabilities[model_id].max_completion_tokens,
-        )
-        for model_id in ordered_ids
-    ]
-    LOGGER.info(
-        "Built model pool (%d models, source=%s): %s",
-        len(models),
-        "live" if live else "catalog/cache",
-        ", ".join(m.model_id for m in models),
+    # Qwen anchors the Groq chain. Preserve the explicit Groq fallback order;
+    # average task score alone would otherwise place 20B ahead of 120B.
+    floors = [m for m in models if m.model_id == FLOOR_MODEL_ID and m.provider == DEFAULT_PROVIDER]
+    groq_order = {model_id: index for index, model_id in enumerate(provider_model_ids(DEFAULT_PROVIDER))}
+    rest = sorted(
+        [m for m in models if m not in floors],
+        key=lambda model: (
+            0,
+            groq_order.get(model.model_id, len(groq_order)),
+        ) if model.provider == DEFAULT_PROVIDER else (
+            1,
+            -_score(model),
+        ),
     )
-    return ModelPool(models=models, capabilities=capabilities, active_ids=set(capabilities.keys()))
+    ordered = [*floors, *rest]
+    LOGGER.info(
+        "Built model pool (%d models, providers=%s): %s",
+        len(ordered),
+        ",".join(sorted({model.provider for model in ordered})) or "none",
+        ", ".join(f"{model.provider}/{model.account_id}/{model.model_id}" for model in ordered),
+    )
+    return ModelPool(models=ordered, capabilities=capabilities, active_ids=active_ids, accounts=accounts)

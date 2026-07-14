@@ -109,6 +109,7 @@ from .prompts import (  # noqa: E402
 
 from .model_registry import build_model_pool  # noqa: E402
 from .budget import DailyBudgetLedger  # noqa: E402
+from .provider_registry import load_provider_accounts, provider_model_ids  # noqa: E402
 
 # ---------------------------------------------------------------------------
 # Patch AnalysisRuntime methods to look up helpers through this module's
@@ -130,11 +131,11 @@ def _analysis_get_session_for_model(self, model):
     _mod = _sys.modules[__name__]
     if model.provider == DEFAULT_PROVIDER:
         return self.get_groq_session(self.current_key_index)
-    session = self.provider_sessions.get(model.provider)
+    session = self.provider_sessions.get(model.session_key)
     if session is not None:
         return session
     session = _mod._build_provider_session(_mod._load_model_api_key(model))
-    self.provider_sessions[model.provider] = session
+    self.provider_sessions[model.session_key] = session
     return session
 
 AnalysisRuntime.get_groq_session = _analysis_get_groq_session
@@ -245,16 +246,34 @@ def _graph_initialize(state: AnalysisGraphState) -> AnalysisGraphState:
     previous_retry_plan = _build_previous_retry_plan(state["previous_articles"], state["previous_report"])
     runtime: AnalysisRuntime | None = None
     if today_plan["new_articles_analyzed"] > 0 or previous_retry_plan["retried_previous_day_articles"] > 0:
+        provider_accounts = load_provider_accounts()
+        configured_groq_keys = [account.api_key for account in provider_accounts if account.provider == DEFAULT_PROVIDER and account.api_key]
         try:
-            groq_keys = load_groq_api_keys()
+            groq_keys = configured_groq_keys or load_groq_api_keys()
         except RuntimeError:
             # Backward-compatible shim for tests and older single-key call sites.
-            groq_keys = [load_groq_api_key()]
-        LOGGER.info("Loaded %d Groq API key(s).", len(groq_keys))
-        pool = build_model_pool(groq_keys, data_dir=state.get("data_dir"))
-        fallback_chain = [ModelConfig(PRIMARY_MODEL_ID), *(ModelConfig(model_id) for model_id in FALLBACK_MODEL_IDS)]
+            if provider_accounts and any(account.provider != DEFAULT_PROVIDER for account in provider_accounts):
+                groq_keys = []
+            else:
+                groq_keys = [load_groq_api_key()]
+        LOGGER.info(
+            "Loaded LLM provider accounts: %s.",
+            ", ".join(sorted({account.provider for account in provider_accounts})) or DEFAULT_PROVIDER,
+        )
+        pool = build_model_pool(
+            groq_keys,
+            data_dir=state.get("data_dir"),
+            provider_accounts=provider_accounts or None,
+        )
+        fallback_model_ids = _groq_fallback_model_ids()
+        fallback_chain = [ModelConfig(model_id) for model_id in fallback_model_ids]
         budget = DailyBudgetLedger.load(state.get("data_dir"))
-        model_limits = {model_id: cap.limits for model_id, cap in pool.capabilities.items() if cap.limits}
+        model_limits: dict[str, dict[str, int]] = {}
+        for model in pool.models:
+            cap = pool.capabilities.get(model.endpoint_id) or pool.capabilities.get(model.model_id)
+            if cap and cap.limits:
+                model_limits[model.quota_key] = cap.limits
+                model_limits.setdefault(model.model_id, cap.limits)
         runtime = AnalysisRuntime(
             groq_api_keys=groq_keys,
             governor=RateLimitGovernor(model_limits=model_limits),
@@ -1134,11 +1153,7 @@ def _finalize_report(
         "executive_summary": _format_top_alerts_for_legacy(top_alerts),
         "executive_summary_structured": _normalize_top_alerts(top_alerts, {}),
         "legacy_executive_summary": legacy_executive_summary or [],
-        "model": {
-            "provider": DEFAULT_PROVIDER,
-            "primary_model": PRIMARY_MODEL_ID,
-            "fallback_models": list(FALLBACK_MODEL_IDS),
-        },
+        "model": _report_model_metadata(runtime),
         "model_switches": list(runtime.model_switches if runtime is not None else []),
         "input": {
             "article_count": input_article_count,
@@ -2956,12 +2971,46 @@ def _category_model_used(article_results: list[dict[str, Any]]) -> str:
     return ",".join(sorted(model_ids))
 
 
+def _groq_fallback_model_ids() -> list[str]:
+    """Return the date-aware Groq emergency chain without widening policy."""
+    return provider_model_ids(DEFAULT_PROVIDER) or [PRIMARY_MODEL_ID]
+
+
+def _report_model_metadata(runtime: AnalysisRuntime | None) -> dict[str, Any]:
+    """Expose provider/model choices without exposing credentials."""
+    if runtime is None or not runtime.model_chain:
+        fallback_model_ids = _groq_fallback_model_ids()
+        return {
+            "provider": DEFAULT_PROVIDER,
+            "primary_model": fallback_model_ids[0],
+            "fallback_models": fallback_model_ids[1:],
+        }
+    providers = sorted({model.provider for model in runtime.model_chain})
+    return {
+        "provider": providers[0] if len(providers) == 1 else "multi",
+        "providers": providers,
+        "primary_model": runtime.primary_model.model_id,
+        "fallback_models": [model.model_id for model in runtime.fallback_models],
+        "endpoints": [
+            {
+                "endpoint_id": model.endpoint_id,
+                "provider": model.provider,
+                "account_id": model.account_id,
+                "model_id": model.model_id,
+                "quota_scope": model.quota_scope,
+            }
+            for model in runtime.model_chain
+        ],
+    }
+
+
 def _build_empty_report(
     target_date: str,
     *,
     incremental: dict[str, int] | None = None,
     macro_release_digest: dict[str, Any] | None = None,
 ) -> dict[str, Any]:
+    fallback_model_ids = _groq_fallback_model_ids()
     return {
         "report_schema_version": REPORT_SCHEMA_VERSION,
         "report_date": target_date,
@@ -2970,8 +3019,8 @@ def _build_empty_report(
         "status": "empty",
         "model": {
             "provider": DEFAULT_PROVIDER,
-            "primary_model": PRIMARY_MODEL_ID,
-            "fallback_models": list(FALLBACK_MODEL_IDS),
+            "primary_model": fallback_model_ids[0],
+            "fallback_models": fallback_model_ids[1:],
         },
         "model_switches": [],
         "input": {

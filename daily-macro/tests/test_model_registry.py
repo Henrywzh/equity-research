@@ -15,6 +15,7 @@ from daily_macro.types import ModelConfig
 
 _LIVE = [
     {"id": "llama-3.1-8b-instant", "context_window": 131072, "max_completion_tokens": 8192},
+    {"id": "qwen/qwen3.6-27b", "context_window": 131072, "max_completion_tokens": 8192},
     {"id": "openai/gpt-oss-120b", "context_window": 131072, "max_completion_tokens": 8192},
     {"id": "openai/gpt-oss-20b", "context_window": 131072, "max_completion_tokens": 8192},
     {"id": "whisper-large-v3", "context_window": None, "max_completion_tokens": None},
@@ -80,9 +81,20 @@ def test_pool_filters_noncat_models_and_keeps_new(monkeypatch, tmp_data_dir):
     # audio / guard / tts excluded
     for junk in ("whisper-large-v3", "meta-llama/llama-prompt-guard-2-86m", "canopylabs/orpheus-v1-english"):
         assert junk not in pool.active_ids
-    # brand-new unknown model included, with live context merged in
-    assert "some-brand-new-90b" in pool.active_ids
-    assert pool.capabilities["some-brand-new-90b"].context_window == 200000
+    # Groq is restricted to the approved transition models, even when the
+    # live catalog exposes unrelated or newly released chat models.
+    assert "some-brand-new-90b" not in pool.active_ids
+    assert "llama-3.1-8b-instant" not in pool.active_ids
+    assert set(model.model_id for model in pool.models) == {
+        "qwen/qwen3.6-27b",
+        "openai/gpt-oss-120b",
+        "openai/gpt-oss-20b",
+    }
+    assert [model.model_id for model in pool.models] == [
+        "qwen/qwen3.6-27b",
+        "openai/gpt-oss-120b",
+        "openai/gpt-oss-20b",
+    ]
     assert pool.models[0].model_id == FLOOR_MODEL_ID
 
 
@@ -94,13 +106,14 @@ def test_removed_model_drops_from_pool(monkeypatch, tmp_data_dir):
     assert "openai/gpt-oss-120b" not in pool.active_ids
 
 
-def test_floor_model_always_present(monkeypatch, tmp_data_dir):
-    # Live list omits the floor model entirely.
+def test_removed_floor_model_is_not_reintroduced(monkeypatch, tmp_data_dir):
+    # Live list omits the primary model entirely. A removed model must not be
+    # synthesized back into the pool by the floor logic.
     live = [{"id": "openai/gpt-oss-120b", "context_window": 131072, "max_completion_tokens": 8192}]
     _patch_live(monkeypatch, live)
     pool = build_model_pool(["k"], data_dir=tmp_data_dir)
-    assert FLOOR_MODEL_ID in pool.active_ids
-    assert pool.models[0].model_id == FLOOR_MODEL_ID
+    assert FLOOR_MODEL_ID not in pool.active_ids
+    assert [model.model_id for model in pool.models] == ["openai/gpt-oss-120b"]
 
 
 def test_cache_used_on_fetch_failure(monkeypatch, tmp_data_dir):
@@ -108,10 +121,15 @@ def test_cache_used_on_fetch_failure(monkeypatch, tmp_data_dir):
     _patch_live(monkeypatch, _LIVE)
     build_model_pool(["k"], data_dir=tmp_data_dir)
     assert (Path(tmp_data_dir) / "model_catalog_cache.json").exists()
-    # Next build with fetch failing must reuse the cached list (incl. new model).
+    # Next build with fetch failing must reuse the cache, but still apply the
+    # approved Groq allowlist.
     _patch_live(monkeypatch, None)
     pool = build_model_pool(["k"], data_dir=tmp_data_dir)
-    assert "some-brand-new-90b" in pool.active_ids
+    assert set(model.model_id for model in pool.models) == {
+        "qwen/qwen3.6-27b",
+        "openai/gpt-oss-120b",
+        "openai/gpt-oss-20b",
+    }
 
 
 # --------------------------------------------------------------------------- #
@@ -119,7 +137,7 @@ def test_cache_used_on_fetch_failure(monkeypatch, tmp_data_dir):
 # --------------------------------------------------------------------------- #
 
 def test_resolver_routes_synthesis_to_premium_and_routing_to_floor(monkeypatch, tmp_data_dir):
-    _patch_live(monkeypatch, None)  # catalog pool (full set)
+    _patch_live(monkeypatch, None)  # catalog pool (approved transition set)
     pool = build_model_pool(["k"], data_dir=tmp_data_dir)
     resolver = ModelResolver(
         active_model_ids=pool.active_ids,
@@ -136,14 +154,20 @@ def test_resolver_routes_synthesis_to_premium_and_routing_to_floor(monkeypatch, 
             preferred_model_id=FLOOR_MODEL_ID,  # mirrors current_model = chain[0]
         ).model.model_id
 
-    # High-value, low-volume tasks go to the premium model (highest task_score).
+    # High-value, low-volume tasks go to the Qwen flagship model.
     assert pick(LLMTask.CATEGORY_SYNTHESIS) == "qwen/qwen3.6-27b"
     assert pick(LLMTask.TOP_ALERTS) == "qwen/qwen3.6-27b"
     # High-volume cheap tasks stay on the floor model (conserves premium budget).
     assert pick(LLMTask.ROUTING) == FLOOR_MODEL_ID
     assert pick(LLMTask.ARTICLE_ANALYSIS) == FLOOR_MODEL_ID
-    # Preview models are never selected under production_only.
+    # Preview models are never selected under production_only, and retired
+    # Groq models are not present in this pool at all.
     assert pick(LLMTask.CATEGORY_SYNTHESIS) != "meta-llama/llama-4-scout-17b-16e-instruct"
+    assert not {model.model_id for model in pool.models} & {
+        "llama-3.1-8b-instant",
+        "llama-3.3-70b-versatile",
+        "qwen/qwen3-32b",
+    }
 
 
 def test_bulk_task_falls_back_to_premium_when_nothing_else():

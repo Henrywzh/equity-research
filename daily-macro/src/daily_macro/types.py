@@ -30,9 +30,13 @@ if TYPE_CHECKING:
 
 GROQ_CHAT_COMPLETIONS_URL = "https://api.groq.com/openai/v1/chat/completions"
 OPENAI_CHAT_COMPLETIONS_URL = "https://api.openai.com/v1/chat/completions"
+CEREBRAS_CHAT_COMPLETIONS_URL = "https://api.cerebras.ai/v1/chat/completions"
+OPENROUTER_CHAT_COMPLETIONS_URL = "https://openrouter.ai/api/v1/chat/completions"
+GOOGLE_AI_STUDIO_CHAT_COMPLETIONS_URL = "https://generativelanguage.googleapis.com/v1beta/openai/chat/completions"
 DEFAULT_PROVIDER = "groq"
+# Groq's current flagship lane: Qwen 3.6 is primary, followed by GPT OSS.
 PRIMARY_MODEL_ID = "qwen/qwen3.6-27b"
-FALLBACK_MODEL_IDS = ["llama-3.3-70b-versatile", "llama-3.1-8b-instant"]
+FALLBACK_MODEL_IDS = ["openai/gpt-oss-120b", "openai/gpt-oss-20b"]
 DELAYED_RETRY_FINAL_MODEL_ID = "openai/gpt-oss-20b"
 
 # ---------------------------------------------------------------------------
@@ -213,6 +217,47 @@ class ModelConfig:
     max_completion_tokens: int = DEFAULT_OUTPUT_TOKENS
     api_url: str | None = None
     api_key_env: str | None = None
+    account_id: str | None = None
+    quota_scope: str | None = None
+    api_key: str | None = field(default=None, repr=False, compare=False)
+
+    @property
+    def endpoint_id(self) -> str:
+        """Stable identity for one provider/account/model endpoint."""
+        account = self.account_id or "default"
+        return f"{self.provider}:{account}:{self.model_id}"
+
+    @property
+    def session_key(self) -> str:
+        """Credential/session identity, independent of the model id."""
+        return self.account_id or self.provider
+
+    @property
+    def quota_key(self) -> str:
+        """Model identity used for quota ledgers and rate-limit state."""
+        if self.quota_scope:
+            return f"{self.quota_scope}:{self.model_id}"
+        return self.model_id
+
+
+@dataclass(frozen=True)
+class ProviderAccount:
+    """One credential endpoint and its quota boundary.
+
+    ``quota_scope`` is deliberately explicit. Providers generally enforce
+    limits at organization/project scope, so credentials must not be treated as
+    independent capacity unless the operator configures separate scopes.
+    """
+
+    account_id: str
+    provider: str
+    api_key_env: str
+    base_url: str
+    quota_scope: str | None = None
+    enabled: bool = True
+    organization_id: str | None = None
+    project_id: str | None = None
+    api_key: str | None = field(default=None, repr=False, compare=False)
 
 
 @dataclass
@@ -260,11 +305,17 @@ class RuntimeDiagnostics:
     model_decommissioned_count: int = 0
     daily_budget_skip_count: int = 0
     daily_budget_tokens_used: int = 0
+    llm_request_count: int = 0
+    input_tokens_used: int = 0
+    output_tokens_used: int = 0
+    total_tokens_used: int = 0
     avoided_rate_limit_wait_count: int = 0
     avoided_rate_limit_wait_seconds_total: float = 0.0
     degraded_mode_count: int = 0
     resolver_rejections: list[dict[str, Any]] = field(default_factory=list)
     model_task_counts: dict[str, dict[str, int]] = field(default_factory=dict)
+    endpoint_task_counts: dict[str, dict[str, int]] = field(default_factory=dict)
+    endpoint_usage: dict[str, dict[str, int]] = field(default_factory=dict)
     model_substitutions: list[dict[str, Any]] = field(default_factory=list)
 
     def as_dict(self) -> dict[str, Any]:
@@ -291,11 +342,17 @@ class RuntimeDiagnostics:
             "model_decommissioned_count": self.model_decommissioned_count,
             "daily_budget_skip_count": self.daily_budget_skip_count,
             "daily_budget_tokens_used": self.daily_budget_tokens_used,
+            "llm_request_count": self.llm_request_count,
+            "input_tokens_used": self.input_tokens_used,
+            "output_tokens_used": self.output_tokens_used,
+            "total_tokens_used": self.total_tokens_used,
             "avoided_rate_limit_wait_count": self.avoided_rate_limit_wait_count,
             "avoided_rate_limit_wait_seconds_total": round(self.avoided_rate_limit_wait_seconds_total, 3),
             "degraded_mode_count": self.degraded_mode_count,
             "resolver_rejections": list(self.resolver_rejections),
             "model_task_counts": {task: dict(counts) for task, counts in self.model_task_counts.items()},
+            "endpoint_task_counts": {task: dict(counts) for task, counts in self.endpoint_task_counts.items()},
+            "endpoint_usage": {endpoint: dict(counts) for endpoint, counts in self.endpoint_usage.items()},
             "model_substitutions": list(self.model_substitutions),
         }
 

@@ -36,6 +36,8 @@ from .types import (
     DEFAULT_CHAT_RETRIES,
     DEFAULT_OUTPUT_TOKENS,
     DEFAULT_PROVIDER,
+    CEREBRAS_CHAT_COMPLETIONS_URL,
+    GOOGLE_AI_STUDIO_CHAT_COMPLETIONS_URL,
     GROQ_CHAT_COMPLETIONS_URL,
     MAX_CATEGORY_SYNTHESIS_RETRIES,
     MAX_CATEGORY_SYNTHESIS_WAIT_SECONDS,
@@ -45,6 +47,7 @@ from .types import (
     MIN_SYNTHESIS_REQUEST_BYTE_BUDGET,
     ModelConfig,
     ModelRateLimitState,
+    OPENROUTER_CHAT_COMPLETIONS_URL,
     RATE_LIMIT_REQUEST_FLOOR,
     RATE_LIMIT_TOKEN_FLOOR,
     RuntimeDiagnostics,
@@ -129,7 +132,18 @@ class ModelResolver:
         return [item.strip() for item in raw.split(",") if item.strip()]
 
     def capability_for(self, model: ModelConfig) -> ModelCapability:
-        return self.capabilities.get(model.model_id) or get_capability(model.model_id, provider=model.provider)
+        return (
+            self.capabilities.get(model.endpoint_id)
+            or self.capabilities.get(f"{model.provider}:{model.model_id}")
+            or self.capabilities.get(model.model_id)
+            or get_capability(model.model_id, provider=model.provider)
+        )
+
+    @staticmethod
+    def _mapping_value(mapping: dict[str, float] | None, model: ModelConfig, default: float = 0.0) -> float:
+        if not mapping:
+            return default
+        return float(mapping.get(model.endpoint_id, mapping.get(model.model_id, default)))
 
     def resolve(
         self,
@@ -156,7 +170,9 @@ class ModelResolver:
             if self.model_policy == "production_only" and capability.lifecycle != "production":
                 rejections.append({"model_id": model.model_id, "reason": "preview_model_disallowed"})
                 continue
-            if self.active_model_ids is not None and model.model_id not in self.active_model_ids:
+            if self.active_model_ids is not None and not (
+                model.model_id in self.active_model_ids or model.endpoint_id in self.active_model_ids
+            ):
                 rejections.append({"model_id": model.model_id, "reason": "model_not_active"})
                 continue
             if not capability.supports_json:
@@ -175,11 +191,11 @@ class ModelResolver:
             # run. budget_remaining is per the current key; UNLIMITED when the
             # model's TPD is unknown (no gating).
             if budget_remaining is not None:
-                remaining_budget = budget_remaining.get(model.model_id, UNLIMITED)
+                remaining_budget = self._mapping_value(budget_remaining, model, UNLIMITED)
                 if remaining_budget < needed_tokens:
                     rejections.append({"model_id": model.model_id, "reason": "daily_budget_exhausted"})
                     continue
-            wait_seconds = rate_limit_waits.get(model.model_id, 0.0)
+            wait_seconds = self._mapping_value(rate_limit_waits, model)
             # Passed every hard constraint (policy, active, json, context,
             # output). Remember it as a fallback that respects those constraints
             # even if its wait exceeds the cap.
@@ -189,10 +205,11 @@ class ModelResolver:
                 continue
 
             task_score = capability.task_scores.get(task_value, capability.task_scores.get("article_analysis", 0.5))
-            preferred_bonus = 0.5 if model.model_id == preferred_model_id else 0.0
+            preferred_bonus = 0.5 if model.model_id == preferred_model_id or model.endpoint_id == preferred_model_id else 0.0
             preference_bonus = 0.0
-            if model.model_id in task_preferences:
-                preference_bonus = max(0.0, 0.35 - task_preferences.index(model.model_id) * 0.03)
+            preference_key = model.endpoint_id if model.endpoint_id in task_preferences else model.model_id
+            if preference_key in task_preferences:
+                preference_bonus = max(0.0, 0.35 - task_preferences.index(preference_key) * 0.03)
             wait_penalty = min(wait_seconds / max(self.max_wait_seconds, 1.0), 1.0) * 0.4
             order_penalty = index * 0.01
             # Reserve premium models for high-value tasks: penalize them on bulk
@@ -208,7 +225,7 @@ class ModelResolver:
                 # below the reserve floor (or with no budget signal at all), apply
                 # the penalty so the remainder is held for high-value tasks.
                 declared_tpd = capability.limits.get("tpd")
-                remaining_budget = budget_remaining.get(model.model_id) if budget_remaining else None
+                remaining_budget = self._mapping_value(budget_remaining, model, UNLIMITED) if budget_remaining else None
                 reserve_floor = RESERVE_FRACTION * declared_tpd if declared_tpd else None
                 if remaining_budget is None or reserve_floor is None or remaining_budget < reserve_floor:
                     reservation_penalty = PREMIUM_BULK_PENALTY
@@ -224,7 +241,10 @@ class ModelResolver:
         if scored:
             scored.sort(key=lambda item: item[0], reverse=True)
             _score, _index, model, wait_seconds = scored[0]
-            return ModelSelection(model=model, rejections=rejections, avoided_wait_seconds=max(rate_limit_waits.get(preferred_model_id or "", 0.0) - wait_seconds, 0.0))
+            preferred_wait = 0.0
+            if preferred_model_id:
+                preferred_wait = float(rate_limit_waits.get(preferred_model_id, 0.0))
+            return ModelSelection(model=model, rejections=rejections, avoided_wait_seconds=max(preferred_wait - wait_seconds, 0.0))
 
         # Nothing scored within the wait cap. Prefer a model that satisfies every
         # hard constraint (policy/active/context/output) and just has a long
@@ -402,6 +422,29 @@ def _estimate_request_payload_bytes(model_id: str, messages: list[dict[str, Any]
     return len(json.dumps(payload, ensure_ascii=False).encode("utf-8"))
 
 
+def _usage_token_counts(
+    usage: dict[str, Any] | None,
+    *,
+    estimated_input_tokens: int,
+    fallback_output_tokens: int,
+) -> tuple[int, int, int]:
+    """Normalize OpenAI, Gemini, and provider-specific usage fields."""
+    usage = usage or {}
+    input_tokens = usage.get("prompt_tokens") or usage.get("input_tokens") or usage.get("prompt_token_count")
+    output_tokens = usage.get("completion_tokens") or usage.get("output_tokens") or usage.get("candidates_token_count")
+    total_tokens = usage.get("total_tokens") or usage.get("total_token_count")
+    input_tokens = int(input_tokens) if isinstance(input_tokens, (int, float)) else 0
+    output_tokens = int(output_tokens) if isinstance(output_tokens, (int, float)) else 0
+    total_tokens = int(total_tokens) if isinstance(total_tokens, (int, float)) else 0
+    if input_tokens <= 0:
+        input_tokens = max(0, int(estimated_input_tokens))
+    if total_tokens <= 0:
+        total_tokens = input_tokens + (output_tokens if output_tokens > 0 else max(0, int(fallback_output_tokens)))
+    if output_tokens <= 0:
+        output_tokens = max(0, total_tokens - input_tokens)
+    return input_tokens, output_tokens, max(total_tokens, input_tokens + output_tokens)
+
+
 # ---------------------------------------------------------------------------
 # JSON parsing (used by _invoke_json_with_retry)
 # ---------------------------------------------------------------------------
@@ -572,23 +615,39 @@ def _post_with_deadline(
 
 
 def _load_model_api_key(model: ModelConfig) -> str:
+    if model.api_key:
+        return model.api_key
     if model.provider == DEFAULT_PROVIDER:
         return load_groq_api_key()
 
     env_name = model.api_key_env or "OPENAI_API_KEY"
-    env_value = os.environ.get(env_name)
-    if env_value:
-        return env_value
+    env_names = [env_name]
+    if model.provider == "google_ai_studio":
+        env_names.extend(["GOOGLE_AI_STUDIO_API_KEY", "GEMINI_API_KEY", "GOOGLE_API_KEY"])
+    for candidate_env in dict.fromkeys(env_names):
+        env_value = os.environ.get(candidate_env)
+        if env_value:
+            return env_value
 
     for config_path in _candidate_config_paths():
         if not config_path.exists():
             continue
         parsed = _parse_simple_env_file(config_path)
-        value = parsed.get(env_name)
-        if value:
-            return value
+        for candidate_env in dict.fromkeys(env_names):
+            value = parsed.get(candidate_env)
+            if value:
+                return value
 
     raise RuntimeError(f"{env_name} is not set for provider {model.provider}.")
+
+
+def _default_provider_url(provider: str) -> str:
+    return {
+        DEFAULT_PROVIDER: GROQ_CHAT_COMPLETIONS_URL,
+        "cerebras": CEREBRAS_CHAT_COMPLETIONS_URL,
+        "google_ai_studio": GOOGLE_AI_STUDIO_CHAT_COMPLETIONS_URL,
+        "openrouter": OPENROUTER_CHAT_COMPLETIONS_URL,
+    }.get(provider, GROQ_CHAT_COMPLETIONS_URL)
 
 
 # ---------------------------------------------------------------------------
@@ -611,18 +670,29 @@ class RateLimitGovernor:
         # Declared per-model limits (rpm/rpd/tpm/tpd) from the catalog, used to
         # pre-seed per-minute headroom before any response header is observed.
         self.model_limits = model_limits or {}
-        # Keyed by (model_id, key_index) to track rate limits per API key independently.
+        # When quota_scope is present, key credentials share one state bucket.
+        # Without it, the legacy per-(model, key) behavior is retained.
         self._states: dict[tuple[str, int], ModelRateLimitState] = {}
 
-    def _state(self, model_id: str, key_index: int) -> ModelRateLimitState:
-        key = (model_id, key_index)
+    @staticmethod
+    def _bucket_id(model_id: str, quota_scope: str | None) -> str:
+        return f"{quota_scope}:{model_id}" if quota_scope else model_id
+
+    def _state(self, model_id: str, key_index: int, quota_scope: str | None = None) -> ModelRateLimitState:
+        bucket_id = self._bucket_id(model_id, quota_scope)
+        key = (bucket_id, 0 if quota_scope else key_index)
         state = self._states.get(key)
         if state is None:
             state = ModelRateLimitState()
             # Pre-seed per-minute token headroom from the declared TPM so the
             # very first burst on a fresh key can't overshoot before a header is
             # seen. Real headers overwrite this on the next response.
-            tpm = self.model_limits.get(model_id, {}).get("tpm")
+            limits = self.model_limits.get(bucket_id, self.model_limits.get(model_id, {}))
+            rpm = limits.get("rpm")
+            if rpm:
+                state.remaining_requests = int(rpm)
+                state.reset_requests_at = self._time_fn() + 60.0
+            tpm = limits.get("tpm")
             if tpm:
                 state.remaining_tokens = int(tpm)
                 state.reset_tokens_at = self._time_fn() + 60.0
@@ -635,6 +705,7 @@ class RateLimitGovernor:
         current_key: int,
         num_keys: int,
         estimated_input_tokens: int = 0,
+        quota_scope: str | None = None,
     ) -> tuple[int, float]:
         """Return (best_key_index, seconds_slept).
 
@@ -648,7 +719,7 @@ class RateLimitGovernor:
         earliest_reset = float("inf")
 
         for ki in range(num_keys):
-            state = self._state(model_id, ki)
+            state = self._state(model_id, ki, quota_scope)
             is_observed_key = (
                 ki == current_key
                 or state.remaining_requests is not None
@@ -688,12 +759,33 @@ class RateLimitGovernor:
             self._sleep_fn(sleep_secs)
         return current_key, sleep_secs
 
+    def reserve_request(
+        self,
+        model_id: str,
+        estimated_tokens: int = 0,
+        *,
+        key_index: int = 0,
+        quota_scope: str | None = None,
+    ) -> None:
+        """Reserve declared request/token headroom before the HTTP call.
+
+        Live headers replace these estimates after the response. Reserving the
+        local catalog values prevents a burst of calls from overshooting a
+        provider's published RPM/TPM before the first header arrives.
+        """
+        state = self._state(model_id, key_index, quota_scope)
+        if state.remaining_requests is not None:
+            state.remaining_requests = max(0, state.remaining_requests - 1)
+        if state.remaining_tokens is not None:
+            state.remaining_tokens = max(0, state.remaining_tokens - max(0, int(estimated_tokens)))
+
     def peek_key(
         self,
         model_id: str,
         current_key: int,
         num_keys: int,
         estimated_input_tokens: int = 0,
+        quota_scope: str | None = None,
     ) -> tuple[int, float]:
         now = self._time_fn()
         best_key: int | None = None
@@ -701,7 +793,7 @@ class RateLimitGovernor:
         earliest_reset = float("inf")
 
         for ki in range(num_keys):
-            state = self._state(model_id, ki)
+            state = self._state(model_id, ki, quota_scope)
             is_observed_key = (
                 ki == current_key
                 or state.remaining_requests is not None
@@ -738,24 +830,46 @@ class RateLimitGovernor:
         _key, waited = self.select_key(model_id, 0, 1, estimated_input_tokens)
         return waited
 
-    def record_response(self, model_id: str, response: requests.Response, key_index: int = 0) -> None:
-        state = self._state(model_id, key_index)
+    def record_response(
+        self,
+        model_id: str,
+        response: requests.Response,
+        key_index: int = 0,
+        quota_scope: str | None = None,
+    ) -> None:
+        state = self._state(model_id, key_index, quota_scope)
         now = self._time_fn()
         headers = {key.lower(): value for key, value in response.headers.items()}
 
-        remaining_requests = _parse_int(headers.get("x-ratelimit-remaining-requests"))
+        remaining_requests = _parse_int(
+            headers.get("x-ratelimit-remaining-requests")
+            or headers.get("x-ratelimit-remaining-requests-minute")
+            or headers.get("x-ratelimit-remaining-requests-day")
+        )
         if remaining_requests is not None:
             state.remaining_requests = remaining_requests
 
-        remaining_tokens = _parse_int(headers.get("x-ratelimit-remaining-tokens"))
+        remaining_tokens = _parse_int(
+            headers.get("x-ratelimit-remaining-tokens")
+            or headers.get("x-ratelimit-remaining-tokens-minute")
+            or headers.get("x-ratelimit-remaining-tokens-day")
+        )
         if remaining_tokens is not None:
             state.remaining_tokens = remaining_tokens
 
-        reset_requests = _parse_duration_seconds(headers.get("x-ratelimit-reset-requests"))
+        reset_requests = _parse_duration_seconds(
+            headers.get("x-ratelimit-reset-requests")
+            or headers.get("x-ratelimit-reset-requests-minute")
+            or headers.get("x-ratelimit-reset-requests-day")
+        )
         if reset_requests is not None:
             state.reset_requests_at = now + reset_requests
 
-        reset_tokens = _parse_duration_seconds(headers.get("x-ratelimit-reset-tokens"))
+        reset_tokens = _parse_duration_seconds(
+            headers.get("x-ratelimit-reset-tokens")
+            or headers.get("x-ratelimit-reset-tokens-minute")
+            or headers.get("x-ratelimit-reset-tokens-day")
+        )
         if reset_tokens is not None:
             state.reset_tokens_at = now + reset_tokens
 
@@ -828,12 +942,18 @@ class AnalysisRuntime:
     def get_session_for_model(self, model: ModelConfig) -> requests.Session:
         if model.provider == DEFAULT_PROVIDER:
             return self.get_groq_session(self.current_key_index)
-        session = self.provider_sessions.get(model.provider)
+        session = self.provider_sessions.get(model.session_key)
         if session is not None:
             return session
         session = _build_provider_session(_load_model_api_key(model))
-        self.provider_sessions[model.provider] = session
+        self.provider_sessions[model.session_key] = session
         return session
+
+    def key_index_for_model(self, model: ModelConfig) -> int:
+        return self.current_key_index if model.provider == DEFAULT_PROVIDER else 0
+
+    def key_count_for_model(self, model: ModelConfig) -> int:
+        return max(1, len(self.groq_api_keys)) if model.provider == DEFAULT_PROVIDER else 1
 
     def rotate_key(self, reason: str) -> bool:
         """Rotate to the next API key. Returns False if only one key available."""
@@ -856,6 +976,9 @@ class AnalysisRuntime:
         for session in self.groq_sessions.values():
             session.close()
         self.groq_sessions.clear()
+        for session in self.provider_sessions.values():
+            session.close()
+        self.provider_sessions.clear()
 
     def reset_session_for_model(self, model: ModelConfig) -> None:
         """Drop the cached session for a model so a fresh one is built next use.
@@ -871,15 +994,13 @@ class AnalysisRuntime:
                     pass
                 del self.groq_sessions[ki]
             return
-        session = self.provider_sessions.pop(model.provider, None)
+        session = self.provider_sessions.pop(model.session_key, None)
         if session is not None:
             try:
                 session.close()
             except Exception:  # noqa: BLE001 - best-effort teardown
                 pass
-        for session in self.provider_sessions.values():
-            session.close()
-        self.provider_sessions.clear()
+        # Other provider/account sessions remain valid and are kept cached.
 
     def get_model_config(self, model_id: str) -> ModelConfig:
         for model in self.model_chain:
@@ -929,14 +1050,19 @@ class AnalysisRuntime:
         """
         if len(self.model_chain) <= 1:
             return False
-        index = next((i for i, m in enumerate(self.model_chain) if m.model_id == model_id), None)
+        index = next(
+            (i for i, m in enumerate(self.model_chain) if m.model_id == model_id or m.endpoint_id == model_id),
+            None,
+        )
         if index is None:
             return False
-        self.model_chain.pop(index)
+        removed_model = self.model_chain.pop(index)
         if self.current_model_index >= len(self.model_chain):
             self.current_model_index = len(self.model_chain) - 1
         if self.resolver is not None and self.resolver.active_model_ids is not None:
             self.resolver.active_model_ids.discard(model_id)
+            self.resolver.active_model_ids.discard(removed_model.model_id)
+            self.resolver.active_model_ids.discard(removed_model.endpoint_id)
         self.diagnostics.fallback_switch_count += 1
         LOGGER.info("Evicted model %s from the pool; %d remain.", model_id, len(self.model_chain))
         return True
@@ -1013,6 +1139,7 @@ class AnalysisRuntime:
             self.diagnostics.response_413_split_count += 1
 
     def record_batch_attempt(self, context: BatchContext, model_id: str) -> None:
+        self.diagnostics.llm_request_count += 1
         if context.llm_task != LLMTask.TOP_ALERTS.value:
             self.diagnostics.batch_count += 1
         task_counts = self.diagnostics.model_task_counts.setdefault(context.llm_task, {})
@@ -1028,6 +1155,27 @@ class AnalysisRuntime:
             diagnostics.serialized_request_bytes_max,
             context.serialized_request_bytes,
         )
+
+    def record_endpoint_attempt(self, context: BatchContext, model: ModelConfig) -> None:
+        counts = self.diagnostics.endpoint_task_counts.setdefault(context.llm_task, {})
+        counts[model.endpoint_id] = counts.get(model.endpoint_id, 0) + 1
+
+    def record_usage(self, model: ModelConfig, input_tokens: int, output_tokens: int, total_tokens: int) -> None:
+        input_tokens = max(0, int(input_tokens))
+        output_tokens = max(0, int(output_tokens))
+        total_tokens = max(0, int(total_tokens))
+        self.diagnostics.input_tokens_used += input_tokens
+        self.diagnostics.output_tokens_used += output_tokens
+        self.diagnostics.total_tokens_used += total_tokens
+        self.diagnostics.daily_budget_tokens_used += total_tokens
+        usage = self.diagnostics.endpoint_usage.setdefault(
+            model.endpoint_id,
+            {"requests": 0, "input_tokens": 0, "output_tokens": 0, "total_tokens": 0},
+        )
+        usage["requests"] += 1
+        usage["input_tokens"] += input_tokens
+        usage["output_tokens"] += output_tokens
+        usage["total_tokens"] += total_tokens
 
     def record_json_repair_retry(self) -> None:
         self.diagnostics.json_repair_retry_count += 1
@@ -1106,11 +1254,12 @@ def _chat_completion(
         task = context.llm_task
         candidate_chain = [preferred_model] if model_override is not None else runtime.model_chain
         rate_limit_waits = {
-            candidate.model_id: runtime.governor.peek_key(
+            candidate.endpoint_id: runtime.governor.peek_key(
                 candidate.model_id,
-                runtime.current_key_index,
-                len(runtime.groq_api_keys),
+                runtime.key_index_for_model(candidate),
+                runtime.key_count_for_model(candidate),
                 estimated_input_tokens,
+                quota_scope=candidate.quota_scope,
             )[1]
             for candidate in candidate_chain
         }
@@ -1118,10 +1267,11 @@ def _chat_completion(
         # Remaining daily token budget per candidate on the current key, so the
         # resolver can skip a TPD-exhausted model and reserve premium capacity.
         budget_remaining = {
-            candidate.model_id: runtime.budget.remaining_tokens(
+            candidate.endpoint_id: runtime.budget.remaining_tokens(
                 candidate.model_id,
-                runtime.current_key_index,
+                runtime.key_index_for_model(candidate),
                 resolver.capability_for(candidate).limits.get("tpd"),
+                quota_scope=candidate.quota_scope,
             )
             for candidate in candidate_chain
         }
@@ -1129,9 +1279,9 @@ def _chat_completion(
             task,
             candidate_chain,
             estimated_input_tokens=estimated_input_tokens,
-            requested_output_tokens=preferred_model.max_completion_tokens,
+            requested_output_tokens=min(preferred_model.max_completion_tokens, DEFAULT_OUTPUT_TOKENS),
             rate_limit_waits=rate_limit_waits,
-            preferred_model_id=preferred_model.model_id,
+            preferred_model_id=preferred_model.endpoint_id,
             budget_remaining=budget_remaining,
         )
         model = selection.model
@@ -1144,7 +1294,7 @@ def _chat_completion(
         )
         if context.batch_kind.startswith("synthesis"):
             runtime.ensure_synthesis_budget(context.category_name)
-        api_url = model.api_url or GROQ_CHAT_COMPLETIONS_URL
+        api_url = model.api_url or _default_provider_url(model.provider)
         session = runtime.get_session_for_model(model)
         runtime.last_attempted_model = model.model_id
         attempt_context = BatchContext(
@@ -1157,10 +1307,11 @@ def _chat_completion(
             content_shrunk=context.content_shrunk,
             llm_task=task,
         )
-        selected_wait = rate_limit_waits.get(model.model_id, 0.0)
+        selected_wait = rate_limit_waits.get(model.endpoint_id, 0.0)
         if task == LLMTask.TOP_ALERTS.value and selected_wait > 0:
             raise RuntimeError(f"Top-alert generation degraded instead of waiting {selected_wait:.1f}s for rate limit reset.")
         runtime.record_batch_attempt(attempt_context, model.model_id)
+        runtime.record_endpoint_attempt(attempt_context, model)
         LOGGER.debug(
             "Sending %s for %s batch=%s model=%s articles=%s estimated_tokens=%s serialized_bytes=%s shrunk=%s attempt=%s.",
             attempt_context.batch_kind,
@@ -1177,11 +1328,12 @@ def _chat_completion(
         # better key exists, sleep only when all keys are exhausted for this model.
         best_key, wait_seconds = runtime.governor.select_key(
             model.model_id,
-            runtime.current_key_index,
-            len(runtime.groq_api_keys),
+            runtime.key_index_for_model(model),
+            runtime.key_count_for_model(model),
             estimated_input_tokens,
+            quota_scope=model.quota_scope,
         )
-        if best_key != runtime.current_key_index and model.provider == DEFAULT_PROVIDER:
+        if best_key != runtime.key_index_for_model(model) and model.provider == DEFAULT_PROVIDER and not model.quota_scope:
             LOGGER.info(
                 "Governor rotating key %d → %d for model %s (more capacity available).",
                 runtime.current_key_index,
@@ -1202,6 +1354,12 @@ def _chat_completion(
                 model.model_id,
                 runtime.current_key_index,
             )
+        runtime.governor.reserve_request(
+            model.model_id,
+            estimated_input_tokens,
+            key_index=runtime.key_index_for_model(model),
+            quota_scope=model.quota_scope,
+        )
         connect_timeout, read_timeout, total_deadline = _llm_request_timeouts()
         try:
             response = _post_with_deadline(
@@ -1235,7 +1393,7 @@ def _chat_completion(
             runtime.record_retry(attempt_context.category_name, batch_kind=attempt_context.batch_kind)
             if attempt == DEFAULT_CHAT_RETRIES - 1:
                 raise
-            if model.provider == DEFAULT_PROVIDER and runtime.rotate_key(
+            if model.provider == DEFAULT_PROVIDER and not model.quota_scope and runtime.rotate_key(
                 f"request error on key {runtime.current_key_index} / model {model.model_id}"
             ):
                 session = runtime.get_session_for_model(model)
@@ -1252,7 +1410,12 @@ def _chat_completion(
             time.sleep(delay_seconds)
             session = runtime.get_session_for_model(model)
             continue
-        runtime.governor.record_response(model.model_id, response, key_index=runtime.current_key_index)
+        runtime.governor.record_response(
+            model.model_id,
+            response,
+            key_index=runtime.key_index_for_model(model),
+            quota_scope=model.quota_scope,
+        )
         LOGGER.debug(
             "Received HTTP %s for %s category=%s batch=%s model=%s.",
             response.status_code,
@@ -1285,7 +1448,7 @@ def _chat_completion(
                 batch_kind="synthesis" if attempt_context.batch_kind.startswith("synthesis") else "article_batch",
             )
             # Try rotating to another key before switching models.
-            if runtime.rotate_key(f"429 on key {runtime.current_key_index} / model {model.model_id}"):
+            if not model.quota_scope and runtime.rotate_key(f"429 on key {runtime.current_key_index} / model {model.model_id}"):
                 session = runtime.get_session_for_model(model)
                 continue
             # All keys exhausted for this model — switch model and reset key index.
@@ -1339,7 +1502,7 @@ def _chat_completion(
                     attempt_context.category_name,
                     attempt_context.batch_label,
                 )
-                if runtime.evict_model(model.model_id):
+                if runtime.evict_model(model.endpoint_id):
                     runtime.diagnostics.model_decommissioned_count += 1
                     runtime.current_key_index = 0
                     session = runtime.get_session_for_model(runtime.current_model)
@@ -1349,11 +1512,20 @@ def _chat_completion(
         payload = response.json()
         # Record actual daily token/request usage so budget survives across runs.
         usage = payload.get("usage") if isinstance(payload, dict) else None
-        used_tokens = (usage or {}).get("total_tokens")
-        if not isinstance(used_tokens, int) or used_tokens <= 0:
-            used_tokens = estimated_input_tokens + model.max_completion_tokens
-        runtime.budget.record(model.model_id, runtime.current_key_index, used_tokens)
-        runtime.diagnostics.daily_budget_tokens_used += used_tokens
+        input_tokens, output_tokens, used_tokens = _usage_token_counts(
+            usage if isinstance(usage, dict) else None,
+            estimated_input_tokens=estimated_input_tokens,
+            fallback_output_tokens=model.max_completion_tokens,
+        )
+        runtime.budget.record(
+            model.model_id,
+            runtime.key_index_for_model(model),
+            used_tokens,
+            quota_scope=model.quota_scope,
+            input_tokens=input_tokens,
+            output_tokens=output_tokens,
+        )
+        runtime.record_usage(model, input_tokens, output_tokens, used_tokens)
         content = payload["choices"][0]["message"]["content"]
         if not isinstance(content, str):
             raise ValueError("Groq response content was not a string.")

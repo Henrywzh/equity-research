@@ -1,6 +1,132 @@
 {
-  "_comment": "Curated model overrides for daily-macro selection. Seeded from MODEL_CATALOG + Groq published limits. task_scores are quality priors per task (0-1). limits are declared rpm/rpd/tpm/tpd (used by Step 2 budget enforcement; recorded but not enforced in Step 1). Editing this file is a config change - no code edit required.",
+  "_comment": "Curated model overrides for daily-macro selection. Keys may be provider:model_id for provider-specific capabilities. task_scores are quality priors per task (0-1). limits seed the quota governor; live response headers refine them. Editing this file is a config change - no code edit required.",
   "models": {
+    "cerebras:gpt-oss-120b": {
+      "provider": "cerebras",
+      "lifecycle": "production",
+      "kind": "chat",
+      "context_window": 65536,
+      "max_output_tokens": 8192,
+      "supports_json": true,
+      "max_completion_tokens": 4096,
+      "task_scores": {
+        "routing": 0.60,
+        "article_analysis": 0.88,
+        "category_synthesis": 0.94,
+        "top_alerts": 0.97,
+        "json_repair": 0.70,
+        "critic": 0.95
+      },
+      "limits": { "rpm": 5, "rph": 150, "rpd": 2400, "tpm": 30000, "tph": 1000000, "tpd": 1000000 }
+    },
+    "cerebras:gemma-4-31b": {
+      "provider": "cerebras",
+      "lifecycle": "preview",
+      "kind": "chat",
+      "context_window": 65536,
+      "max_output_tokens": 8192,
+      "supports_json": true,
+      "max_completion_tokens": 2048,
+      "task_scores": {
+        "routing": 0.78,
+        "article_analysis": 0.82,
+        "category_synthesis": 0.74,
+        "top_alerts": 0.68,
+        "json_repair": 0.82,
+        "critic": 0.72
+      },
+      "limits": { "rpm": 5, "rph": 150, "rpd": 2400, "tpm": 30000, "tph": 1000000, "tpd": 1000000 }
+    },
+    "cerebras:zai-glm-4.7": {
+      "provider": "cerebras",
+      "lifecycle": "preview",
+      "kind": "chat",
+      "context_window": 8192,
+      "max_output_tokens": 4096,
+      "supports_json": true,
+      "max_completion_tokens": 1536,
+      "task_scores": {
+        "routing": 0.72,
+        "article_analysis": 0.75,
+        "category_synthesis": 0.62,
+        "top_alerts": 0.58,
+        "json_repair": 0.75,
+        "critic": 0.58
+      },
+      "limits": { "rpm": 5, "rph": 150, "rpd": 2400, "tpm": 30000, "tph": 1000000, "tpd": 1000000 }
+    },
+    "google_ai_studio:gemini-2.5-flash-lite": {
+      "provider": "google_ai_studio",
+      "lifecycle": "production",
+      "kind": "chat",
+      "context_window": 1048576,
+      "max_output_tokens": 65536,
+      "supports_json": true,
+      "max_completion_tokens": 2048,
+      "task_scores": {
+        "routing": 0.88,
+        "article_analysis": 0.86,
+        "category_synthesis": 0.84,
+        "top_alerts": 0.78,
+        "json_repair": 0.90,
+        "critic": 0.80
+      },
+      "limits": {}
+    },
+    "google_ai_studio:gemini-2.5-flash": {
+      "provider": "google_ai_studio",
+      "lifecycle": "production",
+      "kind": "chat",
+      "context_window": 1048576,
+      "max_output_tokens": 65536,
+      "supports_json": true,
+      "max_completion_tokens": 4096,
+      "task_scores": {
+        "routing": 0.82,
+        "article_analysis": 0.91,
+        "category_synthesis": 0.91,
+        "top_alerts": 0.90,
+        "json_repair": 0.84,
+        "critic": 0.89
+      },
+      "limits": {}
+    },
+    "openrouter:openai/gpt-oss-20b:free": {
+      "provider": "openrouter",
+      "lifecycle": "preview",
+      "kind": "chat",
+      "context_window": 131072,
+      "max_output_tokens": 8192,
+      "supports_json": true,
+      "max_completion_tokens": 2048,
+      "task_scores": {
+        "routing": 0.70,
+        "article_analysis": 0.84,
+        "category_synthesis": 0.86,
+        "top_alerts": 0.88,
+        "json_repair": 0.76,
+        "critic": 0.85
+      },
+      "limits": { "rpm": 20, "rpd": 1000 }
+    },
+    "openrouter:google/gemma-4-31b-it:free": {
+      "provider": "openrouter",
+      "lifecycle": "preview",
+      "kind": "chat",
+      "context_window": 262144,
+      "max_output_tokens": 8192,
+      "supports_json": true,
+      "max_completion_tokens": 2048,
+      "task_scores": {
+        "routing": 0.78,
+        "article_analysis": 0.84,
+        "category_synthesis": 0.78,
+        "top_alerts": 0.70,
+        "json_repair": 0.82,
+        "critic": 0.70
+      },
+      "limits": { "rpm": 20, "rpd": 1000 }
+    },
     "openai/gpt-oss-120b": {
       "lifecycle": "production",
       "kind": "chat",

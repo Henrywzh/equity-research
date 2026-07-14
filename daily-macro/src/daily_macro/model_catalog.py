@@ -154,9 +154,13 @@ def _builtin_catalog() -> dict[str, ModelCapability]:
 
 
 def _capability_from_spec(model_id: str, spec: dict) -> ModelCapability:
+    provider = str(spec.get("provider", "groq"))
+    actual_model_id = str(spec.get("model_id") or model_id)
+    if ":" in model_id and model_id.startswith(("cerebras:", "google_ai_studio:", "openrouter:")):
+        actual_model_id = model_id.split(":", 1)[1]
     return ModelCapability(
-        model_id=model_id,
-        provider=str(spec.get("provider", "groq")),
+        model_id=actual_model_id,
+        provider=provider,
         lifecycle=str(spec.get("lifecycle", "production")),
         kind=str(spec.get("kind", "chat")),
         context_window=int(spec.get("context_window", 8192)),
@@ -196,7 +200,7 @@ def get_capability(model_id: str, provider: str = "groq") -> ModelCapability:
     Never raises — an unknown model gets an inferred kind + provisional scores so
     a newly released Groq model is usable without a code change.
     """
-    capability = MODEL_CATALOG.get(model_id)
+    capability = MODEL_CATALOG.get(f"{provider}:{model_id}") or MODEL_CATALOG.get(model_id)
     if capability is not None:
         return capability
     return ModelCapability(

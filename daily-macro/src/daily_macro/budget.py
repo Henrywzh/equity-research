@@ -71,35 +71,70 @@ class DailyBudgetLedger:
             usage = {}
         return cls(path=path, date=today, usage=usage)
 
-    def _bucket(self, model_id: str, key_index: int) -> dict[str, int]:
-        return self.usage.setdefault(model_id, {}).setdefault(
-            str(key_index), {"tokens": 0, "requests": 0}
+    @staticmethod
+    def _bucket_name(model_id: str, quota_scope: str | None) -> str:
+        return f"{quota_scope}:{model_id}" if quota_scope else model_id
+
+    def _bucket(self, model_id: str, key_index: int, quota_scope: str | None = None) -> dict[str, int]:
+        bucket_name = self._bucket_name(model_id, quota_scope)
+        return self.usage.setdefault(bucket_name, {}).setdefault(
+            "shared" if quota_scope else str(key_index), {"tokens": 0, "requests": 0}
         )
 
-    def record(self, model_id: str, key_index: int, tokens: int, requests: int = 1) -> None:
+    def record(
+        self,
+        model_id: str,
+        key_index: int,
+        tokens: int,
+        requests: int = 1,
+        *,
+        quota_scope: str | None = None,
+        input_tokens: int | None = None,
+        output_tokens: int | None = None,
+    ) -> None:
         """Add ``tokens``/``requests`` to today's bucket for this model+key."""
         with self._lock:
-            bucket = self._bucket(model_id, key_index)
+            bucket = self._bucket(model_id, key_index, quota_scope)
             bucket["tokens"] += max(0, int(tokens))
             bucket["requests"] += max(0, int(requests))
+            bucket.setdefault("input_tokens", 0)
+            bucket.setdefault("output_tokens", 0)
+            if input_tokens is not None:
+                bucket["input_tokens"] += max(0, int(input_tokens))
+            if output_tokens is not None:
+                bucket["output_tokens"] += max(0, int(output_tokens))
 
-    def used_tokens(self, model_id: str, key_index: int) -> int:
+    def used_tokens(self, model_id: str, key_index: int, quota_scope: str | None = None) -> int:
         with self._lock:
-            return self._bucket(model_id, key_index)["tokens"]
+            return self._bucket(model_id, key_index, quota_scope)["tokens"]
 
-    def remaining_tokens(self, model_id: str, key_index: int, declared_tpd: int | None) -> float:
+    def remaining_tokens(
+        self,
+        model_id: str,
+        key_index: int,
+        declared_tpd: int | None,
+        *,
+        quota_scope: str | None = None,
+    ) -> float:
         """Declared TPD minus tokens used today (floored at 0); UNLIMITED if unknown."""
         if not declared_tpd:
             return UNLIMITED
         with self._lock:
-            return max(0, int(declared_tpd) - self._bucket(model_id, key_index)["tokens"])
+            return max(0, int(declared_tpd) - self._bucket(model_id, key_index, quota_scope)["tokens"])
 
-    def remaining_requests(self, model_id: str, key_index: int, declared_rpd: int | None) -> float:
+    def remaining_requests(
+        self,
+        model_id: str,
+        key_index: int,
+        declared_rpd: int | None,
+        *,
+        quota_scope: str | None = None,
+    ) -> float:
         """Declared RPD minus requests made today (floored at 0); UNLIMITED if unknown."""
         if not declared_rpd:
             return UNLIMITED
         with self._lock:
-            return max(0, int(declared_rpd) - self._bucket(model_id, key_index)["requests"])
+            return max(0, int(declared_rpd) - self._bucket(model_id, key_index, quota_scope)["requests"])
 
     def flush(self) -> None:
         """Atomically persist today's usage to disk. Best-effort (never raises)."""

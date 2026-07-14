@@ -64,7 +64,22 @@ The SQLite database is the primary store for normalized article data.
 
 The JSON backups are lightweight article-level snapshots that preserve the parsed result and parser metadata without storing full raw HTML pages.
 
-Daily analysis reports are stored as JSON files. The analysis command uses `GROQ_API_KEY`, starts on `qwen/qwen3-32b`, can fall back to `llama-3.1-8b-instant` when the primary model hits rate limits, and paces requests based on Groq rate-limit headers.
+Daily analysis reports are stored as JSON files. The analysis command builds a
+quota-aware pool from the configured providers, then chooses a model per task
+using context/output limits, JSON support, quality priors, live rate-limit
+headers, and recent usage. Groq remains compatible with the existing
+`GROQ_API_KEY` setup; Cerebras, Google AI Studio, and OpenRouter are optional.
+
+LLM provider configuration:
+- `GROQ_API_KEY`: one key or comma-separated keys. Keys default to one Groq organization quota scope.
+- `CEREBRAS_API_KEY`, `CEREBRAS_API_KEY_2`, ...: replacement keys for separate Cerebras accounts. Set `DAILY_MACRO_CEREBRAS_QUOTA_SCOPE` when they share one organization/project.
+- `GOOGLE_AI_STUDIO_API_KEY` (or `GEMINI_API_KEY` / `GOOGLE_API_KEY`): Google AI Studio key.
+- `OPENROUTER_API_KEY`: OpenRouter key.
+- `DAILY_MACRO_GROQ_MODELS`, `DAILY_MACRO_CEREBRAS_MODELS`, `DAILY_MACRO_GOOGLE_AI_MODELS`, `DAILY_MACRO_OPENROUTER_MODELS`: optional comma-separated model overrides. Groq defaults to `qwen/qwen3.6-27b`, followed by `openai/gpt-oss-120b` and `openai/gpt-oss-20b`.
+- `DAILY_MACRO_MODEL_POLICY=production_only|allow_preview` and `DAILY_MACRO_MAX_LLM_WAIT_SECONDS`: selection and latency controls.
+
+Do not paste API keys into source or reports. Put them in the local `.config`
+file or in CI secrets.
 
 Gmail notification can use either daily-macro-specific env vars or generic Gmail env vars:
 - `DAILY_MACRO_GMAIL_SENDER`
@@ -79,6 +94,7 @@ GitHub Actions automation is split into two workflows:
 
 GitHub Secrets for the analysis/email workflow:
 - `GROQ_API_KEY`
+- optional `CEREBRAS_API_KEY`, `GOOGLE_AI_STUDIO_API_KEY`, and `OPENROUTER_API_KEY`
 - `GMAIL_SENDER`
 - `GMAIL_APP_PASSWORD`
 - `GMAIL_RECIPIENT`
@@ -89,6 +105,6 @@ GitHub Secrets for the analysis/email workflow:
 - Articles are analyzed in category-sized batches, and oversized categories are split into smaller sub-batches before analysis
 - Saved analysis reports include compact diagnostics for rate-limit waits, batch splits, fallback switches, JSON-repair retries, and failed batches
 - Long articles are analyzed in full when they fit the working request budget; otherwise the analyzed slice is truncated and explicitly flagged in the report JSON
-- The analysis path uses only non-deprecated Groq models
+- The analysis path uses only the approved Groq Qwen 3.6/GPT OSS lineup; older Llama and Qwen 3.0/3.2 models remain only in historical report fixtures
 - Analysis/email automation currently runs after both daily scrape runs, and the public site is rebuilt from the saved report JSON without re-running LLM analysis
 - Future downstream workflows can read from the SQLite database, parsed JSON backups, or saved daily analysis reports
