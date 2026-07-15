@@ -283,6 +283,12 @@ class CategoryBudgetState:
 
 @dataclass
 class RuntimeDiagnostics:
+    wall_clock_seconds: float = 0.0
+    phase_seconds: dict[str, float] = field(default_factory=dict)
+    llm_request_seconds_total: float = 0.0
+    llm_request_seconds_by_task: dict[str, float] = field(default_factory=dict)
+    llm_request_seconds_by_endpoint: dict[str, float] = field(default_factory=dict)
+    timeout_seconds_total: float = 0.0
     rate_limit_wait_count: int = 0
     rate_limit_wait_seconds_total: float = 0.0
     fallback_switch_count: int = 0
@@ -302,6 +308,8 @@ class RuntimeDiagnostics:
     degraded_merge_count: int = 0
     key_rotation_count: int = 0
     request_timeout_count: int = 0
+    endpoint_cooldown_count: int = 0
+    endpoint_cooldown_seconds_total: float = 0.0
     model_decommissioned_count: int = 0
     daily_budget_skip_count: int = 0
     daily_budget_tokens_used: int = 0
@@ -322,6 +330,16 @@ class RuntimeDiagnostics:
 
     def as_dict(self) -> dict[str, Any]:
         return {
+            "wall_clock_seconds": round(self.wall_clock_seconds, 3),
+            "phase_seconds": {name: round(seconds, 3) for name, seconds in self.phase_seconds.items()},
+            "llm_request_seconds_total": round(self.llm_request_seconds_total, 3),
+            "llm_request_seconds_by_task": {
+                task: round(seconds, 3) for task, seconds in self.llm_request_seconds_by_task.items()
+            },
+            "llm_request_seconds_by_endpoint": {
+                endpoint: round(seconds, 3) for endpoint, seconds in self.llm_request_seconds_by_endpoint.items()
+            },
+            "timeout_seconds_total": round(self.timeout_seconds_total, 3),
             "rate_limit_wait_count": self.rate_limit_wait_count,
             "rate_limit_wait_seconds_total": round(self.rate_limit_wait_seconds_total, 3),
             "fallback_switch_count": self.fallback_switch_count,
@@ -341,6 +359,8 @@ class RuntimeDiagnostics:
             "synthesis_budget_exhausted_count": self.synthesis_budget_exhausted_count,
             "degraded_merge_count": self.degraded_merge_count,
             "request_timeout_count": self.request_timeout_count,
+            "endpoint_cooldown_count": self.endpoint_cooldown_count,
+            "endpoint_cooldown_seconds_total": round(self.endpoint_cooldown_seconds_total, 3),
             "model_decommissioned_count": self.model_decommissioned_count,
             "daily_budget_skip_count": self.daily_budget_skip_count,
             "daily_budget_tokens_used": self.daily_budget_tokens_used,
