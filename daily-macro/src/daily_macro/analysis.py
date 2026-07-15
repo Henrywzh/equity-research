@@ -150,6 +150,7 @@ def run_analysis(
     db_path: str | Path | None = None,
     force: bool = False,
 ) -> dict[str, Any]:
+    run_started = time.monotonic()
     target_date = date_string or datetime.now().astimezone().date().isoformat()
     resolved_data_dir = get_data_dir(data_dir)
     resolved_db_path = get_db_path(db_path, resolved_data_dir)
@@ -165,6 +166,7 @@ def run_analysis(
 
     LOGGER.info("Starting daily analysis for %s.", target_date)
 
+    storage_started = time.monotonic()
     storage = Storage(resolved_db_path)
     try:
         articles = storage.fetch_published_articles_for_date(target_date, source_site=DEFAULT_SOURCE_SITE)
@@ -179,6 +181,7 @@ def run_analysis(
         )
     finally:
         storage.close()
+    storage_elapsed = time.monotonic() - storage_started
     graph = _build_analysis_graph()
     state: AnalysisGraphState = {
         "target_date": target_date,
@@ -206,8 +209,17 @@ def run_analysis(
     }
     final_state = graph.invoke(state)
     report = final_state["report"]
+    runtime = final_state.get("runtime")
+    wall_clock_seconds = time.monotonic() - run_started
+    if runtime is not None:
+        runtime.record_phase("storage_load", storage_elapsed)
+        runtime.diagnostics.wall_clock_seconds = wall_clock_seconds
+        report["diagnostics"] = runtime.diagnostics.as_dict()
+    else:
+        report.setdefault("diagnostics", {})["wall_clock_seconds"] = round(wall_clock_seconds, 3)
     report["output_path"] = str(report_path)
     report["cached"] = False
+    _write_report(report_path, report)
     LOGGER.info(
         "Finished daily analysis for %s with status %s. Categories=%s, articles=%s.",
         target_date,
@@ -220,15 +232,19 @@ def run_analysis(
 
 def _build_analysis_graph():
     graph = StateGraph(AnalysisGraphState)
-    graph.add_node("initialize", _graph_initialize)
-    graph.add_node("fetch_market_data", _graph_fetch_market_data)
-    graph.add_node("route_attention", _graph_route_attention)
-    graph.add_node("analyze_today", _graph_analyze_today)
-    graph.add_node("retry_previous_day", _graph_retry_previous_day)
-    graph.add_node("validate_outputs", _graph_validate_outputs)
-    graph.add_node("update_theme_memory", _graph_update_theme_memory)
-    graph.add_node("summarize_top_alerts", _graph_summarize_top_alerts)
-    graph.add_node("finalize", _graph_finalize)
+    nodes = {
+        "initialize": _graph_initialize,
+        "fetch_market_data": _graph_fetch_market_data,
+        "route_attention": _graph_route_attention,
+        "analyze_today": _graph_analyze_today,
+        "retry_previous_day": _graph_retry_previous_day,
+        "validate_outputs": _graph_validate_outputs,
+        "update_theme_memory": _graph_update_theme_memory,
+        "summarize_top_alerts": _graph_summarize_top_alerts,
+        "finalize": _graph_finalize,
+    }
+    for name, handler in nodes.items():
+        graph.add_node(name, _timed_graph_node(name, handler))
     graph.add_edge(START, "initialize")
     graph.add_edge("initialize", "fetch_market_data")
     graph.add_edge("fetch_market_data", "route_attention")
@@ -240,6 +256,22 @@ def _build_analysis_graph():
     graph.add_edge("summarize_top_alerts", "finalize")
     graph.add_edge("finalize", END)
     return graph.compile()
+
+
+def _timed_graph_node(name: str, handler):
+    """Measure graph-node wall time without changing the graph state contract."""
+    def invoke(state: AnalysisGraphState) -> AnalysisGraphState:
+        started = time.monotonic()
+        result = state
+        try:
+            result = handler(state)
+            return result
+        finally:
+            runtime = result.get("runtime") or state.get("runtime")
+            if runtime is not None:
+                runtime.record_phase(name, time.monotonic() - started)
+
+    return invoke
 
 
 def _graph_initialize(state: AnalysisGraphState) -> AnalysisGraphState:
@@ -1829,7 +1861,7 @@ def _process_batch_recursive(
             )
             runtime.tighten_category_budget(category_name, "incomplete_model_output", batch_kind="article_batch")
             if len(missing_articles) == 1:
-                next_model = runtime.next_model_after(active_model.model_id)
+                next_model = runtime.next_model_after(active_model)
                 salvage_model = next_model if profile.name == "light" and next_model is not None else model_override
                 salvage_results, salvage_errors, salvage_count = _process_batch_recursive(
                     runtime,
@@ -1885,7 +1917,7 @@ def _process_batch_recursive(
 
             unresolved_results = [result for result in salvage_results if result.get("error")]
             if unresolved_results:
-                next_model = runtime.next_model_after(active_model.model_id)
+                next_model = runtime.next_model_after(active_model)
                 if next_model is not None:
                     unresolved_keys = {
                         _article_key(result.get("source_article_id"), result.get("canonical_url"))
@@ -2039,7 +2071,7 @@ def _process_batch_recursive(
             )
             return left_results + right_results, left_errors + right_errors, left_count + right_count
         if len(working_batch) == 1 and classification in {"invalid_json", "incomplete_model_output", "unexpected_error"} and depth + 1 < effective_budget["salvage_max_depth"]:
-            next_model = runtime.next_model_after(active_model.model_id)
+            next_model = runtime.next_model_after(active_model)
             if next_model is not None:
                 LOGGER.info(
                     "Escalating category %s batch %s from %s to %s after %s.",
@@ -2263,7 +2295,7 @@ def _assign_article_subgroups(
             return normalized
         runtime.tighten_category_budget(category_name, "incomplete_model_output", batch_kind="synthesis")
         if len(missing_articles) == 1:
-            next_model = runtime.next_model_after(active_model.model_id)
+            next_model = runtime.next_model_after(active_model)
             if next_model is not None:
                 return normalized + _assign_article_subgroups(
                     runtime,

@@ -75,6 +75,7 @@ class ModelSelection:
 
 
 DEFAULT_MAX_LLM_WAIT_SECONDS = 45.0
+DEFAULT_LLM_TIMEOUT_COOLDOWN_SECONDS = 30.0
 
 # Tasks whose output quality most benefits from the strongest models; these may
 # select premium models. All other (high-volume) tasks reserve premium capacity
@@ -110,6 +111,16 @@ def _resolve_max_wait_seconds(explicit: float | None = None) -> float:
         except ValueError:
             return DEFAULT_MAX_LLM_WAIT_SECONDS
     return DEFAULT_MAX_LLM_WAIT_SECONDS
+
+
+def _resolve_timeout_cooldown_seconds() -> float:
+    raw = os.environ.get("DAILY_MACRO_LLM_TIMEOUT_COOLDOWN_SECONDS")
+    if not raw:
+        return DEFAULT_LLM_TIMEOUT_COOLDOWN_SECONDS
+    try:
+        return max(0.0, float(raw))
+    except ValueError:
+        return DEFAULT_LLM_TIMEOUT_COOLDOWN_SECONDS
 
 
 class ModelResolver:
@@ -561,8 +572,12 @@ def _llm_request_timeouts() -> tuple[float, float, float]:
             return default
 
     connect_timeout = _read("DAILY_MACRO_LLM_CONNECT_TIMEOUT_SECONDS", 10.0)
-    read_timeout = _read("DAILY_MACRO_LLM_READ_TIMEOUT_SECONDS", 60.0)
-    total_deadline = _read("DAILY_MACRO_LLM_DEADLINE_SECONDS", 120.0)
+    # A stalled provider must not consume a full minute while other healthy
+    # accounts sit idle. Operators can raise these values for unusually slow
+    # models, but the default is deliberately short enough for daily-digest
+    # failover to remain responsive.
+    read_timeout = _read("DAILY_MACRO_LLM_READ_TIMEOUT_SECONDS", 30.0)
+    total_deadline = _read("DAILY_MACRO_LLM_DEADLINE_SECONDS", 45.0)
     # The total deadline must cover at least one connect + read cycle.
     total_deadline = max(total_deadline, connect_timeout + read_timeout)
     return connect_timeout, read_timeout, total_deadline
@@ -673,6 +688,11 @@ class RateLimitGovernor:
         # When quota_scope is present, key credentials share one state bucket.
         # Without it, the legacy per-(model, key) behavior is retained.
         self._states: dict[tuple[str, int], ModelRateLimitState] = {}
+        # Endpoint health is intentionally separate from quota state. Two
+        # accounts may share a provider quota scope while only one account's
+        # socket is unhealthy.
+        self._endpoint_cooldowns: dict[str, float] = {}
+        self._endpoint_attempts: dict[str, int] = {}
         self._lock = threading.RLock()
 
     @staticmethod
@@ -814,43 +834,70 @@ class RateLimitGovernor:
         estimated_input_tokens: int = 0,
         quota_scope: str | None = None,
     ) -> tuple[int, float]:
-        now = self._time_fn()
-        best_key: int | None = None
-        best_remaining_tokens = -1
-        earliest_reset = float("inf")
+        with self._lock:
+            now = self._time_fn()
+            best_key: int | None = None
+            best_remaining_tokens = -1
+            earliest_reset = float("inf")
 
-        for ki in range(num_keys):
-            state = self._state(model_id, ki, quota_scope)
-            is_observed_key = (
-                ki == current_key
-                or state.remaining_requests is not None
-                or state.remaining_tokens is not None
-            )
-            req_ok = (
-                state.remaining_requests is None
-                or state.remaining_requests > RATE_LIMIT_REQUEST_FLOOR
-            )
-            tok_ok = (
-                state.remaining_tokens is None
-                or state.remaining_tokens > estimated_input_tokens + RATE_LIMIT_TOKEN_FLOOR
-            )
-            if req_ok and tok_ok and is_observed_key:
-                remaining = state.remaining_tokens if state.remaining_tokens is not None else 9_999_999
-                if best_key is None or remaining > best_remaining_tokens:
-                    best_key = ki
-                    best_remaining_tokens = remaining
-            else:
-                reset_at = max(
-                    state.reset_requests_at or 0.0,
-                    state.reset_tokens_at or 0.0,
+            for ki in range(num_keys):
+                state = self._state(model_id, ki, quota_scope)
+                is_observed_key = (
+                    ki == current_key
+                    or state.remaining_requests is not None
+                    or state.remaining_tokens is not None
                 )
-                if reset_at > now:
-                    earliest_reset = min(earliest_reset, reset_at)
+                req_ok = (
+                    state.remaining_requests is None
+                    or state.remaining_requests > RATE_LIMIT_REQUEST_FLOOR
+                )
+                tok_ok = (
+                    state.remaining_tokens is None
+                    or state.remaining_tokens > estimated_input_tokens + RATE_LIMIT_TOKEN_FLOOR
+                )
+                if req_ok and tok_ok and is_observed_key:
+                    remaining = state.remaining_tokens if state.remaining_tokens is not None else 9_999_999
+                    if best_key is None or remaining > best_remaining_tokens:
+                        best_key = ki
+                        best_remaining_tokens = remaining
+                else:
+                    reset_at = max(
+                        state.reset_requests_at or 0.0,
+                        state.reset_tokens_at or 0.0,
+                    )
+                    if reset_at > now:
+                        earliest_reset = min(earliest_reset, reset_at)
 
-        if best_key is not None:
-            return best_key, 0.0
-        sleep_secs = max(0.0, earliest_reset - now) if earliest_reset != float("inf") else 0.0
-        return current_key, sleep_secs
+            if best_key is not None:
+                return best_key, 0.0
+            sleep_secs = max(0.0, earliest_reset - now) if earliest_reset != float("inf") else 0.0
+            return current_key, sleep_secs
+
+    def endpoint_cooldown_seconds(self, endpoint_id: str) -> float:
+        with self._lock:
+            return max(0.0, self._endpoint_cooldowns.get(endpoint_id, 0.0) - self._time_fn())
+
+    def mark_endpoint_cooldown(self, endpoint_id: str, seconds: float) -> None:
+        if seconds <= 0:
+            return
+        with self._lock:
+            until = self._time_fn() + seconds
+            self._endpoint_cooldowns[endpoint_id] = max(
+                until,
+                self._endpoint_cooldowns.get(endpoint_id, 0.0),
+            )
+
+    def clear_endpoint_cooldown(self, endpoint_id: str) -> None:
+        with self._lock:
+            self._endpoint_cooldowns.pop(endpoint_id, None)
+
+    def record_endpoint_attempt(self, endpoint_id: str) -> None:
+        with self._lock:
+            self._endpoint_attempts[endpoint_id] = self._endpoint_attempts.get(endpoint_id, 0) + 1
+
+    def endpoint_attempt_snapshot(self) -> dict[str, int]:
+        with self._lock:
+            return dict(self._endpoint_attempts)
 
     def before_request(self, model_id: str, estimated_input_tokens: int = 0) -> float:
         """Backward-compatible single-key check. Uses key_index=0."""
@@ -864,49 +911,50 @@ class RateLimitGovernor:
         key_index: int = 0,
         quota_scope: str | None = None,
     ) -> None:
-        state = self._state(model_id, key_index, quota_scope)
-        now = self._time_fn()
-        headers = {key.lower(): value for key, value in response.headers.items()}
+        with self._lock:
+            state = self._state(model_id, key_index, quota_scope)
+            now = self._time_fn()
+            headers = {key.lower(): value for key, value in response.headers.items()}
 
-        remaining_requests = _parse_int(
-            headers.get("x-ratelimit-remaining-requests")
-            or headers.get("x-ratelimit-remaining-requests-minute")
-            or headers.get("x-ratelimit-remaining-requests-day")
-        )
-        if remaining_requests is not None:
-            state.remaining_requests = remaining_requests
+            remaining_requests = _parse_int(
+                headers.get("x-ratelimit-remaining-requests")
+                or headers.get("x-ratelimit-remaining-requests-minute")
+                or headers.get("x-ratelimit-remaining-requests-day")
+            )
+            if remaining_requests is not None:
+                state.remaining_requests = remaining_requests
 
-        remaining_tokens = _parse_int(
-            headers.get("x-ratelimit-remaining-tokens")
-            or headers.get("x-ratelimit-remaining-tokens-minute")
-            or headers.get("x-ratelimit-remaining-tokens-day")
-        )
-        if remaining_tokens is not None:
-            state.remaining_tokens = remaining_tokens
+            remaining_tokens = _parse_int(
+                headers.get("x-ratelimit-remaining-tokens")
+                or headers.get("x-ratelimit-remaining-tokens-minute")
+                or headers.get("x-ratelimit-remaining-tokens-day")
+            )
+            if remaining_tokens is not None:
+                state.remaining_tokens = remaining_tokens
 
-        reset_requests = _parse_duration_seconds(
-            headers.get("x-ratelimit-reset-requests")
-            or headers.get("x-ratelimit-reset-requests-minute")
-            or headers.get("x-ratelimit-reset-requests-day")
-        )
-        if reset_requests is not None:
-            state.reset_requests_at = now + reset_requests
+            reset_requests = _parse_duration_seconds(
+                headers.get("x-ratelimit-reset-requests")
+                or headers.get("x-ratelimit-reset-requests-minute")
+                or headers.get("x-ratelimit-reset-requests-day")
+            )
+            if reset_requests is not None:
+                state.reset_requests_at = now + reset_requests
 
-        reset_tokens = _parse_duration_seconds(
-            headers.get("x-ratelimit-reset-tokens")
-            or headers.get("x-ratelimit-reset-tokens-minute")
-            or headers.get("x-ratelimit-reset-tokens-day")
-        )
-        if reset_tokens is not None:
-            state.reset_tokens_at = now + reset_tokens
+            reset_tokens = _parse_duration_seconds(
+                headers.get("x-ratelimit-reset-tokens")
+                or headers.get("x-ratelimit-reset-tokens-minute")
+                or headers.get("x-ratelimit-reset-tokens-day")
+            )
+            if reset_tokens is not None:
+                state.reset_tokens_at = now + reset_tokens
 
-        if response.status_code == 429:
-            retry_after = _parse_retry_after_seconds(headers.get("retry-after"))
-            if retry_after is not None:
-                state.remaining_requests = 0
-                state.remaining_tokens = 0
-                state.reset_requests_at = now + retry_after
-                state.reset_tokens_at = now + retry_after
+            if response.status_code == 429:
+                retry_after = _parse_retry_after_seconds(headers.get("retry-after"))
+                if retry_after is not None:
+                    state.remaining_requests = 0
+                    state.remaining_tokens = 0
+                    state.reset_requests_at = now + retry_after
+                    state.reset_tokens_at = now + retry_after
 
     def apply_backoff(self, model_id: str, response: requests.Response, attempt: int) -> float:
         delay_seconds = _retry_delay_seconds(response, attempt)
@@ -985,10 +1033,12 @@ class AnalysisRuntime:
             "delayed_retry_attempted_count", "delayed_retry_recovered_count",
             "delayed_retry_failed_count", "delayed_retry_skipped_final_model_count",
             "synthesis_budget_exhausted_count", "degraded_merge_count", "key_rotation_count",
-            "request_timeout_count", "model_decommissioned_count", "daily_budget_skip_count",
+            "request_timeout_count", "endpoint_cooldown_count", "endpoint_cooldown_seconds_total",
+            "model_decommissioned_count", "daily_budget_skip_count",
             "daily_budget_tokens_used", "llm_request_count", "input_tokens_used",
             "output_tokens_used", "total_tokens_used", "avoided_rate_limit_wait_count",
             "avoided_rate_limit_wait_seconds_total", "degraded_mode_count", "parallel_batch_count",
+            "llm_request_seconds_total", "timeout_seconds_total",
         )
         for name in additive:
             setattr(parent, name, getattr(parent, name) + getattr(child, name))
@@ -1002,6 +1052,10 @@ class AnalysisRuntime:
                 target_counts = target.setdefault(outer_key, {})
                 for key, value in counts.items():
                     target_counts[key] = target_counts.get(key, 0) + value
+        for field_name in ("llm_request_seconds_by_task", "llm_request_seconds_by_endpoint"):
+            target = getattr(parent, field_name)
+            for key, value in getattr(child, field_name).items():
+                target[key] = target.get(key, 0.0) + value
         for category_name, child_category in worker.category_diagnostics.items():
             target_category = self.category_diagnostics.setdefault(category_name, CategoryDiagnostics())
             for name in (
@@ -1129,34 +1183,60 @@ class AnalysisRuntime:
                 return model
         raise KeyError(model_id)
 
-    def next_model_after(self, model_id: str) -> ModelConfig | None:
-        for index, model in enumerate(self.model_chain):
-            if model.model_id == model_id:
-                next_index = index + 1
-                if next_index < len(self.model_chain):
-                    return self.model_chain[next_index]
-                return None
+    def _model_index(self, model: ModelConfig | str | None) -> int | None:
+        if model is None:
+            return self.current_model_index
+        if isinstance(model, ModelConfig):
+            for index, candidate in enumerate(self.model_chain):
+                if candidate.endpoint_id == model.endpoint_id:
+                    return index
+            return None
+        for index, candidate in enumerate(self.model_chain):
+            if candidate.endpoint_id == model:
+                return index
+        matching = [index for index, candidate in enumerate(self.model_chain) if candidate.model_id == model]
+        if not matching:
+            return None
+        return next((index for index in matching if index >= self.current_model_index), matching[0])
+
+    def next_model_after(self, model: ModelConfig | str | None = None) -> ModelConfig | None:
+        index = self._model_index(model)
+        if index is None:
+            return None
+        next_index = index + 1
+        if next_index < len(self.model_chain):
+            return self.model_chain[next_index]
         return None
 
-    def switch_to_next_model(self, reason: str) -> bool:
-        next_model = self.next_model_after(self.current_model.model_id)
+    def switch_to_next_model(self, reason: str, *, failed_model: ModelConfig | None = None) -> bool:
+        failed = failed_model or self.current_model
+        failed_index = self._model_index(failed)
+        if failed_index is None:
+            return False
+        next_index = failed_index + 1
+        if next_index >= len(self.model_chain):
+            return False
+        next_model = self.model_chain[next_index]
         if next_model is None:
             return False
         self.diagnostics.fallback_switch_count += 1
         switch = {
             "switched_at": datetime.now().astimezone().isoformat(),
-            "from_model": self.current_model.model_id,
+            "from_model": failed.model_id,
             "to_model": next_model.model_id,
+            "from_endpoint": failed.endpoint_id,
+            "to_endpoint": next_model.endpoint_id,
             "reason": reason,
         }
         self.model_switches.append(switch)
         LOGGER.info(
-            "Switching Groq model from %s to %s: %s",
-            self.current_model.model_id,
+            "Switching LLM endpoint from %s to %s (model=%s): %s",
+            failed.endpoint_id,
+            next_model.endpoint_id,
             next_model.model_id,
             reason,
         )
-        self.current_model_index += 1
+        self.current_model_index = next_index
         return True
 
     def reset_model_for_category(self) -> None:
@@ -1211,6 +1291,9 @@ class AnalysisRuntime:
         diagnostics.rate_limit_waits += 1
         if batch_kind.startswith("synthesis"):
             diagnostics.synthesis_wait_seconds_total += delay_seconds
+
+    def record_phase(self, phase_name: str, elapsed_seconds: float) -> None:
+        self.diagnostics.phase_seconds[phase_name] = max(0.0, float(elapsed_seconds))
 
     def record_retry(self, category_name: str, *, batch_kind: str = "") -> None:
         if batch_kind.startswith("synthesis"):
@@ -1280,6 +1363,24 @@ class AnalysisRuntime:
     def record_endpoint_attempt(self, context: BatchContext, model: ModelConfig) -> None:
         counts = self.diagnostics.endpoint_task_counts.setdefault(context.llm_task, {})
         counts[model.endpoint_id] = counts.get(model.endpoint_id, 0) + 1
+        self.governor.record_endpoint_attempt(model.endpoint_id)
+
+    def record_request_timing(
+        self,
+        context: BatchContext,
+        model: ModelConfig,
+        elapsed_seconds: float,
+        *,
+        timed_out: bool = False,
+    ) -> None:
+        elapsed_seconds = max(0.0, float(elapsed_seconds))
+        self.diagnostics.llm_request_seconds_total += elapsed_seconds
+        task_times = self.diagnostics.llm_request_seconds_by_task
+        task_times[context.llm_task] = task_times.get(context.llm_task, 0.0) + elapsed_seconds
+        endpoint_times = self.diagnostics.llm_request_seconds_by_endpoint
+        endpoint_times[model.endpoint_id] = endpoint_times.get(model.endpoint_id, 0.0) + elapsed_seconds
+        if timed_out:
+            self.diagnostics.timeout_seconds_total += elapsed_seconds
 
     def record_usage(self, model: ModelConfig, input_tokens: int, output_tokens: int, total_tokens: int) -> None:
         input_tokens = max(0, int(input_tokens))
@@ -1373,7 +1474,16 @@ def _chat_completion(
     for attempt in range(DEFAULT_CHAT_RETRIES):
         preferred_model = model_override or runtime.current_model
         task = context.llm_task
-        candidate_chain = [preferred_model] if model_override is not None else runtime.model_chain
+        if model_override is not None:
+            candidate_chain = [preferred_model]
+        else:
+            candidate_chain = [
+                candidate
+                for candidate in runtime.model_chain
+                if runtime.governor.endpoint_cooldown_seconds(candidate.endpoint_id) <= 0
+            ]
+            if not candidate_chain:
+                raise RuntimeError("No healthy LLM endpoint is available after timeout cooldowns.")
         rate_limit_waits = {
             candidate.endpoint_id: runtime.governor.peek_key(
                 candidate.model_id,
@@ -1467,15 +1577,17 @@ def _chat_completion(
         runtime.record_wait(context.category_name, wait_seconds, batch_kind=context.batch_kind)
         if wait_seconds > 0:
             LOGGER.info(
-                "Waiting %.1f seconds before %s for category %s batch=%s on %s (key=%d).",
+                "Waiting %.1f seconds before %s for category %s batch=%s on %s/%s (key=%d).",
                 wait_seconds,
                 attempt_context.batch_kind,
                 attempt_context.category_name,
                 attempt_context.batch_label,
+                model.provider,
                 model.model_id,
                 runtime.current_key_index,
             )
         connect_timeout, read_timeout, total_deadline = _llm_request_timeouts()
+        request_started = time.monotonic()
         try:
             response = _post_with_deadline(
                 session,
@@ -1495,12 +1607,27 @@ def _chat_completion(
             # Network failure or hard-deadline abort: never sit on a stuck
             # socket. Treat like a transient server error and let key rotation /
             # model fallback recover instead of failing the whole category.
-            runtime.diagnostics.request_timeout_count += 1
+            elapsed_seconds = time.monotonic() - request_started
+            timed_out = isinstance(exc, requests.exceptions.Timeout)
+            runtime.record_request_timing(
+                attempt_context,
+                model,
+                elapsed_seconds,
+                timed_out=timed_out,
+            )
+            if timed_out:
+                runtime.diagnostics.request_timeout_count += 1
+                cooldown_seconds = _resolve_timeout_cooldown_seconds()
+                runtime.governor.mark_endpoint_cooldown(model.endpoint_id, cooldown_seconds)
+                runtime.diagnostics.endpoint_cooldown_count += 1
+                runtime.diagnostics.endpoint_cooldown_seconds_total += cooldown_seconds
             LOGGER.warning(
-                "LLM request error for category %s batch=%s on %s (key=%d): %s",
+                "LLM request error for category %s batch=%s on %s/%s (endpoint=%s, key=%d): %s",
                 attempt_context.category_name,
                 attempt_context.batch_label,
+                model.provider,
                 model.model_id,
+                model.endpoint_id,
                 runtime.current_key_index,
                 exc,
             )
@@ -1514,17 +1641,30 @@ def _chat_completion(
                 session = runtime.get_session_for_model(model)
                 continue
             if model_override is None and runtime.switch_to_next_model(
-                f"Request error on {model.model_id}: {exc}"
+                f"Request error on {model.model_id}: {exc}",
+                failed_model=model,
             ):
                 runtime.current_key_index = 0
                 session = runtime.get_session_for_model(runtime.current_model)
                 runtime.record_model_switch(context.category_name, runtime.model_switches[-1])
+                continue
+            if model_override is None and any(
+                candidate.endpoint_id != model.endpoint_id
+                and runtime.governor.endpoint_cooldown_seconds(candidate.endpoint_id) <= 0
+                for candidate in runtime.model_chain
+            ):
                 continue
             delay_seconds = min(5.0 * (attempt + 1), 20.0)
             runtime.record_wait(attempt_context.category_name, delay_seconds, batch_kind=attempt_context.batch_kind)
             time.sleep(delay_seconds)
             session = runtime.get_session_for_model(model)
             continue
+        runtime.record_request_timing(
+            attempt_context,
+            model,
+            time.monotonic() - request_started,
+        )
+        runtime.governor.clear_endpoint_cooldown(model.endpoint_id)
         runtime.governor.record_response(
             model.model_id,
             response,
@@ -1542,7 +1682,8 @@ def _chat_completion(
 
         if response.status_code == 413:
             LOGGER.info(
-                "Groq returned HTTP 413 for category %s batch=%s on %s.",
+                "LLM provider %s returned HTTP 413 for category %s batch=%s on %s.",
+                model.provider,
                 attempt_context.category_name,
                 attempt_context.batch_label,
                 model.model_id,
@@ -1551,10 +1692,12 @@ def _chat_completion(
 
         if response.status_code == 429 and model_override is None:
             LOGGER.info(
-                "Groq returned HTTP 429 for category %s batch=%s on %s (key=%d).",
+                "LLM provider %s returned HTTP 429 for category %s batch=%s on %s (endpoint=%s, key=%d).",
+                model.provider,
                 attempt_context.category_name,
                 attempt_context.batch_label,
                 model.model_id,
+                model.endpoint_id,
                 runtime.current_key_index,
             )
             runtime.tighten_category_budget(
@@ -1567,7 +1710,10 @@ def _chat_completion(
                 session = runtime.get_session_for_model(model)
                 continue
             # All keys exhausted for this model — switch model and reset key index.
-            if runtime.switch_to_next_model(f"All keys returned 429 on {model.model_id}."):
+            if runtime.switch_to_next_model(
+                f"All keys returned 429 on {model.model_id}.",
+                failed_model=model,
+            ):
                 runtime.current_key_index = 0
                 session = runtime.get_session_for_model(runtime.current_model)
                 runtime.record_model_switch(context.category_name, runtime.model_switches[-1])
@@ -1576,7 +1722,8 @@ def _chat_completion(
         if response.status_code in {429, 500, 502, 503, 504}:
             if response.status_code == 429:
                 LOGGER.info(
-                    "Groq returned HTTP 429 for category %s batch=%s on %s.",
+                    "LLM provider %s returned HTTP 429 for category %s batch=%s on %s.",
+                    model.provider,
                     attempt_context.category_name,
                     attempt_context.batch_label,
                     model.model_id,
@@ -1611,7 +1758,8 @@ def _chat_completion(
             minimal_request = attempt_context.article_count <= 1
             if (response.status_code == 404 or minimal_request) and model_override is None:
                 LOGGER.warning(
-                    "Model %s rejected request (HTTP %s) for category %s batch=%s; evicting and re-resolving.",
+                    "Model %s/%s rejected request (HTTP %s) for category %s batch=%s; evicting and re-resolving.",
+                    model.provider,
                     model.model_id,
                     response.status_code,
                     attempt_context.category_name,

@@ -10,6 +10,7 @@ from typing import Any
 
 from .config import get_project_root
 from .release_calendar import format_calendar_label, summarize_release_intensity
+from .run_notes import build_run_notes
 
 ATTENTION_TIER_RANK = {"high": 0, "medium": 1, "light": 2}
 
@@ -763,42 +764,7 @@ def _attention_badge_html(article: dict[str, Any]) -> str:
 
 
 def _build_run_notes(summary: dict[str, Any]) -> list[str]:
-    diagnostics = summary.get("diagnostics") or {}
-    totals = summary.get("totals") or {}
-    notes: list[str] = []
-    if str(summary.get("status") or "").lower() == "partial":
-        unresolved_count = int(totals.get("failed_article_analyses") or 0)
-        notes.append(f"This digest is partial. {unresolved_count} article(s) remained unresolved after analysis salvage.")
-    truncated_count = int((summary.get("totals") or {}).get("truncated_article_count") or 0)
-    if truncated_count > 0:
-        notes.append(f"{truncated_count} article(s) were truncated to fit the working request budget.")
-    wait_count = int(diagnostics.get("rate_limit_wait_count") or 0)
-    wait_seconds = diagnostics.get("rate_limit_wait_seconds_total") or 0
-    if wait_count > 0:
-        notes.append(f"Analysis paused {wait_count} time(s) for Groq rate limits, totaling about {wait_seconds} second(s).")
-    fallback_switches = int(diagnostics.get("fallback_switch_count") or 0)
-    if fallback_switches > 0:
-        notes.append(f"The run switched to the fallback model {fallback_switches} time(s).")
-    pre_send_splits = int(diagnostics.get("pre_send_split_count") or 0)
-    response_413_splits = int(diagnostics.get("response_413_split_count") or 0)
-    if pre_send_splits > 0 or response_413_splits > 0:
-        notes.append(
-            "Oversized category batches were split "
-            f"(pre-send: {pre_send_splits}, after HTTP 413: {response_413_splits})."
-        )
-    if summary.get("model_switches"):
-        notes.extend(
-            f"Model switch: {item.get('from_model')} -> {item.get('to_model')} ({item.get('reason')})"
-            for item in summary.get("model_switches") or []
-        )
-    error_classes = sorted({str(item.get("classification") or "unclassified") for item in summary.get("errors") or []})
-    if error_classes:
-        notes.append("Failure classifications present: " + ", ".join(error_classes))
-    
-    output_path = summary.get("output_path")
-    if output_path:
-        notes.append(f"Stored analysis report: {output_path}")
-    return notes
+    return build_run_notes(summary)
 
 
 def _build_plain_unresolved_lines(summary: dict[str, Any]) -> list[str]:

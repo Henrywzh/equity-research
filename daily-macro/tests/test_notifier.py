@@ -9,6 +9,7 @@ from pathlib import Path
 from unittest.mock import patch
 
 from daily_macro.notifier import (
+    _build_run_notes,
     _build_html_body,
     _build_html_articles,
     load_analysis_result,
@@ -208,6 +209,44 @@ class NotifierTests(unittest.TestCase):
     def setUp(self) -> None:
         _FakeSMTP.sent_messages = []
         _FakeSMTP.login_calls = []
+
+    def test_run_notes_summarize_wall_clock_breakdown_without_raw_switch_log(self) -> None:
+        notes = _build_run_notes(
+            {
+                "status": "partial",
+                "totals": {
+                    "article_count": 108,
+                    "failed_article_analyses": 0,
+                    "partial_categories": 3,
+                    "successful_categories": 5,
+                    "truncated_article_count": 26,
+                },
+                "diagnostics": {
+                    "wall_clock_seconds": 926.0,
+                    "llm_request_seconds_total": 820.0,
+                    "rate_limit_wait_count": 8,
+                    "rate_limit_wait_seconds_total": 92.5,
+                    "timeout_seconds_total": 300.0,
+                    "request_timeout_count": 5,
+                    "endpoint_cooldown_count": 5,
+                    "llm_request_count": 265,
+                    "pre_send_split_count": 148,
+                    "fallback_switch_count": 49,
+                    "phase_seconds": {"analyze_today": 600.0, "summarize_top_alerts": 40.0},
+                },
+                "model_switches": [
+                    {"from_model": "gpt-oss-120b", "to_model": "gpt-oss-120b"}
+                ],
+            }
+        )
+        rendered = "\n".join(notes)
+
+        self.assertIn("Wall-clock runtime: 15m 26s.", rendered)
+        self.assertIn("LLM calls 13m 40s", rendered)
+        self.assertIn("including 5m 00s timeout time", rendered)
+        self.assertIn("148 pre-send split(s)", rendered)
+        self.assertIn("Model switch summary:", rendered)
+        self.assertNotIn("All keys returned", rendered)
 
     def test_load_analysis_result_reads_json(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:

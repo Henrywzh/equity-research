@@ -78,6 +78,7 @@ LLM provider configuration:
 - `DAILY_MACRO_GROQ_MODELS`, `DAILY_MACRO_CEREBRAS_MODELS`, `DAILY_MACRO_GOOGLE_AI_MODELS`, `DAILY_MACRO_OPENROUTER_MODELS`: optional comma-separated model overrides. Groq defaults to `qwen/qwen3.6-27b`, followed by `openai/gpt-oss-120b` and `openai/gpt-oss-20b`.
 - `DAILY_MACRO_MODEL_POLICY=production_only|allow_preview` and `DAILY_MACRO_MAX_LLM_WAIT_SECONDS`: selection and latency controls.
 - `DAILY_MACRO_LLM_PARALLELISM`: opt-in bounded worker count for independent article batches. Defaults to `1` (sequential); start with `3` after replay validation.
+- `DAILY_MACRO_LLM_READ_TIMEOUT_SECONDS`, `DAILY_MACRO_LLM_DEADLINE_SECONDS`, and `DAILY_MACRO_LLM_TIMEOUT_COOLDOWN_SECONDS`: stalled-endpoint protection and failover timing controls.
 
 Do not paste API keys into source or reports. Put them in the local `.config`
 file or in CI secrets.

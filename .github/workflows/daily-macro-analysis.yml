@@ -54,7 +54,10 @@ jobs:
           GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
           CEREBRAS_API_KEY: ${{ secrets.CEREBRAS_API_KEY }}
           FRED_API_KEY: ${{ secrets.FRED_API_KEY }}
-          DAILY_MACRO_LLM_PARALLELISM: "1"
+          DAILY_MACRO_LLM_PARALLELISM: "3"
+          DAILY_MACRO_LLM_READ_TIMEOUT_SECONDS: "30"
+          DAILY_MACRO_LLM_DEADLINE_SECONDS: "45"
+          DAILY_MACRO_LLM_TIMEOUT_COOLDOWN_SECONDS: "30"
         run: |
           python -m daily_macro analyze today --force --json > analysis-result.json
           python - <<'PY'

@@ -109,3 +109,30 @@ def test_request_timeouts_floor_deadline_to_connect_plus_read(monkeypatch):
     monkeypatch.setenv("DAILY_MACRO_LLM_DEADLINE_SECONDS", "5")  # too small
     _, _, total = llm_client._llm_request_timeouts()
     assert total == 70.0
+
+
+def test_endpoint_cooldown_is_tracked_separately_from_quota_state():
+    now = [10.0]
+    governor = llm_client.RateLimitGovernor(time_fn=lambda: now[0])
+
+    governor.mark_endpoint_cooldown("cerebras:cerebras_1:gpt-oss-120b", 30.0)
+
+    assert governor.endpoint_cooldown_seconds("cerebras:cerebras_1:gpt-oss-120b") == 30.0
+    assert governor.endpoint_cooldown_seconds("cerebras:cerebras_2:gpt-oss-120b") == 0.0
+    now[0] = 40.0
+    assert governor.endpoint_cooldown_seconds("cerebras:cerebras_1:gpt-oss-120b") == 0.0
+
+
+def test_runtime_failover_advances_after_exact_endpoint_with_duplicate_model_ids():
+    first = llm_client.ModelConfig("gpt-oss-120b", provider="cerebras", account_id="cerebras_1")
+    second = llm_client.ModelConfig("gpt-oss-120b", provider="cerebras", account_id="cerebras_2")
+    third = llm_client.ModelConfig("gpt-oss-120b", provider="cerebras", account_id="cerebras_3")
+    runtime = llm_client.AnalysisRuntime(
+        governor=llm_client.RateLimitGovernor(),
+        model_chain=[first, second, third],
+    )
+
+    assert runtime.next_model_after(second) == third
+    assert runtime.switch_to_next_model("timeout", failed_model=second)
+    assert runtime.current_model.endpoint_id == third.endpoint_id
+    assert runtime.model_switches[-1]["from_endpoint"] == second.endpoint_id

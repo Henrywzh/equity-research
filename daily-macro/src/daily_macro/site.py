@@ -3,13 +3,13 @@ from __future__ import annotations
 import json
 import logging
 import shutil
-from collections import Counter
 from html import escape
 from pathlib import Path
 from typing import Any
 
 from .analysis import REPORT_FILE_NAME
 from .config import get_analysis_dir, get_project_root
+from .run_notes import build_run_notes
 
 LOGGER = logging.getLogger(__name__)
 
@@ -135,6 +135,18 @@ def _sanitize_report(report: dict[str, Any]) -> dict[str, Any]:
             "failed_categories": totals.get("failed_categories", 0),
         },
         "diagnostics": {
+            "wall_clock_seconds": diagnostics.get("wall_clock_seconds", 0),
+            "phase_seconds": {
+                str(name): value for name, value in (diagnostics.get("phase_seconds") or {}).items()
+            },
+            "llm_request_seconds_total": diagnostics.get("llm_request_seconds_total", 0),
+            "llm_request_seconds_by_task": {
+                str(name): value for name, value in (diagnostics.get("llm_request_seconds_by_task") or {}).items()
+            },
+            "llm_request_seconds_by_endpoint": {
+                str(name): value for name, value in (diagnostics.get("llm_request_seconds_by_endpoint") or {}).items()
+            },
+            "timeout_seconds_total": diagnostics.get("timeout_seconds_total", 0),
             "rate_limit_wait_count": diagnostics.get("rate_limit_wait_count", 0),
             "rate_limit_wait_seconds_total": diagnostics.get("rate_limit_wait_seconds_total", 0),
             "pre_send_split_count": diagnostics.get("pre_send_split_count", 0),
@@ -147,6 +159,11 @@ def _sanitize_report(report: dict[str, Any]) -> dict[str, Any]:
             "high_medium_unresolved_count": diagnostics.get("high_medium_unresolved_count", 0),
             "light_unresolved_count": diagnostics.get("light_unresolved_count", 0),
             "delayed_retry_skipped_final_model_count": diagnostics.get("delayed_retry_skipped_final_model_count", 0),
+            "request_timeout_count": diagnostics.get("request_timeout_count", 0),
+            "endpoint_cooldown_count": diagnostics.get("endpoint_cooldown_count", 0),
+            "endpoint_cooldown_seconds_total": diagnostics.get("endpoint_cooldown_seconds_total", 0),
+            "llm_request_count": diagnostics.get("llm_request_count", 0),
+            "parallel_worker_count": diagnostics.get("parallel_worker_count", 1),
         },
         "model": _sanitize_model(report.get("model") or {}),
         "model_switches": [_sanitize_model_switch(item) for item in report.get("model_switches") or []],
@@ -171,6 +188,8 @@ def _sanitize_model_switch(item: dict[str, Any]) -> dict[str, Any]:
     return {
         "from_model": item.get("from_model"),
         "to_model": item.get("to_model"),
+        "from_endpoint": item.get("from_endpoint"),
+        "to_endpoint": item.get("to_endpoint"),
         "reason": item.get("reason"),
     }
 
@@ -649,40 +668,7 @@ def _render_unresolved_section(unresolved_articles: list[dict[str, Any]]) -> str
 
 
 def _build_run_notes(report: dict[str, Any]) -> list[str]:
-    totals = report.get("totals") or {}
-    diagnostics = report.get("diagnostics") or {}
-    unresolved = list(report.get("unresolved_articles") or [])
-    notes: list[str] = []
-    if unresolved:
-        notes.append(f"This digest is partial. {len(unresolved)} article(s) remained unresolved.")
-    truncated = int(totals.get("truncated_article_count", 0) or 0)
-    if truncated:
-        notes.append(f"{truncated} article(s) were truncated to fit the working request budget.")
-    wait_count = int(diagnostics.get("rate_limit_wait_count", 0) or 0)
-    if wait_count:
-        wait_seconds = float(diagnostics.get("rate_limit_wait_seconds_total", 0.0) or 0.0)
-        notes.append(f"Analysis paused {wait_count} time(s) for rate limits, totaling about {wait_seconds:.1f} second(s).")
-    pre_send = int(diagnostics.get("pre_send_split_count", 0) or 0)
-    after_413 = int(diagnostics.get("response_413_split_count", 0) or 0)
-    if pre_send or after_413:
-        notes.append(f"Oversized batches were split (pre-send: {pre_send}, after HTTP 413: {after_413}).")
-    switches = int(diagnostics.get("fallback_switch_count", 0) or 0)
-    if switches:
-        notes.append(f"Fallback models were used {switches} time(s) during this run.")
-    skipped_final = int(diagnostics.get("delayed_retry_skipped_final_model_count", 0) or 0)
-    if skipped_final:
-        notes.append(f"The final delayed-retry model was skipped {skipped_final} time(s) because OPENAI_API_KEY was unavailable.")
-    classifications = Counter(
-        str(article.get("error_classification") or "unknown")
-        for article in unresolved
-        if str(article.get("error_classification") or "").strip()
-    )
-    if classifications:
-        labels = ", ".join(sorted(classifications))
-        notes.append(f"Failure classifications present: {labels}.")
-    if not notes:
-        notes.append("All articles were published successfully with no unresolved items.")
-    return notes
+    return build_run_notes(report)
 
 
 def _render_bullet_list(items: list[str], *, fallback: str, compact: bool = False) -> str:
