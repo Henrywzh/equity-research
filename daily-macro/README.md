@@ -76,8 +76,11 @@ LLM provider configuration:
 - `GOOGLE_AI_STUDIO_API_KEY` (or `GEMINI_API_KEY` / `GOOGLE_API_KEY`): Google AI Studio key.
 - `OPENROUTER_API_KEY`: OpenRouter key.
 - `DAILY_MACRO_GROQ_MODELS`, `DAILY_MACRO_CEREBRAS_MODELS`, `DAILY_MACRO_GOOGLE_AI_MODELS`, `DAILY_MACRO_OPENROUTER_MODELS`: optional comma-separated model overrides. Groq defaults to `qwen/qwen3.6-27b`, followed by `openai/gpt-oss-120b` and `openai/gpt-oss-20b`.
-- `DAILY_MACRO_MODEL_POLICY=production_only|allow_preview` and `DAILY_MACRO_MAX_LLM_WAIT_SECONDS`: selection and latency controls.
+- `DAILY_MACRO_MODEL_POLICY=production_only|allow_preview` and `DAILY_MACRO_MAX_LLM_WAIT_SECONDS`: selection and latency controls. Per-task wait caps such as `DAILY_MACRO_MAX_LLM_WAIT_SECONDS_ARTICLE_ANALYSIS`, plus per-task model preferences such as `DAILY_MACRO_MODEL_TOP_ALERTS_PREFERENCES`, override the defaults.
 - `DAILY_MACRO_LLM_PARALLELISM`: opt-in bounded worker count for independent article batches. Defaults to `1` (sequential); start with `3` after replay validation.
+- `DAILY_MACRO_PREVIOUS_RETRY_MAX_ARTICLES` and `DAILY_MACRO_PREVIOUS_RETRY_MAX_WAIT_SECONDS`: cap yesterday's salvage work so today's digest keeps priority.
+- `DAILY_MACRO_MAX_CATEGORY_SYNTHESIS_WAIT_SECONDS`: cumulative per-category synthesis wait cap; defaults to 180 seconds before local merge.
+- `DAILY_MACRO_THEME_CLOSE_DAYS` and `DAILY_MACRO_EVENT_PIPELINE_MODE`: control theme lifecycle expiry and event-layer mode metadata.
 - `DAILY_MACRO_LLM_READ_TIMEOUT_SECONDS`, `DAILY_MACRO_LLM_DEADLINE_SECONDS`, and `DAILY_MACRO_LLM_TIMEOUT_COOLDOWN_SECONDS`: stalled-endpoint protection and failover timing controls.
 
 Do not paste API keys into source or reports. Put them in the local `.config`
@@ -105,8 +108,8 @@ GitHub Secrets for the analysis/email workflow:
 
 - This subproject is designed to stay simple, reusable, and easy to extend
 - Articles are analyzed in category-sized batches, and oversized categories are split into smaller sub-batches before analysis
-- Saved analysis reports include compact diagnostics for rate-limit waits, batch splits, fallback switches, JSON-repair retries, and failed batches
+- Saved analysis reports include compact diagnostics for rate-limit waits by endpoint/task, batch splits by kind, resolver substitutions, JSON-repair retries, typed failures, and failed batches. They also include conservative evidence-backed `events`, a `review_queue`, category-level local rollups when synthesis is unavailable, and alert-quality checks for citations, numeric scales, causal wording, and asset identifiers alongside the legacy category fields.
 - Long articles are analyzed in full when they fit the working request budget; otherwise the analyzed slice is truncated and explicitly flagged in the report JSON
-- The analysis path uses only the approved Groq Qwen 3.6/GPT OSS lineup; older Llama and Qwen 3.0/3.2 models remain only in historical report fixtures
+- The default Groq path uses the approved Qwen 3.6/GPT OSS lineup; Cerebras, Google AI Studio, and OpenRouter remain provider-level fallbacks, while older Llama and Qwen 3.0/3.2 models remain only in historical report fixtures
 - Analysis/email automation currently runs after both daily scrape runs, and the public site is rebuilt from the saved report JSON without re-running LLM analysis
 - Future downstream workflows can read from the SQLite database, parsed JSON backups, or saved daily analysis reports

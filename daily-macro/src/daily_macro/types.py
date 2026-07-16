@@ -51,8 +51,8 @@ REPORT_SCHEMA_VERSION = 6
 # ---------------------------------------------------------------------------
 
 DELAYED_RETRY_WAIT_SECONDS = 60.0
-MAX_CATEGORY_SYNTHESIS_WAIT_SECONDS = 1800.0
-MAX_CATEGORY_SYNTHESIS_RETRIES = 24
+MAX_CATEGORY_SYNTHESIS_WAIT_SECONDS = 180.0
+MAX_CATEGORY_SYNTHESIS_RETRIES = 8
 MAX_SYNTHESIS_MERGE_DEPTH = 3
 DEFAULT_CHAT_RETRIES = 4
 
@@ -97,6 +97,9 @@ ENTITY_TYPES = {"person", "company", "country", "institution", "index", "organiz
 FAILURE_CLASSIFICATIONS = {
     "payload_too_large",
     "rate_limited",
+    "no_eligible_endpoint",
+    "provider_timeout",
+    "provider_unavailable",
     "invalid_json",
     "incomplete_model_output",
     "http_error",
@@ -190,6 +193,8 @@ class AnalysisGraphState(TypedDict):
     previous_retry_plan: dict[str, Any]
     runtime: Any  # AnalysisRuntime at runtime; typed as Any to avoid circular import with llm_client
     category_reports: list[dict[str, Any]]
+    event_packets: NotRequired[list[dict[str, Any]]]
+    review_queue: NotRequired[list[dict[str, Any]]]
     previous_day_retry_successes: int
     updated_previous_report: NotRequired[dict[str, Any] | None]
     incremental: dict[str, int]
@@ -198,6 +203,7 @@ class AnalysisGraphState(TypedDict):
     top_alerts: list[str]
     legacy_executive_summary: list[str]
     validation_issues: NotRequired[list[dict[str, Any]]]
+    critic_issues: NotRequired[list[dict[str, Any]]]
     theme_memory: NotRequired[dict[str, Any]]
     report: dict[str, Any]
     total_scraped_articles: int
@@ -266,6 +272,8 @@ class ModelRateLimitState:
     reset_requests_at: float | None = None
     remaining_tokens: int | None = None
     reset_tokens_at: float | None = None
+    limit_requests: int | None = None
+    limit_tokens: int | None = None
 
 
 @dataclass
@@ -320,11 +328,16 @@ class RuntimeDiagnostics:
     avoided_rate_limit_wait_count: int = 0
     avoided_rate_limit_wait_seconds_total: float = 0.0
     degraded_mode_count: int = 0
+    critic_checked_alert_count: int = 0
     resolver_rejections: list[dict[str, Any]] = field(default_factory=list)
     model_task_counts: dict[str, dict[str, int]] = field(default_factory=dict)
     endpoint_task_counts: dict[str, dict[str, int]] = field(default_factory=dict)
     endpoint_usage: dict[str, dict[str, int]] = field(default_factory=dict)
     model_substitutions: list[dict[str, Any]] = field(default_factory=list)
+    rate_limit_events: list[dict[str, Any]] = field(default_factory=list)
+    rate_limit_waits_by_endpoint: dict[str, dict[str, float | int]] = field(default_factory=dict)
+    failure_classifications: dict[str, int] = field(default_factory=dict)
+    split_counts_by_kind: dict[str, int] = field(default_factory=dict)
     parallel_batch_count: int = 0
     parallel_worker_count: int = 1
 
@@ -371,11 +384,18 @@ class RuntimeDiagnostics:
             "avoided_rate_limit_wait_count": self.avoided_rate_limit_wait_count,
             "avoided_rate_limit_wait_seconds_total": round(self.avoided_rate_limit_wait_seconds_total, 3),
             "degraded_mode_count": self.degraded_mode_count,
+            "critic_checked_alert_count": self.critic_checked_alert_count,
             "resolver_rejections": list(self.resolver_rejections),
             "model_task_counts": {task: dict(counts) for task, counts in self.model_task_counts.items()},
             "endpoint_task_counts": {task: dict(counts) for task, counts in self.endpoint_task_counts.items()},
             "endpoint_usage": {endpoint: dict(counts) for endpoint, counts in self.endpoint_usage.items()},
             "model_substitutions": list(self.model_substitutions),
+            "rate_limit_events": list(self.rate_limit_events),
+            "rate_limit_waits_by_endpoint": {
+                endpoint: dict(values) for endpoint, values in self.rate_limit_waits_by_endpoint.items()
+            },
+            "failure_classifications": dict(self.failure_classifications),
+            "split_counts_by_kind": dict(self.split_counts_by_kind),
             "parallel_batch_count": self.parallel_batch_count,
             "parallel_worker_count": self.parallel_worker_count,
         }

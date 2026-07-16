@@ -90,6 +90,17 @@ def _batch_attention_tier(batch_articles: list[dict[str, Any]]) -> str:
 def _build_article_batch_messages(category_name: str, batch_articles: list[dict[str, Any]], market_context: str = "") -> list[dict[str, Any]]:
     profile = _section_profile(category_name)
     batch_tier = _batch_attention_tier(batch_articles)
+    lane_names = sorted({str(article.get("research_lane") or "general_research") for article in batch_articles})
+    lane_guidance = {
+        "macro_policy": "focus on policy transmission, rates, inflation, growth, FX, and timing",
+        "hk_china_equity": "focus on company, sector, valuation, earnings, and China/HK market transmission",
+        "geopolitical_risk": "focus on sanctions, trade restrictions, conflict escalation, and affected markets",
+        "commodities": "focus on supply/demand, inventories, price moves, and commodity-linked assets",
+        "company_specific": "focus on earnings, guidance, capital allocation, catalysts, and risks",
+        "low_relevance": "keep the analysis concise and flag only concrete market relevance",
+        "general_research": "separate verifiable facts from interpretation and identify the market channel",
+    }
+    lane_instruction = "; ".join(lane_guidance.get(lane, lane_guidance["general_research"]) for lane in lane_names)
     return [
         {
             "role": "system",
@@ -97,7 +108,8 @@ def _build_article_batch_messages(category_name: str, batch_articles: list[dict[
                 "You are a financial news analyst. Return one valid JSON object only. "
                 "Analyze every article in the batch. Use integer scores from 1 to 10. "
                 "Do not omit any article. "
-                f"This batch is primarily {batch_tier}-attention; keep low-attention stories concise."
+                f"This batch is primarily {batch_tier}-attention; keep low-attention stories concise. "
+                f"Research-lane guidance: {lane_instruction}."
             ),
         },
         {
@@ -126,6 +138,8 @@ def _build_article_batch_messages(category_name: str, batch_articles: list[dict[
                         "Do not include category-level summary in this response.",
                         "If an article is tagged as light attention, keep key points especially concise.",
                         "If market_context data is provided, reference specific price movements and percentage changes in your key_points when relevant to the article.",
+                        "Preserve the source's numeric scale and currency exactly; do not convert 億/億元 into billions or millions unless the conversion is explicit and verified.",
+                        "Separate facts stated by the source from interpretation. Do not claim that one market move caused another without source evidence.",
                     ],
                     "scoring_rubric": {
                         "novelty_score": "How new or non-repetitive this development is within the current news flow.",
@@ -196,6 +210,8 @@ def _build_synthesis_messages(
                         "Each key_developments item is an object with `text` (a single sentence string) and `source_article_ids`.",
                         "Populate `source_article_ids` only with source_article_id values that appear in the provided inputs; do not invent ids.",
                         "If market_context data is provided, incorporate specific price movements into developments where relevant.",
+                        "Preserve every source number's currency, unit, and scale. Do not turn Chinese 億/億元 values into the same numeric value in English billions.",
+                        "Do not add a ticker, company, or causal relationship that is not supported by the provided article analyses or market context.",
                     ],
                     "category": category_name,
                     "scope_title": scope_title,

@@ -2381,6 +2381,7 @@ class AnalysisTests(unittest.TestCase):
         self.assertEqual(category["analysis_profile"], "light")
         self.assertEqual(len(category["subgroups"]), 2)
         self.assertEqual(category["subgroups"][0]["title"], "Regional policy pulse")
+        self.assertTrue(category["key_developments"])
         self.assertLessEqual(len(category["articles"][0]["key_points"]), 2)
 
 

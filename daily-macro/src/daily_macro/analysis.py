@@ -1,10 +1,12 @@
 from __future__ import annotations
 
+import hashlib
 import json
 import logging
 import math
 import os
 import random
+import re
 import time
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from collections import defaultdict
@@ -196,12 +198,15 @@ def run_analysis(
         "previous_retry_plan": {},
         "runtime": None,
         "category_reports": [],
+        "event_packets": [],
+        "review_queue": [],
         "previous_day_retry_successes": 0,
         "market_context_string": "",
         "market_snapshots": [],
         "macro_release_digest": {},
         "top_alerts": [],
         "validation_issues": [],
+        "critic_issues": [],
         "theme_memory": {},
         "report": {},
         "total_scraped_articles": total_scraped_articles,
@@ -237,10 +242,12 @@ def _build_analysis_graph():
         "fetch_market_data": _graph_fetch_market_data,
         "route_attention": _graph_route_attention,
         "analyze_today": _graph_analyze_today,
+        "build_event_packets": _graph_build_event_packets,
         "retry_previous_day": _graph_retry_previous_day,
         "validate_outputs": _graph_validate_outputs,
         "update_theme_memory": _graph_update_theme_memory,
         "summarize_top_alerts": _graph_summarize_top_alerts,
+        "critic_outputs": _graph_critic_outputs,
         "finalize": _graph_finalize,
     }
     for name, handler in nodes.items():
@@ -249,11 +256,13 @@ def _build_analysis_graph():
     graph.add_edge("initialize", "fetch_market_data")
     graph.add_edge("fetch_market_data", "route_attention")
     graph.add_edge("route_attention", "analyze_today")
-    graph.add_edge("analyze_today", "retry_previous_day")
+    graph.add_edge("analyze_today", "build_event_packets")
+    graph.add_edge("build_event_packets", "retry_previous_day")
     graph.add_edge("retry_previous_day", "validate_outputs")
     graph.add_edge("validate_outputs", "update_theme_memory")
     graph.add_edge("update_theme_memory", "summarize_top_alerts")
-    graph.add_edge("summarize_top_alerts", "finalize")
+    graph.add_edge("summarize_top_alerts", "critic_outputs")
+    graph.add_edge("critic_outputs", "finalize")
     graph.add_edge("finalize", END)
     return graph.compile()
 
@@ -385,10 +394,92 @@ def _graph_analyze_today(state: AnalysisGraphState) -> AnalysisGraphState:
     return state
 
 
+def _graph_build_event_packets(state: AnalysisGraphState) -> AnalysisGraphState:
+    """Build an evidence-first event layer from successful article analyses.
+
+    This is deliberately local and conservative. It reduces duplicate coverage
+    before any future event-level LLM work, while still preserving the current
+    article/category report as the compatibility surface.
+    """
+    packets, review_queue = _build_event_packets(
+        state.get("category_reports") or [],
+        target_date=state["target_date"],
+    )
+    state["event_packets"] = packets
+    state["review_queue"] = review_queue
+    return state
+
+
+def _previous_retry_max_articles() -> int:
+    raw = os.environ.get("DAILY_MACRO_PREVIOUS_RETRY_MAX_ARTICLES", "12")
+    try:
+        return max(0, int(raw))
+    except ValueError:
+        return 12
+
+
+def _previous_retry_allowed(state: AnalysisGraphState) -> tuple[bool, str]:
+    runtime = state.get("runtime")
+    if runtime is None:
+        return True, "no_runtime"
+    unresolved = _collect_unresolved_articles(state.get("category_reports") or [])
+    high_medium_unresolved = sum(
+        1 for item in unresolved if str(item.get("attention_tier") or "medium") in {"high", "medium"}
+    )
+    if high_medium_unresolved:
+        return False, "today_high_medium_unresolved"
+    if runtime.diagnostics.synthesis_budget_exhausted_count:
+        return False, "today_synthesis_budget_exhausted"
+    max_wait = os.environ.get("DAILY_MACRO_PREVIOUS_RETRY_MAX_WAIT_SECONDS", "30")
+    try:
+        wait_budget = max(0.0, float(max_wait))
+    except ValueError:
+        wait_budget = 30.0
+    if runtime.diagnostics.rate_limit_wait_seconds_total >= wait_budget:
+        return False, "today_rate_limit_wait_budget_exhausted"
+    return True, "capacity_available"
+
+
 def _graph_retry_previous_day(state: AnalysisGraphState) -> AnalysisGraphState:
     runtime = state["runtime"]
     try:
         if state["previous_report"] is not None and state["previous_retry_plan"]["retried_previous_day_articles"] > 0:
+            allowed, reason = _previous_retry_allowed(state)
+            if not allowed:
+                skipped = state["previous_retry_plan"]["retried_previous_day_articles"]
+                LOGGER.info(
+                    "Skipping previous-day retry for %s article(s): %s.",
+                    skipped,
+                    reason,
+                )
+                state["previous_retry_plan"] = {"work_articles": [], "retried_previous_day_articles": 0}
+                state["incremental"]["retried_previous_day_articles"] = 0
+                state["incremental"]["previous_day_retry_skipped"] = skipped
+                if runtime is not None:
+                    runtime.diagnostics.degraded_mode_count += 1
+                return state
+            max_articles = _previous_retry_max_articles()
+            retry_articles = list(state["previous_retry_plan"].get("work_articles") or [])
+            retry_articles.sort(
+                key=lambda item: (
+                    ATTENTION_TIER_RANK.get(str(item.get("attention_tier") or "medium"), ATTENTION_TIER_RANK["medium"]),
+                    str(item.get("published_at") or ""),
+                )
+            )
+            skipped = max(0, len(retry_articles) - max_articles)
+            if skipped:
+                retry_articles = retry_articles[:max_articles]
+                state["previous_retry_plan"] = {
+                    "work_articles": retry_articles,
+                    "retried_previous_day_articles": len(retry_articles),
+                }
+                state["incremental"]["retried_previous_day_articles"] = len(retry_articles)
+                state["incremental"]["previous_day_retry_skipped"] = skipped
+                LOGGER.info(
+                    "Capping previous-day retry to %s article(s); %s lower-priority article(s) deferred.",
+                    max_articles,
+                    skipped,
+                )
             updated_previous_report, previous_day_retry_successes = _retry_previous_report(
                 runtime=runtime,
                 previous_date=(datetime.fromisoformat(state["target_date"]).date() - timedelta(days=1)).isoformat(),
@@ -409,6 +500,12 @@ def _graph_retry_previous_day(state: AnalysisGraphState) -> AnalysisGraphState:
 
 def _graph_validate_outputs(state: AnalysisGraphState) -> AnalysisGraphState:
     issues: list[dict[str, Any]] = []
+    valid_article_ids = {
+        str(article.get("source_article_id") or article.get("canonical_url") or "")
+        for category in state.get("category_reports") or []
+        for article in category.get("articles") or []
+        if not article.get("error")
+    }
     for category in state.get("category_reports") or []:
         for article in category.get("articles") or []:
             if article.get("error"):
@@ -420,6 +517,26 @@ def _graph_validate_outputs(state: AnalysisGraphState) -> AnalysisGraphState:
                 issues.append({"type": "article_validation", "category": category.get("category"), "reason": "missing_key_points", "target": key})
             if str(article.get("research_lane") or "").strip() == "":
                 article["research_lane"] = _infer_research_lane(article)
+    event_ids: set[str] = set()
+    for event in state.get("event_packets") or []:
+        event_id = str(event.get("event_id") or "")
+        if not event_id:
+            issues.append({"type": "event_validation", "reason": "missing_event_identifier"})
+        else:
+            event_ids.add(event_id)
+        source_ids = [str(item) for item in event.get("source_article_ids") or []]
+        invalid_ids = [item for item in source_ids if item not in valid_article_ids]
+        if not source_ids:
+            issues.append({"type": "event_validation", "reason": "missing_event_sources", "target": event_id})
+        if invalid_ids:
+            issues.append({"type": "event_validation", "reason": "invalid_event_sources", "target": event_id, "source_ids": invalid_ids})
+        for evidence in event.get("evidence") or []:
+            evidence_id = str(evidence.get("source_article_id") or "") if isinstance(evidence, dict) else ""
+            if evidence_id not in source_ids:
+                issues.append({"type": "event_validation", "reason": "invalid_event_evidence", "target": event_id, "source_id": evidence_id})
+    for review_item in state.get("review_queue") or []:
+        if str(review_item.get("event_id") or "") not in event_ids:
+            issues.append({"type": "review_validation", "reason": "unknown_event", "event_id": review_item.get("event_id")})
     state["validation_issues"] = issues
     if issues and state.get("runtime") is not None:
         state["runtime"].diagnostics.degraded_mode_count += 1
@@ -430,9 +547,255 @@ def _graph_update_theme_memory(state: AnalysisGraphState) -> AnalysisGraphState:
     data_dir = state.get("data_dir")
     if data_dir is None:
         return state
-    memory = _update_theme_memory_file(Path(data_dir), state["target_date"], state.get("category_reports") or [])
+    memory = _update_theme_memory_file(
+        Path(data_dir),
+        state["target_date"],
+        state.get("category_reports") or [],
+        event_packets=state.get("event_packets") or [],
+    )
     state["theme_memory"] = memory
     return state
+
+
+_CRITIC_NUMERIC_FACT_RE = re.compile(
+    r"(?P<left>\d[\d,]*(?:\.\d+)?)\s*"
+    r"(?:(?:[-–—~至到])\s*(?P<right>\d[\d,]*(?:\.\d+)?)\s*)?"
+    r"(?P<unit>萬億|万亿|億元|亿元|億|亿|萬元|万元|萬|万|百萬|百万|"
+    r"trillion|billion|bn|million|mn|thousand|k|%)",
+    re.IGNORECASE,
+)
+_CRITIC_TICKER_RE = re.compile(r"^(?:\^?[A-Z]{3,8}(?:[._-][A-Z0-9]{1,8})?|\d{4,6}\.[A-Z]{2}|[A-Z]{2,8}=F)$")
+_CRITIC_UNIT_SCALES = {
+    "萬億": 1_000_000_000_000.0,
+    "万亿": 1_000_000_000_000.0,
+    "億元": 100_000_000.0,
+    "亿元": 100_000_000.0,
+    "億": 100_000_000.0,
+    "亿": 100_000_000.0,
+    "萬元": 10_000.0,
+    "万元": 10_000.0,
+    "萬": 10_000.0,
+    "万": 10_000.0,
+    "百萬": 1_000_000.0,
+    "百万": 1_000_000.0,
+    "trillion": 1_000_000_000_000.0,
+    "billion": 1_000_000_000.0,
+    "bn": 1_000_000_000.0,
+    "million": 1_000_000.0,
+    "mn": 1_000_000.0,
+    "thousand": 1_000.0,
+    "k": 1_000.0,
+    "%": 1.0,
+}
+_CANONICAL_ASSET_ALIASES = {
+    "賽力斯": {"canonical_id": "09927.HK", "display_name": "Seres", "confidence": 0.98},
+    "seres": {"canonical_id": "09927.HK", "display_name": "Seres", "confidence": 0.98},
+    "三星電子": {"canonical_id": "005930.KS", "display_name": "Samsung Electronics", "confidence": 0.97},
+    "samsung electronics": {"canonical_id": "005930.KS", "display_name": "Samsung Electronics", "confidence": 0.97},
+    "恒指": {"canonical_id": "^HSI", "display_name": "Hang Seng Index", "confidence": 0.99},
+    "恒生指數": {"canonical_id": "^HSI", "display_name": "Hang Seng Index", "confidence": 0.99},
+    "hang seng index": {"canonical_id": "^HSI", "display_name": "Hang Seng Index", "confidence": 0.99},
+}
+
+
+def _critic_numeric_facts(text: str) -> list[float]:
+    facts: list[float] = []
+    for match in _CRITIC_NUMERIC_FACT_RE.finditer(text or ""):
+        scale = _CRITIC_UNIT_SCALES.get(str(match.group("unit") or "").lower())
+        if scale is None:
+            scale = _CRITIC_UNIT_SCALES.get(str(match.group("unit") or ""))
+        if scale is None:
+            continue
+        for value in (match.group("left"), match.group("right")):
+            if value:
+                facts.append(float(value.replace(",", "")) * scale)
+    return facts
+
+
+def _critic_numeric_issues(alert: dict[str, Any], evidence_text: str) -> list[dict[str, Any]]:
+    alert_text = " ".join(
+        str(alert.get(field) or "")
+        for field in ("summary", "why_it_matters")
+    )
+    alert_facts = _critic_numeric_facts(alert_text)
+    if not alert_facts:
+        return []
+    evidence_facts = _critic_numeric_facts(evidence_text)
+    issues: list[dict[str, Any]] = []
+    for value in alert_facts:
+        supported = any(math.isclose(value, candidate, rel_tol=0.01, abs_tol=0.01) for candidate in evidence_facts)
+        if not supported:
+            issues.append(
+                {
+                    "type": "numeric_fact_unsupported",
+                    "severity": "high",
+                    "value": value,
+                    "target": alert.get("summary"),
+                    "reason": "A number with a financial scale or percentage was not found in the cited source evidence or market context.",
+                }
+            )
+    return issues
+
+
+def _critic_source_evidence(state: AnalysisGraphState) -> dict[str, str]:
+    evidence: dict[str, list[str]] = defaultdict(list)
+    for article in state.get("articles") or []:
+        source_id = str(article.get("source_article_id") or "").strip()
+        if not source_id:
+            continue
+        evidence[source_id].extend(
+            str(article.get(field) or "")
+            for field in ("title", "summary_snippet", "content_text")
+        )
+    for category in state.get("category_reports") or []:
+        for article in category.get("articles") or []:
+            source_id = str(article.get("source_article_id") or "").strip()
+            if not source_id:
+                continue
+            evidence[source_id].extend(
+                [
+                    str(article.get("title") or ""),
+                    *[str(point) for point in article.get("key_points") or []],
+                    *[
+                        str(entity.get("name") if isinstance(entity, dict) else entity)
+                        for entity in article.get("named_entities") or []
+                    ],
+                ]
+            )
+    return {source_id: _normalize_whitespace(" ".join(parts)) for source_id, parts in evidence.items()}
+
+
+def _critic_asset_check(
+    raw_assets: Any,
+    *,
+    evidence_text: str,
+    source_ids: list[str],
+) -> tuple[list[str], list[dict[str, Any]], list[dict[str, Any]]]:
+    assets = _normalize_string_list(raw_assets, limit=8)
+    normalized_assets: list[str] = []
+    details: list[dict[str, Any]] = []
+    issues: list[dict[str, Any]] = []
+    evidence_folded = evidence_text.casefold()
+    seen_canonical: set[str] = set()
+
+    for raw_asset in assets:
+        folded = raw_asset.casefold()
+        alias = next(
+            (value for key, value in _CANONICAL_ASSET_ALIASES.items() if key.casefold() in folded),
+            None,
+        )
+        if alias is not None:
+            canonical_id = str(alias["canonical_id"])
+            if canonical_id not in seen_canonical:
+                normalized_assets.append(canonical_id)
+                seen_canonical.add(canonical_id)
+            details.append(
+                {
+                    "input": raw_asset,
+                    "canonical_id": canonical_id,
+                    "display_name": alias["display_name"],
+                    "mapping_confidence": alias["confidence"],
+                    "status": "canonical",
+                    "source_article_ids": source_ids,
+                }
+            )
+            continue
+
+        if _CRITIC_TICKER_RE.fullmatch(raw_asset.strip()) and folded not in evidence_folded:
+            issues.append(
+                {
+                    "type": "unsupported_asset_identifier",
+                    "severity": "medium",
+                    "target": raw_asset,
+                    "reason": "Ticker-like asset was not present in the cited source evidence or market context and was removed.",
+                }
+            )
+            continue
+
+        normalized_assets.append(raw_asset)
+        details.append(
+            {
+                "input": raw_asset,
+                "canonical_id": raw_asset if _CRITIC_TICKER_RE.fullmatch(raw_asset.strip()) else None,
+                "display_name": raw_asset,
+                "mapping_confidence": 0.8 if folded in evidence_folded else 0.45,
+                "status": "evidence_supported" if folded in evidence_folded else "unmapped_name",
+                "source_article_ids": source_ids,
+            }
+        )
+    return list(dict.fromkeys(normalized_assets)), details, issues
+
+
+def _critic_alerts(state: AnalysisGraphState, alerts: list[dict[str, Any]]) -> tuple[list[dict[str, Any]], list[dict[str, Any]]]:
+    metadata = {
+        str(article.get("source_article_id") or article.get("canonical_url") or ""): article
+        for category in state.get("category_reports") or []
+        for article in category.get("articles") or []
+        if not article.get("error")
+    }
+    valid_ids = set(metadata)
+    evidence_by_id = _critic_source_evidence(state)
+    market_context = str(state.get("market_context_string") or "")
+    issues: list[dict[str, Any]] = []
+    checked: list[dict[str, Any]] = []
+    rejected: list[dict[str, Any]] = []
+
+    for alert in alerts:
+        if not isinstance(alert, dict) or not str(alert.get("summary") or "").strip():
+            issues.append({"type": "alert_critic", "severity": "high", "reason": "missing_summary"})
+            continue
+        source_ids = [str(item).strip() for item in alert.get("source_article_ids") or [] if str(item).strip()]
+        valid_source_ids = list(dict.fromkeys(item for item in source_ids if item in valid_ids))
+        if not valid_source_ids:
+            issues.append({"type": "alert_critic", "severity": "high", "reason": "missing_or_invalid_citations", "target": alert.get("summary")})
+            continue
+        if len(valid_source_ids) != len(source_ids):
+            issues.append({"type": "alert_critic", "severity": "high", "reason": "unsupported_citations_removed", "target": alert.get("summary")})
+
+        evidence_text = " ".join([*(evidence_by_id.get(source_id, "") for source_id in valid_source_ids), market_context])
+        normalized = dict(alert)
+        normalized["source_article_ids"] = valid_source_ids
+        assets, asset_details, asset_issues = _critic_asset_check(
+            alert.get("affected_assets"),
+            evidence_text=evidence_text,
+            source_ids=valid_source_ids,
+        )
+        normalized["affected_assets"] = assets
+        normalized["affected_asset_details"] = asset_details
+        issues.extend({**item, "target": item.get("target") or alert.get("summary")} for item in asset_issues)
+
+        numeric_issues = _critic_numeric_issues(alert, evidence_text)
+        issues.extend(numeric_issues)
+        if numeric_issues:
+            rejected.append({**normalized, "critic_status": "needs_review", "confidence": min(float(normalized.get("confidence") or 0.5), 0.35)})
+            continue
+
+        causal_text = str(alert.get("summary") or "") + " " + str(alert.get("why_it_matters") or "")
+        if re.search(r"\b(drove|caused|led to|triggered|underpinning|because of)\b", causal_text, re.IGNORECASE):
+            issues.append(
+                {
+                    "type": "causal_claim_unverified",
+                    "severity": "medium",
+                    "target": alert.get("summary"),
+                    "reason": "Causal wording should be reviewed against source evidence; co-movement alone does not establish causality.",
+                }
+            )
+            normalized["critic_status"] = "needs_review"
+        else:
+            normalized["critic_status"] = "passed"
+        checked.append(normalized)
+
+    if not checked and rejected:
+        checked = [rejected[0]]
+        issues.append(
+            {
+                "type": "alert_critic",
+                "severity": "high",
+                "reason": "All candidate alerts had evidence issues; retained the highest-ranked candidate for human review.",
+                "target": checked[0].get("summary"),
+            }
+        )
+    return checked[:3], issues
 
 
 def _graph_summarize_top_alerts(state: AnalysisGraphState) -> AnalysisGraphState:
@@ -514,12 +877,17 @@ def _graph_summarize_top_alerts(state: AnalysisGraphState) -> AnalysisGraphState
         return state
 
     try:
+        alert_kwargs = {
+            "runtime": runtime,
+            "market_context": state["market_context_string"],
+            "developments": all_developments,
+            "article_metadata": article_metadata,
+            "is_incremental": bool(state.get("legacy_executive_summary")),
+        }
+        if state.get("event_packets"):
+            alert_kwargs["event_packets"] = state["event_packets"]
         top_alerts = _generate_top_alerts(
-            runtime=runtime,
-            market_context=state["market_context_string"],
-            developments=all_developments,
-            article_metadata=article_metadata,
-            is_incremental=bool(state.get("legacy_executive_summary")),
+            **alert_kwargs,
         )
         state["executive_summary"] = top_alerts
         # Legacy key support
@@ -531,6 +899,38 @@ def _graph_summarize_top_alerts(state: AnalysisGraphState) -> AnalysisGraphState
 
     if state.get("executive_summary"):
         LOGGER.info("Successfully generated %d top-level alerts.", len(state["executive_summary"]))
+    return state
+
+
+def _graph_critic_outputs(state: AnalysisGraphState) -> AnalysisGraphState:
+    """Run evidence, citation, numeric, and asset checks before rendering."""
+    alerts = list(state.get("top_alerts") or [])
+    metadata = {
+        str(article.get("source_article_id") or article.get("canonical_url") or ""): article
+        for category in state.get("category_reports") or []
+        for article in category.get("articles") or []
+        if not article.get("error")
+    }
+    checked, issues = _critic_alerts(state, alerts)
+    for alert in checked:
+        source_ids = [str(item) for item in alert.get("source_article_ids") or []]
+        alert["source_articles"] = [
+            {
+                "source_article_id": source_id,
+                "title": str(metadata[source_id].get("title") or ""),
+                "date": str(metadata[source_id].get("published_at") or state["target_date"])[:10],
+                "url": str(metadata[source_id].get("canonical_url") or ""),
+            }
+            for source_id in source_ids
+            if source_id in metadata
+        ]
+    state["top_alerts"] = checked[:3]
+    state["executive_summary"] = checked[:3]
+    state["critic_issues"] = issues
+    if state.get("runtime") is not None:
+        state["runtime"].diagnostics.critic_checked_alert_count += len(alerts)
+        if issues:
+            state["runtime"].diagnostics.degraded_mode_count += 1
     return state
 
 
@@ -561,6 +961,9 @@ def _graph_finalize(state: AnalysisGraphState) -> AnalysisGraphState:
         newly_analyzed_keys=state.get("newly_analyzed_keys"),
         validation_issues=state.get("validation_issues"),
         theme_memory=state.get("theme_memory"),
+        event_packets=state.get("event_packets"),
+        review_queue=state.get("review_queue"),
+        critic_issues=state.get("critic_issues"),
     )
     _write_report(state["report_path"], report)
     state["report"] = report
@@ -844,7 +1247,7 @@ def _route_batch_recursive(
             or request_bytes > budget_state.synthesis_request_byte_budget
         )
     ):
-        runtime.record_split(category_name, "pre_send_budget")
+        runtime.record_split(category_name, "pre_send_budget", batch_kind="routing")
         left, right = _split_batch(batch_articles)
         return _route_batch_recursive(runtime, category_name, left, batch_label=f"{batch_label}a", depth=depth + 1) + _route_batch_recursive(
             runtime, category_name, right, batch_label=f"{batch_label}b", depth=depth + 1
@@ -879,9 +1282,10 @@ def _route_batch_recursive(
         return _order_articles_like_input(batch_articles, merged_results + salvage_results)
     except Exception as exc:
         classification = _classify_exception(exc)
-        runtime.tighten_category_budget(category_name, classification, batch_kind="synthesis")
+        runtime.record_failure_classification(classification)
+        runtime.tighten_category_budget(category_name, classification, batch_kind="routing")
         if classification == "payload_too_large":
-            runtime.record_split(category_name, "response_413")
+            runtime.record_split(category_name, "response_413", batch_kind="routing")
         if len(batch_articles) > 1 and depth < 1:
             left, right = _split_batch(batch_articles)
             return _route_batch_recursive(runtime, category_name, left, batch_label=f"{batch_label}a", depth=depth + 1) + _route_batch_recursive(
@@ -1105,6 +1509,14 @@ def _merge_category_report(
                 sub_batch_count += synthesis_batch_count
             except Exception as exc:
                 category_error_message = str(exc)
+                runtime.mark_degraded_merge(category_name, "synthesis_failed_local_fallback")
+                fallback_developments = _fallback_developments_from_articles(
+                    successful_articles,
+                    limit=profile.category_bullet_limit,
+                )
+                key_developments = [dev["text"] for dev in fallback_developments]
+                subgroups = [_local_fallback_subgroup(category_name, successful_articles, fallback_developments)]
+                model_used = "local_fallback"
         elif not successful_articles:
             category_error_message = "No successful article analyses available for synthesis."
     diagnostics["sub_batch_count"] = sub_batch_count
@@ -1139,7 +1551,7 @@ def _finalize_report(
     source_site: str,
     input_article_count: int,
     category_reports: list[dict[str, Any]],
-    top_alerts: list[str],
+    top_alerts: list[Any],
     runtime: AnalysisRuntime | None,
     incremental: dict[str, int],
     total_scraped_count: int,
@@ -1149,6 +1561,9 @@ def _finalize_report(
     newly_analyzed_keys: set[tuple[str | None, str]] | None = None,
     validation_issues: list[dict[str, Any]] | None = None,
     theme_memory: dict[str, Any] | None = None,
+    event_packets: list[dict[str, Any]] | None = None,
+    review_queue: list[dict[str, Any]] | None = None,
+    critic_issues: list[dict[str, Any]] | None = None,
 ) -> dict[str, Any]:
     # Flag new articles
     if newly_analyzed_keys:
@@ -1201,7 +1616,15 @@ def _finalize_report(
         },
         "macro_release_digest": macro_release_digest or {},
         "validation_issues": validation_issues or [],
+        "critic_issues": critic_issues or [],
         "theme_memory": theme_memory or {},
+        "events": event_packets or [],
+        "review_queue": review_queue or [],
+        "event_pipeline": {
+            "mode": os.environ.get("DAILY_MACRO_EVENT_PIPELINE_MODE", "hybrid"),
+            "event_count": len(event_packets or []),
+            "review_count": len(review_queue or []),
+        },
         "unresolved_articles": unresolved_articles,
         "totals": {
             "article_count": len(all_articles),
@@ -1307,6 +1730,12 @@ def _category_error_classification(category: dict[str, Any]) -> str:
     message = str(category.get("error") or "")
     if "synthesis wait budget" in message or "synthesis retry budget" in message:
         return "synthesis_budget_exhausted"
+    if "NoEligibleEndpoint" in message or "not available within" in message:
+        return "no_eligible_endpoint"
+    if "timed out" in message.lower() or "deadline" in message.lower():
+        return "provider_timeout"
+    if "connection" in message.lower() or "unavailable" in message.lower():
+        return "provider_unavailable"
     if "413" in message:
         return "payload_too_large"
     if category.get("status") == "failed":
@@ -1443,10 +1872,24 @@ def _analyze_category(
                 dev["text"]
                 for dev in _normalize_developments(synthesis_payload.get("key_developments"), valid_ids=None, limit=profile.category_bullet_limit)
             ]
+            if not key_developments:
+                runtime.mark_degraded_merge(category_name, "empty_synthesis_local_fallback")
+                fallback_developments = _fallback_developments_from_articles(
+                    successful_articles,
+                    limit=profile.category_bullet_limit,
+                )
+                key_developments = [dev["text"] for dev in fallback_developments]
             named_entities = _normalize_entities(synthesis_payload.get("named_entities"))[: profile.entity_limit]
         except Exception as exc:
             category_status = "partial"
             category_error_message = str(exc)
+            runtime.mark_degraded_merge(category_name, "synthesis_failed_local_fallback")
+            fallback_developments = _fallback_developments_from_articles(
+                successful_articles,
+                limit=profile.category_bullet_limit,
+            )
+            key_developments = [dev["text"] for dev in fallback_developments]
+            subgroup_reports = [_local_fallback_subgroup(category_name, successful_articles, fallback_developments)]
             category_errors.append(
                 {
                     "type": "category",
@@ -1790,7 +2233,7 @@ def _process_batch_recursive(
         )
         and len(working_batch) > 1
     ):
-        runtime.record_split(category_name, "pre_send_budget")
+        runtime.record_split(category_name, "pre_send_budget", batch_kind="article_batch")
         LOGGER.info(
             "Splitting category %s batch %s before send: estimated_input_tokens=%s request_bytes=%s article_count=%s.",
             category_name,
@@ -1964,8 +2407,9 @@ def _process_batch_recursive(
     except requests.HTTPError as exc:
         status_code = exc.response.status_code if exc.response is not None else None
         classification = _classify_exception(exc)
+        runtime.record_failure_classification(classification)
         if status_code == 413 and len(working_batch) > 1:
-            runtime.record_split(category_name, "response_413")
+            runtime.record_split(category_name, "response_413", batch_kind="article_batch")
             runtime.tighten_category_budget(category_name, classification, batch_kind="article_batch")
             LOGGER.info(
                 "Splitting category %s batch %s after HTTP 413: article_count=%s.",
@@ -2044,6 +2488,7 @@ def _process_batch_recursive(
         model_used = runtime.last_attempted_model or active_model.model_id
         message = str(exc)
         classification = _classify_exception(exc)
+        runtime.record_failure_classification(classification)
         if len(working_batch) > 1 and classification in {"invalid_json", "unexpected_error"} and depth + 1 < effective_budget["salvage_max_depth"]:
             runtime.tighten_category_budget(category_name, classification, batch_kind="article_batch")
             LOGGER.info(
@@ -2158,6 +2603,12 @@ def _build_category_outputs(
             valid_ids=_subgroup_article_ids(successful_articles),
             limit=profile.subgroup_bullet_limit,
         )
+        if not detailed_developments:
+            runtime.mark_degraded_merge(category_name, "empty_synthesis_local_fallback")
+            detailed_developments = _fallback_developments_from_articles(
+                successful_articles,
+                limit=profile.subgroup_bullet_limit,
+            )
         subgroup = {
             "title": f"{category_name} overview",
             "theme_rationale": "Single subgroup because the category size did not require thematic splitting.",
@@ -2192,6 +2643,12 @@ def _build_category_outputs(
             valid_ids=_subgroup_article_ids(subgroup["articles"]),
             limit=profile.subgroup_bullet_limit,
         )
+        if not detailed_developments:
+            runtime.mark_degraded_merge(category_name, "empty_synthesis_local_fallback")
+            detailed_developments = _fallback_developments_from_articles(
+                subgroup["articles"],
+                limit=profile.subgroup_bullet_limit,
+            )
         subgroup_reports.append(
             {
                 "title": subgroup["title"],
@@ -2232,8 +2689,27 @@ def _build_category_outputs(
             if name and name not in seen_entity_names:
                 seen_entity_names.add(name)
                 merged_entities.append(entity)
+    category_developments: list[dict[str, Any]] = []
+    seen_development_text: set[str] = set()
+    for subgroup in subgroup_reports:
+        detailed = _normalize_developments(
+            subgroup.get("key_developments_detailed"),
+            valid_ids=_subgroup_article_ids(subgroup.get("articles") or []),
+            limit=profile.subgroup_bullet_limit,
+        )
+        for development in detailed:
+            if development["text"] in seen_development_text:
+                continue
+            seen_development_text.add(development["text"])
+            category_developments.append(development)
+            if len(category_developments) >= profile.category_bullet_limit:
+                break
+        if len(category_developments) >= profile.category_bullet_limit:
+            break
+
     category_payload = {
-        "key_developments": [],
+        "key_developments": category_developments,
+        "key_developments_detailed": category_developments,
         "named_entities": merged_entities[: profile.entity_limit],
     }
     return category_payload, model_used, total_batches, subgroup_reports
@@ -2265,7 +2741,7 @@ def _assign_article_subgroups(
             or serialized_bytes > grouping_request_byte_budget
         )
     ):
-        runtime.record_split(category_name, "pre_send_budget")
+        runtime.record_split(category_name, "pre_send_budget", batch_kind="synthesis_grouping")
         left, right = _split_batch(successful_articles)
         return _assign_article_subgroups(runtime, category_name, left, batch_label=f"{batch_label}a", model_override=model_override, depth=depth) + _assign_article_subgroups(
             runtime, category_name, right, batch_label=f"{batch_label}b", model_override=model_override, depth=depth
@@ -2328,10 +2804,11 @@ def _assign_article_subgroups(
         )
     except Exception as exc:
         classification = _classify_exception(exc)
+        runtime.record_failure_classification(classification)
         runtime.tighten_category_budget(category_name, classification, batch_kind="synthesis")
         if len(successful_articles) > 1 and depth + 1 < profile.salvage_max_depth:
             if classification == "payload_too_large":
-                runtime.record_split(category_name, "response_413")
+                runtime.record_split(category_name, "response_413", batch_kind="synthesis_grouping")
             left, right = _split_batch(successful_articles)
             return _assign_article_subgroups(
                 runtime,
@@ -2387,9 +2864,10 @@ def _synthesize_summary_items(
             total_batch_count += 1
         except Exception as exc:
             classification = _classify_exception(exc)
+            runtime.record_failure_classification(classification)
             if len(batch) > 1 and classification in {"payload_too_large", "invalid_json", "unexpected_error"}:
                 if classification == "payload_too_large":
-                    runtime.record_split(category_name, "response_413")
+                    runtime.record_split(category_name, "response_413", batch_kind="synthesis")
                 runtime.tighten_category_budget(category_name, classification, batch_kind="synthesis")
                 left, right = _split_batch(batch)
                 left_payload, left_model, left_count = _synthesize_summary_items(
@@ -2527,7 +3005,7 @@ def _plan_category_batches(
             request_byte_budget=effective_budget["request_byte_budget"],
             model_id=runtime.current_model.model_id,
         ):
-            runtime.record_split(category_name, "pre_send_budget")
+            runtime.record_split(category_name, "planned_batch_boundary", batch_kind="article_batch")
             LOGGER.info(
                 "Planning smaller batch for category %s before send: current_articles=%s next_article=%s.",
                 category_name,
@@ -2612,7 +3090,7 @@ def _plan_synthesis_batches(
             request_byte_budget=budget_state.synthesis_request_byte_budget,
             model_id=model_id,
         ):
-            runtime.record_split(category_name, "pre_send_budget")
+            runtime.record_split(category_name, "planned_batch_boundary", batch_kind="synthesis")
             planned.append(current)
             current = [item]
         else:
@@ -3152,7 +3630,15 @@ def _build_empty_report(
         },
         "macro_release_digest": macro_release_digest or {},
         "validation_issues": [],
+        "critic_issues": [],
         "theme_memory": {},
+        "events": [],
+        "review_queue": [],
+        "event_pipeline": {
+            "mode": os.environ.get("DAILY_MACRO_EVENT_PIPELINE_MODE", "hybrid"),
+            "event_count": 0,
+            "review_count": 0,
+        },
         "totals": {
             "article_count": 0,
             "successful_article_analyses": 0,
@@ -3322,6 +3808,59 @@ def _normalize_developments(
     return developments
 
 
+def _fallback_developments_from_articles(
+    articles: list[dict[str, Any]],
+    *,
+    limit: int,
+) -> list[dict[str, Any]]:
+    """Build a provenance-preserving summary when synthesis returns no bullets.
+
+    Historical runs frequently had complete article analysis but an empty
+    category summary. A short local rollup is preferable to publishing a
+    successful section with no usable developments.
+    """
+    developments: list[dict[str, Any]] = []
+    seen: set[str] = set()
+    for article in articles:
+        source_id = str(article.get("source_article_id") or "").strip()
+        points = _normalize_string_list(article.get("key_points"), limit=4)
+        if not points:
+            title = str(article.get("title") or "").strip()
+            points = [title] if title else []
+        for point in points:
+            text = _normalize_whitespace(point)
+            if not text or text in seen:
+                continue
+            seen.add(text)
+            developments.append(
+                {
+                    "text": text,
+                    "source_article_ids": [source_id] if source_id else [],
+                }
+            )
+            if len(developments) >= max(1, limit):
+                return developments
+    return developments
+
+
+def _local_fallback_subgroup(
+    category_name: str,
+    articles: list[dict[str, Any]],
+    developments: list[dict[str, Any]],
+) -> dict[str, Any]:
+    """Represent a degraded local rollup as a normal subgroup for downstream use."""
+    return {
+        "title": f"{category_name} local rollup",
+        "theme_rationale": "Local evidence rollup used because category synthesis was unavailable within the run budget.",
+        "article_count": len(articles),
+        "key_developments": [item["text"] for item in developments],
+        "key_developments_detailed": developments,
+        "named_entities": _collect_entities_from_articles(articles)[: _section_profile(category_name).entity_limit],
+        "articles": articles,
+        "model_used": "local_fallback",
+    }
+
+
 def _coerce_score(value: Any) -> int:
     try:
         numeric = int(value)
@@ -3375,6 +3914,224 @@ def _infer_research_lane(article: dict[str, Any]) -> str:
     return "general_research"
 
 
+_EVENT_STOPWORDS = {
+    "about", "after", "amid", "and", "are", "as", "at", "be", "by", "for", "from",
+    "has", "have", "in", "into", "is", "its", "of", "on", "or", "over", "that", "the",
+    "to", "with", "will", "hong", "kong", "china", "market", "news", "今日", "香港", "中國",
+}
+
+
+def _event_tokens(value: Any) -> set[str]:
+    text = str(value or "").casefold()
+    tokens = re.findall(r"[a-z0-9]+|[\u4e00-\u9fff]{2,}", text)
+    return {
+        token for token in tokens
+        if token not in _EVENT_STOPWORDS and (len(token) > 1 or token.isdigit())
+    }
+
+
+def _event_entities(article: dict[str, Any]) -> set[str]:
+    entities: set[str] = set()
+    for entity in article.get("named_entities") or []:
+        if isinstance(entity, dict):
+            name = str(entity.get("name") or "").strip().casefold()
+        else:
+            name = str(entity).strip().casefold()
+        if name:
+            entities.add(name)
+    return entities
+
+
+def _event_datetime(value: Any, fallback: str) -> datetime:
+    raw = str(value or fallback).strip()
+    try:
+        parsed = datetime.fromisoformat(raw.replace("Z", "+00:00"))
+        return parsed.replace(tzinfo=None)
+    except ValueError:
+        return datetime.fromisoformat(fallback).replace(tzinfo=None)
+
+
+def _event_similarity(left: dict[str, Any], right: dict[str, Any]) -> float:
+    left_tokens = _event_tokens(
+        " ".join([str(left.get("title") or ""), *(str(item) for item in left.get("key_points") or [])])
+    )
+    right_tokens = _event_tokens(
+        " ".join([str(right.get("title") or ""), *(str(item) for item in right.get("key_points") or [])])
+    )
+    union = left_tokens | right_tokens
+    overlap = len(left_tokens & right_tokens) / max(len(union), 1)
+    shared_entities = _event_entities(left) & _event_entities(right)
+    if shared_entities and overlap >= 0.30:
+        return max(overlap, 0.7)
+    return overlap
+
+
+def _event_source_quality(article: dict[str, Any]) -> float:
+    tier_score = {"high": 1.0, "medium": 0.75, "light": 0.45}.get(
+        str(article.get("attention_tier") or "medium").lower(),
+        0.65,
+    )
+    try:
+        score = max(float(article.get("relevance_score") or 0), float(article.get("urgency_score") or 0)) / 10.0
+    except (TypeError, ValueError):
+        score = 0.5
+    return round(min(1.0, max(tier_score, score)), 2)
+
+
+def _build_event_packets(
+    category_reports: list[dict[str, Any]],
+    *,
+    target_date: str,
+) -> tuple[list[dict[str, Any]], list[dict[str, Any]]]:
+    """Conservatively cluster analyzed articles into evidence-backed events."""
+    candidates: list[dict[str, Any]] = []
+    for category in category_reports:
+        category_name = str(category.get("category") or "Uncategorized")
+        for article in category.get("articles") or []:
+            if article.get("error"):
+                continue
+            source_id = str(article.get("source_article_id") or article.get("canonical_url") or "").strip()
+            if not source_id:
+                continue
+            candidate = dict(article)
+            candidate["_category"] = category_name
+            candidate["_published_dt"] = _event_datetime(article.get("published_at"), target_date)
+            candidate["_event_tokens"] = _event_tokens(
+                " ".join([str(article.get("title") or ""), *(str(item) for item in article.get("key_points") or [])])
+            )
+            candidate["_event_entities"] = _event_entities(article)
+            candidates.append(candidate)
+
+    clusters: list[dict[str, Any]] = []
+    for candidate in candidates:
+        best_cluster: dict[str, Any] | None = None
+        best_similarity = 0.0
+        for cluster in clusters:
+            if candidate["_category"] != cluster["category"]:
+                continue
+            if candidate.get("research_lane") != cluster.get("research_lane"):
+                continue
+            if candidate.get("theme") != cluster.get("theme"):
+                continue
+            for existing in cluster["articles"]:
+                hours = abs((candidate["_published_dt"] - existing["_published_dt"]).total_seconds()) / 3600.0
+                if hours > 72:
+                    continue
+                similarity = _event_similarity(candidate, existing)
+                if similarity >= 0.55 and similarity > best_similarity:
+                    best_cluster = cluster
+                    best_similarity = similarity
+        if best_cluster is None:
+            clusters.append(
+                {
+                    "category": candidate["_category"],
+                    "theme": candidate.get("theme") or "general",
+                    "research_lane": candidate.get("research_lane") or _infer_research_lane(candidate),
+                    "articles": [candidate],
+                }
+            )
+        else:
+            best_cluster["articles"].append(candidate)
+
+    packets: list[dict[str, Any]] = []
+    review_queue: list[dict[str, Any]] = []
+    for cluster in clusters:
+        articles = sorted(cluster["articles"], key=lambda item: item["_published_dt"], reverse=True)
+        source_ids = [str(item.get("source_article_id") or item.get("canonical_url") or "") for item in articles]
+        source_ids = list(dict.fromkeys(item for item in source_ids if item))
+        anchor = articles[0]
+        entity_names = []
+        for article in articles:
+            for entity in article.get("named_entities") or []:
+                name = str(entity.get("name") if isinstance(entity, dict) else entity or "").strip()
+                if name and name not in entity_names:
+                    entity_names.append(name)
+        facts: list[str] = []
+        evidence: list[dict[str, Any]] = []
+        best_sources: list[dict[str, Any]] = []
+        for article in articles:
+            article_id = str(article.get("source_article_id") or article.get("canonical_url") or "")
+            for point in article.get("key_points") or []:
+                text = str(point).strip()
+                if text and text not in facts:
+                    facts.append(text)
+            article_evidence = [str(point).strip() for point in article.get("key_points") or [] if str(point).strip()]
+            evidence.append(
+                {
+                    "source_article_id": article_id,
+                    "title": str(article.get("title") or ""),
+                    "url": str(article.get("canonical_url") or ""),
+                    "claims": article_evidence[:3],
+                }
+            )
+            best_sources.append(
+                {
+                    "source_article_id": article_id,
+                    "title": str(article.get("title") or ""),
+                    "url": str(article.get("canonical_url") or ""),
+                    "published_at": str(article.get("published_at") or ""),
+                    "quality": _event_source_quality(article),
+                }
+            )
+        try:
+            novelty = max(float(article.get("novelty_score") or 0) for article in articles) / 10.0
+            market_relevance = max(
+                max(float(article.get("relevance_score") or 0), float(article.get("urgency_score") or 0))
+                for article in articles
+            ) / 10.0
+        except (TypeError, ValueError):
+            novelty, market_relevance = 0.5, 0.5
+        review_reasons: list[str] = []
+        if len(source_ids) == 1 and market_relevance >= 0.7:
+            review_reasons.append("single_source_high_impact")
+        if not facts:
+            review_reasons.append("missing_evidence_claims")
+        if market_relevance >= 0.85 and len(source_ids) < 2:
+            review_reasons.append("high_market_relevance_needs_confirmation")
+        confidence = min(0.96, 0.52 + 0.10 * min(len(source_ids) - 1, 3) + 0.12 * max(_event_source_quality(anchor) - 0.5, 0))
+        signature = "|".join(
+            [
+                str(cluster["category"]),
+                str(cluster["research_lane"]),
+                str(cluster["theme"]),
+                ",".join(sorted(entity_names[:4])),
+                " ".join(sorted(_event_tokens(anchor.get("title")))[0:5]),
+            ]
+        )
+        event_id = "evt_" + hashlib.sha1(signature.encode("utf-8")).hexdigest()[:12]
+        packet = {
+            "event_id": event_id,
+            "event_title": str(anchor.get("title") or "Untitled event"),
+            "category": cluster["category"],
+            "research_lane": cluster["research_lane"],
+            "theme": cluster["theme"],
+            "source_article_ids": source_ids,
+            "source_count": len(source_ids),
+            "best_sources": best_sources[:5],
+            "facts": facts[:8],
+            "evidence": evidence,
+            "affected_assets": entity_names[:12],
+            "novelty": round(min(1.0, max(0.0, novelty)), 2),
+            "market_relevance": round(min(1.0, max(0.0, market_relevance)), 2),
+            "confidence": round(confidence, 2),
+            "review_required": bool(review_reasons),
+            "review_reasons": review_reasons,
+        }
+        packets.append(packet)
+        if review_reasons:
+            review_queue.append(
+                {
+                    "event_id": event_id,
+                    "priority": "high" if market_relevance >= 0.8 else "normal",
+                    "reasons": review_reasons,
+                    "source_article_ids": source_ids,
+                }
+            )
+    packets.sort(key=lambda item: (item.get("market_relevance", 0), item.get("confidence", 0)), reverse=True)
+    review_queue.sort(key=lambda item: (item.get("priority") != "high", item.get("event_id") or ""))
+    return packets, review_queue
+
+
 def _theme_memory_file(data_dir: Path) -> Path:
     return data_dir / "theme_memory.json"
 
@@ -3383,6 +4140,8 @@ def _update_theme_memory_file(
     data_dir: Path,
     target_date: str,
     category_reports: list[dict[str, Any]],
+    *,
+    event_packets: list[dict[str, Any]] | None = None,
 ) -> dict[str, Any]:
     path = _theme_memory_file(data_dir)
     try:
@@ -3392,6 +4151,7 @@ def _update_theme_memory_file(
     themes = memory.setdefault("themes", {})
     today_counts: dict[str, int] = defaultdict(int)
     today_articles: dict[str, list[str]] = defaultdict(list)
+    today_events: dict[str, list[str]] = defaultdict(list)
 
     for category in category_reports:
         for article in category.get("articles") or []:
@@ -3405,20 +4165,51 @@ def _update_theme_memory_file(
             if article_id:
                 today_articles[key].append(article_id)
 
+    for event in event_packets or []:
+        lane = str(event.get("research_lane") or "general_research")
+        theme = str(event.get("theme") or "general")
+        key = f"{lane}:{theme}"
+        event_id = str(event.get("event_id") or "")
+        if event_id:
+            today_events[key].append(event_id)
+
     for key, count in today_counts.items():
         existing = themes.get(key) if isinstance(themes.get(key), dict) else {}
         previous_count = int(existing.get("last_count") or 0)
         related = list(dict.fromkeys([*(existing.get("related_articles") or []), *today_articles[key]]))[-50:]
+        related_events = list(dict.fromkeys([*(existing.get("related_events") or []), *today_events[key]]))[-50:]
         themes[key] = {
             "theme": key.split(":", 1)[1],
             "research_lane": key.split(":", 1)[0],
             "first_seen": existing.get("first_seen") or target_date,
             "last_updated": target_date,
             "related_articles": related,
+            "related_events": related_events,
             "trend": "strengthening" if count > previous_count else "unchanged",
             "confidence": round(min(0.95, 0.55 + 0.05 * count), 2),
             "last_count": count,
+            "status": "open",
+            "last_seen": target_date,
+            "inactive_days": 0,
         }
+
+    close_after_raw = os.environ.get("DAILY_MACRO_THEME_CLOSE_DAYS", "7")
+    try:
+        close_after_days = max(1, int(close_after_raw))
+    except ValueError:
+        close_after_days = 7
+    target_dt = datetime.fromisoformat(target_date).date()
+    for key, existing in themes.items():
+        if key in today_counts or not isinstance(existing, dict):
+            continue
+        last_seen = str(existing.get("last_seen") or existing.get("last_updated") or "")
+        try:
+            inactive_days = max(0, (target_dt - datetime.fromisoformat(last_seen).date()).days)
+        except ValueError:
+            inactive_days = close_after_days
+        existing["inactive_days"] = inactive_days
+        existing["status"] = "closed" if inactive_days >= close_after_days else "cooling"
+        existing["trend"] = "weakening"
 
     memory["last_updated"] = target_date
     try:
@@ -3441,6 +4232,7 @@ def _generate_top_alerts(
     developments: list[dict[str, Any]],
     article_metadata: dict[str, dict[str, str]],
     is_incremental: bool = False,
+    event_packets: list[dict[str, Any]] | None = None,
 ) -> list[dict[str, Any]]:
     """Use the shared LLM path to select 1-3 structured top alerts."""
     briefing_style = os.environ.get("DAILY_MACRO_BRIEFING_STYLE") or "CIO briefing"
@@ -3475,9 +4267,27 @@ def _generate_top_alerts(
                         "Return 1 to 3 alerts.",
                         "Use source_article_ids from the provided ref_ids only.",
                         "Prefer developments with concrete market, macro, or asset-price implications.",
+                        "Preserve every source number's currency, unit, and scale exactly; do not convert 億/億元 into billions without checking the conversion.",
+                        "Only emit ticker-like identifiers when they appear in the provided evidence or market context; otherwise use the company, sector, or commodity name.",
+                        "Use cautious language for causal claims: co-movement is not proof that one event caused another.",
                     ],
                     "market_context": market_context,
                     "developments": developments,
+                    "event_packets": [
+                        {
+                            "event_id": event.get("event_id"),
+                            "event_title": event.get("event_title"),
+                            "theme": event.get("theme"),
+                            "research_lane": event.get("research_lane"),
+                            "facts": list(event.get("facts") or [])[:4],
+                            "affected_assets": list(event.get("affected_assets") or [])[:8],
+                            "source_article_ids": list(event.get("source_article_ids") or []),
+                            "confidence": event.get("confidence"),
+                            "market_relevance": event.get("market_relevance"),
+                            "review_required": event.get("review_required"),
+                        }
+                        for event in (event_packets or [])[:40]
+                    ],
                     "article_metadata": article_metadata,
                 },
                 ensure_ascii=False,
@@ -3539,17 +4349,22 @@ def _normalize_top_alerts(alerts_data: Any, article_metadata: dict[str, dict[str
             confidence = float(raw.get("confidence", 0.5))
         except (TypeError, ValueError):
             confidence = 0.5
-        alerts.append(
-            {
-                "summary": summary,
-                "why_it_matters": str(raw.get("why_it_matters") or "").strip(),
-                "affected_assets": _normalize_string_list(raw.get("affected_assets"), limit=8),
-                "time_horizon": str(raw.get("time_horizon") or "1w").strip() or "1w",
-                "confidence": max(0.0, min(1.0, confidence)),
-                "source_article_ids": source_ids,
-                "source_articles": source_articles,
-            }
-        )
+        normalized = {
+            "summary": summary,
+            "why_it_matters": str(raw.get("why_it_matters") or "").strip(),
+            "affected_assets": _normalize_string_list(raw.get("affected_assets"), limit=8),
+            "time_horizon": str(raw.get("time_horizon") or "1w").strip() or "1w",
+            "confidence": max(0.0, min(1.0, confidence)),
+            "source_article_ids": source_ids,
+            "source_articles": source_articles,
+        }
+        if raw.get("critic_status"):
+            normalized["critic_status"] = str(raw.get("critic_status"))
+        if isinstance(raw.get("affected_asset_details"), list):
+            normalized["affected_asset_details"] = [
+                detail for detail in raw.get("affected_asset_details") if isinstance(detail, dict)
+            ]
+        alerts.append(normalized)
     return alerts
 
 

@@ -118,6 +118,11 @@ def _sanitize_report(report: dict[str, Any]) -> dict[str, Any]:
         "top_alerts": _string_list(report.get("top_alerts")),
         "synthesis_alerts": _string_list(report.get("synthesis_alerts")),
         "previous_top_alerts": _string_list(report.get("previous_top_alerts")),
+        "validation_issues": report.get("validation_issues") or [],
+        "critic_issues": report.get("critic_issues") or [],
+        "events": [_sanitize_event(item) for item in report.get("events") or []],
+        "review_queue": report.get("review_queue") or [],
+        "event_pipeline": report.get("event_pipeline") or {},
         "market_context": _string_list(report.get("market_context")),
         "daily_stats": {
             "total_scraped": (report.get("daily_stats") or {}).get("total_scraped", 0),
@@ -164,6 +169,10 @@ def _sanitize_report(report: dict[str, Any]) -> dict[str, Any]:
             "endpoint_cooldown_seconds_total": diagnostics.get("endpoint_cooldown_seconds_total", 0),
             "llm_request_count": diagnostics.get("llm_request_count", 0),
             "parallel_worker_count": diagnostics.get("parallel_worker_count", 1),
+            "rate_limit_events": diagnostics.get("rate_limit_events") or [],
+            "rate_limit_waits_by_endpoint": diagnostics.get("rate_limit_waits_by_endpoint") or {},
+            "failure_classifications": diagnostics.get("failure_classifications") or {},
+            "split_counts_by_kind": diagnostics.get("split_counts_by_kind") or {},
         },
         "model": _sanitize_model(report.get("model") or {}),
         "model_switches": [_sanitize_model_switch(item) for item in report.get("model_switches") or []],
@@ -171,6 +180,27 @@ def _sanitize_report(report: dict[str, Any]) -> dict[str, Any]:
         "unresolved_articles": [_sanitize_unresolved_article(item) for item in report.get("unresolved_articles") or []],
     }
     return safe_report
+
+
+def _sanitize_event(event: dict[str, Any]) -> dict[str, Any]:
+    return {
+        "event_id": event.get("event_id"),
+        "event_title": event.get("event_title"),
+        "category": event.get("category"),
+        "research_lane": event.get("research_lane"),
+        "theme": event.get("theme"),
+        "source_article_ids": [str(item) for item in event.get("source_article_ids") or []],
+        "source_count": event.get("source_count", 0),
+        "best_sources": event.get("best_sources") or [],
+        "facts": [str(item) for item in event.get("facts") or []],
+        "evidence": event.get("evidence") or [],
+        "affected_assets": [str(item) for item in event.get("affected_assets") or []],
+        "novelty": event.get("novelty", 0),
+        "market_relevance": event.get("market_relevance", 0),
+        "confidence": event.get("confidence", 0),
+        "review_required": bool(event.get("review_required")),
+        "review_reasons": [str(item) for item in event.get("review_reasons") or []],
+    }
 
 
 def _sanitize_model(model: dict[str, Any]) -> dict[str, Any]:
@@ -301,6 +331,7 @@ def _render_report_page(report: dict[str, Any], *, page_title: str, nav_prefix: 
     diagnostics = report.get("diagnostics") or {}
     unresolved_articles = list(report.get("unresolved_articles") or [])
     unresolved_section = _render_unresolved_section(unresolved_articles)
+    event_section = _render_event_section(list(report.get("events") or []), list(report.get("review_queue") or []))
     
     # Handle sectioned executive summary
     # Handle sectioned executive summary with robust fallbacks
@@ -420,6 +451,7 @@ def _render_report_page(report: dict[str, Any], *, page_title: str, nav_prefix: 
     {market_context_html}
     <section class="metrics-grid">{cards_html}</section>
     {summary_section_html}
+    {event_section}
     {unresolved_section}
     <section class="panel">
       <h2>Briefing Items</h2>
@@ -665,6 +697,29 @@ def _render_unresolved_section(unresolved_articles: list[dict[str, Any]]) -> str
         f"<ul class='unresolved-list'>{''.join(items_html)}</ul>"
         "</section>"
     )
+
+
+def _render_event_section(events: list[dict[str, Any]], review_queue: list[dict[str, Any]]) -> str:
+    if not events:
+        return ""
+    review_ids = {str(item.get("event_id") or "") for item in review_queue}
+    blocks = []
+    for event in events[:12]:
+        event_id = str(event.get("event_id") or "")
+        title = escape(str(event.get("event_title") or "Untitled event"))
+        category = escape(str(event.get("category") or ""))
+        theme = escape(str(event.get("theme") or "general"))
+        source_count = int(event.get("source_count") or len(event.get("source_article_ids") or []))
+        facts = _render_bullet_list([str(item) for item in event.get("facts") or []][:3], fallback="", compact=True)
+        review_badge = "<span class='pill pill-unresolved'>REVIEW</span>" if event_id in review_ids else ""
+        blocks.append(
+            f"<article class='event-item'><div class='article-main'><strong>{title}</strong> "
+            f"<span class='pill pill-medium'>{category} / {theme}</span>{review_badge}</div>"
+            f"<p class='muted'>{source_count} source(s) • confidence {float(event.get('confidence') or 0):.2f} • "
+            f"market relevance {float(event.get('market_relevance') or 0):.2f}</p>{facts}</article>"
+        )
+    review_note = f"<p class='muted'>{len(review_queue)} event(s) need source confirmation.</p>" if review_queue else ""
+    return f"<section class='panel'><h2>Event monitor</h2>{review_note}{''.join(blocks)}</section>"
 
 
 def _build_run_notes(report: dict[str, Any]) -> list[str]:

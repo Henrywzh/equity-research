@@ -67,15 +67,29 @@ class LLMTask(StrEnum):
     CRITIC = "critic"
 
 
+class NoEligibleEndpoint(RuntimeError):
+    """Raised when every endpoint exceeds the task's allowed quota wait."""
+
+
 @dataclass(frozen=True)
 class ModelSelection:
     model: ModelConfig
     rejections: list[dict[str, str]] = field(default_factory=list)
     avoided_wait_seconds: float = 0.0
+    wait_seconds: float = 0.0
+    wait_exceeded: bool = False
 
 
 DEFAULT_MAX_LLM_WAIT_SECONDS = 45.0
 DEFAULT_LLM_TIMEOUT_COOLDOWN_SECONDS = 30.0
+TASK_WAIT_BUDGETS_SECONDS = {
+    LLMTask.ROUTING.value: 10.0,
+    LLMTask.ARTICLE_ANALYSIS.value: 15.0,
+    LLMTask.CATEGORY_SYNTHESIS.value: 75.0,
+    LLMTask.TOP_ALERTS.value: 90.0,
+    LLMTask.JSON_REPAIR.value: 10.0,
+    LLMTask.CRITIC.value: 90.0,
+}
 
 # Tasks whose output quality most benefits from the strongest models; these may
 # select premium models. All other (high-volume) tasks reserve premium capacity
@@ -123,6 +137,35 @@ def _resolve_timeout_cooldown_seconds() -> float:
         return DEFAULT_LLM_TIMEOUT_COOLDOWN_SECONDS
 
 
+def _resolve_task_wait_seconds(task: str) -> float:
+    """Return the maximum useful quota wait for one LLM task.
+
+    Per-task environment variables take precedence. The legacy global setting
+    remains an override for operators who want one uniform cap.
+    """
+    task_name = str(task).strip().lower()
+    task_env = f"DAILY_MACRO_MAX_LLM_WAIT_SECONDS_{task_name.upper()}"
+    raw = os.environ.get(task_env)
+    if raw:
+        try:
+            return max(0.0, float(raw))
+        except ValueError:
+            pass
+    if os.environ.get("DAILY_MACRO_MAX_LLM_WAIT_SECONDS"):
+        return _resolve_max_wait_seconds()
+    return TASK_WAIT_BUDGETS_SECONDS.get(task_name, DEFAULT_MAX_LLM_WAIT_SECONDS)
+
+
+def _resolve_category_synthesis_wait_seconds() -> float:
+    raw = os.environ.get("DAILY_MACRO_MAX_CATEGORY_SYNTHESIS_WAIT_SECONDS")
+    if raw:
+        try:
+            return max(0.0, float(raw))
+        except ValueError:
+            pass
+    return MAX_CATEGORY_SYNTHESIS_WAIT_SECONDS
+
+
 class ModelResolver:
     def __init__(
         self,
@@ -136,6 +179,10 @@ class ModelResolver:
         self.model_policy = (model_policy or os.environ.get("DAILY_MACRO_MODEL_POLICY") or "production_only").strip().lower()
         self.max_wait_seconds = _resolve_max_wait_seconds(max_wait_seconds)
         self.capabilities = capabilities or {}
+
+    def wait_budget_seconds(self, task: LLMTask | str) -> float:
+        task_value = task.value if isinstance(task, LLMTask) else str(task)
+        return _resolve_task_wait_seconds(task_value)
 
     def task_preferences(self, task: str) -> list[str]:
         env_name = f"DAILY_MACRO_MODEL_{task.upper()}_PREFERENCES"
@@ -169,6 +216,7 @@ class ModelResolver:
     ) -> ModelSelection:
         task_value = task.value if isinstance(task, LLMTask) else str(task)
         task_preferences = self.task_preferences(task_value)
+        task_wait_budget = self.wait_budget_seconds(task_value)
         is_high_value = task_value in HIGH_VALUE_TASKS
         rejections: list[dict[str, str]] = []
         scored: list[tuple[float, int, ModelConfig, float]] = []
@@ -211,7 +259,7 @@ class ModelResolver:
             # output). Remember it as a fallback that respects those constraints
             # even if its wait exceeds the cap.
             wait_eligible.append((wait_seconds, index, model))
-            if wait_seconds > self.max_wait_seconds:
+            if wait_seconds > task_wait_budget:
                 rejections.append({"model_id": model.model_id, "reason": "rate_limit_wait_too_long"})
                 continue
 
@@ -221,7 +269,7 @@ class ModelResolver:
             preference_key = model.endpoint_id if model.endpoint_id in task_preferences else model.model_id
             if preference_key in task_preferences:
                 preference_bonus = max(0.0, 0.35 - task_preferences.index(preference_key) * 0.03)
-            wait_penalty = min(wait_seconds / max(self.max_wait_seconds, 1.0), 1.0) * 0.4
+            wait_penalty = min(wait_seconds / max(task_wait_budget, 1.0), 1.0) * 0.4
             order_penalty = index * 0.01
             # Reserve premium models for high-value tasks: penalize them on bulk
             # tasks so any non-premium model with headroom outranks them, keeping
@@ -255,7 +303,12 @@ class ModelResolver:
             preferred_wait = 0.0
             if preferred_model_id:
                 preferred_wait = float(rate_limit_waits.get(preferred_model_id, 0.0))
-            return ModelSelection(model=model, rejections=rejections, avoided_wait_seconds=max(preferred_wait - wait_seconds, 0.0))
+            return ModelSelection(
+                model=model,
+                rejections=rejections,
+                avoided_wait_seconds=max(preferred_wait - wait_seconds, 0.0),
+                wait_seconds=wait_seconds,
+            )
 
         # Nothing scored within the wait cap. Prefer a model that satisfies every
         # hard constraint (policy/active/context/output) and just has a long
@@ -265,7 +318,13 @@ class ModelResolver:
         if wait_eligible:
             wait_eligible.sort(key=lambda item: (item[0], item[1]))
             wait_seconds, _index, model = wait_eligible[0]
-            return ModelSelection(model=model, rejections=rejections, avoided_wait_seconds=0.0)
+            return ModelSelection(
+                model=model,
+                rejections=rejections,
+                avoided_wait_seconds=0.0,
+                wait_seconds=wait_seconds,
+                wait_exceeded=wait_seconds > task_wait_budget,
+            )
 
         # Truly no eligible model (e.g. request too large for every context
         # window, or no active production model). Fall back to the chain head as
@@ -386,6 +445,12 @@ def _retry_delay_seconds(response: requests.Response, attempt: int) -> float:
 def _classify_exception(exc: Exception) -> str:
     if isinstance(exc, SynthesisBudgetExceeded):
         return "synthesis_budget_exhausted"
+    if isinstance(exc, NoEligibleEndpoint):
+        return "no_eligible_endpoint"
+    if isinstance(exc, (requests.Timeout, LLMRequestDeadlineError)):
+        return "provider_timeout"
+    if isinstance(exc, requests.ConnectionError):
+        return "provider_unavailable"
     if isinstance(exc, ValueError):
         return "invalid_json"
     if isinstance(exc, requests.HTTPError):
@@ -711,14 +776,31 @@ class RateLimitGovernor:
             limits = self.model_limits.get(bucket_id, self.model_limits.get(model_id, {}))
             rpm = limits.get("rpm")
             if rpm:
+                state.limit_requests = int(rpm)
                 state.remaining_requests = int(rpm)
                 state.reset_requests_at = self._time_fn() + 60.0
             tpm = limits.get("tpm")
             if tpm:
+                state.limit_tokens = int(tpm)
                 state.remaining_tokens = int(tpm)
                 state.reset_tokens_at = self._time_fn() + 60.0
             self._states[key] = state
         return state
+
+    @staticmethod
+    def _refresh_expired_window(state: ModelRateLimitState, now: float) -> None:
+        """Refill declared minute capacity after a known reset.
+
+        Providers use moving token buckets, so this is deliberately a
+        conservative local approximation. The next response header remains
+        authoritative and overwrites the estimate.
+        """
+        if state.limit_requests is not None and state.reset_requests_at is not None and now >= state.reset_requests_at:
+            state.remaining_requests = state.limit_requests
+            state.reset_requests_at = now + 60.0
+        if state.limit_tokens is not None and state.reset_tokens_at is not None and now >= state.reset_tokens_at:
+            state.remaining_tokens = state.limit_tokens
+            state.reset_tokens_at = now + 60.0
 
     def select_key(
         self,
@@ -727,6 +809,7 @@ class RateLimitGovernor:
         num_keys: int,
         estimated_input_tokens: int = 0,
         quota_scope: str | None = None,
+        max_wait_seconds: float | None = None,
     ) -> tuple[int, float]:
         """Return (best_key_index, seconds_slept).
 
@@ -741,6 +824,7 @@ class RateLimitGovernor:
 
         for ki in range(num_keys):
             state = self._state(model_id, ki, quota_scope)
+            self._refresh_expired_window(state, now)
             is_observed_key = (
                 ki == current_key
                 or state.remaining_requests is not None
@@ -775,9 +859,24 @@ class RateLimitGovernor:
         # limit) would otherwise block the whole run for hours; capping lets the
         # caller's retry/model-fallback logic degrade gracefully instead.
         sleep_secs = max(0.0, earliest_reset - now) if earliest_reset != float("inf") else 0.0
-        sleep_secs = min(sleep_secs, self.max_wait_seconds)
+        wait_cap = self.max_wait_seconds if max_wait_seconds is None else max(0.0, float(max_wait_seconds))
+        sleep_secs = min(sleep_secs, wait_cap)
         if sleep_secs > 0:
             self._sleep_fn(sleep_secs)
+            # The normal sleep advances monotonic time. Test doubles and
+            # injected schedulers may not advance their clock, so explicitly
+            # release the window we just waited through; otherwise the next
+            # task would count the same reset twice.
+            for ki in range(num_keys):
+                state = self._states.get((self._bucket_id(model_id, quota_scope), 0 if quota_scope else ki))
+                if state is None:
+                    continue
+                if state.reset_requests_at is not None and state.reset_requests_at <= now + sleep_secs:
+                    state.remaining_requests = state.limit_requests if state.limit_requests is not None else 1
+                    state.reset_requests_at = now
+                if state.reset_tokens_at is not None and state.reset_tokens_at <= now + sleep_secs:
+                    state.remaining_tokens = state.limit_tokens if state.limit_tokens is not None else max(1, estimated_input_tokens + 1)
+                    state.reset_tokens_at = now
         return current_key, sleep_secs
 
     def reserve_request(
@@ -808,6 +907,7 @@ class RateLimitGovernor:
         num_keys: int,
         estimated_input_tokens: int = 0,
         quota_scope: str | None = None,
+        max_wait_seconds: float | None = None,
     ) -> tuple[int, float]:
         """Select and reserve one key atomically for concurrent workers."""
         with self._lock:
@@ -817,6 +917,7 @@ class RateLimitGovernor:
                 num_keys,
                 estimated_input_tokens,
                 quota_scope=quota_scope,
+                max_wait_seconds=max_wait_seconds,
             )
             self.reserve_request(
                 model_id,
@@ -842,6 +943,7 @@ class RateLimitGovernor:
 
             for ki in range(num_keys):
                 state = self._state(model_id, ki, quota_scope)
+                self._refresh_expired_window(state, now)
                 is_observed_key = (
                     ki == current_key
                     or state.remaining_requests is not None
@@ -915,6 +1017,16 @@ class RateLimitGovernor:
             state = self._state(model_id, key_index, quota_scope)
             now = self._time_fn()
             headers = {key.lower(): value for key, value in response.headers.items()}
+
+            header_limit_requests = _parse_int(headers.get("x-ratelimit-limit-requests-minute"))
+            if header_limit_requests is not None:
+                state.limit_requests = header_limit_requests
+            header_limit_tokens = _parse_int(
+                headers.get("x-ratelimit-limit-tokens-minute")
+                or headers.get("x-ratelimit-limit-tokens")
+            )
+            if header_limit_tokens is not None:
+                state.limit_tokens = header_limit_tokens
 
             remaining_requests = _parse_int(
                 headers.get("x-ratelimit-remaining-requests")
@@ -1046,6 +1158,16 @@ class AnalysisRuntime:
         parent.light_unresolved_count = max(parent.light_unresolved_count, child.light_unresolved_count)
         parent.resolver_rejections.extend(child.resolver_rejections)
         parent.model_substitutions.extend(child.model_substitutions)
+        parent.rate_limit_events.extend(child.rate_limit_events)
+        self.model_switches.extend(worker.model_switches)
+        for key, value in child.failure_classifications.items():
+            parent.failure_classifications[key] = parent.failure_classifications.get(key, 0) + value
+        for key, value in child.split_counts_by_kind.items():
+            parent.split_counts_by_kind[key] = parent.split_counts_by_kind.get(key, 0) + value
+        for endpoint, values in child.rate_limit_waits_by_endpoint.items():
+            target = parent.rate_limit_waits_by_endpoint.setdefault(endpoint, {"count": 0, "seconds": 0.0})
+            target["count"] = int(target.get("count", 0)) + int(values.get("count", 0))
+            target["seconds"] = float(target.get("seconds", 0.0)) + float(values.get("seconds", 0.0))
         for field_name in ("model_task_counts", "endpoint_task_counts", "endpoint_usage"):
             target = getattr(parent, field_name)
             for outer_key, counts in getattr(child, field_name).items():
@@ -1282,7 +1404,16 @@ class AnalysisRuntime:
             )
         return self.category_budgets[category_name]
 
-    def record_wait(self, category_name: str, delay_seconds: float, *, batch_kind: str = "") -> None:
+    def record_wait(
+        self,
+        category_name: str,
+        delay_seconds: float,
+        *,
+        batch_kind: str = "",
+        model: ModelConfig | None = None,
+        task: str | None = None,
+        reason: str = "quota",
+    ) -> None:
         if delay_seconds <= 0:
             return
         self.diagnostics.rate_limit_wait_count += 1
@@ -1291,6 +1422,25 @@ class AnalysisRuntime:
         diagnostics.rate_limit_waits += 1
         if batch_kind.startswith("synthesis"):
             diagnostics.synthesis_wait_seconds_total += delay_seconds
+        if model is not None:
+            endpoint = model.endpoint_id
+            endpoint_stats = self.diagnostics.rate_limit_waits_by_endpoint.setdefault(
+                endpoint, {"count": 0, "seconds": 0.0}
+            )
+            endpoint_stats["count"] = int(endpoint_stats.get("count", 0)) + 1
+            endpoint_stats["seconds"] = float(endpoint_stats.get("seconds", 0.0)) + delay_seconds
+            self.diagnostics.rate_limit_events.append(
+                {
+                    "category": category_name,
+                    "task": task or "",
+                    "batch_kind": batch_kind,
+                    "endpoint": endpoint,
+                    "provider": model.provider,
+                    "model": model.model_id,
+                    "seconds": round(delay_seconds, 3),
+                    "reason": reason,
+                }
+            )
 
     def record_phase(self, phase_name: str, elapsed_seconds: float) -> None:
         self.diagnostics.phase_seconds[phase_name] = max(0.0, float(elapsed_seconds))
@@ -1314,7 +1464,8 @@ class AnalysisRuntime:
 
     def ensure_synthesis_budget(self, category_name: str) -> None:
         diagnostics = self.get_category_diagnostics(category_name)
-        if diagnostics.synthesis_wait_seconds_total >= MAX_CATEGORY_SYNTHESIS_WAIT_SECONDS:
+        max_wait_seconds = _resolve_category_synthesis_wait_seconds()
+        if diagnostics.synthesis_wait_seconds_total >= max_wait_seconds:
             if not diagnostics.synthesis_budget_exhausted:
                 self.diagnostics.synthesis_budget_exhausted_count += 1
             diagnostics.synthesis_budget_exhausted = True
@@ -1333,7 +1484,7 @@ class AnalysisRuntime:
                 f"{diagnostics.synthesis_retry_count} retries."
             )
 
-    def record_split(self, category_name: str, reason: str) -> None:
+    def record_split(self, category_name: str, reason: str, *, batch_kind: str = "") -> None:
         diagnostics = self.get_category_diagnostics(category_name)
         if reason not in diagnostics.split_reasons:
             diagnostics.split_reasons.append(reason)
@@ -1341,6 +1492,38 @@ class AnalysisRuntime:
             self.diagnostics.pre_send_split_count += 1
         elif reason == "response_413":
             self.diagnostics.response_413_split_count += 1
+        split_key = batch_kind or "unknown"
+        self.diagnostics.split_counts_by_kind[split_key] = (
+            self.diagnostics.split_counts_by_kind.get(split_key, 0) + 1
+        )
+
+    def record_rate_limit_event(
+        self,
+        *,
+        category_name: str,
+        task: str,
+        model: ModelConfig,
+        wait_seconds: float,
+        action: str,
+        status_code: int = 429,
+    ) -> None:
+        self.diagnostics.rate_limit_events.append(
+            {
+                "category": category_name,
+                "task": task,
+                "endpoint": model.endpoint_id,
+                "provider": model.provider,
+                "model": model.model_id,
+                "wait_seconds": round(max(0.0, wait_seconds), 3),
+                "action": action,
+                "status_code": status_code,
+            }
+        )
+
+    def record_failure_classification(self, classification: str) -> None:
+        self.diagnostics.failure_classifications[classification] = (
+            self.diagnostics.failure_classifications.get(classification, 0) + 1
+        )
 
     def record_batch_attempt(self, context: BatchContext, model_id: str) -> None:
         self.diagnostics.llm_request_count += 1
@@ -1518,11 +1701,24 @@ def _chat_completion(
         model = selection.model
         runtime.record_resolver_selection(
             task=task,
-            preferred_model=preferred_model.model_id,
-            selected_model=model.model_id,
+            preferred_model=preferred_model.endpoint_id,
+            selected_model=model.endpoint_id,
             rejections=selection.rejections,
             avoided_wait_seconds=selection.avoided_wait_seconds,
         )
+        if selection.wait_exceeded:
+            runtime.record_failure_classification("no_eligible_endpoint")
+            runtime.record_rate_limit_event(
+                category_name=context.category_name,
+                task=task,
+                model=model,
+                wait_seconds=selection.wait_seconds,
+                action="skipped_wait_budget",
+            )
+            raise NoEligibleEndpoint(
+                f"No {task} endpoint is available within the "
+                f"{runtime.resolver.wait_budget_seconds(task):.1f}s wait budget."
+            )
         if context.batch_kind.startswith("synthesis"):
             runtime.ensure_synthesis_budget(context.category_name)
         api_url = model.api_url or _default_provider_url(model.provider)
@@ -1539,8 +1735,6 @@ def _chat_completion(
             llm_task=task,
         )
         selected_wait = rate_limit_waits.get(model.endpoint_id, 0.0)
-        if task == LLMTask.TOP_ALERTS.value and selected_wait > 0:
-            raise RuntimeError(f"Top-alert generation degraded instead of waiting {selected_wait:.1f}s for rate limit reset.")
         runtime.record_batch_attempt(attempt_context, model.model_id)
         runtime.record_endpoint_attempt(attempt_context, model)
         LOGGER.debug(
@@ -1563,6 +1757,7 @@ def _chat_completion(
             runtime.key_count_for_model(model),
             estimated_input_tokens,
             quota_scope=model.quota_scope,
+            max_wait_seconds=runtime.resolver.wait_budget_seconds(task),
         )
         if best_key != runtime.key_index_for_model(model) and model.provider == DEFAULT_PROVIDER and not model.quota_scope:
             LOGGER.info(
@@ -1574,7 +1769,14 @@ def _chat_completion(
             runtime.current_key_index = best_key
             runtime.diagnostics.key_rotation_count += 1
             session = runtime.get_session_for_model(model)
-        runtime.record_wait(context.category_name, wait_seconds, batch_kind=context.batch_kind)
+        runtime.record_wait(
+            context.category_name,
+            wait_seconds,
+            batch_kind=context.batch_kind,
+            model=model,
+            task=task,
+            reason="quota_reservation",
+        )
         if wait_seconds > 0:
             LOGGER.info(
                 "Waiting %.1f seconds before %s for category %s batch=%s on %s/%s (key=%d).",
@@ -1705,6 +1907,30 @@ def _chat_completion(
                 "rate_limited",
                 batch_kind="synthesis" if attempt_context.batch_kind.startswith("synthesis") else "article_batch",
             )
+            retry_wait = runtime.governor.peek_key(
+                model.model_id,
+                runtime.key_index_for_model(model),
+                runtime.key_count_for_model(model),
+                estimated_input_tokens,
+                quota_scope=model.quota_scope,
+            )[1]
+            task_wait_budget = runtime.resolver.wait_budget_seconds(task)
+            if model.quota_scope and retry_wait <= task_wait_budget:
+                runtime.record_rate_limit_event(
+                    category_name=attempt_context.category_name,
+                    task=task,
+                    model=model,
+                    wait_seconds=retry_wait,
+                    action="wait_for_reset",
+                )
+                LOGGER.info(
+                    "Keeping %s/%s for %.1f seconds after HTTP 429; within %s wait budget.",
+                    model.provider,
+                    model.model_id,
+                    retry_wait,
+                    task,
+                )
+                continue
             # Try rotating to another key before switching models.
             if not model.quota_scope and runtime.rotate_key(f"429 on key {runtime.current_key_index} / model {model.model_id}"):
                 session = runtime.get_session_for_model(model)
@@ -1717,6 +1943,13 @@ def _chat_completion(
                 runtime.current_key_index = 0
                 session = runtime.get_session_for_model(runtime.current_model)
                 runtime.record_model_switch(context.category_name, runtime.model_switches[-1])
+                runtime.record_rate_limit_event(
+                    category_name=attempt_context.category_name,
+                    task=task,
+                    model=model,
+                    wait_seconds=retry_wait,
+                    action="switch_endpoint",
+                )
                 continue
 
         if response.status_code in {429, 500, 502, 503, 504}:
@@ -1737,7 +1970,14 @@ def _chat_completion(
             if attempt == DEFAULT_CHAT_RETRIES - 1:
                 response.raise_for_status()
             delay_seconds = runtime.governor.apply_backoff(model.model_id, response, attempt)
-            runtime.record_wait(attempt_context.category_name, delay_seconds, batch_kind=attempt_context.batch_kind)
+            runtime.record_wait(
+                attempt_context.category_name,
+                delay_seconds,
+                batch_kind=attempt_context.batch_kind,
+                model=model,
+                task=task,
+                reason=f"http_{response.status_code}_backoff",
+            )
             LOGGER.info(
                 "Retrying category %s batch=%s on %s after HTTP %s in %.1f seconds.",
                 attempt_context.category_name,

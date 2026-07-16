@@ -23,10 +23,12 @@ def _phase_label(name: str) -> str:
         "fetch_market_data": "market data",
         "route_attention": "routing",
         "analyze_today": "article analysis",
+        "build_event_packets": "event packet build",
         "retry_previous_day": "previous-day retry",
         "validate_outputs": "validation",
         "update_theme_memory": "theme memory",
         "summarize_top_alerts": "top alerts",
+        "critic_outputs": "alert critic",
         "finalize": "finalization",
         "initialize": "initialization",
     }.get(name, name.replace("_", " "))
@@ -43,6 +45,12 @@ def build_run_notes(summary: dict[str, Any]) -> list[str]:
     failed_articles = int(totals.get("failed_article_analyses") or len(unresolved))
     partial_categories = int(totals.get("partial_categories") or 0)
     successful_categories = int(totals.get("successful_categories") or 0)
+    incremental = summary.get("incremental") or {}
+    previous_retry_skipped = int(incremental.get("previous_day_retry_skipped") or 0)
+    if previous_retry_skipped:
+        notes.append(
+            f"Previous-day retry was capped/deferred for {previous_retry_skipped} article(s) to protect today's quota."
+        )
     if status == "partial":
         if failed_articles:
             notes.append(
@@ -84,6 +92,24 @@ def build_run_notes(summary: dict[str, Any]) -> list[str]:
                 breakdown.append(f"parallel workers {parallel_workers}")
             notes.append("Time breakdown: " + "; ".join(breakdown) + ".")
 
+        wait_by_endpoint = diagnostics.get("rate_limit_waits_by_endpoint") or {}
+        if wait_by_endpoint:
+            ranked_waits = sorted(
+                (
+                    str(endpoint),
+                    float(values.get("seconds") or 0.0),
+                    int(values.get("count") or 0),
+                )
+                for endpoint, values in wait_by_endpoint.items()
+                if isinstance(values, dict)
+            )
+            ranked_waits.sort(key=lambda item: item[1], reverse=True)
+            notes.append(
+                "Wait detail: "
+                + "; ".join(f"{endpoint} {_format_duration(seconds)} ({count} event(s))" for endpoint, seconds, count in ranked_waits[:4])
+                + ("; more endpoints omitted." if len(ranked_waits) > 4 else "")
+            )
+
         phases = diagnostics.get("phase_seconds") or {}
         phase_items = sorted(
             ((name, float(seconds)) for name, seconds in phases.items() if float(seconds) >= 0.5),
@@ -117,6 +143,13 @@ def build_run_notes(summary: dict[str, Any]) -> list[str]:
             f"{pre_send_splits} pre-send split(s), {response_413_splits} HTTP 413 split(s), "
             f"{int(diagnostics.get('llm_request_count') or 0)} LLM request attempt(s)."
         )
+    split_counts = diagnostics.get("split_counts_by_kind") or {}
+    if split_counts:
+        notes.append(
+            "Split detail: "
+            + ", ".join(f"{kind}={int(count)}" for kind, count in sorted(split_counts.items()))
+            + "."
+        )
 
     fallback_switches = int(diagnostics.get("fallback_switch_count") or 0)
     switches = list(summary.get("model_switches") or [])
@@ -140,6 +173,28 @@ def build_run_notes(summary: dict[str, Any]) -> list[str]:
     })
     if error_classes:
         notes.append("Failure classifications: " + ", ".join(error_classes) + ".")
+    classified_failures = diagnostics.get("failure_classifications") or {}
+    if classified_failures:
+        notes.append(
+            "Failure counts: "
+            + ", ".join(f"{name}={int(count)}" for name, count in sorted(classified_failures.items()))
+            + "."
+        )
+
+    event_pipeline = summary.get("event_pipeline") or {}
+    if event_pipeline.get("event_count"):
+        notes.append(
+            f"Event layer: {int(event_pipeline.get('event_count') or 0)} event packet(s), "
+            f"{int(event_pipeline.get('review_count') or 0)} review item(s)."
+        )
+
+    critic_checked = int(diagnostics.get("critic_checked_alert_count") or 0)
+    critic_issue_count = len(summary.get("critic_issues") or [])
+    if critic_checked:
+        notes.append(
+            f"Alert quality checks: {critic_checked} alert candidate(s) checked; "
+            f"{critic_issue_count} issue(s) flagged."
+        )
 
     if not notes:
         notes.append(f"All {successful_categories or article_count} report unit(s) completed successfully.")
