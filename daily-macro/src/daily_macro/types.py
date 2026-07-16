@@ -34,9 +34,11 @@ CEREBRAS_CHAT_COMPLETIONS_URL = "https://api.cerebras.ai/v1/chat/completions"
 OPENROUTER_CHAT_COMPLETIONS_URL = "https://openrouter.ai/api/v1/chat/completions"
 GOOGLE_AI_STUDIO_CHAT_COMPLETIONS_URL = "https://generativelanguage.googleapis.com/v1beta/openai/chat/completions"
 DEFAULT_PROVIDER = "groq"
-# Groq's current flagship lane: Qwen 3.6 is primary, followed by GPT OSS.
-PRIMARY_MODEL_ID = "qwen/qwen3.6-27b"
-FALLBACK_MODEL_IDS = ["openai/gpt-oss-120b", "openai/gpt-oss-20b"]
+# Groq's production lane: GPT OSS 120B is primary, followed by the 20B
+# production fallback. Qwen 3.6 remains available only when preview usage is
+# explicitly enabled through DAILY_MACRO_MODEL_POLICY=allow_preview.
+PRIMARY_MODEL_ID = "openai/gpt-oss-120b"
+FALLBACK_MODEL_IDS = ["openai/gpt-oss-20b"]
 DELAYED_RETRY_FINAL_MODEL_ID = "openai/gpt-oss-20b"
 
 # ---------------------------------------------------------------------------

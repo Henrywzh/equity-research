@@ -155,9 +155,9 @@ def provider_model_ids(provider: str) -> list[str]:
     configured = _model_override_env(provider)
     if provider == "groq":
         approved = [
-            "qwen/qwen3.6-27b",
             "openai/gpt-oss-120b",
             "openai/gpt-oss-20b",
+            "qwen/qwen3.6-27b",
         ]
         if configured is not None:
             return [model_id for model_id in configured if model_id in approved]

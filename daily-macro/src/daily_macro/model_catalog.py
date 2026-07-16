@@ -122,6 +122,13 @@ def _builtin_catalog() -> dict[str, ModelCapability]:
             task_scores={"routing": 0.60, "article_analysis": 0.72, "category_synthesis": 0.74, "top_alerts": 0.70, "json_repair": 0.65, "critic": 0.70},
             **common,
         ),
+        "qwen/qwen3.6-27b": ModelCapability(
+            model_id="qwen/qwen3.6-27b",
+            lifecycle="preview",
+            max_completion_tokens=2048,
+            task_scores={"routing": 0.66, "article_analysis": 0.92, "category_synthesis": 0.97, "top_alerts": 0.99, "json_repair": 0.72, "critic": 0.97},
+            **common,
+        ),
         "llama-3.1-8b-instant": ModelCapability(
             model_id="llama-3.1-8b-instant",
             lifecycle="production",

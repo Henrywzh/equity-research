@@ -91,9 +91,9 @@ def test_pool_filters_noncat_models_and_keeps_new(monkeypatch, tmp_data_dir):
         "openai/gpt-oss-20b",
     }
     assert [model.model_id for model in pool.models] == [
-        "qwen/qwen3.6-27b",
         "openai/gpt-oss-120b",
         "openai/gpt-oss-20b",
+        "qwen/qwen3.6-27b",
     ]
     assert pool.models[0].model_id == FLOOR_MODEL_ID
 
@@ -109,11 +109,11 @@ def test_removed_model_drops_from_pool(monkeypatch, tmp_data_dir):
 def test_removed_floor_model_is_not_reintroduced(monkeypatch, tmp_data_dir):
     # Live list omits the primary model entirely. A removed model must not be
     # synthesized back into the pool by the floor logic.
-    live = [{"id": "openai/gpt-oss-120b", "context_window": 131072, "max_completion_tokens": 8192}]
+    live = [{"id": "qwen/qwen3.6-27b", "context_window": 131072, "max_completion_tokens": 8192}]
     _patch_live(monkeypatch, live)
     pool = build_model_pool(["k"], data_dir=tmp_data_dir)
     assert FLOOR_MODEL_ID not in pool.active_ids
-    assert [model.model_id for model in pool.models] == ["openai/gpt-oss-120b"]
+    assert [model.model_id for model in pool.models] == ["qwen/qwen3.6-27b"]
 
 
 def test_cache_used_on_fetch_failure(monkeypatch, tmp_data_dir):
@@ -154,10 +154,11 @@ def test_resolver_routes_synthesis_to_premium_and_routing_to_floor(monkeypatch, 
             preferred_model_id=FLOOR_MODEL_ID,  # mirrors current_model = chain[0]
         ).model.model_id
 
-    # High-value, low-volume tasks go to the Qwen flagship model.
-    assert pick(LLMTask.CATEGORY_SYNTHESIS) == "qwen/qwen3.6-27b"
-    assert pick(LLMTask.TOP_ALERTS) == "qwen/qwen3.6-27b"
-    # High-volume cheap tasks stay on the floor model (conserves premium budget).
+    # Production-only policy excludes preview Qwen, so high-value tasks use
+    # the stable GPT OSS 120B floor.
+    assert pick(LLMTask.CATEGORY_SYNTHESIS) == FLOOR_MODEL_ID
+    assert pick(LLMTask.TOP_ALERTS) == FLOOR_MODEL_ID
+    # High-volume tasks also stay on the production floor/fallback lineup.
     assert pick(LLMTask.ROUTING) == FLOOR_MODEL_ID
     assert pick(LLMTask.ARTICLE_ANALYSIS) == FLOOR_MODEL_ID
     # Preview models are never selected under production_only, and retired
@@ -168,6 +169,24 @@ def test_resolver_routes_synthesis_to_premium_and_routing_to_floor(monkeypatch, 
         "llama-3.3-70b-versatile",
         "qwen/qwen3-32b",
     }
+
+
+def test_preview_qwen_is_selectable_only_when_explicitly_allowed(monkeypatch, tmp_data_dir):
+    _patch_live(monkeypatch, None)
+    pool = build_model_pool(["k"], data_dir=tmp_data_dir)
+    resolver = ModelResolver(
+        active_model_ids=pool.active_ids,
+        capabilities=pool.capabilities,
+        model_policy="allow_preview",
+    )
+    selection = resolver.resolve(
+        LLMTask.TOP_ALERTS,
+        pool.models,
+        estimated_input_tokens=500,
+        requested_output_tokens=500,
+        preferred_model_id="qwen/qwen3.6-27b",
+    )
+    assert selection.model.model_id == "qwen/qwen3.6-27b"
 
 
 def test_bulk_task_falls_back_to_premium_when_nothing_else():
