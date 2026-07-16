@@ -539,6 +539,42 @@ class AnalysisTests(unittest.TestCase):
         self.assertEqual(runtime.diagnostics.avoided_rate_limit_wait_count, 1)
         self.assertEqual(session.models_used, ["llama-3.3-70b-versatile"])
 
+    def test_chat_completion_switches_model_on_server_error(self) -> None:
+        session = _FakeGroqSession(
+            [
+                _FakeResponse(503),
+                _FakeResponse(
+                    200,
+                    payload={"choices": [{"message": {"content": json.dumps({"ok": True})}}]},
+                ),
+            ]
+        )
+        runtime = AnalysisRuntime(
+            session=session,
+            governor=RateLimitGovernor(sleep_fn=lambda seconds: None),
+            model_chain=[
+                ModelConfig("qwen/qwen3.6-27b"),
+                ModelConfig("openai/gpt-oss-120b"),
+            ],
+            resolver=ModelResolver(
+                active_model_ids={"qwen/qwen3.6-27b", "openai/gpt-oss-120b"},
+                model_policy="production_with_qwen",
+            ),
+        )
+
+        payload, model_used = analysis_module._invoke_json_with_retry(
+            runtime,
+            [{"role": "user", "content": "{}"}],
+            10,
+            analysis_module.BatchContext("test", "article_batch", "1", 1, 10, 100),
+        )
+
+        self.assertEqual(payload, {"ok": True})
+        self.assertEqual(model_used, "openai/gpt-oss-120b")
+        self.assertEqual(session.models_used, ["qwen/qwen3.6-27b", "openai/gpt-oss-120b"])
+        self.assertEqual(runtime.diagnostics.fallback_switch_count, 1)
+        self.assertEqual(runtime.diagnostics.endpoint_cooldown_count, 1)
+
     def test_chat_completion_records_actual_usage_into_budget(self) -> None:
         governor = RateLimitGovernor(sleep_fn=lambda _seconds: None)
         session = _FakeGroqSession(

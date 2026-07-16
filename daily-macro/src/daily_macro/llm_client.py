@@ -82,6 +82,8 @@ class ModelSelection:
 
 DEFAULT_MAX_LLM_WAIT_SECONDS = 45.0
 DEFAULT_LLM_TIMEOUT_COOLDOWN_SECONDS = 30.0
+DEFAULT_MODEL_POLICY = "production_with_qwen"
+DEFAULT_PREVIEW_MODEL_ALLOWLIST = frozenset({"qwen/qwen3.6-27b"})
 TASK_WAIT_BUDGETS_SECONDS = {
     LLMTask.ROUTING.value: 10.0,
     LLMTask.ARTICLE_ANALYSIS.value: 15.0,
@@ -174,11 +176,34 @@ class ModelResolver:
         model_policy: str | None = None,
         max_wait_seconds: float | None = None,
         capabilities: dict[str, ModelCapability] | None = None,
+        preview_model_allowlist: set[str] | None = None,
     ) -> None:
         self.active_model_ids = active_model_ids
-        self.model_policy = (model_policy or os.environ.get("DAILY_MACRO_MODEL_POLICY") or "production_only").strip().lower()
+        self.model_policy = (
+            model_policy
+            or os.environ.get("DAILY_MACRO_MODEL_POLICY")
+            or DEFAULT_MODEL_POLICY
+        ).strip().lower()
         self.max_wait_seconds = _resolve_max_wait_seconds(max_wait_seconds)
         self.capabilities = capabilities or {}
+        configured_preview_models = os.environ.get("DAILY_MACRO_PREVIEW_MODEL_ALLOWLIST")
+        if preview_model_allowlist is not None:
+            self.preview_model_allowlist = set(preview_model_allowlist)
+        elif configured_preview_models:
+            self.preview_model_allowlist = {
+                item.strip() for item in configured_preview_models.split(",") if item.strip()
+            }
+        else:
+            self.preview_model_allowlist = set(DEFAULT_PREVIEW_MODEL_ALLOWLIST)
+
+    def _preview_model_allowed(self, model: ModelConfig, capability: ModelCapability) -> bool:
+        if capability.lifecycle == "production":
+            return True
+        if self.model_policy == "allow_preview":
+            return True
+        if self.model_policy == "production_with_qwen":
+            return model.model_id in self.preview_model_allowlist
+        return False
 
     def wait_budget_seconds(self, task: LLMTask | str) -> float:
         task_value = task.value if isinstance(task, LLMTask) else str(task)
@@ -226,7 +251,7 @@ class ModelResolver:
 
         for index, model in enumerate(model_chain):
             capability = self.capability_for(model)
-            if self.model_policy == "production_only" and capability.lifecycle != "production":
+            if not self._preview_model_allowed(model, capability):
                 rejections.append({"model_id": model.model_id, "reason": "preview_model_disallowed"})
                 continue
             if self.active_model_ids is not None and not (
@@ -1121,6 +1146,7 @@ class AnalysisRuntime:
                 model_policy=self.resolver.model_policy,
                 max_wait_seconds=self.resolver.max_wait_seconds,
                 capabilities=self.resolver.capabilities,
+                preview_model_allowlist=set(self.resolver.preview_model_allowlist),
             )
         worker = AnalysisRuntime(
             governor=self.governor,
@@ -1950,6 +1976,21 @@ def _chat_completion(
                     wait_seconds=retry_wait,
                     action="switch_endpoint",
                 )
+                continue
+
+        if response.status_code in {500, 502, 503, 504} and model_override is None and attempt < DEFAULT_CHAT_RETRIES - 1:
+            cooldown_seconds = _resolve_timeout_cooldown_seconds()
+            runtime.governor.mark_endpoint_cooldown(model.endpoint_id, cooldown_seconds)
+            runtime.diagnostics.endpoint_cooldown_count += 1
+            runtime.diagnostics.endpoint_cooldown_seconds_total += cooldown_seconds
+            runtime.record_retry(attempt_context.category_name, batch_kind=attempt_context.batch_kind)
+            if runtime.switch_to_next_model(
+                f"Provider HTTP {response.status_code} on {model.model_id}; cooling down endpoint.",
+                failed_model=model,
+            ):
+                runtime.current_key_index = 0
+                session = runtime.get_session_for_model(runtime.current_model)
+                runtime.record_model_switch(context.category_name, runtime.model_switches[-1])
                 continue
 
         if response.status_code in {429, 500, 502, 503, 504}:

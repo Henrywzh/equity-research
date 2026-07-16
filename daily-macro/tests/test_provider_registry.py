@@ -35,13 +35,13 @@ def test_provider_accounts_keep_explicit_quota_boundaries(monkeypatch):
     }
 
 
-def test_groq_allowlist_prefers_production_gpt_oss_then_preview_qwen(monkeypatch):
+def test_groq_allowlist_prefers_qwen_then_production_gpt_oss(monkeypatch):
     monkeypatch.setattr("daily_macro.provider_registry._config_values", lambda: {})
     monkeypatch.delenv("DAILY_MACRO_GROQ_MODELS", raising=False)
     assert provider_model_ids("groq") == [
+        "qwen/qwen3.6-27b",
         "openai/gpt-oss-120b",
         "openai/gpt-oss-20b",
-        "qwen/qwen3.6-27b",
     ]
 
 

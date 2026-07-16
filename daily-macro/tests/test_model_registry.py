@@ -91,9 +91,9 @@ def test_pool_filters_noncat_models_and_keeps_new(monkeypatch, tmp_data_dir):
         "openai/gpt-oss-20b",
     }
     assert [model.model_id for model in pool.models] == [
+        "qwen/qwen3.6-27b",
         "openai/gpt-oss-120b",
         "openai/gpt-oss-20b",
-        "qwen/qwen3.6-27b",
     ]
     assert pool.models[0].model_id == FLOOR_MODEL_ID
 
@@ -109,11 +109,11 @@ def test_removed_model_drops_from_pool(monkeypatch, tmp_data_dir):
 def test_removed_floor_model_is_not_reintroduced(monkeypatch, tmp_data_dir):
     # Live list omits the primary model entirely. A removed model must not be
     # synthesized back into the pool by the floor logic.
-    live = [{"id": "qwen/qwen3.6-27b", "context_window": 131072, "max_completion_tokens": 8192}]
+    live = [{"id": "openai/gpt-oss-120b", "context_window": 131072, "max_completion_tokens": 8192}]
     _patch_live(monkeypatch, live)
     pool = build_model_pool(["k"], data_dir=tmp_data_dir)
     assert FLOOR_MODEL_ID not in pool.active_ids
-    assert [model.model_id for model in pool.models] == ["qwen/qwen3.6-27b"]
+    assert [model.model_id for model in pool.models] == ["openai/gpt-oss-120b"]
 
 
 def test_cache_used_on_fetch_failure(monkeypatch, tmp_data_dir):
@@ -155,12 +155,11 @@ def test_resolver_routes_synthesis_to_premium_and_routing_to_floor(monkeypatch, 
         ).model.model_id
 
     # Production-only policy excludes preview Qwen, so high-value tasks use
-    # the stable GPT OSS 120B floor.
-    assert pick(LLMTask.CATEGORY_SYNTHESIS) == FLOOR_MODEL_ID
-    assert pick(LLMTask.TOP_ALERTS) == FLOOR_MODEL_ID
-    # High-volume tasks also stay on the production floor/fallback lineup.
-    assert pick(LLMTask.ROUTING) == FLOOR_MODEL_ID
-    assert pick(LLMTask.ARTICLE_ANALYSIS) == FLOOR_MODEL_ID
+    # stable GPT OSS 120B and bulk tasks use the lighter production fallback.
+    assert pick(LLMTask.CATEGORY_SYNTHESIS) == "openai/gpt-oss-120b"
+    assert pick(LLMTask.TOP_ALERTS) == "openai/gpt-oss-120b"
+    assert pick(LLMTask.ROUTING) == "openai/gpt-oss-20b"
+    assert pick(LLMTask.ARTICLE_ANALYSIS) == "openai/gpt-oss-120b"
     # Preview models are never selected under production_only, and retired
     # Groq models are not present in this pool at all.
     assert pick(LLMTask.CATEGORY_SYNTHESIS) != "meta-llama/llama-4-scout-17b-16e-instruct"
@@ -171,7 +170,7 @@ def test_resolver_routes_synthesis_to_premium_and_routing_to_floor(monkeypatch, 
     }
 
 
-def test_preview_qwen_is_selectable_only_when_explicitly_allowed(monkeypatch, tmp_data_dir):
+def test_allow_preview_policy_selects_qwen_with_explicit_preference(monkeypatch, tmp_data_dir):
     _patch_live(monkeypatch, None)
     pool = build_model_pool(["k"], data_dir=tmp_data_dir)
     resolver = ModelResolver(
@@ -187,6 +186,26 @@ def test_preview_qwen_is_selectable_only_when_explicitly_allowed(monkeypatch, tm
         preferred_model_id="qwen/qwen3.6-27b",
     )
     assert selection.model.model_id == "qwen/qwen3.6-27b"
+
+
+def test_default_policy_uses_qwen_but_strict_policy_excludes_it(monkeypatch, tmp_data_dir):
+    _patch_live(monkeypatch, None)
+    pool = build_model_pool(["k"], data_dir=tmp_data_dir)
+    default_resolver = ModelResolver(active_model_ids=pool.active_ids, capabilities=pool.capabilities)
+    strict_resolver = ModelResolver(
+        active_model_ids=pool.active_ids,
+        capabilities=pool.capabilities,
+        model_policy="production_only",
+    )
+    kwargs = {
+        "estimated_input_tokens": 500,
+        "requested_output_tokens": 500,
+        "preferred_model_id": "qwen/qwen3.6-27b",
+    }
+    assert default_resolver.resolve(LLMTask.ARTICLE_ANALYSIS, pool.models, **kwargs).model.model_id == "qwen/qwen3.6-27b"
+    strict_selection = strict_resolver.resolve(LLMTask.ARTICLE_ANALYSIS, pool.models, **kwargs)
+    assert strict_selection.model.model_id != "qwen/qwen3.6-27b"
+    assert any(item["reason"] == "preview_model_disallowed" for item in strict_selection.rejections)
 
 
 def test_bulk_task_falls_back_to_premium_when_nothing_else():

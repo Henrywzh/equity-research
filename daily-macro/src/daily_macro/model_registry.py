@@ -34,9 +34,9 @@ from .types import (
 
 LOGGER = logging.getLogger(__name__)
 
-# Groq's stable production floor. Preview models remain in the candidate pool
-# for explicitly opted-in policies, but never anchor the default chain.
-FLOOR_MODEL_ID = "openai/gpt-oss-120b"
+# Groq's default quality floor. The resolver treats this preview model as a
+# probationary primary and immediately falls back when it is unavailable.
+FLOOR_MODEL_ID = "qwen/qwen3.6-27b"
 
 _GROQ_MODELS_URL = "https://api.groq.com/openai/v1/models"
 _CACHE_FILENAME = "model_catalog_cache.json"
@@ -275,9 +275,8 @@ def build_model_pool(
         scores = capabilities.get(key, get_capability(model.model_id, model.provider)).task_scores
         return sum(scores.values()) / len(scores) if scores else 0.5
 
-    # GPT OSS 120B anchors the production Groq chain. Preserve the explicit
-    # provider order; average task score alone could reorder the transition
-    # lineup and make the stable production model less predictable.
+    # Qwen anchors the default quality chain. Preserve the explicit provider
+    # order; average task score alone could reorder the transition lineup.
     floors = [m for m in models if m.model_id == FLOOR_MODEL_ID and m.provider == DEFAULT_PROVIDER]
     groq_order = {model_id: index for index, model_id in enumerate(provider_model_ids(DEFAULT_PROVIDER))}
     rest = sorted(
