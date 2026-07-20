@@ -52,6 +52,7 @@ from .types import (
     RATE_LIMIT_TOKEN_FLOOR,
     RuntimeDiagnostics,
     SynthesisBudgetExceeded,
+    ZAI_CHAT_COMPLETIONS_URL,
     _section_profile,
 )
 
@@ -238,6 +239,7 @@ class ModelResolver:
         rate_limit_waits: dict[str, float] | None = None,
         preferred_model_id: str | None = None,
         budget_remaining: dict[str, float] | None = None,
+        budget_required: dict[str, float] | None = None,
     ) -> ModelSelection:
         task_value = task.value if isinstance(task, LLMTask) else str(task)
         task_preferences = self.task_preferences(task_value)
@@ -276,7 +278,8 @@ class ModelResolver:
             # model's TPD is unknown (no gating).
             if budget_remaining is not None:
                 remaining_budget = self._mapping_value(budget_remaining, model, UNLIMITED)
-                if remaining_budget < needed_tokens:
+                required_budget = self._mapping_value(budget_required, model, needed_tokens)
+                if remaining_budget < required_budget:
                     rejections.append({"model_id": model.model_id, "reason": "daily_budget_exhausted"})
                     continue
             wait_seconds = self._mapping_value(rate_limit_waits, model)
@@ -752,7 +755,54 @@ def _default_provider_url(provider: str) -> str:
         "cerebras": CEREBRAS_CHAT_COMPLETIONS_URL,
         "google_ai_studio": GOOGLE_AI_STUDIO_CHAT_COMPLETIONS_URL,
         "openrouter": OPENROUTER_CHAT_COMPLETIONS_URL,
+        "zai": ZAI_CHAT_COMPLETIONS_URL,
     }.get(provider, GROQ_CHAT_COMPLETIONS_URL)
+
+
+def _compute_units_for(capability: ModelCapability, input_tokens: int, output_tokens: int) -> int:
+    """Convert token usage to a provider's metered compute units (Cloudflare neurons)."""
+    input_rate = capability.limits.get("input_neurons_per_million")
+    output_rate = capability.limits.get("output_neurons_per_million")
+    if not input_rate and not output_rate:
+        return 0
+    units = (max(0, input_tokens) * (input_rate or 0) + max(0, output_tokens) * (output_rate or 0)) / 1_000_000
+    return math.ceil(units)
+
+
+def _chat_request_body(model: ModelConfig, messages: list[dict[str, Any]]) -> dict[str, Any]:
+    """Build the common OpenAI-compatible body with provider token-field quirks."""
+    body: dict[str, Any] = {
+        "model": model.model_id,
+        "messages": messages,
+        "temperature": 0.1,
+        "response_format": {"type": "json_object"},
+    }
+    # Cloudflare's OpenAI-compatible endpoint expects max_tokens. Using
+    # max_completion_tokens can hang or truncate long structured Gemma calls.
+    token_field = "max_tokens" if model.provider in {"zai", "cloudflare"} else "max_completion_tokens"
+    body[token_field] = model.max_completion_tokens
+    if model.provider == "cloudflare":
+        body["chat_template_kwargs"] = {"enable_thinking": False}
+    elif model.provider == DEFAULT_PROVIDER and model.model_id in {
+        "openai/gpt-oss-20b",
+        "openai/gpt-oss-120b",
+    }:
+        # Groq's GPT-OSS models spend completion budget on reasoning unless the
+        # effort is bounded. Hidden reasoning keeps the response compatible
+        # with the JSON parser used by the analysis pipeline.
+        body["reasoning_effort"] = "low"
+        body["reasoning_format"] = "hidden"
+    return body
+
+
+def _response_message_content(message: dict[str, Any]) -> str:
+    """Extract a usable answer from normal or Cloudflare Qwen message fields."""
+    content = message.get("content")
+    if content is None:
+        content = message.get("reasoning_content")
+    if not isinstance(content, str):
+        raise ValueError("LLM response content was not a string.")
+    return content
 
 
 # ---------------------------------------------------------------------------
@@ -1173,10 +1223,11 @@ class AnalysisRuntime:
             "synthesis_budget_exhausted_count", "degraded_merge_count", "key_rotation_count",
             "request_timeout_count", "endpoint_cooldown_count", "endpoint_cooldown_seconds_total",
             "model_decommissioned_count", "daily_budget_skip_count",
-            "daily_budget_tokens_used", "llm_request_count", "input_tokens_used",
+            "daily_budget_tokens_used", "cloudflare_neurons_used", "llm_request_count", "input_tokens_used",
             "output_tokens_used", "total_tokens_used", "avoided_rate_limit_wait_count",
             "avoided_rate_limit_wait_seconds_total", "degraded_mode_count", "parallel_batch_count",
             "llm_request_seconds_total", "timeout_seconds_total",
+            "quality_review_count", "quality_review_failed_count", "quality_review_skipped_count",
         )
         for name in additive:
             setattr(parent, name, getattr(parent, name) + getattr(child, name))
@@ -1704,27 +1755,67 @@ def _chat_completion(
             for candidate in candidate_chain
         }
         resolver = runtime.resolver or ModelResolver()
-        # Remaining daily token budget per candidate on the current key, so the
-        # resolver can skip a TPD-exhausted model and reserve premium capacity.
-        budget_remaining = {
-            candidate.endpoint_id: runtime.budget.remaining_tokens(
-                candidate.model_id,
-                runtime.key_index_for_model(candidate),
-                resolver.capability_for(candidate).limits.get("tpd"),
-                quota_scope=candidate.quota_scope,
+        requested_output_tokens = min(preferred_model.max_completion_tokens, DEFAULT_OUTPUT_TOKENS)
+        budget_remaining: dict[str, float] = {}
+        budget_required: dict[str, float] = {}
+        for candidate in candidate_chain:
+            capability = resolver.capability_for(candidate)
+            daily_neurons = capability.limits.get("daily_neurons")
+            if daily_neurons and candidate.quota_scope:
+                budget_remaining[candidate.endpoint_id] = runtime.budget.remaining_compute_units(
+                    candidate.quota_scope, daily_neurons
+                )
+                budget_required[candidate.endpoint_id] = _compute_units_for(
+                    capability, estimated_input_tokens, requested_output_tokens
+                )
+            else:
+                budget_remaining[candidate.endpoint_id] = runtime.budget.remaining_tokens(
+                    candidate.model_id,
+                    runtime.key_index_for_model(candidate),
+                    capability.limits.get("tpd"),
+                    quota_scope=candidate.quota_scope,
+                )
+
+        # The resolver's budget check is advisory; this atomic reservation is
+        # what prevents parallel calls from collectively overbooking a shared
+        # account-wide compute allowance.
+        reservation_units = 0
+        accumulated_rejections: list[dict[str, str]] = []
+        selectable_chain = list(candidate_chain)
+        while selectable_chain:
+            selection = resolver.resolve(
+                task,
+                selectable_chain,
+                estimated_input_tokens=estimated_input_tokens,
+                requested_output_tokens=requested_output_tokens,
+                rate_limit_waits=rate_limit_waits,
+                preferred_model_id=preferred_model.endpoint_id,
+                budget_remaining=budget_remaining,
+                budget_required=budget_required,
             )
-            for candidate in candidate_chain
-        }
-        selection = resolver.resolve(
-            task,
-            candidate_chain,
-            estimated_input_tokens=estimated_input_tokens,
-            requested_output_tokens=min(preferred_model.max_completion_tokens, DEFAULT_OUTPUT_TOKENS),
-            rate_limit_waits=rate_limit_waits,
-            preferred_model_id=preferred_model.endpoint_id,
-            budget_remaining=budget_remaining,
+            model = selection.model
+            accumulated_rejections.extend(selection.rejections)
+            capability = resolver.capability_for(model)
+            daily_neurons = capability.limits.get("daily_neurons")
+            reservation_units = int(budget_required.get(model.endpoint_id, 0))
+            if not daily_neurons or not model.quota_scope or runtime.budget.try_reserve_compute_units(
+                model.quota_scope, reservation_units, daily_neurons
+            ):
+                break
+            accumulated_rejections.append(
+                {"model_id": model.model_id, "reason": "daily_budget_exhausted"}
+            )
+            selectable_chain = [item for item in selectable_chain if item.endpoint_id != model.endpoint_id]
+        else:
+            raise NoEligibleEndpoint(f"No {task} endpoint has sufficient daily compute budget.")
+
+        selection = ModelSelection(
+            model=model,
+            rejections=accumulated_rejections,
+            avoided_wait_seconds=selection.avoided_wait_seconds,
+            wait_seconds=selection.wait_seconds,
+            wait_exceeded=selection.wait_exceeded,
         )
-        model = selection.model
         runtime.record_resolver_selection(
             task=task,
             preferred_model=preferred_model.endpoint_id,
@@ -1820,13 +1911,7 @@ def _chat_completion(
             response = _post_with_deadline(
                 session,
                 api_url,
-                json_body={
-                    "model": model.model_id,
-                    "messages": messages,
-                    "temperature": 0.1,
-                    "max_completion_tokens": model.max_completion_tokens,
-                    "response_format": {"type": "json_object"},
-                },
+                json_body=_chat_request_body(model, messages),
                 connect_timeout=connect_timeout,
                 read_timeout=read_timeout,
                 total_deadline=total_deadline,
@@ -2069,10 +2154,15 @@ def _chat_completion(
             input_tokens=input_tokens,
             output_tokens=output_tokens,
         )
+        if reservation_units and model.quota_scope:
+            actual_compute_units = _compute_units_for(
+                resolver.capability_for(model), input_tokens, output_tokens
+            )
+            runtime.budget.settle_compute_units(model.quota_scope, reservation_units, actual_compute_units)
+            if model.provider == "cloudflare":
+                runtime.diagnostics.cloudflare_neurons_used += actual_compute_units
         runtime.record_usage(model, input_tokens, output_tokens, used_tokens)
-        content = payload["choices"][0]["message"]["content"]
-        if not isinstance(content, str):
-            raise ValueError("Groq response content was not a string.")
+        content = _response_message_content(payload["choices"][0]["message"])
         return content, model.model_id
 
     if response is not None:

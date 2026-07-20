@@ -252,6 +252,27 @@ def test_resolver_skips_budget_exhausted_model(monkeypatch, tmp_data_dir):
     assert any(r["reason"] == "daily_budget_exhausted" for r in selection.rejections)
 
 
+def test_resolver_compares_metered_budget_in_provider_units():
+    cloudflare = ModelConfig(
+        "@cf/zai-org/glm-4.7-flash",
+        provider="cloudflare",
+        account_id="cloudflare_1",
+        quota_scope="cloudflare:account-123",
+    )
+    groq = ModelConfig("llama-3.1-8b-instant")
+    resolver = ModelResolver(model_policy="production_only")
+    selection = resolver.resolve(
+        LLMTask.ARTICLE_ANALYSIS,
+        [cloudflare, groq],
+        estimated_input_tokens=10_000,
+        requested_output_tokens=1_000,
+        budget_remaining={cloudflare.endpoint_id: 80},
+        budget_required={cloudflare.endpoint_id: 92},
+    )
+    assert selection.model == groq
+    assert any(item["reason"] == "daily_budget_exhausted" for item in selection.rejections)
+
+
 def test_resolver_reservation_relaxes_with_ample_budget():
     caps = {
         "openai/gpt-oss-120b": get_capability("openai/gpt-oss-120b"),

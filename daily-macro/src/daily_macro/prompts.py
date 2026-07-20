@@ -24,7 +24,8 @@ def _build_attention_routing_messages(category_name: str, batch_articles: list[d
             "role": "system",
             "content": (
                 "You are a financial news triage router. Return one valid JSON object only. "
-                "Route every article into an attention tier and compact theme. Do not omit any article."
+                "Route every article into an attention tier and compact theme. Do not omit any article. "
+                "High precision matters more than producing many high-priority items."
             ),
         },
         {
@@ -39,6 +40,11 @@ def _build_attention_routing_messages(category_name: str, batch_articles: list[d
                                 "canonical_url": "string",
                                 "attention_tier": "high|medium|light",
                                 "theme": "short theme such as stocks|macro|geopolitics|property|general",
+                                "market_channel": "equity|macro|rates|fx|commodity|geopolitics|property|none|multi",
+                                "market_impact_score": "integer 0-5",
+                                "urgency_score": "integer 0-3",
+                                "novelty_score": "integer 0-2",
+                                "priority_score": "integer 0-15, derived as 2*market_impact_score+urgency_score+novelty_score",
                                 "reason": "one short sentence",
                                 "must_keep": "boolean",
                             }
@@ -46,15 +52,18 @@ def _build_attention_routing_messages(category_name: str, batch_articles: list[d
                     },
                     "routing_policy": {
                         "high": [
-                            "stocks, earnings, guidance, placements, buybacks, capital markets",
-                            "macro, central banks, inflation, rates, growth, FX, oil",
-                            "geopolitics, sanctions, tariffs, war, trade restrictions",
+                            "Use high only when the title/summary contains a concrete event or catalyst and a clear market channel: earnings/guidance/profit warning, buyback/placement/M&A/IPO/regulatory action; a central-bank/rates/inflation/jobs/GDP/fiscal decision or release; sanctions/tariffs/export controls/military escalation; or a material asset move with a stated catalyst.",
+                            "A broad word such as 股價, 經濟, 利率, 油價, 樓市, stocks, economy, or oil is not enough by itself. Routine commentary, interviews, forecasts, and daily market wraps are not high without a concrete catalyst.",
+                        ],
+                        "medium": [
+                            "Use medium for relevant company, macro, property, sector, or market context where the impact is plausible but indirect, routine, or not yet a concrete catalyst.",
+                            "When evidence is incomplete or ambiguous, choose medium rather than light.",
                         ],
                         "light": [
-                            "softer pulse-style or local-interest items",
-                            "stories in 時事脈搏 or 地產新聞 without obvious market-moving signals",
+                            "Use light only for routine/local-interest or generic commentary with no specific actor, event, market channel, or material number. Section name alone must never force light.",
                         ],
-                        "default": "Use medium when ambiguous.",
+                        "scoring": "market_impact_score measures directness/materiality (0-5); urgency_score measures how quickly a human should read it today (0-3); novelty_score measures whether it is a new development rather than context (0-2).",
+                        "default": "Use medium when ambiguous. Set must_keep true for high-signal items even if the tier is medium after uncertainty calibration.",
                     },
                     "category": category_name,
                     "articles": [
@@ -68,6 +77,81 @@ def _build_attention_routing_messages(category_name: str, batch_articles: list[d
                         }
                         for article in batch_articles
                     ],
+                },
+                ensure_ascii=False,
+            ),
+        },
+    ]
+
+
+def _build_article_quality_review_messages(
+    category_name: str,
+    article: dict[str, Any],
+    first_pass: dict[str, Any],
+    *,
+    report_date: str | None = None,
+) -> list[dict[str, Any]]:
+    """Build a compact, source-grounded critic request for one article."""
+    return [
+        {
+            "role": "system",
+            "content": (
+                "You are a rigorous financial-news quality reviewer. Return one valid JSON object only. "
+                "Check the first-pass analysis against the source, preserve the source language, and do not "
+                "invent facts. Treat report_date as the reference date when interpreting relative dates."
+            ),
+        },
+        {
+            "role": "user",
+            "content": json.dumps(
+                {
+                    "task": "Review one article analysis and identify material factual or usefulness problems.",
+                    "required_schema": {
+                        "verdict": "pass|needs_correction|needs_review",
+                        "factuality_score": "integer 1-5",
+                        "completeness_score": "integer 1-5",
+                        "financial_usefulness_score": "integer 1-5",
+                        "language_fit_score": "integer 1-5",
+                        "issues": ["short, source-grounded issue"],
+                        "corrections": ["short correction; empty when none"],
+                        "confidence": "number 0-1",
+                    },
+                    "rules": [
+                        "Check dates, numbers, currencies, named entities, and causal claims against the source.",
+                        "Do not penalize Chinese source material for being Chinese; judge language fit to the source.",
+                        "Use needs_correction when the first-pass result needs a material correction.",
+                        "Use needs_review only when the source does not support a reliable decision.",
+                        "Keep every issue and correction concise.",
+                    ],
+                    "category": category_name,
+                    "report_date": report_date,
+                    "article": {
+                        "source_article_id": article.get("source_article_id"),
+                        "canonical_url": article.get("canonical_url"),
+                        "title": article.get("title"),
+                        "published_at": article.get("published_at"),
+                        "article_section": article.get("section") or article.get("article_section"),
+                        "summary_snippet": article.get("summary_snippet"),
+                        "content_text": article.get("content_text"),
+                        "content_truncated": article.get("content_truncated"),
+                    },
+                    "first_pass_analysis": {
+                        key: first_pass.get(key)
+                        for key in (
+                            "source_article_id",
+                            "canonical_url",
+                            "title",
+                            "novelty_score",
+                            "relevance_score",
+                            "urgency_score",
+                            "named_entities",
+                            "key_points",
+                            "attention_tier",
+                            "theme",
+                            "must_keep",
+                        )
+                        if key in first_pass
+                    },
                 },
                 ensure_ascii=False,
             ),
@@ -162,6 +246,8 @@ def _build_article_batch_messages(category_name: str, batch_articles: list[dict[
                             "theme": article.get("theme"),
                             "research_lane": article.get("research_lane"),
                             "must_keep": article.get("must_keep"),
+                            "market_channel": article.get("market_channel"),
+                            "priority_score": article.get("priority_score"),
                         }
                         for article in batch_articles
                     ],

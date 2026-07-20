@@ -18,6 +18,10 @@ def test_provider_accounts_keep_explicit_quota_boundaries(monkeypatch):
     monkeypatch.setenv("DAILY_MACRO_CEREBRAS_QUOTA_SCOPE", "cerebras:shared-org")
     monkeypatch.setenv("GOOGLE_AI_STUDIO_API_KEY", "google-one")
     monkeypatch.setenv("OPENROUTER_API_KEY", "router-one")
+    monkeypatch.setenv("ZAI_API_KEY", "zai-one")
+    monkeypatch.setenv("CLOUDFLARE_API_TOKEN", "cloudflare-one")
+    cloudflare_account_id = "a" * 32
+    monkeypatch.setenv("CLOUDFLARE_ACCOUNT_ID", cloudflare_account_id)
 
     accounts = load_provider_accounts()
     groq = [account for account in accounts if account.provider == "groq"]
@@ -32,7 +36,15 @@ def test_provider_accounts_keep_explicit_quota_boundaries(monkeypatch):
         "cerebras",
         "google_ai_studio",
         "openrouter",
+        "zai",
+        "cloudflare",
     }
+
+    cloudflare = next(account for account in accounts if account.provider == "cloudflare")
+    assert cloudflare.base_url == (
+        f"https://api.cloudflare.com/client/v4/accounts/{cloudflare_account_id}/ai/v1/chat/completions"
+    )
+    assert cloudflare.quota_scope == f"cloudflare:{cloudflare_account_id}"
 
 
 def test_groq_allowlist_prefers_qwen_then_production_gpt_oss(monkeypatch):
@@ -57,6 +69,43 @@ def test_groq_model_override_cannot_reintroduce_unapproved_models(monkeypatch):
     assert provider_model_ids("groq") == []
 
 
+def test_cloudflare_defaults_to_qwen_and_gemma(monkeypatch):
+    monkeypatch.setattr("daily_macro.provider_registry._config_values", lambda: {})
+    monkeypatch.delenv("DAILY_MACRO_CLOUDFLARE_MODELS", raising=False)
+    assert provider_model_ids("cloudflare") == [
+        "@cf/qwen/qwen3-30b-a3b-fp8",
+        "@cf/google/gemma-4-26b-a4b-it",
+    ]
+
+
+def test_cloudflare_requires_account_id(monkeypatch):
+    monkeypatch.setattr("daily_macro.provider_registry._config_values", lambda: {})
+    monkeypatch.setenv("CLOUDFLARE_API_TOKEN", "cloudflare-one")
+    monkeypatch.delenv("CLOUDFLARE_ACCOUNT_ID", raising=False)
+    assert all(account.provider != "cloudflare" for account in load_provider_accounts())
+
+
+def test_cloudflare_pairs_comma_separated_tokens_and_account_ids(monkeypatch):
+    monkeypatch.setattr("daily_macro.provider_registry._config_values", lambda: {})
+    account_one = "a" * 32
+    account_two = "b" * 32
+    monkeypatch.setenv("CLOUDFLARE_API_TOKEN", "token-one,token-two")
+    monkeypatch.setenv("CLOUDFLARE_ACCOUNT_ID", f"{account_one},{account_two}")
+
+    accounts = [account for account in load_provider_accounts() if account.provider == "cloudflare"]
+
+    assert [account.account_id for account in accounts] == ["cloudflare_1", "cloudflare_2"]
+    assert [account.api_key for account in accounts] == ["token-one", "token-two"]
+    assert [account.base_url for account in accounts] == [
+        f"https://api.cloudflare.com/client/v4/accounts/{account_one}/ai/v1/chat/completions",
+        f"https://api.cloudflare.com/client/v4/accounts/{account_two}/ai/v1/chat/completions",
+    ]
+    assert [account.quota_scope for account in accounts] == [
+        f"cloudflare:{account_one}",
+        f"cloudflare:{account_two}",
+    ]
+
+
 def test_multi_provider_pool_namespaces_models(monkeypatch, tmp_path):
     monkeypatch.setattr("daily_macro.model_registry.load_groq_models", lambda *args, **kwargs: None)
     monkeypatch.setattr("daily_macro.model_registry.load_provider_models", lambda *args, **kwargs: None)
@@ -65,15 +114,38 @@ def test_multi_provider_pool_namespaces_models(monkeypatch, tmp_path):
         ProviderAccount("cerebras_1", "cerebras", "CEREBRAS_API_KEY", "https://cerebras.test", api_key="y"),
         ProviderAccount("cerebras_2", "cerebras", "CEREBRAS_API_KEY_2", "https://cerebras.test", api_key="y2"),
         ProviderAccount("google_1", "google_ai_studio", "GOOGLE_AI_STUDIO_API_KEY", "https://google.test", api_key="z"),
+        ProviderAccount("zai_1", "zai", "ZAI_API_KEY", "https://zai.test", api_key="za"),
+        ProviderAccount("cloudflare_1", "cloudflare", "CLOUDFLARE_API_TOKEN", "https://cf.test", api_key="cf"),
     ]
 
     pool = build_model_pool(["x"], data_dir=tmp_path, provider_accounts=accounts)
     providers = {model.provider for model in pool.models}
-    assert providers == {"groq", "cerebras", "google_ai_studio"}
+    assert providers == {"groq", "cerebras", "google_ai_studio", "zai", "cloudflare"}
     assert any(model.endpoint_id == "cerebras:cerebras_1:gpt-oss-120b" for model in pool.models)
     assert sum(model.provider == "cerebras" and model.model_id == "gpt-oss-120b" for model in pool.models) == 2
     assert any(model.endpoint_id == "cerebras:cerebras_2:gpt-oss-120b" for model in pool.models)
     assert any(model.endpoint_id == "google_ai_studio:google_1:gemini-2.5-flash-lite" for model in pool.models)
+    assert any(model.endpoint_id == "zai:zai_1:glm-4.7-flash" for model in pool.models)
+    assert pool.models[0].provider == "zai"
+    cloudflare_models = [model.model_id for model in pool.models if model.provider == "cloudflare"]
+    assert cloudflare_models == [
+        "@cf/qwen/qwen3-30b-a3b-fp8",
+        "@cf/google/gemma-4-26b-a4b-it",
+    ]
+    resolver = ModelResolver(
+        active_model_ids=pool.active_ids,
+        capabilities=pool.capabilities,
+        model_policy="production_only",
+    )
+    bulk_selection = resolver.resolve(
+        LLMTask.ARTICLE_ANALYSIS,
+        pool.models,
+        estimated_input_tokens=1000,
+        requested_output_tokens=500,
+        preferred_model_id=pool.models[0].endpoint_id,
+    )
+    assert bulk_selection.model.provider == "cloudflare"
+    assert bulk_selection.model.model_id == "@cf/qwen/qwen3-30b-a3b-fp8"
     assert all(":" in endpoint_id for endpoint_id in pool.active_ids if endpoint_id.startswith("cerebras:"))
 
 

@@ -178,6 +178,109 @@ class AnalysisTests(unittest.TestCase):
         self.assertEqual(routed["theme"], "macro")
         self.assertTrue(routed["must_keep"])
 
+    def test_heuristic_attention_router_does_not_promote_broad_market_words(self) -> None:
+        for title in (
+            "恒指今日上升 市場關注經濟前景",
+            "油價上升 分析料後市反覆",
+            "股價走勢受市場情緒影響",
+        ):
+            routed = analysis_module._heuristic_attention_metadata(
+                {
+                    "title": title,
+                    "summary_snippet": "市場人士分享一般看法，未有公布新的政策或公司行動",
+                    "article_section": "國際財經",
+                }
+            )
+            self.assertNotEqual(routed["attention_tier"], "high", title)
+            self.assertFalse(routed["must_keep"], title)
+
+    def test_heuristic_attention_router_marks_concrete_catalyst_high(self) -> None:
+        routed = analysis_module._heuristic_attention_metadata(
+            {
+                "title": "某公司公布盈警 預告年度盈利大幅下跌",
+                "summary_snippet": "公司表示業績將受到需求疲弱影響",
+                "article_section": "香港財經",
+            }
+        )
+
+        self.assertEqual(routed["attention_tier"], "high")
+        self.assertEqual(routed["market_channel"], "equity")
+        self.assertEqual(routed["priority_score"], 15)
+        self.assertTrue(routed["must_keep"])
+
+    def test_light_sections_route_only_when_an_exception_needs_disambiguation(self) -> None:
+        routine = {
+            "title": "社區活動及生活資訊",
+            "summary_snippet": "本地日常消息摘要",
+            "article_section": "時事脈搏",
+        }
+        exceptional = {
+            "title": "聯儲局宣布加息並上調利率路徑",
+            "summary_snippet": "央行決定收緊政策，市場重新評估估值",
+            "article_section": "時事脈搏",
+        }
+        routine_seed = analysis_module._apply_attention_metadata(routine, analysis_module._heuristic_attention_metadata(routine))
+        exceptional_seed = analysis_module._apply_attention_metadata(exceptional, analysis_module._heuristic_attention_metadata(exceptional))
+
+        self.assertFalse(analysis_module._should_use_llm_router("時事脈搏", [routine_seed]))
+        self.assertTrue(analysis_module._should_use_llm_router("時事脈搏", [exceptional_seed]))
+
+    def test_medium_attention_article_is_compacted_for_chinese_content(self) -> None:
+        prepared = analysis_module._prepare_single_article(
+            {
+                "source_article_id": "9101",
+                "canonical_url": "https://example.com/9101",
+                "title": "經濟展望及市場評論",
+                "article_section": "國際財經",
+                "summary_snippet": "分析人士討論未來經濟走勢",
+                "content_text": "市場評論及經濟展望。" * 5000,
+            }
+        )
+
+        self.assertEqual(prepared["attention_tier"], "medium")
+        self.assertTrue(prepared["content_truncated"])
+        self.assertEqual(prepared["analysis_method"], "truncated_text")
+        self.assertLessEqual(prepared["analyzed_content_token_estimate"], 1600)
+        self.assertEqual(prepared["routing_market_impact_score"], 2)
+
+    def test_attention_router_metadata_survives_merge(self) -> None:
+        batch = [
+            {
+                "source_article_id": "9102",
+                "canonical_url": "https://example.com/9102",
+                "title": "央行公布利率決定",
+                "summary_snippet": "政策利率維持不變",
+                "article_section": "時事脈搏",
+                "published_at": "2026-04-04T08:00:00+08:00",
+            }
+        ]
+        merged, missing = analysis_module._merge_attention_results(
+            batch,
+            {
+                "routes": [
+                    {
+                        "source_article_id": "9102",
+                        "canonical_url": "https://example.com/9102",
+                        "attention_tier": "high",
+                        "theme": "macro",
+                        "market_channel": "rates",
+                        "market_impact_score": 5,
+                        "urgency_score": 3,
+                        "novelty_score": 2,
+                        "priority_score": 15,
+                        "reason": "Central-bank rate decision has a direct rates channel.",
+                        "must_keep": True,
+                    }
+                ]
+            },
+        )
+
+        self.assertFalse(missing)
+        self.assertEqual(merged[0]["attention_tier"], "high")
+        self.assertEqual(merged[0]["market_channel"], "rates")
+        self.assertEqual(merged[0]["routing_market_impact_score"], 5)
+        self.assertEqual(merged[0]["priority_score"], 15)
+
     def test_merge_attention_results_defaults_missing_items_for_salvage(self) -> None:
         batch = [
             {

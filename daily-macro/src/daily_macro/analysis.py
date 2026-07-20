@@ -11,6 +11,7 @@ import time
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from collections import defaultdict
 from datetime import datetime, timedelta
+from dataclasses import replace
 from pathlib import Path
 from typing import Any
 
@@ -43,6 +44,7 @@ from .types import (  # noqa: E402
     DEFAULT_INPUT_BUDGET_TOKENS,
     DEFAULT_SYNTHESIS_INPUT_BUDGET_TOKENS,
     DEFAULT_PROMPT_OVERHEAD_TOKENS,
+    MEDIUM_ANALYSIS_MAX_CONTENT_TOKENS,
     SHORT_ARTICLE_FULL_TEXT_THRESHOLD,
     DEFAULT_CHAT_RETRIES,
     RATE_LIMIT_REQUEST_FLOOR,
@@ -61,6 +63,7 @@ from .types import (  # noqa: E402
     LIGHT_ANALYSIS_SECTIONS,
     ATTENTION_TIERS,
     ATTENTION_TIER_RANK,
+    MARKET_CHANNELS,
     ROUTER_LLM_MIN_ARTICLES,
     HIGH_ATTENTION_THEME_KEYWORDS,
     SectionProfile,
@@ -106,13 +109,14 @@ from .prompts import (  # noqa: E402
     _batch_attention_tier,
     _build_attention_routing_messages,
     _build_article_batch_messages,
+    _build_article_quality_review_messages,
     _build_synthesis_messages,
     _build_grouping_messages,
 )
 
 from .model_registry import build_model_pool  # noqa: E402
 from .budget import DailyBudgetLedger  # noqa: E402
-from .provider_registry import load_provider_accounts, provider_model_ids  # noqa: E402
+from .provider_registry import config_value, load_provider_accounts, provider_model_ids  # noqa: E402
 
 # ---------------------------------------------------------------------------
 # Patch AnalysisRuntime methods to look up helpers through this module's
@@ -316,18 +320,21 @@ def _graph_initialize(state: AnalysisGraphState) -> AnalysisGraphState:
             if cap and cap.limits:
                 model_limits[model.quota_key] = cap.limits
                 model_limits.setdefault(model.model_id, cap.limits)
+        delayed_retry_final_model = None
+        if config_value("OPENAI_API_KEY"):
+            delayed_retry_final_model = ModelConfig(
+                DELAYED_RETRY_FINAL_MODEL_ID,
+                provider="openai",
+                api_url=OPENAI_CHAT_COMPLETIONS_URL,
+                api_key_env="OPENAI_API_KEY",
+            )
         runtime = AnalysisRuntime(
             groq_api_keys=groq_keys,
             governor=RateLimitGovernor(model_limits=model_limits),
             model_chain=pool.models or fallback_chain,
             resolver=ModelResolver(active_model_ids=pool.active_ids, capabilities=pool.capabilities),
             budget=budget,
-            delayed_retry_final_model=ModelConfig(
-                DELAYED_RETRY_FINAL_MODEL_ID,
-                provider="openai",
-                api_url=OPENAI_CHAT_COMPLETIONS_URL,
-                api_key_env="OPENAI_API_KEY",
-            ),
+            delayed_retry_final_model=delayed_retry_final_model,
         )
     state["today_plan"] = today_plan
     state["previous_retry_plan"] = previous_retry_plan
@@ -385,6 +392,7 @@ def _graph_analyze_today(state: AnalysisGraphState) -> AnalysisGraphState:
         existing_report=state["existing_report"],
         plan=state["today_plan"],
         retry_only=False,
+        report_date=state["target_date"],
     )
     # Record which articles were actually newly analyzed in this run
     state["newly_analyzed_keys"].update(
@@ -970,12 +978,14 @@ def _graph_finalize(state: AnalysisGraphState) -> AnalysisGraphState:
     return state
 
 
-def select_content_for_analysis(content_text: str) -> dict[str, Any]:
+def select_content_for_analysis(content_text: str, *, max_content_tokens: int | None = None) -> dict[str, Any]:
     normalized = _normalize_whitespace(content_text)
     original_length = len(normalized)
     original_token_estimate = _estimate_tokens(normalized)
 
-    if original_length <= SHORT_ARTICLE_FULL_TEXT_THRESHOLD:
+    if original_length <= SHORT_ARTICLE_FULL_TEXT_THRESHOLD and (
+        max_content_tokens is None or original_token_estimate <= max_content_tokens
+    ):
         return {
             "content_text": normalized,
             "content_truncated": False,
@@ -988,7 +998,10 @@ def select_content_for_analysis(content_text: str) -> dict[str, Any]:
         }
 
     projected_input_tokens = original_token_estimate + DEFAULT_PROMPT_OVERHEAD_TOKENS
-    if projected_input_tokens <= DEFAULT_INPUT_BUDGET_TOKENS:
+    if (
+        (max_content_tokens is None or original_token_estimate <= max_content_tokens)
+        and projected_input_tokens <= DEFAULT_INPUT_BUDGET_TOKENS
+    ):
         return {
             "content_text": normalized,
             "content_truncated": False,
@@ -1000,21 +1013,44 @@ def select_content_for_analysis(content_text: str) -> dict[str, Any]:
             "truncation_reason": None,
         }
 
+    target_tokens = max_content_tokens or max(DEFAULT_INPUT_BUDGET_TOKENS - DEFAULT_PROMPT_OVERHEAD_TOKENS, 500)
     return _build_truncated_selection(
         normalized,
         original_length,
         original_token_estimate,
-        max(DEFAULT_INPUT_BUDGET_TOKENS - DEFAULT_PROMPT_OVERHEAD_TOKENS, 500) * 4,
-        (
-            "Full article exceeded the working request budget after prompt overhead; "
-            "the leading content slice was analyzed instead."
-        ),
+        _content_prefix_length_for_token_budget(normalized, target_tokens),
+        "Medium-attention article was compacted to preserve token budget; the leading source content slice was analyzed."
+        if max_content_tokens is not None
+        else "Full article exceeded the working request budget after prompt overhead; the leading content slice was analyzed instead.",
     )
 
 
+def _content_prefix_length_for_token_budget(text: str, max_tokens: int) -> int:
+    """Return the longest leading prefix whose estimate fits the token budget.
+
+    HKEJ is predominantly Chinese, where the estimator is approximately one
+    token per character. A fixed ``tokens * 4`` character conversion would
+    therefore recreate the exact over-budget failure this selector is meant to
+    prevent.
+    """
+    if not text or _estimate_tokens(text) <= max_tokens:
+        return len(text)
+    lower, upper = 0, len(text)
+    while lower < upper:
+        midpoint = (lower + upper + 1) // 2
+        if _estimate_tokens(text[:midpoint]) <= max_tokens:
+            lower = midpoint
+        else:
+            upper = midpoint - 1
+    return lower
+
+
 def _prepare_single_article(article: dict[str, Any]) -> dict[str, Any]:
-    selected = select_content_for_analysis(article.get("content_text") or "")
     attention = _article_attention_defaults(article)
+    selected = select_content_for_analysis(
+        article.get("content_text") or "",
+        max_content_tokens=MEDIUM_ANALYSIS_MAX_CONTENT_TOKENS if attention["attention_tier"] == "medium" else None,
+    )
     return {
         "source_article_id": article.get("source_article_id"),
         "title": article.get("title"),
@@ -1035,6 +1071,11 @@ def _prepare_single_article(article: dict[str, Any]) -> dict[str, Any]:
         "research_lane": attention["research_lane"],
         "attention_reason": attention["attention_reason"],
         "must_keep": attention["must_keep"],
+        "market_channel": attention["market_channel"],
+        "routing_market_impact_score": attention["routing_market_impact_score"],
+        "routing_urgency_score": attention["routing_urgency_score"],
+        "routing_novelty_score": attention["routing_novelty_score"],
+        "priority_score": attention["priority_score"],
     }
 
 
@@ -1045,9 +1086,74 @@ def _article_attention_defaults(article: dict[str, Any]) -> dict[str, Any]:
             "theme": article.get("theme"),
             "attention_reason": article.get("attention_reason"),
             "must_keep": article.get("must_keep"),
+            "market_channel": article.get("market_channel"),
+            "market_impact_score": article.get("routing_market_impact_score"),
+            "urgency_score": article.get("routing_urgency_score"),
+            "novelty_score": article.get("routing_novelty_score"),
+            "priority_score": article.get("priority_score"),
         },
         article,
     )
+
+
+_ROUTING_STATEMENT_MARKERS = (
+    "宣布", "表示", "稱", "指出", "決定", "公布", "發布", "批准", "通過", "警告", "預計",
+    "announce", "announced", "says", "said", "decides", "decision", "reports", "reported",
+)
+_ROUTING_STRONG_STOCK_EVENTS = (
+    "盈喜", "盈警", "盈利預警", "回購", "配股", "供股", "集資", "併購", "收購", "出售", "重組",
+    "停牌", "復牌", "上市", "退市", "發行股份", "派息", "減持", "增持", "同店銷售", "里程碑付款",
+    "訂單", "搜查", "調查", "涉嫌", "交棒", "管理層變動", "profit warning", "buyback", "placement",
+    "rights issue", "merger", "acquisition", "ipo", "delisting", "guidance", "investigation",
+)
+_ROUTING_MACRO_EVENTS = (
+    "加息", "減息", "降息", "降準", "加準", "維持利率", "議息", "利率決議", "通脹數據", "就業數據", "非農", "褐皮書", "收緊", "放寬",
+    "gdp", "cpi", "inflation data", "jobs data", "rate decision", "rate hike", "rate cut",
+)
+_ROUTING_GEOPOLITICAL_EVENTS = (
+    "制裁", "關稅", "出口管制", "貿易限制", "軍事升級", "衝突升級", "襲擊", "打擊", "空襲", "入侵", "停火",
+    "sanction", "tariff", "export control", "trade restriction", "military escalation", "attack",
+    "invasion", "ceasefire",
+)
+_ROUTING_PROPERTY_EVENTS = (
+    "房屋政策", "樓市政策", "按揭利率", "賣地", "土地拍賣", "樓價數據", "成交數據", "地產商業績",
+    "housing policy", "mortgage rate", "land auction", "property data",
+)
+_ROUTING_MATERIAL_MOVE_MARKERS = (
+    "暴跌", "急挫", "大跌", "大升", "飆升", "飆", "急升", "崩跌", "跌逾", "升逾", "創新高", "surge", "plunge",
+    "soars", "slumps", "falls sharply", "rises sharply",
+)
+
+
+def _contains_routing_signal(text: str, signals: tuple[str, ...]) -> bool:
+    return any(signal.lower() in text for signal in signals)
+
+
+def _routing_market_channel(haystack: str, theme: str) -> str:
+    channels: list[str] = []
+    if theme == "stocks" or _contains_routing_signal(haystack, ("股", "ads", "shares", "stocks", "equity", "earnings")):
+        channels.append("equity")
+    if theme == "macro" or _contains_routing_signal(haystack, ("經濟", "央行", "聯儲", "通脹", "inflation", "economy", "gdp")):
+        channels.append("macro")
+    if _contains_routing_signal(haystack, ("利率", "息率", "收益率", "債券", "rate", "yield", "bond")):
+        channels.append("rates")
+    if _contains_routing_signal(haystack, ("匯率", "美元", "人民幣", "外匯", "fx", "currency")):
+        channels.append("fx")
+    if _contains_routing_signal(haystack, ("油價", "原油", "天然氣", "黃金", "商品", "oil", "gold", "commodity")):
+        channels.append("commodity")
+    if theme == "geopolitics" or _contains_routing_signal(haystack, ("戰爭", "制裁", "關稅", "軍事", "sanction", "tariff", "war")):
+        channels.append("geopolitics")
+    if theme == "property" or _contains_routing_signal(haystack, ("樓市", "地產", "樓價", "按揭", "property", "housing")):
+        channels.append("property")
+    deduplicated = list(dict.fromkeys(channels))
+    if not deduplicated:
+        return "none"
+    specific_channels = [channel for channel in ("rates", "fx", "commodity") if channel in deduplicated]
+    if len(deduplicated) == 2 and "macro" in deduplicated and len(specific_channels) == 1:
+        return specific_channels[0]
+    if len(deduplicated) > 1:
+        return "multi"
+    return deduplicated[0]
 
 
 def _heuristic_attention_metadata(article: dict[str, Any]) -> dict[str, Any]:
@@ -1056,46 +1162,100 @@ def _heuristic_attention_metadata(article: dict[str, Any]) -> dict[str, Any]:
     section = str(article.get("article_section") or article.get("section") or "").strip()
     haystack = f"{title} {snippet} {section}".lower()
 
-    matched_theme = "general"
-    high_signal = False
-    for theme, keywords in HIGH_ATTENTION_THEME_KEYWORDS.items():
-        if any(keyword.lower() in haystack for keyword in keywords):
-            matched_theme = theme
-            high_signal = theme in {"stocks", "macro", "geopolitics"}
-            break
+    theme_hits = {
+        theme: sum(1 for keyword in keywords if keyword.lower() in haystack)
+        for theme, keywords in HIGH_ATTENTION_THEME_KEYWORDS.items()
+    }
+    matched_theme = max(theme_hits, key=theme_hits.get) if max(theme_hits.values(), default=0) else "general"
+    market_channel = _routing_market_channel(haystack, matched_theme)
+    has_number = bool(re.search(r"(?:\d[\d,.]*\s*(?:%|％|點|個百分點|億|萬|m|bn|million|billion)?|逾\s*\d|超過\s*\d)", haystack))
+    has_statement = _contains_routing_signal(haystack, _ROUTING_STATEMENT_MARKERS)
+    has_material_move = _contains_routing_signal(haystack, _ROUTING_MATERIAL_MOVE_MARKERS)
+
+    stock_high = _contains_routing_signal(haystack, _ROUTING_STRONG_STOCK_EVENTS) and (
+        has_statement or has_number or _contains_routing_signal(haystack, ("盈喜", "盈警", "回購", "配股", "供股", "併購", "收購", "停牌", "上市", "ipo", "investigation"))
+    )
+    macro_high = (
+        (_contains_routing_signal(haystack, ("聯儲", "央行", "人行", "政府", "federal reserve", "central bank", "treasury"))
+         or _contains_routing_signal(haystack, _ROUTING_MACRO_EVENTS))
+        and (_contains_routing_signal(haystack, _ROUTING_MACRO_EVENTS) or has_statement)
+        and _contains_routing_signal(haystack, ("利率", "通脹", "經濟", "增長", "就業", "gdp", "inflation", "rate", "growth", "jobs"))
+        and not (_contains_routing_signal(haystack, ("預期", "料", "可能", "或會", "預計")) and not has_statement)
+    )
+    geopolitical_high = _contains_routing_signal(haystack, _ROUTING_GEOPOLITICAL_EVENTS) and (
+        has_statement or has_number or _contains_routing_signal(haystack, ("美國", "中國", "俄羅斯", "伊朗", "烏克蘭", "中東", "us", "china", "russia", "iran"))
+    )
+    property_high = _contains_routing_signal(haystack, _ROUTING_PROPERTY_EVENTS) and (has_statement or has_number)
+    material_move_high = has_material_move and has_number and market_channel != "none"
+    high_signal = stock_high or macro_high or geopolitical_high or property_high or material_move_high
 
     if high_signal:
         tier = "high"
         must_keep = True
-        reason = f"High-signal {matched_theme} headline based on title/summary keywords."
+        reason = f"Concrete {matched_theme} catalyst or material market event with a visible {market_channel} channel."
+        market_impact_score, urgency_score, novelty_score = 5, 3, 2
     elif section in LIGHT_ANALYSIS_SECTIONS:
         tier = "light"
         must_keep = False
         if matched_theme == "general" and section == "地產新聞":
             matched_theme = "property"
-        reason = f"Lighter treatment because this story sits in the {section} section without strong market-moving signals."
+        market_channel = _routing_market_channel(haystack, matched_theme)
+        reason = f"Routine or low-catalyst story in {section}; no concrete market-moving event was detected."
+        market_impact_score, urgency_score, novelty_score = 0, 0, 0
     else:
         tier = "medium"
         must_keep = False
-        reason = "Default medium attention because the story is relevant but not an obvious top-priority market mover."
+        reason = "Relevant financial or market context, but no sufficiently concrete catalyst for high priority."
+        market_impact_score, urgency_score, novelty_score = 2, 1, 1
+
+    priority_score = 2 * market_impact_score + urgency_score + novelty_score
 
     return {
         "attention_tier": tier,
         "theme": matched_theme,
-        "research_lane": _infer_research_lane({"theme": matched_theme, "attention_tier": tier, "article_section": section, "title": title}),
+        "research_lane": _infer_research_lane({"theme": matched_theme, "market_channel": market_channel, "attention_tier": tier, "article_section": section, "title": title}),
         "attention_reason": reason,
         "must_keep": must_keep,
+        "market_channel": market_channel,
+        "routing_market_impact_score": market_impact_score,
+        "routing_urgency_score": urgency_score,
+        "routing_novelty_score": novelty_score,
+        "priority_score": priority_score,
+        "high_confidence": high_signal,
     }
 
 
 def _normalize_attention_metadata(metadata: dict[str, Any], article: dict[str, Any]) -> dict[str, Any]:
     heuristic = _heuristic_attention_metadata(article)
-    attention_tier = str(metadata.get("attention_tier") or heuristic["attention_tier"]).strip().lower()
+    requested_tier = str(metadata.get("attention_tier") or heuristic["attention_tier"]).strip().lower()
+    attention_tier = requested_tier
     if attention_tier not in ATTENTION_TIERS:
         attention_tier = heuristic["attention_tier"]
     theme = str(metadata.get("theme") or heuristic["theme"]).strip().lower() or heuristic["theme"]
-    research_lane = str(metadata.get("research_lane") or heuristic.get("research_lane") or "").strip() or _infer_research_lane({**article, "theme": theme, "attention_tier": attention_tier})
     attention_reason = str(metadata.get("attention_reason") or heuristic["attention_reason"]).strip() or heuristic["attention_reason"]
+    market_channel = str(metadata.get("market_channel") or heuristic["market_channel"]).strip().lower()
+    if market_channel not in MARKET_CHANNELS:
+        market_channel = heuristic["market_channel"]
+    if market_channel == "none" and heuristic["market_channel"] != "none":
+        market_channel = heuristic["market_channel"]
+    market_impact_score = _coerce_bounded_score(
+        metadata.get("market_impact_score", metadata.get("routing_market_impact_score")),
+        0,
+        5,
+        heuristic["routing_market_impact_score"],
+    )
+    urgency_score = _coerce_bounded_score(
+        metadata.get("urgency_score", metadata.get("routing_urgency_score")),
+        0,
+        3,
+        heuristic["routing_urgency_score"],
+    )
+    novelty_score = _coerce_bounded_score(
+        metadata.get("novelty_score", metadata.get("routing_novelty_score")),
+        0,
+        2,
+        heuristic["routing_novelty_score"],
+    )
     must_keep_value = metadata.get("must_keep")
     if isinstance(must_keep_value, bool):
         must_keep = must_keep_value
@@ -1103,14 +1263,37 @@ def _normalize_attention_metadata(metadata: dict[str, Any], article: dict[str, A
         must_keep = bool(heuristic["must_keep"])
     else:
         must_keep = str(must_keep_value).strip().lower() in {"1", "true", "yes"}
+    if heuristic.get("high_confidence"):
+        attention_tier = "high"
+        must_keep = True
+        market_impact_score = max(market_impact_score, 4)
+        urgency_score = max(urgency_score, 2)
+        novelty_score = max(novelty_score, 1)
+    elif attention_tier == "high":
+        attention_tier = "medium"
+        attention_reason = "Downgraded to medium because the title/summary did not show a concrete market-moving catalyst."
     if must_keep and attention_tier == "light":
         attention_tier = "medium"
+    research_lane = str(metadata.get("research_lane") or heuristic.get("research_lane") or "").strip() or _infer_research_lane(
+        {**article, "theme": theme, "market_channel": market_channel, "attention_tier": attention_tier}
+    )
+    priority_score = _coerce_bounded_score(
+        metadata.get("priority_score"),
+        0,
+        15,
+        2 * market_impact_score + urgency_score + novelty_score,
+    )
     return {
         "attention_tier": attention_tier,
         "theme": theme,
         "research_lane": research_lane,
         "attention_reason": attention_reason,
         "must_keep": must_keep,
+        "market_channel": market_channel,
+        "routing_market_impact_score": market_impact_score,
+        "routing_urgency_score": urgency_score,
+        "routing_novelty_score": novelty_score,
+        "priority_score": priority_score,
     }
 
 
@@ -1212,9 +1395,17 @@ def _route_articles(runtime: AnalysisRuntime | None, articles: list[dict[str, An
 
 
 def _should_use_llm_router(category_name: str, category_articles: list[dict[str, Any]]) -> bool:
-    if category_name in LIGHT_ANALYSIS_SECTIONS:
+    # A section label is a weak prior, not a reason to miss an exceptional
+    # story. Clearly routine light items can still use the deterministic title
+    # heuristic; route a light section when any item needs disambiguation.
+    if not category_articles or len(category_articles) < ROUTER_LLM_MIN_ARTICLES:
         return False
-    return len(category_articles) >= ROUTER_LLM_MIN_ARTICLES
+    if category_name in LIGHT_ANALYSIS_SECTIONS:
+        return any(
+            str(article.get("attention_tier") or "medium").lower() != "light"
+            for article in category_articles
+        )
+    return True
 
 
 def _route_articles_with_llm(
@@ -1319,6 +1510,11 @@ def _merge_attention_results(
                 {
                     "attention_tier": routed.get("attention_tier"),
                     "theme": routed.get("theme"),
+                    "market_channel": routed.get("market_channel"),
+                    "market_impact_score": routed.get("market_impact_score"),
+                    "urgency_score": routed.get("urgency_score"),
+                    "novelty_score": routed.get("novelty_score"),
+                    "priority_score": routed.get("priority_score"),
                     "attention_reason": routed.get("reason"),
                     "must_keep": routed.get("must_keep"),
                 },
@@ -1334,6 +1530,7 @@ def _build_incremental_report_categories(
     existing_report: dict[str, Any] | None,
     plan: dict[str, Any],
     retry_only: bool,
+    report_date: str | None = None,
 ) -> list[dict[str, Any]]:
     existing_categories = _existing_categories_by_name(existing_report)
     existing_articles = _existing_articles_by_key(existing_report)
@@ -1350,7 +1547,12 @@ def _build_incremental_report_categories(
     if runtime is not None and plan["work_articles"]:
         for category_name, category_articles in _group_source_articles(plan["work_articles"]):
             prepared_articles = [_prepare_single_article(article) for article in category_articles]
-            category_report, _ = _analyze_category(runtime, category_name, prepared_articles)
+            category_report, _ = _analyze_category(
+                runtime,
+                category_name,
+                prepared_articles,
+                report_date=report_date,
+            )
             analyzed_categories[category_name] = category_report
 
     if retry_only:
@@ -1429,6 +1631,7 @@ def _retry_previous_report(
         existing_report=existing_report,
         plan=retry_plan,
         retry_only=True,
+        report_date=previous_date,
     )
     updated_report = _finalize_report(
         target_date=previous_date,
@@ -1797,10 +2000,214 @@ def _ensure_attention_fields(article_result: dict[str, Any], source_article: dic
     return hydrated
 
 
+def _quality_review_enabled() -> bool:
+    raw = os.environ.get("DAILY_MACRO_ENABLE_LLM_CRITIC")
+    if raw is None:
+        raw = config_value("DAILY_MACRO_ENABLE_LLM_CRITIC")
+    return str(raw or "0").strip().lower() in {"1", "true", "yes", "on"}
+
+
+def _quality_review_max_articles() -> int:
+    raw = os.environ.get("DAILY_MACRO_QUALITY_REVIEW_MAX_ARTICLES")
+    if raw is None:
+        raw = config_value("DAILY_MACRO_QUALITY_REVIEW_MAX_ARTICLES")
+    try:
+        return max(0, min(50, int(raw or 12)))
+    except (TypeError, ValueError):
+        return 12
+
+
+def _quality_review_sample_rate() -> float:
+    raw = os.environ.get("DAILY_MACRO_QUALITY_REVIEW_SAMPLE_RATE")
+    if raw is None:
+        raw = config_value("DAILY_MACRO_QUALITY_REVIEW_SAMPLE_RATE")
+    try:
+        return max(0.0, min(1.0, float(raw or 0.10)))
+    except (TypeError, ValueError):
+        return 0.10
+
+
+def _quality_review_model(runtime: AnalysisRuntime) -> ModelConfig | None:
+    preferred_id = os.environ.get("DAILY_MACRO_QUALITY_REVIEW_MODEL")
+    if preferred_id is None:
+        preferred_id = config_value("DAILY_MACRO_QUALITY_REVIEW_MODEL")
+    preferred_id = str(preferred_id or "openai/gpt-oss-120b").strip()
+    for model in runtime.model_chain:
+        if model.provider == DEFAULT_PROVIDER and model.model_id == preferred_id:
+            return replace(model, max_completion_tokens=min(model.max_completion_tokens, 1024))
+    return None
+
+
+def _stable_sample_fraction(article: dict[str, Any]) -> float:
+    key = _article_key(article.get("source_article_id"), article.get("canonical_url"))
+    digest = hashlib.sha256("|".join(str(value or "") for value in key).encode("utf-8")).digest()
+    return int.from_bytes(digest[:8], "big") / float(1 << 64)
+
+
+def _select_quality_review_articles(
+    prepared_articles: list[dict[str, Any]],
+    article_results: list[dict[str, Any]],
+) -> list[tuple[dict[str, Any], dict[str, Any]]]:
+    result_by_key = _article_result_by_key(article_results)
+    priority: list[tuple[dict[str, Any], dict[str, Any]]] = []
+    sample: list[tuple[dict[str, Any], dict[str, Any]]] = []
+    sample_rate = _quality_review_sample_rate()
+    for article in prepared_articles:
+        key = _article_key(article.get("source_article_id"), article.get("canonical_url"))
+        result = result_by_key.get(key)
+        if not result or result.get("error") or str(result.get("attention_tier") or "medium") == "light":
+            continue
+        if bool(article.get("must_keep")) or str(article.get("attention_tier") or "medium") == "high":
+            priority.append((article, result))
+        elif _stable_sample_fraction(article) < sample_rate:
+            sample.append((article, result))
+    return (priority + sample)[: _quality_review_max_articles()]
+
+
+def _normalize_quality_review(payload: dict[str, Any]) -> dict[str, Any]:
+    verdict = str(payload.get("verdict") or "needs_review").strip().lower()
+    if verdict not in {"pass", "needs_correction", "needs_review"}:
+        verdict = "needs_review"
+
+    def score(name: str) -> int:
+        try:
+            return max(1, min(5, int(payload.get(name) or 3)))
+        except (TypeError, ValueError):
+            return 3
+
+    try:
+        confidence = max(0.0, min(1.0, float(payload.get("confidence") or 0.0)))
+    except (TypeError, ValueError):
+        confidence = 0.0
+
+    def text_list(name: str) -> list[str]:
+        values = payload.get(name)
+        if not isinstance(values, list):
+            return []
+        return [str(value).strip() for value in values if str(value).strip()][:5]
+
+    return {
+        "verdict": verdict,
+        "factuality_score": score("factuality_score"),
+        "completeness_score": score("completeness_score"),
+        "financial_usefulness_score": score("financial_usefulness_score"),
+        "language_fit_score": score("language_fit_score"),
+        "issues": text_list("issues"),
+        "corrections": text_list("corrections"),
+        "confidence": round(confidence, 3),
+    }
+
+
+def _run_quality_reviews(
+    runtime: AnalysisRuntime,
+    category_name: str,
+    prepared_articles: list[dict[str, Any]],
+    article_results: list[dict[str, Any]],
+    *,
+    report_date: str | None,
+) -> list[dict[str, Any]]:
+    if not _quality_review_enabled():
+        return article_results
+    quality_model = _quality_review_model(runtime)
+    if quality_model is None:
+        LOGGER.info("Skipping LLM quality review for %s: Groq GPT-OSS 120B is unavailable.", category_name)
+        return article_results
+
+    result_by_key = _article_result_by_key(article_results)
+    selected = _select_quality_review_articles(prepared_articles, article_results)
+    for index, (article, first_pass) in enumerate(selected, start=1):
+        completed_reviews = (
+            runtime.diagnostics.quality_review_count
+            + runtime.diagnostics.quality_review_failed_count
+            + runtime.diagnostics.quality_review_skipped_count
+        )
+        if completed_reviews >= _quality_review_max_articles():
+            break
+        messages = _build_article_quality_review_messages(
+            category_name,
+            article,
+            first_pass,
+            report_date=report_date,
+        )
+        estimated_input_tokens = _estimate_messages_tokens(messages)
+        context = BatchContext(
+            category_name=category_name,
+            batch_kind="quality_review",
+            batch_label=f"quality-{index}",
+            article_count=1,
+            estimated_input_tokens=estimated_input_tokens,
+            serialized_request_bytes=_estimate_request_payload_bytes(
+                quality_model.model_id,
+                messages,
+                quality_model.max_completion_tokens,
+            ),
+            content_shrunk=bool(article.get("content_truncated")),
+            llm_task=LLMTask.CRITIC.value,
+        )
+        _, expected_wait = runtime.governor.peek_key(
+            quality_model.model_id,
+            runtime.key_index_for_model(quality_model),
+            runtime.key_count_for_model(quality_model),
+            estimated_input_tokens,
+            quota_scope=quality_model.quota_scope,
+        )
+        critic_wait_budget = runtime.resolver.wait_budget_seconds(LLMTask.CRITIC.value) if runtime.resolver else 90.0
+        if expected_wait > critic_wait_budget:
+            first_pass["quality_review"] = {
+                "verdict": "needs_review",
+                "status": "skipped",
+                "reason": "rate_limit_wait",
+            }
+            first_pass["quality_review_model"] = quality_model.model_id
+            runtime.diagnostics.quality_review_skipped_count += 1
+            LOGGER.info(
+                "Skipping quality review for %s article %s: expected Groq wait %.1fs exceeds %.1fs budget.",
+                category_name,
+                article.get("source_article_id") or article.get("canonical_url"),
+                expected_wait,
+                critic_wait_budget,
+            )
+            # All Groq credentials share the same organization quota; later
+            # candidates would see the same wait, so stop this category's lane.
+            break
+        try:
+            payload, model_used = _invoke_json_with_retry(
+                runtime,
+                messages,
+                estimated_input_tokens,
+                context,
+                model_override=quality_model,
+            )
+            first_pass["quality_review"] = _normalize_quality_review(payload)
+            first_pass["quality_review_model"] = model_used
+            runtime.diagnostics.quality_review_count += 1
+        except Exception as exc:  # noqa: BLE001 - review must not fail the report
+            first_pass["quality_review"] = {
+                "verdict": "needs_review",
+                "status": "failed",
+                "error": _classify_exception(exc),
+            }
+            first_pass["quality_review_model"] = quality_model.model_id
+            runtime.diagnostics.quality_review_failed_count += 1
+            LOGGER.warning(
+                "Quality review failed for %s article %s: %s",
+                category_name,
+                article.get("source_article_id") or article.get("canonical_url"),
+                exc,
+            )
+        result_by_key[_article_key(article.get("source_article_id"), article.get("canonical_url"))] = first_pass
+    return [
+        result_by_key.get(_article_key(result.get("source_article_id"), result.get("canonical_url")), result)
+        for result in article_results
+    ]
+
+
 def _analyze_category(
     runtime: AnalysisRuntime,
     category_name: str,
     prepared_articles: list[dict[str, Any]],
+    *,
+    report_date: str | None = None,
 ) -> tuple[dict[str, Any], list[dict[str, Any]]]:
     runtime.reset_model_for_category()
     LOGGER.info("Analyzing category %s with %s article(s).", category_name, len(prepared_articles))
@@ -1834,6 +2241,11 @@ def _analyze_category(
                 "research_lane": article.get("research_lane") or "low_relevance",
                 "attention_reason": article.get("attention_reason"),
                 "must_keep": article.get("must_keep"),
+                "market_channel": article.get("market_channel"),
+                "routing_market_impact_score": article.get("routing_market_impact_score"),
+                "routing_urgency_score": article.get("routing_urgency_score"),
+                "routing_novelty_score": article.get("routing_novelty_score"),
+                "priority_score": article.get("priority_score"),
                 "novelty_score": 5,
                 "relevance_score": 5,
                 "urgency_score": 5,
@@ -1847,6 +2259,13 @@ def _analyze_category(
     article_results = _order_results_like_input(prepared_articles, article_results)
     article_results, delayed_retry_count = _run_delayed_retry_pass(runtime, category_name, prepared_articles, article_results)
     sub_batch_count += delayed_retry_count
+    article_results = _run_quality_reviews(
+        runtime,
+        category_name,
+        prepared_articles,
+        article_results,
+        report_date=report_date,
+    )
     article_errors = _article_errors_from_results(article_results)
     successful_articles = [article for article in article_results if not article.get("error")]
     category_errors = list(article_errors)
@@ -3019,6 +3438,8 @@ def _plan_category_batches(
 
     if current:
         planned.append(current)
+    # Keep the fallback for an all-light category for compatibility with the
+    # existing direct-analysis path and its partial-result recovery behavior.
     return planned or [prepared_articles]
 
 
@@ -3110,6 +3531,8 @@ def _article_to_synthesis_item(article: dict[str, Any]) -> dict[str, Any]:
         "published_at": article["published_at"],
         "attention_tier": article.get("attention_tier"),
         "theme": article.get("theme"),
+        "market_channel": article.get("market_channel"),
+        "priority_score": article.get("priority_score"),
         "research_lane": article.get("research_lane"),
         "must_keep": article.get("must_keep"),
         "scores": {
@@ -3131,6 +3554,8 @@ def _article_to_grouping_item(article: dict[str, Any]) -> dict[str, Any]:
         "published_at": article["published_at"],
         "attention_tier": article.get("attention_tier"),
         "theme": article.get("theme"),
+        "market_channel": article.get("market_channel"),
+        "priority_score": article.get("priority_score"),
         "research_lane": article.get("research_lane"),
         "must_keep": article.get("must_keep"),
         "attention_reason": article.get("attention_reason"),
@@ -3455,6 +3880,11 @@ def _merge_batch_article_results(
                 "research_lane": article.get("research_lane"),
                 "attention_reason": article.get("attention_reason"),
                 "must_keep": article.get("must_keep"),
+                "market_channel": article.get("market_channel"),
+                "routing_market_impact_score": article.get("routing_market_impact_score"),
+                "routing_urgency_score": article.get("routing_urgency_score"),
+                "routing_novelty_score": article.get("routing_novelty_score"),
+                "priority_score": article.get("priority_score"),
                 "model_used": model_used,
                 "delayed_retry_attempted": False,
                 "delayed_retry_model_chain": [],
@@ -3514,6 +3944,11 @@ def _build_failed_article_result(
         "research_lane": article.get("research_lane"),
         "attention_reason": article.get("attention_reason"),
         "must_keep": article.get("must_keep"),
+        "market_channel": article.get("market_channel"),
+        "routing_market_impact_score": article.get("routing_market_impact_score"),
+        "routing_urgency_score": article.get("routing_urgency_score"),
+        "routing_novelty_score": article.get("routing_novelty_score"),
+        "priority_score": article.get("priority_score"),
         "model_used": model_used,
         "delayed_retry_attempted": False,
         "delayed_retry_model_chain": [],
@@ -3698,6 +4133,11 @@ def _clone_prepared_article(article: dict[str, Any]) -> dict[str, Any]:
         "research_lane": article.get("research_lane"),
         "attention_reason": article.get("attention_reason"),
         "must_keep": article.get("must_keep"),
+        "market_channel": article.get("market_channel"),
+        "routing_market_impact_score": article.get("routing_market_impact_score"),
+        "routing_urgency_score": article.get("routing_urgency_score"),
+        "routing_novelty_score": article.get("routing_novelty_score"),
+        "priority_score": article.get("priority_score"),
     }
 
 
@@ -3869,6 +4309,14 @@ def _coerce_score(value: Any) -> int:
     return max(1, min(10, numeric))
 
 
+def _coerce_bounded_score(value: Any, lower: int, upper: int, default: int) -> int:
+    try:
+        numeric = int(value)
+    except (TypeError, ValueError):
+        numeric = default
+    return max(lower, min(upper, numeric))
+
+
 def _write_report(report_path: Path, payload: dict[str, Any]) -> None:
     report_path.parent.mkdir(parents=True, exist_ok=True)
     report_path.write_text(json.dumps(payload, ensure_ascii=False, indent=2), encoding="utf-8")
@@ -3893,12 +4341,21 @@ def _article_group_key(article: dict[str, Any]) -> str:
 
 def _infer_research_lane(article: dict[str, Any]) -> str:
     theme = str(article.get("theme") or "").lower()
+    market_channel = str(article.get("market_channel") or "").lower()
     tier = str(article.get("attention_tier") or "").lower()
     section = str(article.get("article_section") or article.get("section") or "")
     title = str(article.get("title") or "").lower()
     haystack = f"{theme} {section} {title}"
     if tier == "light":
         return "low_relevance"
+    if market_channel in {"rates", "fx", "macro"}:
+        return "macro_policy"
+    if market_channel == "commodity":
+        return "commodities"
+    if market_channel == "geopolitics":
+        return "geopolitical_risk"
+    if market_channel in {"equity", "property"}:
+        return "hk_china_equity"
     if theme == "geopolitics":
         return "geopolitical_risk"
     if theme == "macro":

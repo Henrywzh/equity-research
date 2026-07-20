@@ -1,6 +1,97 @@
 {
   "_comment": "Curated model overrides for daily-macro selection. Keys may be provider:model_id for provider-specific capabilities. task_scores are quality priors per task (0-1). limits seed the quota governor; live response headers refine them. Editing this file is a config change - no code edit required.",
   "models": {
+    "zai:glm-4.7-flash": {
+      "provider": "zai",
+      "model_id": "glm-4.7-flash",
+      "lifecycle": "production",
+      "kind": "chat",
+      "context_window": 200000,
+      "max_output_tokens": 128000,
+      "supports_json": true,
+      "max_completion_tokens": 2048,
+      "task_scores": {
+        "routing": 0.86,
+        "article_analysis": 0.88,
+        "category_synthesis": 0.93,
+        "top_alerts": 0.92,
+        "json_repair": 0.86,
+        "critic": 0.92
+      },
+      "limits": { "rpm": 5 }
+    },
+    "cloudflare:@cf/zai-org/glm-4.7-flash": {
+      "provider": "cloudflare",
+      "model_id": "@cf/zai-org/glm-4.7-flash",
+      "lifecycle": "production",
+      "kind": "chat",
+      "context_window": 131072,
+      "max_output_tokens": 8192,
+      "supports_json": true,
+      "max_completion_tokens": 2048,
+      "task_scores": {
+        "routing": 0.94,
+        "article_analysis": 0.93,
+        "category_synthesis": 0.84,
+        "top_alerts": 0.82,
+        "json_repair": 0.92,
+        "critic": 0.82
+      },
+      "limits": {
+        "rpm": 300,
+        "daily_neurons": 10000,
+        "input_neurons_per_million": 5500,
+        "output_neurons_per_million": 36400
+      }
+    },
+    "cloudflare:@cf/qwen/qwen3-30b-a3b-fp8": {
+      "provider": "cloudflare",
+      "model_id": "@cf/qwen/qwen3-30b-a3b-fp8",
+      "lifecycle": "production",
+      "kind": "chat",
+      "context_window": 32768,
+      "max_output_tokens": 8192,
+      "supports_json": true,
+      "max_completion_tokens": 1536,
+      "task_scores": {
+        "routing": 0.86,
+        "article_analysis": 0.82,
+        "category_synthesis": 0.78,
+        "top_alerts": 0.74,
+        "json_repair": 0.86,
+        "critic": 0.76
+      },
+      "limits": {
+        "rpm": 300,
+        "daily_neurons": 10000,
+        "input_neurons_per_million": 4625,
+        "output_neurons_per_million": 30475
+      }
+    },
+    "cloudflare:@cf/google/gemma-4-26b-a4b-it": {
+      "provider": "cloudflare",
+      "model_id": "@cf/google/gemma-4-26b-a4b-it",
+      "lifecycle": "production",
+      "kind": "chat",
+      "context_window": 256000,
+      "max_output_tokens": 8192,
+      "supports_json": true,
+      "max_completion_tokens": 2048,
+      "task_scores": {
+        "routing": 0.90,
+        "article_analysis": 0.94,
+        "category_synthesis": 0.97,
+        "top_alerts": 0.96,
+        "json_repair": 0.92,
+        "critic": 0.95
+      },
+      "limits": {
+        "rpm": 300,
+        "daily_neurons": 10000,
+        "input_neurons_per_million": 9091,
+        "output_neurons_per_million": 27273
+      }
+    },
     "cerebras:gpt-oss-120b": {
       "provider": "cerebras",
       "lifecycle": "production",

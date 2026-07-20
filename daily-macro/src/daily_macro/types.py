@@ -33,6 +33,10 @@ OPENAI_CHAT_COMPLETIONS_URL = "https://api.openai.com/v1/chat/completions"
 CEREBRAS_CHAT_COMPLETIONS_URL = "https://api.cerebras.ai/v1/chat/completions"
 OPENROUTER_CHAT_COMPLETIONS_URL = "https://openrouter.ai/api/v1/chat/completions"
 GOOGLE_AI_STUDIO_CHAT_COMPLETIONS_URL = "https://generativelanguage.googleapis.com/v1beta/openai/chat/completions"
+ZAI_CHAT_COMPLETIONS_URL = "https://api.z.ai/api/paas/v4/chat/completions"
+CLOUDFLARE_CHAT_COMPLETIONS_URL_TEMPLATE = (
+    "https://api.cloudflare.com/client/v4/accounts/{account_id}/ai/v1/chat/completions"
+)
 DEFAULT_PROVIDER = "groq"
 # Groq's default quality lane starts with Qwen 3.6, with GPT OSS 120B and 20B
 # as immediate fallbacks. Qwen is preview and is guarded by the resolver's
@@ -66,6 +70,7 @@ DEFAULT_OUTPUT_TOKENS = 1200
 DEFAULT_INPUT_BUDGET_TOKENS = 4500
 DEFAULT_SYNTHESIS_INPUT_BUDGET_TOKENS = 2400
 DEFAULT_PROMPT_OVERHEAD_TOKENS = 900
+MEDIUM_ANALYSIS_MAX_CONTENT_TOKENS = 1600
 SHORT_ARTICLE_FULL_TEXT_THRESHOLD = 1500
 RATE_LIMIT_REQUEST_FLOOR = 0
 RATE_LIMIT_TOKEN_FLOOR = 800
@@ -113,6 +118,17 @@ LIGHT_ANALYSIS_SECTIONS = {"時事脈搏", "地產新聞"}
 
 ATTENTION_TIERS = ("high", "medium", "light")
 ATTENTION_TIER_RANK = {"high": 0, "medium": 1, "light": 2}
+MARKET_CHANNELS = {
+    "equity",
+    "macro",
+    "rates",
+    "fx",
+    "commodity",
+    "geopolitics",
+    "property",
+    "none",
+    "multi",
+}
 
 ROUTER_LLM_MIN_ARTICLES = 1
 
@@ -323,6 +339,7 @@ class RuntimeDiagnostics:
     model_decommissioned_count: int = 0
     daily_budget_skip_count: int = 0
     daily_budget_tokens_used: int = 0
+    cloudflare_neurons_used: int = 0
     llm_request_count: int = 0
     input_tokens_used: int = 0
     output_tokens_used: int = 0
@@ -331,6 +348,9 @@ class RuntimeDiagnostics:
     avoided_rate_limit_wait_seconds_total: float = 0.0
     degraded_mode_count: int = 0
     critic_checked_alert_count: int = 0
+    quality_review_count: int = 0
+    quality_review_failed_count: int = 0
+    quality_review_skipped_count: int = 0
     resolver_rejections: list[dict[str, Any]] = field(default_factory=list)
     model_task_counts: dict[str, dict[str, int]] = field(default_factory=dict)
     endpoint_task_counts: dict[str, dict[str, int]] = field(default_factory=dict)
@@ -379,6 +399,7 @@ class RuntimeDiagnostics:
             "model_decommissioned_count": self.model_decommissioned_count,
             "daily_budget_skip_count": self.daily_budget_skip_count,
             "daily_budget_tokens_used": self.daily_budget_tokens_used,
+            "cloudflare_neurons_used": self.cloudflare_neurons_used,
             "llm_request_count": self.llm_request_count,
             "input_tokens_used": self.input_tokens_used,
             "output_tokens_used": self.output_tokens_used,
@@ -387,6 +408,9 @@ class RuntimeDiagnostics:
             "avoided_rate_limit_wait_seconds_total": round(self.avoided_rate_limit_wait_seconds_total, 3),
             "degraded_mode_count": self.degraded_mode_count,
             "critic_checked_alert_count": self.critic_checked_alert_count,
+            "quality_review_count": self.quality_review_count,
+            "quality_review_failed_count": self.quality_review_failed_count,
+            "quality_review_skipped_count": self.quality_review_skipped_count,
             "resolver_rejections": list(self.resolver_rejections),
             "model_task_counts": {task: dict(counts) for task, counts in self.model_task_counts.items()},
             "endpoint_task_counts": {task: dict(counts) for task, counts in self.endpoint_task_counts.items()},

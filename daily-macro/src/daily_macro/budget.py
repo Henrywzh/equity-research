@@ -136,6 +136,45 @@ class DailyBudgetLedger:
         with self._lock:
             return max(0, int(declared_rpd) - self._bucket(model_id, key_index, quota_scope)["requests"])
 
+    @staticmethod
+    def _compute_bucket_name(quota_scope: str) -> str:
+        return f"{quota_scope}:__shared_compute__"
+
+    def _compute_bucket(self, quota_scope: str) -> dict[str, int]:
+        return self.usage.setdefault(self._compute_bucket_name(quota_scope), {}).setdefault(
+            "shared", {"tokens": 0, "requests": 0, "compute_units": 0}
+        )
+
+    def used_compute_units(self, quota_scope: str) -> int:
+        """Return account-wide metered compute consumed or reserved today."""
+        with self._lock:
+            return int(self._compute_bucket(quota_scope).get("compute_units", 0))
+
+    def remaining_compute_units(self, quota_scope: str, declared_limit: int | None) -> float:
+        if not declared_limit:
+            return UNLIMITED
+        with self._lock:
+            used = int(self._compute_bucket(quota_scope).get("compute_units", 0))
+            return max(0, int(declared_limit) - used)
+
+    def try_reserve_compute_units(self, quota_scope: str, units: int, declared_limit: int) -> bool:
+        """Atomically reserve shared provider compute before a concurrent call."""
+        requested = max(0, int(units))
+        with self._lock:
+            bucket = self._compute_bucket(quota_scope)
+            used = int(bucket.get("compute_units", 0))
+            if used + requested > int(declared_limit):
+                return False
+            bucket["compute_units"] = used + requested
+            return True
+
+    def settle_compute_units(self, quota_scope: str, reserved: int, actual: int) -> None:
+        """Replace a pessimistic reservation with the provider's actual usage."""
+        with self._lock:
+            bucket = self._compute_bucket(quota_scope)
+            current = int(bucket.get("compute_units", 0))
+            bucket["compute_units"] = max(0, current - max(0, int(reserved)) + max(0, int(actual)))
+
     def flush(self) -> None:
         """Atomically persist today's usage to disk. Best-effort (never raises)."""
         if self.path is None:

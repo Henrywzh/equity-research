@@ -89,3 +89,26 @@ def test_flush_without_path_is_noop():
     # The default in-memory ledger (used in tests / legacy constructions) must
     # not raise when flushed.
     DailyBudgetLedger().flush()
+
+
+def test_shared_compute_reservation_is_atomic_across_models(tmp_data_dir):
+    ledger = DailyBudgetLedger.load(tmp_data_dir)
+    scope = "cloudflare:account-123"
+    assert ledger.try_reserve_compute_units(scope, 7000, 10000)
+    assert not ledger.try_reserve_compute_units(scope, 4000, 10000)
+    assert ledger.remaining_compute_units(scope, 10000) == 3000
+
+    # Settle the pessimistic reservation to actual usage, then another model on
+    # the same Cloudflare account can consume the released capacity.
+    ledger.settle_compute_units(scope, reserved=7000, actual=2500)
+    assert ledger.used_compute_units(scope) == 2500
+    assert ledger.try_reserve_compute_units(scope, 7000, 10000)
+
+
+def test_shared_compute_usage_persists_across_runs(tmp_data_dir):
+    scope = "cloudflare:account-123"
+    first = DailyBudgetLedger.load(tmp_data_dir)
+    assert first.try_reserve_compute_units(scope, 1234, 10000)
+    first.flush()
+    second = DailyBudgetLedger.load(tmp_data_dir)
+    assert second.used_compute_units(scope) == 1234

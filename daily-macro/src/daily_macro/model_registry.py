@@ -275,17 +275,27 @@ def build_model_pool(
         scores = capabilities.get(key, get_capability(model.model_id, model.provider)).task_scores
         return sum(scores.values()) / len(scores) if scores else 0.5
 
-    # Qwen anchors the default quality chain. Preserve the explicit provider
-    # order; average task score alone could reorder the transition lineup.
-    floors = [m for m in models if m.model_id == FLOOR_MODEL_ID and m.provider == DEFAULT_PROVIDER]
+    # When strategic providers are configured, Z.AI anchors quality-sensitive
+    # work and Cloudflare follows as the bulk lane. With Groq alone, preserve
+    # the historical Qwen floor behavior.
+    strategic_pool = any(model.provider in {"zai", "cloudflare"} for model in models)
+    floors = [] if strategic_pool else [
+        m for m in models if m.model_id == FLOOR_MODEL_ID and m.provider == DEFAULT_PROVIDER
+    ]
     groq_order = {model_id: index for index, model_id in enumerate(provider_model_ids(DEFAULT_PROVIDER))}
+    provider_order = {"zai": 0, "cloudflare": 1, DEFAULT_PROVIDER: 2}
+    per_provider_order = {
+        provider: {model_id: index for index, model_id in enumerate(provider_model_ids(provider))}
+        for provider in provider_order
+    }
     rest = sorted(
         [m for m in models if m not in floors],
         key=lambda model: (
-            0,
-            groq_order.get(model.model_id, len(groq_order)),
-        ) if model.provider == DEFAULT_PROVIDER else (
-            1,
+            provider_order.get(model.provider, 3),
+            per_provider_order.get(model.provider, {}).get(
+                model.model_id,
+                groq_order.get(model.model_id, 999),
+            ),
             -_score(model),
         ),
     )

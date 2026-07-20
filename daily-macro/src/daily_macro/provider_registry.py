@@ -8,17 +8,25 @@ data. One ``ProviderAccount`` represents one credential and one quota boundary.
 from __future__ import annotations
 
 import os
+import logging
+import re
 from dataclasses import replace
 from pathlib import Path
 
 from .config import get_project_root
 from .types import (
     CEREBRAS_CHAT_COMPLETIONS_URL,
+    CLOUDFLARE_CHAT_COMPLETIONS_URL_TEMPLATE,
     GOOGLE_AI_STUDIO_CHAT_COMPLETIONS_URL,
     GROQ_CHAT_COMPLETIONS_URL,
     OPENROUTER_CHAT_COMPLETIONS_URL,
+    ZAI_CHAT_COMPLETIONS_URL,
     ProviderAccount,
 )
+
+
+LOGGER = logging.getLogger(__name__)
+_CLOUDFLARE_ACCOUNT_ID_RE = re.compile(r"^[0-9a-fA-F]{32}$")
 
 
 def _config_paths() -> list[Path]:
@@ -73,11 +81,52 @@ def _model_override_env(provider: str) -> list[str] | None:
         "cerebras": "DAILY_MACRO_CEREBRAS_MODELS",
         "google_ai_studio": "DAILY_MACRO_GOOGLE_AI_MODELS",
         "openrouter": "DAILY_MACRO_OPENROUTER_MODELS",
+        "zai": "DAILY_MACRO_ZAI_MODELS",
+        "cloudflare": "DAILY_MACRO_CLOUDFLARE_MODELS",
     }.get(provider)
     if not env_name:
         return None
     values = _split(config_value(env_name))
     return values or None
+
+
+def _cloudflare_account_ids() -> list[str]:
+    """Return valid comma-separated Cloudflare account IDs without secrets."""
+    raw_ids = _split(config_value("CLOUDFLARE_ACCOUNT_ID"))
+    valid_ids: list[str] = []
+    invalid_count = 0
+    for account_id in raw_ids:
+        if _CLOUDFLARE_ACCOUNT_ID_RE.fullmatch(account_id):
+            valid_ids.append(account_id)
+        else:
+            invalid_count += 1
+    if invalid_count:
+        LOGGER.warning(
+            "Ignoring %d malformed Cloudflare account ID value(s); expected 32 hexadecimal characters.",
+            invalid_count,
+        )
+    return valid_ids
+
+
+def _cloudflare_key_account_pairs(keys: list[str], account_ids: list[str]) -> list[tuple[str, str]]:
+    """Pair Cloudflare tokens and account IDs, supporting singleton broadcast."""
+    if not keys or not account_ids:
+        return []
+    if len(keys) == len(account_ids):
+        return list(zip(keys, account_ids))
+    if len(account_ids) == 1:
+        return [(key, account_ids[0]) for key in keys]
+    if len(keys) == 1:
+        return [(keys[0], account_id) for account_id in account_ids]
+
+    pair_count = min(len(keys), len(account_ids))
+    LOGGER.warning(
+        "Cloudflare token/account counts differ (%d tokens, %d account IDs); using %d paired entries.",
+        len(keys),
+        len(account_ids),
+        pair_count,
+    )
+    return list(zip(keys[:pair_count], account_ids[:pair_count]))
 
 
 def load_provider_accounts() -> list[ProviderAccount]:
@@ -148,6 +197,41 @@ def load_provider_accounts() -> list[ProviderAccount]:
             )
         )
 
+    zai_keys = _keys_for("ZAI_API_KEY")
+    zai_scope = config_value("DAILY_MACRO_ZAI_QUOTA_SCOPE") or "zai:account"
+    for index, key in enumerate(zai_keys, start=1):
+        accounts.append(
+            ProviderAccount(
+                account_id=f"zai_{index}",
+                provider="zai",
+                api_key_env="ZAI_API_KEY",
+                base_url=ZAI_CHAT_COMPLETIONS_URL,
+                quota_scope=zai_scope,
+                api_key=key,
+            )
+        )
+
+    cloudflare_keys = _keys_for("CLOUDFLARE_API_TOKEN", aliases=("CLOUDFLARE_API_KEY",))
+    cloudflare_account_ids = _cloudflare_account_ids()
+    configured_cloudflare_scope = config_value("DAILY_MACRO_CLOUDFLARE_QUOTA_SCOPE")
+    for index, (key, cloudflare_account_id) in enumerate(
+        _cloudflare_key_account_pairs(cloudflare_keys, cloudflare_account_ids),
+        start=1,
+    ):
+        base_url = CLOUDFLARE_CHAT_COMPLETIONS_URL_TEMPLATE.format(account_id=cloudflare_account_id)
+        cloudflare_scope = configured_cloudflare_scope or f"cloudflare:{cloudflare_account_id}"
+        if key and cloudflare_account_id:
+            accounts.append(
+                ProviderAccount(
+                    account_id=f"cloudflare_{index}",
+                    provider="cloudflare",
+                    api_key_env="CLOUDFLARE_API_TOKEN",
+                    base_url=base_url,
+                    quota_scope=cloudflare_scope,
+                    api_key=key,
+                )
+            )
+
     return [account for account in accounts if account.enabled]
 
 
@@ -168,6 +252,11 @@ def provider_model_ids(provider: str) -> list[str]:
         "cerebras": ["gpt-oss-120b", "gemma-4-31b", "zai-glm-4.7"],
         "google_ai_studio": ["gemini-2.5-flash-lite", "gemini-2.5-flash"],
         "openrouter": ["openai/gpt-oss-20b:free", "google/gemma-4-31b-it:free"],
+        "zai": ["glm-4.7-flash"],
+        "cloudflare": [
+            "@cf/qwen/qwen3-30b-a3b-fp8",
+            "@cf/google/gemma-4-26b-a4b-it",
+        ],
     }
     return list(defaults.get(provider, []))
 

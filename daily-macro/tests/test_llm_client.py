@@ -103,6 +103,57 @@ def test_estimate_tokens_counts_cjk_per_char():
     assert llm_client._estimate_tokens(zh) > len(zh) // 4 * 2
 
 
+def test_cloudflare_neuron_estimate_uses_asymmetric_token_rates():
+    capability = llm_client.get_capability("@cf/zai-org/glm-4.7-flash", provider="cloudflare")
+    assert llm_client._compute_units_for(capability, 10_000, 1_000) == 92
+
+
+def test_zai_uses_max_tokens_request_field():
+    messages = [{"role": "user", "content": "summarise"}]
+    model = llm_client.ModelConfig("glm", provider="zai", max_completion_tokens=777)
+    body = llm_client._chat_request_body(model, messages)
+    assert body["max_tokens"] == 777
+    assert "max_completion_tokens" not in body
+
+
+def test_cloudflare_disables_thinking_for_bulk_qwen_requests():
+    model = llm_client.ModelConfig("@cf/qwen/qwen3-30b-a3b-fp8", provider="cloudflare", max_completion_tokens=777)
+    body = llm_client._chat_request_body(model, [{"role": "user", "content": "x"}])
+    assert body["chat_template_kwargs"] == {"enable_thinking": False}
+
+
+def test_cloudflare_uses_max_tokens_request_field_for_gemma_compatibility():
+    model = llm_client.ModelConfig("@cf/google/gemma-4-26b-a4b-it", provider="cloudflare", max_completion_tokens=777)
+    body = llm_client._chat_request_body(model, [{"role": "user", "content": "x"}])
+    assert body["max_tokens"] == 777
+    assert "max_completion_tokens" not in body
+
+
+def test_response_content_falls_back_to_cloudflare_qwen_reasoning_field():
+    assert llm_client._response_message_content({"content": None, "reasoning_content": "{\"ok\":true}"}) == (
+        '{"ok":true}'
+    )
+
+
+def test_response_content_prefers_normal_content():
+    assert llm_client._response_message_content({"content": "answer", "reasoning_content": "internal"}) == "answer"
+
+
+def test_groq_uses_max_completion_tokens_request_field():
+    provider = "groq"
+    model = llm_client.ModelConfig("model", provider=provider, max_completion_tokens=888)
+    body = llm_client._chat_request_body(model, [{"role": "user", "content": "x"}])
+    assert body["max_completion_tokens"] == 888
+    assert "max_tokens" not in body
+
+
+def test_groq_gpt_oss_bounds_and_hides_reasoning():
+    model = llm_client.ModelConfig("openai/gpt-oss-120b", provider="groq", max_completion_tokens=888)
+    body = llm_client._chat_request_body(model, [{"role": "user", "content": "x"}])
+    assert body["reasoning_effort"] == "low"
+    assert body["reasoning_format"] == "hidden"
+
+
 def test_request_timeouts_floor_deadline_to_connect_plus_read(monkeypatch):
     monkeypatch.setenv("DAILY_MACRO_LLM_CONNECT_TIMEOUT_SECONDS", "10")
     monkeypatch.setenv("DAILY_MACRO_LLM_READ_TIMEOUT_SECONDS", "60")

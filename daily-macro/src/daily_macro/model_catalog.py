@@ -163,7 +163,9 @@ def _builtin_catalog() -> dict[str, ModelCapability]:
 def _capability_from_spec(model_id: str, spec: dict) -> ModelCapability:
     provider = str(spec.get("provider", "groq"))
     actual_model_id = str(spec.get("model_id") or model_id)
-    if ":" in model_id and model_id.startswith(("cerebras:", "google_ai_studio:", "openrouter:")):
+    if ":" in model_id and model_id.startswith(
+        ("cerebras:", "google_ai_studio:", "openrouter:", "zai:", "cloudflare:")
+    ):
         actual_model_id = model_id.split(":", 1)[1]
     return ModelCapability(
         model_id=actual_model_id,
