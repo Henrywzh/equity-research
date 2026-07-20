@@ -2,8 +2,7 @@ name: Daily Market Fetch
 
 on:
   schedule:
-    - cron: "59 22 * * *"   # 06:59 HKT — morning brief (recaps US/EU close + Asia overnight)
-    - cron: "0 10 * * *"    # 18:00 HKT — evening brief (recaps Asia close + early EU)
+    - cron: "0 16 * * *"    # 00:00 HKT — daily brief
   workflow_dispatch:
     inputs:
       session:

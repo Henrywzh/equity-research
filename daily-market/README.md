@@ -3,7 +3,7 @@
 Daily macro market price snapshot collection via Yahoo Finance and Polymarket.
 
 Fetches prices for a configurable watchlist (indices, commodities, FX, crypto) via yfinance,
-stores snapshots in SQLite, and emails a bilingual (EN/ZH) formatted summary twice daily.
+stores snapshots in SQLite, and emails a bilingual (EN/ZH) formatted summary once daily.
 It also stores a curated hourly Polymarket watchlist for macro and asset prediction markets.
 
 ## Default watchlist
@@ -19,8 +19,7 @@ It also stores a curated hourly Polymarket watchlist for macro and asset predict
 
 | Session | Cron (UTC) | HKT | Purpose |
 |---------|-----------|-----|---------|
-| Morning | `59 22 * * *` | 06:59 | Recaps US/EU close + Asia overnight |
-| Evening | `0 10 * * *`  | 18:00 | Recaps Asia close + early EU |
+| Evening | `0 16 * * *` | 00:00 | Daily market brief |
 
 ## Commands
 
