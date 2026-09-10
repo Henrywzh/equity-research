@@ -251,7 +251,7 @@
   "polymarket": {
     "status": "partial",
     "updated": "2026-09-10T14:21:44.962009+00:00",
-    "freshness_minutes": 3,
+    "freshness_minutes": 99,
     "error_count": 9,
     "errors": [
       "qqq_up_down_daily: no active market matched configured slug(s)",
@@ -11111,17 +11111,6 @@
   "fred": {
     "items": [
       {
-        "release_id": 10,
-        "release_key": "fred_10_2026-09-11",
-        "name": "Consumer Price Index",
-        "date": "2026-09-11",
-        "impact": "high",
-        "series_id": "CPIAUCSL",
-        "display_unit": "%",
-        "prior_value": null,
-        "source": "FRED"
-      },
-      {
         "release_id": "fomc_2026-09-15_day1",
         "release_key": "fomc_2026-09-15_day1",
         "name": "FOMC Meeting (Day 1) (SEP)",
@@ -11146,54 +11135,13 @@
         "source": "Federal Reserve",
         "event_type": "statement_day",
         "is_sep_meeting": true
-      },
-      {
-        "release_id": 9,
-        "release_key": "fred_9_2026-09-16",
-        "name": "Retail Sales Advance",
-        "date": "2026-09-16",
-        "impact": "medium",
-        "series_id": "RSXFS",
-        "display_unit": "%",
-        "prior_value": null,
-        "source": "FRED"
-      },
-      {
-        "release_id": 53,
-        "release_key": "fred_53_2026-09-30",
-        "name": "GDP Advance Estimate",
-        "date": "2026-09-30",
-        "impact": "high",
-        "series_id": "GDP",
-        "display_unit": "%",
-        "prior_value": null,
-        "source": "FRED"
-      },
-      {
-        "release_id": 54,
-        "release_key": "fred_54_2026-09-30",
-        "name": "Personal Income and Outlays (PCE)",
-        "date": "2026-09-30",
-        "impact": "high",
-        "series_id": "PCEPI",
-        "display_unit": "%",
-        "prior_value": null,
-        "source": "FRED"
-      },
-      {
-        "release_id": 50,
-        "release_key": "fred_50_2026-10-02",
-        "name": "Employment Situation",
-        "date": "2026-10-02",
-        "impact": "high",
-        "series_id": "PAYEMS",
-        "display_unit": "k",
-        "prior_value": null,
-        "source": "FRED"
       }
     ],
-    "updated": "2026-09-10T14:24:30.415878+00:00",
-    "status": "success"
+    "updated": "2026-09-10T16:00:28.163760+00:00",
+    "status": "partial",
+    "error_messages": [
+      "fred:502 Server Error: Bad Gateway for url: https://api.stlouisfed.org/fred/releases/dates?api_key=fff6dc02f5a8b6dcbd78574394e0cb6f&file_type=json&realtime_start=2026-09-10&realtime_end=2026-10-10&order_by=release_date&sort_order=asc&include_release_dates_with_no_data=true"
+    ]
   },
   "youtube": {
     "signals": [
@@ -11207,5 +11155,5 @@
     "total_analyzed": 0,
     "updated": "2026-06-20T13-25-51.935193plus00-00"
   },
-  "last_baked": "2026-09-10T14:24:30.419471+00:00"
+  "last_baked": "2026-09-10T16:00:28.167716+00:00"
 }
